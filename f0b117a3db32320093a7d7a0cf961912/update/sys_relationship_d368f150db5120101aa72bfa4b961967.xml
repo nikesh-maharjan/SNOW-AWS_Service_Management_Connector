@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_relationship">
+    <sys_relationship action="INSERT_OR_UPDATE">
+        <advanced>false</advanced>
+        <apply_to/>
+        <basic_apply_to>incident</basic_apply_to>
+        <basic_query_from>x_126749_aws_sc_opsitem_resource</basic_query_from>
+        <insert_callback/>
+        <name>AWS Related Resources</name>
+        <query_from/>
+        <query_with><![CDATA[/*
+@Deployable({
+    table: 'sys_relationship',
+    column: 'query_with',
+    sysId: 'd368f150db5120101aa72bfa4b961967',
+    metadata: {
+        name: 'AWS Related Resources',
+        basic_query_from: 'x_126749_aws_sc_opsitem_resource',
+        basic_apply_to: 'incident'
+    }
+})
+ */
+(function refineQuery(current, parent) {
+    current.addQuery('awsopsitem.incident', parent.sys_id);
+})(current, parent);
+]]></query_with>
+        <reference_field>awsopsitem</reference_field>
+        <related_list/>
+        <simple_reference>false</simple_reference>
+        <sys_class_name>sys_relationship</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-12-21 10:11:59</sys_created_on>
+        <sys_id>d368f150db5120101aa72bfa4b961967</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AWS Related Resources</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_relationship_d368f150db5120101aa72bfa4b961967</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_relationship>
+    <sys_translated_text action="delete_multiple" query="documentkey=d368f150db5120101aa72bfa4b961967"/>
+    <sys_ui_related_list_relationship_entry action="INSERT_OR_UPDATE">
+        <filter/>
+        <list_id display_value="Incident - Default view" name="incident" related_list="NULL" sys_domain="global" view="Default view">97be62a10f130000b12e6903cfe01258</list_id>
+        <order_by/>
+        <position>3</position>
+        <related_list>REL:d368f150db5120101aa72bfa4b961967</related_list>
+        <sys_class_name>sys_ui_related_list_relationship_entry</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-02-15 12:00:35</sys_created_on>
+        <sys_id>362ce2da2f92201047d8b6a62799b633</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_relationship display_value="AWS Related Resources">d368f150db5120101aa72bfa4b961967</sys_relationship>
+        <sys_ui_related_list display_value="Incident - Default view" name="incident" related_list="NULL" sys_domain="global" view="Default view">97be62a10f130000b12e6903cfe01258</sys_ui_related_list>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-02-15 12:00:35</sys_updated_on>
+    </sys_ui_related_list_relationship_entry>
+    <sys_ui_related_list_relationship_entry action="INSERT_OR_UPDATE">
+        <filter/>
+        <list_id display_value="Incident - Metrics" name="incident" related_list="NULL" sys_domain="global" view="412795810a25810200b1caed39d4d16e">4159e9520a2581020072fe88c70f0ba5</list_id>
+        <order_by/>
+        <position>3</position>
+        <related_list>REL:d368f150db5120101aa72bfa4b961967</related_list>
+        <sys_class_name>sys_ui_related_list_relationship_entry</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-02-15 12:00:35</sys_created_on>
+        <sys_id>be2c26da2f92201047d8b6a62799b614</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_relationship display_value="AWS Related Resources">d368f150db5120101aa72bfa4b961967</sys_relationship>
+        <sys_ui_related_list display_value="Incident - Metrics" name="incident" related_list="NULL" sys_domain="global" view="412795810a25810200b1caed39d4d16e">4159e9520a2581020072fe88c70f0ba5</sys_ui_related_list>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-02-15 12:00:35</sys_updated_on>
+    </sys_ui_related_list_relationship_entry>
+    <sys_ui_related_list_relationship_entry action="INSERT_OR_UPDATE">
+        <filter/>
+        <list_id display_value="Incident - Major incidents" name="incident" related_list="NULL" sys_domain="global" view="b581af400f220000b12e6903cfe01246">793767026730020045c114db37415ae4</list_id>
+        <order_by/>
+        <position>7</position>
+        <related_list>REL:d368f150db5120101aa72bfa4b961967</related_list>
+        <sys_class_name>sys_ui_related_list_relationship_entry</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-02-15 12:00:35</sys_created_on>
+        <sys_id>f22ce2da2f92201047d8b6a62799b634</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_relationship display_value="AWS Related Resources">d368f150db5120101aa72bfa4b961967</sys_relationship>
+        <sys_ui_related_list display_value="Incident - Major incidents" name="incident" related_list="NULL" sys_domain="global" view="b581af400f220000b12e6903cfe01246">793767026730020045c114db37415ae4</sys_ui_related_list>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-02-15 12:00:35</sys_updated_on>
+    </sys_ui_related_list_relationship_entry>
+</record_update>

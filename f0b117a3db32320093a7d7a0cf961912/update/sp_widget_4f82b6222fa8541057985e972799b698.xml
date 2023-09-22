@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>custom</category>
+        <client_script><![CDATA[function automationExecutionsClient(spUtil, $scope) {
+    var c = this;
+
+    c.collapsible = {
+        automationExecutions: true
+    };
+
+    spUtil.recordWatch($scope, "x_126749_aws_sc_cmdb_ci_ae",
+        "owned_by.sys_id=" + c.data.sys_id,
+        function(name, data) {
+        spUtil.update($scope);
+    });
+}
+]]></client_script>
+        <controller_as>c</controller_as>
+        <css>.result-container {
+    margin-top: 10px;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.floatright {
+    float: right;
+}
+
+.panel-heading .panel-title {
+    display: inline;
+}
+
+.invisible {
+    display: none;
+}
+
+.item-title {
+    margin-top: 10px;
+}
+
+.item-details {
+    margin-top: 10px;
+}
+
+.item-update {
+    border-left: 1px solid #ccc;
+    margin-left: 5px;
+    padding-left: 8px;
+}
+</css>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>true</has_preview>
+        <id>aws_automation_executions</id>
+        <internal>false</internal>
+        <link><![CDATA[function link(scope, element, attrs, controller) {  }]]></link>
+        <name>AWS Automation Executions</name>
+        <option_schema/>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[(function() {
+    function parseGlideDateTime(date) {
+        var glideDateTime = date && !date.nil() ? new GlideDateTime(date) : null;
+        if (glideDateTime) {
+            return {
+                value: glideDateTime.getValue(),
+                displayValue: glideDateTime.getDisplayValue(),
+                numericValue: glideDateTime.getNumericValue(),
+                tzOffset:  glideDateTime.getTZOffset()
+            };
+        }
+        return null;
+    }
+
+    data.executions = [];
+
+    var userID = gs.getUserID();
+    data.userID = userID;
+
+    var grExecution = new GlideRecordSecure('x_126749_aws_sc_cmdb_ci_ae');
+    grExecution.addQuery('owned_by', userID);
+    grExecution.orderBy('awsdocumentname');
+    grExecution.query();
+
+    while (grExecution.next()) {
+        var execution = {
+            sys_id: grExecution.sys_id.toString(),
+            automationExecutiond: grExecution.awsautomationexecutionid.toString(),
+            automationExecutionStatus: grExecution.awsautomationexecutionstatus.toString(),
+            currentAction: grExecution.awscurrentaction.toString(),
+            currentStepName: grExecution.awscurrentstepname.toString(),
+            documentName: grExecution.awsdocumentname.toString(),
+            executedBy: grExecution.awsexecutedby.toString(),
+            executionEndTime: parseGlideDateTime(grExecution.awsexecutionendtime),
+            executionStartTime: parseGlideDateTime(grExecution.awsexecutionstarttime),
+            failureMessage: grExecution.awsfailuremessage.toString(),
+            lastSyncTime: parseGlideDateTime(grExecution.awslastsynctime),
+            logFile: grExecution.awslogfile.toString(),
+            mode: grExecution.awsmode.toString(),
+            parentAutomationExecutionId: grExecution.awsparentautomationexecutionid.toString()
+        };
+        data.executions.push(execution);
+    }
+})();
+]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-05-06 11:05:53</sys_created_on>
+        <sys_id>4f82b6222fa8541057985e972799b698</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AWS Automation Executions</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sp_widget_4f82b6222fa8541057985e972799b698</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <template><![CDATA[<!--
+    Automation Executions
+-->
+<div class="panel panel-{{::c.options.color}} b">
+
+    <div class="panel-heading">
+        <h4 class="panel-title">Automation Executions</h4>
+        <span class="clickable floatright glyphicon glyphicon-resize-full"
+              ng-class="{'invisible': c.collapsible.automationExecutions}"
+              ng-click="c.collapsible.automationExecutions = !c.collapsible.automationExecutions"
+              data-toggle="collapse" data-target="#automationExecutions"></span>
+        <span class="clickable floatright glyphicon glyphicon-resize-small"
+              ng-class="{'invisible': !c.collapsible.automationExecutions}"
+              ng-click="c.collapsible.automationExecutions = !c.collapsible.automationExecutions"
+              data-toggle="collapse" data-target="#automationExecutions"></span>
+    </div>
+
+    <div id="automationExecutions" class="collapse in list-group result-container hide-x-overflow" style="overflow-y: auto;">
+        <a ng-if="c.data.executions.length > 0"
+           ng-repeat="item in c.data.executions as automationExecutions track by item.sys_id"
+           ng-href="/sp?id=aws_ssm_ae_details&sys_id={{ item.sys_id }}" ng-click="c.select(item.sys_id)"
+           href="javascript:void(0)" class="list-group-item">
+            <h2 class="text-primary item-title">{{ item.documentName }}</h2>
+            <p class="text-muted item-details">
+                <i class="glyphicon glyphicon-flag"></i>
+                <span>{{ ::item.automationExecutionStatus }}</span>
+                <em class="item-update" ng-if="item.executionStartTime" uib-tooltip="{{ item.executionStartTime.displayValue }}" tooltip-placement="top">
+                    <i class="glyphicon glyphicon-calendar"></i>Execution start
+                    <sn-time-ago timestamp="item.executionStartTime.value"></sn-time-ago>
+                </em>
+                <em class="item-update" ng-if="item.executionEndTime" uib-tooltip="{{ item.executionEndTime.displayValue }}" tooltip-placement="top">
+                    <i class="glyphicon glyphicon-calendar"></i>Execution end
+                    <sn-time-ago timestamp="item.executionEndTime.value"></sn-time-ago>
+                </em>
+                <em class="item-update" ng-if="item.executedBy" uib-tooltip="{{ item.executedBy.displayValue }}" tooltip-placement="top">
+                    <i class="glyphicon glyphicon-user"></i>Executed by
+                    {{ item.executedBy }}
+                </em>
+            </p>
+        </a>
+
+        <div ng-if="automationExecutions.length === 0" class="list-group-item">
+            ${No records found}
+        </div>
+    </div>
+
+</div>
+]]></template>
+    </sp_widget>
+</record_update>

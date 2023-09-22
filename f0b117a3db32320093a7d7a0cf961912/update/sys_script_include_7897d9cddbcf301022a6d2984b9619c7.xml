@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.ChangeTemplateRepo</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>ChangeTemplateRepo</name>
+        <script><![CDATA[var ChangeTemplateRepo = /** @class */ (function () {
+    function ChangeTemplateRepo() {
+        // This is to include a 3rd party library, in this case marked to convert markdown to HTML.
+        gs.include('Marked');
+        this.catalogSysId = this.getCatalogSysId();
+        this.categorySysId = this.getCategorySysId();
+    }
+    ChangeTemplateRepo.prototype.get = function (name, version, accountGr, region) {
+        var changeTemplateGr = new sn_sc.CatalogSearch().search('', '', '', false, true);
+        if (changeTemplateGr) {
+            changeTemplateGr.addQuery('name', name);
+            changeTemplateGr.addQuery('meta', 'CONTAINS', version);
+            changeTemplateGr.addQuery('meta', 'CONTAINS', accountGr.sys_id.toString());
+            changeTemplateGr.addQuery('meta', 'CONTAINS', region);
+            changeTemplateGr.query();
+            if (changeTemplateGr.next() && changeTemplateGr.getValue('sys_class_name') === 'sc_cat_item_producer') {
+                return new sn_sc.CatItem(changeTemplateGr.sys_id.toString());
+            }
+        }
+        return null;
+    };
+    ChangeTemplateRepo.prototype.insertOrUpdate = function (awsSystemsManager, document, accountGr, region) {
+        var changeTemplateCatItem = this.get(document.Name, document.DocumentVersion, accountGr, region);
+        gs.debug((changeTemplateCatItem !== null ? 'Updating' : 'Inserting') + " change template \"" + document.Name + "\" for account \"" + accountGr.awsname + "\" (" + accountGr.awsaccountnumber + ") in region \"" + region + "\"");
+        if (changeTemplateCatItem !== null) {
+            this.update(awsSystemsManager, changeTemplateCatItem, document, accountGr, region);
+        }
+        else {
+            changeTemplateCatItem = this.insert(awsSystemsManager, document, accountGr, region);
+        }
+        return changeTemplateCatItem;
+    };
+    ChangeTemplateRepo.prototype.deleteExpired = function (startTime) {
+        var changeTemplateGr = new sn_sc.CatalogSearch().search('', '', '', false, true);
+        changeTemplateGr.addQuery('sys_class_name', 'sc_cat_item_producer');
+        // Delete only Change Template Record Producer
+        changeTemplateGr.addQuery('meta', 'CONTAINS', 'version');
+        changeTemplateGr.addQuery('meta', 'CONTAINS', 'account');
+        changeTemplateGr.addQuery('meta', 'CONTAINS', 'region');
+        changeTemplateGr.addQuery('sys_updated_on', '<', startTime);
+        changeTemplateGr.query();
+        while (changeTemplateGr.next()) {
+            var catItem = new sn_sc.CatItem(changeTemplateGr.sys_id.toString());
+            catItem.deleteRecord(true);
+        }
+    };
+    ChangeTemplateRepo.prototype.initChangeRequest = function (producer, current) {
+        //The field `Model` (chg_model) has been added starting from Quebec.
+        switch (Util.instanceVersion()) {
+            case "paris" /* PARIS */:
+            case "orlando" /* ORLANDO */:
+                break;
+            default:
+                var changeModel = new GlideRecord('chg_model');
+                changeModel.addQuery('name', "AWS Change Request");
+                changeModel.query();
+                if (changeModel.next()) {
+                    Util.setValue(current, 'chg_model', changeModel.sys_id);
+                }
+                else {
+                    Util.setValue(current, 'chg_model', null);
+                }
+                break;
+        }
+        Util.setValue(current, 'type', 'AWSChangeRequest');
+        Util.setValue(current, 'x_126749_aws_sc_awsaccount', producer.AwsAccount);
+        Util.setValue(current, 'x_126749_aws_sc_awsregion', producer.AwsRegion);
+        Util.setValue(current, 'x_126749_aws_sc_awsstatus', 'Pending');
+        Util.setValue(current, 'short_description', "Request execution of Change Template \"" + producer.DocumentName + "\" (" + producer.DocumentVersion + ")");
+    };
+    ChangeTemplateRepo.prototype.insert = function (awsSystemsManager, document, accountGr, region) {
+        var catItem = new sn_sc.CatItem();
+        catItem.setTableName('sc_cat_item_producer');
+        catItem.setAttributes(this.createCommonAttributes(awsSystemsManager, document, accountGr, region));
+        var sysId = catItem.create(true);
+        if (sysId === null) {
+            throw new Error("Failed to insert change template \"" + document.Name + "\"");
+        }
+        var variableSetGr = Util.getRecord('item_option_new_set', 'title', 'AWS Systems Manager Change Manager Variables');
+        if (variableSetGr.isValid() && variableSetGr.isValidRecord()) {
+            this.attachVariableSet(sysId, variableSetGr.sys_id.toString());
+        }
+        return catItem;
+    };
+    ChangeTemplateRepo.prototype.update = function (awsSystemsManager, changeTemplateCatItem, document, accountGr, region) {
+        var attributes = this.createCommonAttributes(awsSystemsManager, document, accountGr, region);
+        changeTemplateCatItem.update(attributes, true);
+        return changeTemplateCatItem;
+    };
+    ChangeTemplateRepo.prototype.createCommonAttributes = function (awsSystemsManager, document, accountGr, region) {
+        var attributes = {
+            'name': document.Name,
+            'sc_catalogs': this.catalogSysId,
+            'category': this.categorySysId,
+            'table_name': 'change_request',
+            'script': 'new x_126749_aws_sc.ChangeTemplateRepo().initChangeRequest(producer, current);',
+            'meta': JSON.stringify({
+                account: accountGr.sys_id.toString(),
+                region: region,
+                name: document.Name,
+                version: document.DocumentVersion,
+                author: document.Author,
+                lastSyncTime: new GlideDateTime().getNumericValue()
+            })
+        };
+        var describeDocumentResponse = awsSystemsManager.describeDocument(document.Name, document.DocumentVersion);
+        if (!describeDocumentResponse.haveError()) {
+            var describeDocumentPayload = describeDocumentResponse.deserialize();
+            attributes['description'] = this.formatDescription(describeDocumentPayload.Document.Description, accountGr, region);
+            attributes['short_description'] = Util.getShortDescription(describeDocumentPayload.Document.Description);
+        }
+        return attributes;
+    };
+    ChangeTemplateRepo.prototype.attachVariableSet = function (catalogItemId, variableSetId) {
+        var m2m = new sn_sc.CatalogItemVariableSetM2M();
+        m2m.setAttributes({ "sc_cat_item": catalogItemId, "variable_set": variableSetId });
+        m2m.create(true);
+    };
+    ChangeTemplateRepo.prototype.formatDescription = function (documentDescription, account, region) {
+        var description = [];
+        if (documentDescription) {
+            description.push(documentDescription, '');
+        }
+        description.push("Available from:", "- Region \"" + region + "\"", "- AWS account \"" + account.awsname + "\" (" + account.awsaccountnumber + ")");
+        return marked(description.join('\n'));
+    };
+    ChangeTemplateRepo.prototype.getCatalogSysId = function () {
+        var catalogTitle = 'Service Catalog';
+        var catalogGr = Util.getRecord('sc_catalog', 'title', catalogTitle);
+        if (!catalogGr.isValid() || !catalogGr.isValidRecord()) {
+            throw new Error("Service Catalog catalog with title \"" + catalogTitle + "\" not found");
+        }
+        return catalogGr && catalogGr.sys_id && catalogGr.sys_id.toString();
+    };
+    ChangeTemplateRepo.prototype.getCategorySysId = function () {
+        var categoryTitle = 'AWS Systems Manager Change Manager';
+        var categoryGr = Util.getRecord('sc_category', 'title', categoryTitle);
+        if (!categoryGr.isValid() || !categoryGr.isValidRecord()) {
+            throw new Error("Service Catalog category with title \"" + categoryTitle + "\" not found");
+        }
+        return categoryGr && categoryGr.sys_id && categoryGr.sys_id.toString();
+    };
+    return ChangeTemplateRepo;
+}());
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-10-05 11:37:09</sys_created_on>
+        <sys_id>7897d9cddbcf301022a6d2984b9619c7</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>ChangeTemplateRepo</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_7897d9cddbcf301022a6d2984b9619c7</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

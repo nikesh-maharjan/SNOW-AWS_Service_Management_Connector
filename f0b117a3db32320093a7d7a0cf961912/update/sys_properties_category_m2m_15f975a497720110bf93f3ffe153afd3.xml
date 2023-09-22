@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_properties_category_m2m">
+    <sys_properties_category_m2m action="INSERT_OR_UPDATE">
+        <category display_value="AWS Systems Manager Incident Manager">8998751e2feec110c10e5fd62799b61c</category>
+        <order>200</order>
+        <property display_value="x_126749_aws_sc.incidentmanager.sync.resolved" name="x_126749_aws_sc.incidentmanager.sync.resolved">9224a59c2f760110d4e093acf699b6b2</property>
+        <sys_class_name>sys_properties_category_m2m</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2022-04-08 10:45:33</sys_created_on>
+        <sys_id>15f975a497720110bf93f3ffe153afd3</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>x_126749_aws_sc.incidentmanager.sync.resolved.AWS Systems Manager Incident Manager</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_properties_category_m2m_15f975a497720110bf93f3ffe153afd3</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_properties_category_m2m>
+</record_update>

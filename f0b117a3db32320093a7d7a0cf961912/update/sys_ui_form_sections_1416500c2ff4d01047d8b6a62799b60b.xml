@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update>
+    <sys_ui_form_sections form_id="1416500c2ff4d01047d8b6a62799b60b" sys_domain="global" table="x_126749_aws_sc_cmdb_ci_ae" version="3">
+        <sys_ui_form_section action="INSERT_OR_UPDATE">
+            <position>0</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2020-05-10 15:33:07</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>5016500c2ff4d01047d8b6a62799b64c</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_overrides/>
+            <sys_ui_form display_value="x_126749_aws_sc_cmdb_ci_ae" name="x_126749_aws_sc_cmdb_ci_ae" sys_domain="global" view="Default view">1416500c2ff4d01047d8b6a62799b60b</sys_ui_form>
+            <sys_ui_section caption="NULL" display_value="" name="x_126749_aws_sc_cmdb_ci_ae" sys_domain="global" view="Default view">5a6450c82ff4d01047d8b6a62799b669</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2020-05-10 15:33:07</sys_updated_on>
+        </sys_ui_form_section>
+        <sys_ui_form_section action="INSERT_OR_UPDATE">
+            <position>1</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2020-05-10 15:33:07</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>5c16500c2ff4d01047d8b6a62799b64c</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_overrides/>
+            <sys_ui_form display_value="x_126749_aws_sc_cmdb_ci_ae" name="x_126749_aws_sc_cmdb_ci_ae" sys_domain="global" view="Default view">1416500c2ff4d01047d8b6a62799b60b</sys_ui_form>
+            <sys_ui_section caption="Automation Document" display_value="Automation Document" name="x_126749_aws_sc_cmdb_ci_ae" sys_domain="global" view="Default view">1816500c2ff4d01047d8b6a62799b609</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2020-05-10 15:33:07</sys_updated_on>
+        </sys_ui_form_section>
+        <sys_ui_form_section action="INSERT_OR_UPDATE">
+            <position>2</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2020-05-10 15:33:07</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>5016500c2ff4d01047d8b6a62799b650</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_overrides/>
+            <sys_ui_form display_value="x_126749_aws_sc_cmdb_ci_ae" name="x_126749_aws_sc_cmdb_ci_ae" sys_domain="global" view="Default view">1416500c2ff4d01047d8b6a62799b60b</sys_ui_form>
+            <sys_ui_section caption="Sync" display_value="Sync" name="x_126749_aws_sc_cmdb_ci_ae" sys_domain="global" view="Default view">d016500c2ff4d01047d8b6a62799b60a</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2020-05-10 15:33:07</sys_updated_on>
+        </sys_ui_form_section>
+        <sys_ui_form action="INSERT_OR_UPDATE">
+            <name>x_126749_aws_sc_cmdb_ci_ae</name>
+            <roles/>
+            <sys_class_name>sys_ui_form</sys_class_name>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2020-05-10 15:33:07</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>1416500c2ff4d01047d8b6a62799b60b</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_name>x_126749_aws_sc_cmdb_ci_ae</sys_name>
+            <sys_overrides/>
+            <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+            <sys_policy/>
+            <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+            <sys_update_name>sys_ui_form_sections_1416500c2ff4d01047d8b6a62799b60b</sys_update_name>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+            <sys_user/>
+            <view display_value="Default view" name="NULL">Default view</view>
+            <view_name/>
+        </sys_ui_form>
+    </sys_ui_form_sections>
+</record_update>

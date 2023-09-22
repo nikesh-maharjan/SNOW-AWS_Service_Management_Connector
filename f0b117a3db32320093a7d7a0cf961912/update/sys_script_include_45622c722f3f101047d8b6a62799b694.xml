@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.CmdbCiAppServerTomcatWarResourceType</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>CmdbCiAppServerTomcatWarResourceType</name>
+        <script><![CDATA[var CmdbCiAppServerTomcatWarResourceType = /** @class */ (function (_super) {
+    Polyfill.__extends(CmdbCiAppServerTomcatWarResourceType, _super);
+    function CmdbCiAppServerTomcatWarResourceType() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    CmdbCiAppServerTomcatWarResourceType.prototype.rules = function () {
+        return [{
+                order: 100,
+                syncType: ConfigSyncProvider.SYNC_DIR.TO_AWS_CONFIG,
+                externalResourceType: 'ServiceNow::CMDB::AppServerTomcatWar',
+                externalResourceId: 'resourceId',
+                internalResourceName: 'name',
+                snTable: 'cmdb_ci_app_server_tomcat_war',
+                syncFromSn: this.syncFromSn
+            }];
+    };
+    CmdbCiAppServerTomcatWarResourceType.prototype.fields = function () {
+        return [
+            {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'Asset',
+                snField: 'asset'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'AssetTag',
+                snField: 'asset_tag'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'Assigned',
+                snField: 'assigned'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'AssignedTo',
+                snField: 'assigned_to'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'AssignmentGroup',
+                snField: 'assignment_group'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'AttestationScore',
+                transformFromSn: function (resourceGr) { return parseInt(resourceGr.attestation_score.toString()); }
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'Attested',
+                transformFromSn: function (resourceGr) { return resourceGr.attested.toString() === 'true'; }
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'AttestedBy',
+                snField: 'attested_by'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'AttestedDate',
+                snField: 'attested_date'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'Attributes',
+                snField: 'attributes'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'CanPrint',
+                transformFromSn: function (resourceGr) { return resourceGr.can_print.toString() === 'true'; }
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'Category',
+                snField: 'category'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'ChangeControl',
+                snField: 'change_control'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'CheckedIn',
+                snField: 'checked_in'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'CheckedOut',
+                snField: 'checked_out'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'ClPort',
+                transformFromSn: function (resourceGr) { return parseInt(resourceGr.cl_port.toString()); }
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'Comments',
+                snField: 'comments'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'Company',
+                snField: 'company'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'ConfigDirectory',
+                snField: 'config_directory'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'ConfigFile',
+                snField: 'config_file'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'Container',
+                snField: 'container'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'CorrelationId',
+                snField: 'correlation_id'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'Cost',
+                transformFromSn: function (resourceGr) { return parseFloat(resourceGr.cost.toString()); }
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'CostCc',
+                snField: 'cost_cc'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'CostCenter',
+                snField: 'cost_center'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'DeliveryDate',
+                snField: 'delivery_date'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'Department',
+                snField: 'department'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'DiscoverySource',
+                snField: 'discovery_source'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'DnsDomain',
+                snField: 'dns_domain'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'Due',
+                snField: 'due'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'DueIn',
+                snField: 'due_in'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'DuplicateOf',
+                snField: 'duplicate_of'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'Edition',
+                snField: 'edition'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'Environment',
+                snField: 'environment'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'FaultCount',
+                transformFromSn: function (resourceGr) { return parseInt(resourceGr.fault_count.toString()); }
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'FirstDiscovered',
+                snField: 'first_discovered'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'Fqdn',
+                snField: 'fqdn'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'GlAccount',
+                snField: 'gl_account'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'InstallDate',
+                snField: 'install_date'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'InstallDirectory',
+                snField: 'install_directory'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'InstallStatus',
+                transformFromSn: function (resourceGr) { return parseInt(resourceGr.install_status.toString()); }
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'InvoiceNumber',
+                snField: 'invoice_number'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'IpAddress',
+                snField: 'ip_address'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'IsClustered',
+                transformFromSn: function (resourceGr) { return resourceGr.is_clustered.toString() === 'true'; }
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'Justification',
+                snField: 'justification'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'LastDiscovered',
+                snField: 'last_discovered'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'LeaseId',
+                snField: 'lease_id'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'Location',
+                snField: 'location'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'MacAddress',
+                snField: 'mac_address'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'MaintenanceSchedule',
+                snField: 'maintenance_schedule'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'ManagedBy',
+                snField: 'managed_by'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'ManagedByGroup',
+                snField: 'managed_by_group'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'Manufacturer',
+                snField: 'manufacturer'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'ModelId',
+                snField: 'model_id'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'ModelNumber',
+                snField: 'model_number'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'Monitor',
+                transformFromSn: function (resourceGr) { return resourceGr.monitor.toString() === 'true'; }
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'Name',
+                snField: 'name'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'OperationalStatus',
+                transformFromSn: function (resourceGr) { return parseInt(resourceGr.operational_status.toString()); }
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'OrderDate',
+                snField: 'order_date'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'OwnedBy',
+                snField: 'owned_by'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'Pid',
+                transformFromSn: function (resourceGr) { return parseInt(resourceGr.pid.toString()); }
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'PoNumber',
+                snField: 'po_number'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'PurchaseDate',
+                snField: 'purchase_date'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'RpCommandHash',
+                snField: 'rp_command_hash'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'RpKeyParametersHash',
+                snField: 'rp_key_parameters_hash'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'RunningProcessCommand',
+                snField: 'running_process_command'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'RunningProcessKeyParameters',
+                snField: 'running_process_key_parameters'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'Schedule',
+                snField: 'schedule'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'SerialNumber',
+                snField: 'serial_number'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'ShortDescription',
+                snField: 'short_description'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'SkipSync',
+                transformFromSn: function (resourceGr) { return resourceGr.skip_sync.toString() === 'true'; }
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'StartDate',
+                snField: 'start_date'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'Subcategory',
+                snField: 'subcategory'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'SupportedBy',
+                snField: 'supported_by'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'SupportGroup',
+                snField: 'support_group'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'SysClassName',
+                snField: 'sys_class_name'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'SysClassPath',
+                snField: 'sys_class_path'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'SysCreatedBy',
+                snField: 'sys_created_by'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'SysCreatedOn',
+                snField: 'sys_created_on'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'SysDomain',
+                snField: 'sys_domain'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'SysDomainPath',
+                snField: 'sys_domain_path'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'SysId',
+                snField: 'sys_id'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'SysModCount',
+                transformFromSn: function (resourceGr) { return parseInt(resourceGr.sys_mod_count.toString()); }
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'SysUpdatedBy',
+                snField: 'sys_updated_by'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'SysUpdatedOn',
+                snField: 'sys_updated_on'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'TcpPort',
+                snField: 'tcp_port'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'Unverified',
+                transformFromSn: function (resourceGr) { return resourceGr.unverified.toString() === 'true'; }
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'UsedFor',
+                snField: 'used_for'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'Vendor',
+                snField: 'vendor'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'Version',
+                snField: 'version'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'WarrantyExpiration',
+                snField: 'warranty_expiration'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromSn,
+                awsField: 'InstanceId',
+                transformFromSn: function (resourceGr) { return gs.getProperty('instance_id'); }
+            }
+        ];
+    };
+    CmdbCiAppServerTomcatWarResourceType.prototype.relationships = function () {
+        return [];
+    };
+    CmdbCiAppServerTomcatWarResourceType.prototype.syncFromAwsAddRelationships = function (context, config, resourceSysId) {
+        // No-op
+    };
+    return CmdbCiAppServerTomcatWarResourceType;
+}(AbstractResourceType));
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-10-15 08:38:50</sys_created_on>
+        <sys_id>45622c722f3f101047d8b6a62799b694</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>CmdbCiAppServerTomcatWarResourceType</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_45622c722f3f101047d8b6a62799b694</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

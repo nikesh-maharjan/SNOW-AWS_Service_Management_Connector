@@ -1,0 +1,1095 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="wf_workflow_version">
+    <wf_workflow_version action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <activity_stages>{"ends":["4ae9e2a0db6033006c85ab7dca961994"],"subflows":[],"stages":{"8ae9266cdb2033006c85ab7dca961958":{"duration":"1 Day","order":120,"stageId":"8ae9266cdb2033006c85ab7dca961958","name":"Fulfillment","value":"fulfillment"}},"activities":{"02e9e2a0db6033006c85ab7dca961996":"8ae9266cdb2033006c85ab7dca961958"}}</activity_stages>
+        <after_business_rules>false</after_business_rules>
+        <checked_out/>
+        <checked_out_by/>
+        <column_renderer display_value="Workflow-driven">a56213111b030100adca1e094f0713ac</column_renderer>
+        <condition/>
+        <condition_type/>
+        <description>Workflow to request provisioning of a Product from AWS Service Catalog</description>
+        <expected_sequences>82e9e2a0db6033006c85ab7dca961993,86e9e2a0db6033006c85ab7dca961997,82e9266cdb2033006c85ab7dca96195a,02e9e2a0db6033006c85ab7dca961996,8ee9e2a0db6033006c85ab7dca96198e</expected_sequences>
+        <expected_time>1970-01-01 14:00:00</expected_time>
+        <expected_time_type/>
+        <full_sequences>82e9e2a0db6033006c85ab7dca961993,86e9e2a0db6033006c85ab7dca961997,82e9266cdb2033006c85ab7dca96195a,02e9e2a0db6033006c85ab7dca961996,8ee9e2a0db6033006c85ab7dca96198e,4ae9e2a0db6033006c85ab7dca961994</full_sequences>
+        <journal/>
+        <max_activity_count>1000</max_activity_count>
+        <name>AWS Service Catalog - Provision Product Request</name>
+        <not_cacheable>false</not_cacheable>
+        <on_cancel><![CDATA[// This script executes if the workflow is cancelled.// The global variable context_sys_id contains the sys_id of the cancelled workflow context.]]></on_cancel>
+        <order>100</order>
+        <pin_type>set_by_activity</pin_type>
+        <published>true</published>
+        <relative_duration/>
+        <requires_ert>true</requires_ert>
+        <run_multiple>false</run_multiple>
+        <schedule/>
+        <stage_field>stage</stage_field>
+        <stage_order>computed</stage_order>
+        <start display_value="Begin">82e9e2a0db6033006c85ab7dca961993</start>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>c2e9266cdb2033006c85ab7dca961957</sys_id>
+        <sys_mod_count>5</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2023-04-24 17:28:54</sys_updated_on>
+        <table>sc_req_item</table>
+        <timezone/>
+        <validated>true</validated>
+        <workflow display_value="AWS Service Catalog - Provision Product Request">70b400704fb90300c5883b728110c76e</workflow>
+    </wf_workflow_version>
+    <wf_workflow action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <description>Workflow to request provisioning of a Product from AWS Service Catalog</description>
+        <name>AWS Service Catalog - Provision Product Request</name>
+        <preview/>
+        <sys_class_name>wf_workflow</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2017-10-11 10:19:41</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>70b400704fb90300c5883b728110c76e</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AWS Service Catalog - Provision Product Request</sys_name>
+        <sys_overrides/>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>wf_workflow_70b400704fb90300c5883b728110c76e</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-10-20 09:32:53</sys_updated_on>
+        <table>sc_req_item</table>
+        <template>false</template>
+        <vars/>
+    </wf_workflow>
+    <wf_stage action="INSERT_OR_UPDATE">
+        <name>Completed</name>
+        <ola>1970-01-01 00:00:00</ola>
+        <order>1100</order>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>02e9266cdb2033006c85ab7dca961959</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <value>complete</value>
+        <workflow_version display_value="AWS Service Catalog - Provision Product Request">c2e9266cdb2033006c85ab7dca961957</workflow_version>
+    </wf_stage>
+    <wf_stage action="INSERT_OR_UPDATE">
+        <name>Delivery</name>
+        <ola>1970-01-03 00:00:00</ola>
+        <order>140</order>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>82e9266cdb2033006c85ab7dca961959</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <value>delivery</value>
+        <workflow_version display_value="AWS Service Catalog - Provision Product Request">c2e9266cdb2033006c85ab7dca961957</workflow_version>
+    </wf_stage>
+    <wf_stage action="INSERT_OR_UPDATE">
+        <name>Fulfillment</name>
+        <ola>1970-01-02 00:00:00</ola>
+        <order>120</order>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>8ae9266cdb2033006c85ab7dca961958</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <value>fulfillment</value>
+        <workflow_version display_value="AWS Service Catalog - Provision Product Request">c2e9266cdb2033006c85ab7dca961957</workflow_version>
+    </wf_stage>
+    <wf_stage action="INSERT_OR_UPDATE">
+        <name>Request Cancelled</name>
+        <ola>1970-01-01 00:00:00</ola>
+        <order>1000</order>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>0ee9266cdb2033006c85ab7dca961958</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <value>Request Cancelled</value>
+        <workflow_version display_value="AWS Service Catalog - Provision Product Request">c2e9266cdb2033006c85ab7dca961957</workflow_version>
+    </wf_stage>
+    <wf_stage action="INSERT_OR_UPDATE">
+        <name>Request Approved</name>
+        <ola>1970-01-01 00:00:00</ola>
+        <order>90</order>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>8ee9266cdb2033006c85ab7dca961958</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <value>request_approved</value>
+        <workflow_version display_value="AWS Service Catalog - Provision Product Request">c2e9266cdb2033006c85ab7dca961957</workflow_version>
+    </wf_stage>
+    <wf_stage action="INSERT_OR_UPDATE">
+        <name>Waiting for Approval</name>
+        <ola>1970-01-02 00:00:00</ola>
+        <order>100</order>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>c6e9266cdb2033006c85ab7dca961958</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <value>waiting_for_approval</value>
+        <workflow_version display_value="AWS Service Catalog - Provision Product Request">c2e9266cdb2033006c85ab7dca961957</workflow_version>
+    </wf_stage>
+    <wf_activity action="INSERT_OR_UPDATE">
+        <activity_definition display_value="Approval Action">50a78fa50a6a803f66d064255f7201a5</activity_definition>
+        <activity_definition_updated>false</activity_definition_updated>
+        <databus_lookup_id>5</databus_lookup_id>
+        <height/>
+        <input>{}</input>
+        <is_parent>false</is_parent>
+        <name>Approve action</name>
+        <new_activity_definition/>
+        <notes/>
+        <out_of_date>false</out_of_date>
+        <parent/>
+        <pinned>false</pinned>
+        <pinned_version/>
+        <stage/>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>82e9266cdb2033006c85ab7dca96195a</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <timeout>1970-01-01 00:00:00</timeout>
+        <vars/>
+        <width/>
+        <workflow_version display_value="AWS Service Catalog - Provision Product Request">c2e9266cdb2033006c85ab7dca961957</workflow_version>
+        <x>145</x>
+        <y>216</y>
+    </wf_activity>
+    <sys_variable_value action="delete_multiple" query="document_key=82e9266cdb2033006c85ab7dca96195a"/>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>82e9266cdb2033006c85ab7dca96195a</document_key>
+        <order>100</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>cae9266cdb2033006c85ab7dca96195a</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <value>approved</value>
+        <variable display_value="Action">50ab35f70a6a803f76d36e1ebaf3639e</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>82e9266cdb2033006c85ab7dca96195a</document_key>
+        <order>100</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>cae9266cdb2033006c85ab7dca96195a</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <value>approved</value>
+        <variable display_value="Action">50ab35f70a6a803f76d36e1ebaf3639e</variable>
+    </sys_variable_value>
+    <wf_condition action="INSERT_OR_UPDATE">
+        <activity display_value="Approve action">82e9266cdb2033006c85ab7dca96195a</activity>
+        <condition>true</condition>
+        <condition_default/>
+        <condition_type>standard</condition_type>
+        <else_flag>false</else_flag>
+        <error>false</error>
+        <event>false</event>
+        <event_name/>
+        <is_positive>true</is_positive>
+        <name>Always</name>
+        <order>0</order>
+        <short_description/>
+        <skip_during_generate>false</skip_during_generate>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>0ae9266cdb2033006c85ab7dca96195b</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+    </wf_condition>
+    <wf_activity action="INSERT_OR_UPDATE">
+        <activity_definition display_value="Begin">c7a5e32c0a0a0b3a002377c24ed8ea76</activity_definition>
+        <activity_definition_updated>false</activity_definition_updated>
+        <databus_lookup_id>1</databus_lookup_id>
+        <height/>
+        <input/>
+        <is_parent>false</is_parent>
+        <name>Begin</name>
+        <new_activity_definition/>
+        <notes/>
+        <out_of_date>false</out_of_date>
+        <parent/>
+        <pinned>false</pinned>
+        <pinned_version/>
+        <stage/>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>82e9e2a0db6033006c85ab7dca961993</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <timeout>1970-01-01 00:00:00</timeout>
+        <vars/>
+        <width>80</width>
+        <workflow_version display_value="AWS Service Catalog - Provision Product Request">c2e9266cdb2033006c85ab7dca961957</workflow_version>
+        <x>32</x>
+        <y>21</y>
+    </wf_activity>
+    <sys_variable_value action="delete_multiple" query="document_key=82e9e2a0db6033006c85ab7dca961993"/>
+    <wf_condition action="INSERT_OR_UPDATE">
+        <activity display_value="Begin">82e9e2a0db6033006c85ab7dca961993</activity>
+        <condition>true</condition>
+        <condition_default/>
+        <condition_type>standard</condition_type>
+        <else_flag>false</else_flag>
+        <error>false</error>
+        <event>false</event>
+        <event_name/>
+        <is_positive>true</is_positive>
+        <name>Always</name>
+        <order>0</order>
+        <short_description/>
+        <skip_during_generate>false</skip_during_generate>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>cae9e2a0db6033006c85ab7dca961993</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+    </wf_condition>
+    <wf_activity action="INSERT_OR_UPDATE">
+        <activity_definition display_value="End">c7a66f7d0a0a0b3a004544a6d2f14076</activity_definition>
+        <activity_definition_updated>false</activity_definition_updated>
+        <databus_lookup_id>2</databus_lookup_id>
+        <height/>
+        <input>{}</input>
+        <is_parent>false</is_parent>
+        <name>End</name>
+        <new_activity_definition/>
+        <notes/>
+        <out_of_date>false</out_of_date>
+        <parent/>
+        <pinned>false</pinned>
+        <pinned_version/>
+        <stage/>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>4ae9e2a0db6033006c85ab7dca961994</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <timeout>1970-01-01 00:00:00</timeout>
+        <vars/>
+        <width>80</width>
+        <workflow_version display_value="AWS Service Catalog - Provision Product Request">c2e9266cdb2033006c85ab7dca961957</workflow_version>
+        <x>816</x>
+        <y>493</y>
+    </wf_activity>
+    <sys_variable_value action="delete_multiple" query="document_key=4ae9e2a0db6033006c85ab7dca961994"/>
+    <wf_activity action="INSERT_OR_UPDATE">
+        <activity_definition display_value="Run Script">db8c65aec0a8016501d00259bc7203a4</activity_definition>
+        <activity_definition_updated>false</activity_definition_updated>
+        <databus_lookup_id>9</databus_lookup_id>
+        <height/>
+        <input>{}</input>
+        <is_parent>false</is_parent>
+        <name>Initialize workflow</name>
+        <new_activity_definition/>
+        <notes/>
+        <out_of_date>false</out_of_date>
+        <parent/>
+        <pinned>false</pinned>
+        <pinned_version/>
+        <stage/>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>86e9e2a0db6033006c85ab7dca961997</sys_id>
+        <sys_mod_count>1</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 13:07:11</sys_updated_on>
+        <timeout>1970-01-01 00:00:00</timeout>
+        <vars/>
+        <width/>
+        <workflow_version display_value="AWS Service Catalog - Provision Product Request">c2e9266cdb2033006c85ab7dca961957</workflow_version>
+        <x>31</x>
+        <y>112</y>
+    </wf_activity>
+    <sys_variable_value action="delete_multiple" query="document_key=86e9e2a0db6033006c85ab7dca961997"/>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>86e9e2a0db6033006c85ab7dca961997</document_key>
+        <order>1</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>0ae9e2a0db6033006c85ab7dca961997</sys_id>
+        <sys_mod_count>1</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 13:07:11</sys_updated_on>
+        <value>// The number of times the workflow has attempted to invoke the action.&#13;
+workflow.scratchpad.invoke_attempts = 0;&#13;
+// The number of times to retry failed requests.&#13;
+workflow.scratchpad.retries_permitted = Math.max(Util.getSystemPropertyInt(C.sysprop.retryLimit, 5), 1);&#13;
+// The base delay between each retry.&#13;
+workflow.scratchpad.retry_delay_seconds = Math.max(Util.getSystemPropertyInt(C.sysprop.retryDelaySeconds, 2), 1);&#13;
+// Fix the token for each request.&#13;
+workflow.scratchpad.token = Util.idempotencyToken('P');&#13;
+</value>
+        <variable display_value="Script">c35ddef20a0a0ba96248a7090eccd518</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>86e9e2a0db6033006c85ab7dca961997</document_key>
+        <order>1</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>0ae9e2a0db6033006c85ab7dca961997</sys_id>
+        <sys_mod_count>1</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 13:07:11</sys_updated_on>
+        <value>// The number of times the workflow has attempted to invoke the action.&#13;
+workflow.scratchpad.invoke_attempts = 0;&#13;
+// The number of times to retry failed requests.&#13;
+workflow.scratchpad.retries_permitted = Math.max(Util.getSystemPropertyInt(C.sysprop.retryLimit, 5), 1);&#13;
+// The base delay between each retry.&#13;
+workflow.scratchpad.retry_delay_seconds = Math.max(Util.getSystemPropertyInt(C.sysprop.retryDelaySeconds, 2), 1);&#13;
+// Fix the token for each request.&#13;
+workflow.scratchpad.token = Util.idempotencyToken('P');&#13;
+</value>
+        <variable display_value="Script">c35ddef20a0a0ba96248a7090eccd518</variable>
+    </sys_variable_value>
+    <wf_condition action="INSERT_OR_UPDATE">
+        <activity display_value="Initialize workflow">86e9e2a0db6033006c85ab7dca961997</activity>
+        <condition>true</condition>
+        <condition_default/>
+        <condition_type>standard</condition_type>
+        <else_flag>false</else_flag>
+        <error>false</error>
+        <event>false</event>
+        <event_name/>
+        <is_positive>true</is_positive>
+        <name>Always</name>
+        <order>0</order>
+        <short_description/>
+        <skip_during_generate>false</skip_during_generate>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>0ee9e2a0db6033006c85ab7dca961997</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+    </wf_condition>
+    <wf_activity action="INSERT_OR_UPDATE">
+        <activity_definition display_value="Run Script">db8c65aec0a8016501d00259bc7203a4</activity_definition>
+        <activity_definition_updated>false</activity_definition_updated>
+        <databus_lookup_id>3</databus_lookup_id>
+        <height/>
+        <input>{}</input>
+        <is_parent>false</is_parent>
+        <name>Request provisioning</name>
+        <new_activity_definition/>
+        <notes/>
+        <out_of_date>false</out_of_date>
+        <parent/>
+        <pinned>false</pinned>
+        <pinned_version/>
+        <stage display_value="Fulfillment">8ae9266cdb2033006c85ab7dca961958</stage>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>02e9e2a0db6033006c85ab7dca961996</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <timeout>1970-01-01 00:00:00</timeout>
+        <vars/>
+        <width/>
+        <workflow_version display_value="AWS Service Catalog - Provision Product Request">c2e9266cdb2033006c85ab7dca961957</workflow_version>
+        <x>435</x>
+        <y>243</y>
+    </wf_activity>
+    <sys_variable_value action="delete_multiple" query="document_key=02e9e2a0db6033006c85ab7dca961996"/>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>02e9e2a0db6033006c85ab7dca961996</document_key>
+        <order>1</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>86e9e2a0db6033006c85ab7dca961996</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <value>// Script to use as a "Run Script" activity in workflow for provisioning.&#13;
+// workflow name: 'AWS Service Catalog - Provision Product Request'&#13;
+// workflow table: Requested Item (sc_req_item)&#13;
+(function () {&#13;
+    var provisioning = new Provisioner(workflow, context, activity, current);&#13;
+    provisioning.requestProduct();&#13;
+})();&#13;
+</value>
+        <variable display_value="Script">c35ddef20a0a0ba96248a7090eccd518</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>02e9e2a0db6033006c85ab7dca961996</document_key>
+        <order>1</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>86e9e2a0db6033006c85ab7dca961996</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <value>// Script to use as a "Run Script" activity in workflow for provisioning.&#13;
+// workflow name: 'AWS Service Catalog - Provision Product Request'&#13;
+// workflow table: Requested Item (sc_req_item)&#13;
+(function () {&#13;
+    var provisioning = new Provisioner(workflow, context, activity, current);&#13;
+    provisioning.requestProduct();&#13;
+})();&#13;
+</value>
+        <variable display_value="Script">c35ddef20a0a0ba96248a7090eccd518</variable>
+    </sys_variable_value>
+    <wf_condition action="INSERT_OR_UPDATE">
+        <activity display_value="Request provisioning">02e9e2a0db6033006c85ab7dca961996</activity>
+        <condition>activity.state == 'faulted'</condition>
+        <condition_default/>
+        <condition_type>else_flag</condition_type>
+        <else_flag>true</else_flag>
+        <error>false</error>
+        <event>false</event>
+        <event_name/>
+        <is_positive>false</is_positive>
+        <name>Error</name>
+        <order>4</order>
+        <short_description/>
+        <skip_during_generate>false</skip_during_generate>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>0ee9e2a0db6033006c85ab7dca961996</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+    </wf_condition>
+    <wf_condition action="INSERT_OR_UPDATE">
+        <activity display_value="Request provisioning">02e9e2a0db6033006c85ab7dca961996</activity>
+        <condition>activity.result=='retry' &amp;&amp; activity.state != 'faulted'</condition>
+        <condition_default/>
+        <condition_type>standard</condition_type>
+        <else_flag>false</else_flag>
+        <error>false</error>
+        <event>false</event>
+        <event_name/>
+        <is_positive>false</is_positive>
+        <name>Retry</name>
+        <order>1</order>
+        <short_description>Request was throttled and will be retried</short_description>
+        <skip_during_generate>false</skip_during_generate>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>02e9e2a0db6033006c85ab7dca961997</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+    </wf_condition>
+    <wf_condition action="INSERT_OR_UPDATE">
+        <activity display_value="Request provisioning">02e9e2a0db6033006c85ab7dca961996</activity>
+        <condition>activity.result=='yes' &amp;&amp; activity.state != 'faulted'</condition>
+        <condition_default/>
+        <condition_type>standard</condition_type>
+        <else_flag>false</else_flag>
+        <error>false</error>
+        <event>false</event>
+        <event_name/>
+        <is_positive>false</is_positive>
+        <name>Success</name>
+        <order>2</order>
+        <short_description>Request was successfully issued</short_description>
+        <skip_during_generate>false</skip_during_generate>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>8ee9e2a0db6033006c85ab7dca961996</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+    </wf_condition>
+    <wf_activity action="INSERT_OR_UPDATE">
+        <activity_definition display_value="Timer">3961a1da0a0a0b5c00ecd84822f70d85</activity_definition>
+        <activity_definition_updated>false</activity_definition_updated>
+        <databus_lookup_id>8</databus_lookup_id>
+        <height/>
+        <input>{}</input>
+        <is_parent>false</is_parent>
+        <name>Wait</name>
+        <new_activity_definition/>
+        <notes/>
+        <out_of_date>false</out_of_date>
+        <parent/>
+        <pinned>false</pinned>
+        <pinned_version/>
+        <stage/>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>8ee9e2a0db6033006c85ab7dca96198e</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <timeout>1970-01-01 00:00:00</timeout>
+        <vars/>
+        <width/>
+        <workflow_version display_value="AWS Service Catalog - Provision Product Request">c2e9266cdb2033006c85ab7dca961957</workflow_version>
+        <x>315</x>
+        <y>93</y>
+    </wf_activity>
+    <sys_variable_value action="delete_multiple" query="document_key=8ee9e2a0db6033006c85ab7dca96198e"/>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>8ee9e2a0db6033006c85ab7dca96198e</document_key>
+        <order>3000</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>02e9e2a0db6033006c85ab7dca961990</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <value>// Set 'answer' to the number of seconds this timer should wait&#13;
+answer = workflow.scratchpad.retry_delay_seconds * workflow.scratchpad.invoke_attempts;&#13;
+</value>
+        <variable display_value="Script">293493710a0a0b2115e3e5b4fce1d12a</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>8ee9e2a0db6033006c85ab7dca96198e</document_key>
+        <order>320</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>06e9e2a0db6033006c85ab7dca96198f</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <value/>
+        <variable display_value="Schedule based on">4cba34da0a0a0b5200798c86eafe1203</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>8ee9e2a0db6033006c85ab7dca96198e</document_key>
+        <order>1360</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>0ae9e2a0db6033006c85ab7dca961991</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <value/>
+        <variable display_value="Time after">292c91070a0a0b212543d91ffde5014c</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>8ee9e2a0db6033006c85ab7dca96198e</document_key>
+        <order>1360</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>0ee9e2a0db6033006c85ab7dca961990</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <value/>
+        <variable display_value="Time before">292bd15e0a0a0b215a040c701033e3c5</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>8ee9e2a0db6033006c85ab7dca96198e</document_key>
+        <order>1320</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>46e9e2a0db6033006c85ab7dca961991</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <value/>
+        <variable display_value="Schedule field">4cc6788c0a0a0b5200e6743c94001b16</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>8ee9e2a0db6033006c85ab7dca96198e</document_key>
+        <order>1310</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>4ae9e2a0db6033006c85ab7dca961990</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <value/>
+        <variable display_value="Field">21fd462c0a0a0b211c997276d7806c03</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>8ee9e2a0db6033006c85ab7dca96198e</document_key>
+        <order>350</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>4ee9e2a0db6033006c85ab7dca96198f</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <value/>
+        <variable display_value="Time zone based on">4cbfe48a0a0a0b5200cf8b82cc6685f1</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>8ee9e2a0db6033006c85ab7dca96198e</document_key>
+        <order>1320</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>82e9e2a0db6033006c85ab7dca961991</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <value>08fcd0830a0a0b2600079f56b1adb9ae</value>
+        <variable display_value="Schedule">4cc4a4030a0a0b52007334f001376dc5</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>8ee9e2a0db6033006c85ab7dca96198e</document_key>
+        <order>1310</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>86e9e2a0db6033006c85ab7dca961990</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <value>3bf802c20a0a0b52008e2859cd8abcf2</value>
+        <variable display_value="Relative duration">220cd53d0a0a0b214103bdc2ec5c7ab4</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>8ee9e2a0db6033006c85ab7dca96198e</document_key>
+        <order>1350</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>8ae9e2a0db6033006c85ab7dca96198f</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <value/>
+        <variable display_value="Time zone">4cc836da0a0a0b520083ebc07da2f47c</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>8ee9e2a0db6033006c85ab7dca96198e</document_key>
+        <order>1350</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>8ee9e2a0db6033006c85ab7dca961991</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <value/>
+        <variable display_value="Time zone field">4cc740fe0a0a0b520025dcf8e2ff78e7</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>8ee9e2a0db6033006c85ab7dca96198e</document_key>
+        <order>1310</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>c2e9e2a0db6033006c85ab7dca961990</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <value>1970-01-01 00:00:02</value>
+        <variable display_value="Duration">c35dc0df0a0a0ba96248a7098d737925</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>8ee9e2a0db6033006c85ab7dca96198e</document_key>
+        <order>500</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>c6e9e2a0db6033006c85ab7dca96198f</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <value/>
+        <variable display_value="Wait">220dc5a40a0a0b2109fbd28b8c4b6213</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>8ee9e2a0db6033006c85ab7dca96198e</document_key>
+        <order>310</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>cae9e2a0db6033006c85ab7dca961991</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <value>script</value>
+        <variable display_value="Timer based on">21f80cd00a0a0b2101fcd5b5defc0810</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>8ee9e2a0db6033006c85ab7dca96198e</document_key>
+        <order>1360</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>cee9e2a0db6033006c85ab7dca961990</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <value/>
+        <variable display_value="Percentage">292b2f0e0a0a0b215aa2dd2cbc578dc5</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>8ee9e2a0db6033006c85ab7dca96198e</document_key>
+        <order>310</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>cae9e2a0db6033006c85ab7dca961991</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <value>script</value>
+        <variable display_value="Timer based on">21f80cd00a0a0b2101fcd5b5defc0810</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>8ee9e2a0db6033006c85ab7dca96198e</document_key>
+        <order>320</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>06e9e2a0db6033006c85ab7dca96198f</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <value/>
+        <variable display_value="Schedule based on">4cba34da0a0a0b5200798c86eafe1203</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>8ee9e2a0db6033006c85ab7dca96198e</document_key>
+        <order>350</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>4ee9e2a0db6033006c85ab7dca96198f</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <value/>
+        <variable display_value="Time zone based on">4cbfe48a0a0a0b5200cf8b82cc6685f1</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>8ee9e2a0db6033006c85ab7dca96198e</document_key>
+        <order>500</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>c6e9e2a0db6033006c85ab7dca96198f</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <value/>
+        <variable display_value="Wait">220dc5a40a0a0b2109fbd28b8c4b6213</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>8ee9e2a0db6033006c85ab7dca96198e</document_key>
+        <order>1310</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>4ae9e2a0db6033006c85ab7dca961990</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <value/>
+        <variable display_value="Field">21fd462c0a0a0b211c997276d7806c03</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>8ee9e2a0db6033006c85ab7dca96198e</document_key>
+        <order>1310</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>86e9e2a0db6033006c85ab7dca961990</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <value>3bf802c20a0a0b52008e2859cd8abcf2</value>
+        <variable display_value="Relative duration">220cd53d0a0a0b214103bdc2ec5c7ab4</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>8ee9e2a0db6033006c85ab7dca96198e</document_key>
+        <order>1310</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>c2e9e2a0db6033006c85ab7dca961990</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <value>1970-01-01 00:00:02</value>
+        <variable display_value="Duration">c35dc0df0a0a0ba96248a7098d737925</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>8ee9e2a0db6033006c85ab7dca96198e</document_key>
+        <order>1320</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>82e9e2a0db6033006c85ab7dca961991</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <value>08fcd0830a0a0b2600079f56b1adb9ae</value>
+        <variable display_value="Schedule">4cc4a4030a0a0b52007334f001376dc5</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>8ee9e2a0db6033006c85ab7dca96198e</document_key>
+        <order>1320</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>46e9e2a0db6033006c85ab7dca961991</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <value/>
+        <variable display_value="Schedule field">4cc6788c0a0a0b5200e6743c94001b16</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>8ee9e2a0db6033006c85ab7dca96198e</document_key>
+        <order>1350</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>8ae9e2a0db6033006c85ab7dca96198f</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <value/>
+        <variable display_value="Time zone">4cc836da0a0a0b520083ebc07da2f47c</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>8ee9e2a0db6033006c85ab7dca96198e</document_key>
+        <order>1350</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>8ee9e2a0db6033006c85ab7dca961991</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <value/>
+        <variable display_value="Time zone field">4cc740fe0a0a0b520025dcf8e2ff78e7</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>8ee9e2a0db6033006c85ab7dca96198e</document_key>
+        <order>1360</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>cee9e2a0db6033006c85ab7dca961990</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <value/>
+        <variable display_value="Percentage">292b2f0e0a0a0b215aa2dd2cbc578dc5</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>8ee9e2a0db6033006c85ab7dca96198e</document_key>
+        <order>1360</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>0ee9e2a0db6033006c85ab7dca961990</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <value/>
+        <variable display_value="Time before">292bd15e0a0a0b215a040c701033e3c5</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>8ee9e2a0db6033006c85ab7dca96198e</document_key>
+        <order>1360</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>0ae9e2a0db6033006c85ab7dca961991</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <value/>
+        <variable display_value="Time after">292c91070a0a0b212543d91ffde5014c</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>8ee9e2a0db6033006c85ab7dca96198e</document_key>
+        <order>3000</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>02e9e2a0db6033006c85ab7dca961990</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <value>// Set 'answer' to the number of seconds this timer should wait&#13;
+answer = workflow.scratchpad.retry_delay_seconds * workflow.scratchpad.invoke_attempts;&#13;
+</value>
+        <variable display_value="Script">293493710a0a0b2115e3e5b4fce1d12a</variable>
+    </sys_variable_value>
+    <wf_condition action="INSERT_OR_UPDATE">
+        <activity display_value="Wait">8ee9e2a0db6033006c85ab7dca96198e</activity>
+        <condition>true</condition>
+        <condition_default/>
+        <condition_type>standard</condition_type>
+        <else_flag>false</else_flag>
+        <error>false</error>
+        <event>false</event>
+        <event_name/>
+        <is_positive>true</is_positive>
+        <name>Always</name>
+        <order>0</order>
+        <short_description/>
+        <skip_during_generate>false</skip_during_generate>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>06e9e2a0db6033006c85ab7dca961992</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+    </wf_condition>
+    <wf_transition action="INSERT_OR_UPDATE">
+        <condition display_value="Error">0ee9e2a0db6033006c85ab7dca961996</condition>
+        <from display_value="Request provisioning">02e9e2a0db6033006c85ab7dca961996</from>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>12e9e2a0db6033006c85ab7dca961999</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <to display_value="End">4ae9e2a0db6033006c85ab7dca961994</to>
+    </wf_transition>
+    <wf_transition action="INSERT_OR_UPDATE">
+        <condition display_value="Always">06e9e2a0db6033006c85ab7dca961992</condition>
+        <from display_value="Wait">8ee9e2a0db6033006c85ab7dca96198e</from>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>56e9e2a0db6033006c85ab7dca961999</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <to display_value="Request provisioning">02e9e2a0db6033006c85ab7dca961996</to>
+    </wf_transition>
+    <wf_transition action="INSERT_OR_UPDATE">
+        <condition display_value="Always">0ee9e2a0db6033006c85ab7dca961997</condition>
+        <from display_value="Initialize workflow">86e9e2a0db6033006c85ab7dca961997</from>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>5ae9e2a0db6033006c85ab7dca961999</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <to display_value="Approve action">82e9266cdb2033006c85ab7dca96195a</to>
+    </wf_transition>
+    <wf_transition action="INSERT_OR_UPDATE">
+        <condition display_value="Retry">02e9e2a0db6033006c85ab7dca961997</condition>
+        <from display_value="Request provisioning">02e9e2a0db6033006c85ab7dca961996</from>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>92e9e2a0db6033006c85ab7dca961999</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <to display_value="Wait">8ee9e2a0db6033006c85ab7dca96198e</to>
+    </wf_transition>
+    <wf_transition action="INSERT_OR_UPDATE">
+        <condition display_value="Success">8ee9e2a0db6033006c85ab7dca961996</condition>
+        <from display_value="Request provisioning">02e9e2a0db6033006c85ab7dca961996</from>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>9ee9e2a0db6033006c85ab7dca961998</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <to display_value="End">4ae9e2a0db6033006c85ab7dca961994</to>
+    </wf_transition>
+    <wf_transition action="INSERT_OR_UPDATE">
+        <condition display_value="Always">cae9e2a0db6033006c85ab7dca961993</condition>
+        <from display_value="Begin">82e9e2a0db6033006c85ab7dca961993</from>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>d6e9e2a0db6033006c85ab7dca961998</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <to display_value="Initialize workflow">86e9e2a0db6033006c85ab7dca961997</to>
+    </wf_transition>
+    <wf_transition action="INSERT_OR_UPDATE">
+        <condition display_value="Always">0ae9266cdb2033006c85ab7dca96195b</condition>
+        <from display_value="Approve action">82e9266cdb2033006c85ab7dca96195a</from>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>dae9e2a0db6033006c85ab7dca961998</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <to display_value="Request provisioning">02e9e2a0db6033006c85ab7dca961996</to>
+    </wf_transition>
+    <wf_estimated_runtime_config action="INSERT_OR_UPDATE">
+        <estimated_run_time/>
+        <no_of_data_points>1</no_of_data_points>
+        <percentage_threshold_ert>20</percentage_threshold_ert>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-29 12:58:00</sys_created_on>
+        <sys_id>86e9266cdb2033006c85ab7dca961957</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-03-29 12:58:00</sys_updated_on>
+        <workflow_version display_value="AWS Service Catalog - Provision Product Request">c2e9266cdb2033006c85ab7dca961957</workflow_version>
+    </wf_estimated_runtime_config>
+    <wf_workflow_version action="update_multiple" query="workflow=70b400704fb90300c5883b728110c76e^sys_id!=c2e9266cdb2033006c85ab7dca961957">
+        <published>false</published>
+    </wf_workflow_version>
+</record_update>

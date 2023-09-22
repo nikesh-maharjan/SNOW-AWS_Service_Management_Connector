@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ws_query_parameter">
+    <sys_ws_query_parameter action="INSERT_OR_UPDATE">
+        <example_value>validate=false</example_value>
+        <name>validate</name>
+        <required>false</required>
+        <short_description>Whether or not validate the credentials</short_description>
+        <sys_class_name>sys_ws_query_parameter</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-10-07 15:43:42</sys_created_on>
+        <sys_id>20a678542fffd01047d8b6a62799b6de</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>validate</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_ws_query_parameter_20a678542fffd01047d8b6a62799b6de</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <web_service_definition display_value="AWS Account API">28dfdb7b2fa3d01047d8b6a62799b66c</web_service_definition>
+    </sys_ws_query_parameter>
+</record_update>

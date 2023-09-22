@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category/>
+        <client_script><![CDATA[function updateFormClient ($scope, $timeout, $rootScope, $location, $http, spUtil, provisionedProduct, connectorAjax) {
+
+    /* widget controller */
+    var c = this;
+    c.errs = [];
+    c.inputsDisabled = true;
+    c.updateRequested = false;
+    c.hasPlan = false;
+
+    $scope.$on('on.plan.created', () => {
+        c.hasPlan = true;
+    });
+    $scope.$on('on.plan.deleted', () => {
+        c.hasPlan = false;
+    });
+
+    /*
+     * Capture the form so that we can mark required inputs as
+     * dirty when the form is submitted before everything is ready.
+     */
+    var form = undefined;
+    c.setForm = function (f) {
+        form = f;
+    };
+
+    c.clickSubmit = function ($event) {
+        c.dirtyForm();
+        if ((form && !form.$valid) || !c.model.valid) {
+            $event.preventDefault();
+        }
+    };
+
+    c.dirtyForm = function () {
+        if (form) {
+            angular.forEach(form.$error.required, function (field) {
+                field.$setDirty();
+            });
+        }
+    };
+
+    function displayAnyWarnings() {
+        c.data.warnings.forEach(function (e) {
+            spUtil.addErrorMessage(e);
+        });
+    }
+
+    c.initialize = function () {
+        $timeout(function() {
+            $rootScope.$broadcast('sp.update.breadcrumbs', c.data.breadcrumbs);
+        });
+
+        displayAnyWarnings();
+
+        var productSysId = c.data.sys_id;
+        if (!productSysId) {
+            spUtil.addErrorMessage('Could not determine product ID');
+        } else {
+            c.productSysId = productSysId;
+        }
+    };
+
+    c.setUserToken = function() {
+        connectorAjax.setUserToken(c.data.sessionToken);
+        c.tokenIsSet = true;
+    };
+
+    c.onError = function (errs) {
+        c.errs = errs;
+    };
+
+    c.updateModel = function (model) {
+        c.model = model;
+    };
+
+    // NOTE error handling below is done as an error argument function rather than
+    // a .catch as the Widget Editor complains about invalid syntax when using catch.
+    // Similarly 'finally' is not available, hence repetition of c.updateRequested=false
+    c.submitForm = function () {
+        c.inputsDisabled = true;
+        c.updateRequested = true;
+        c.errs.length = 0;
+        var options = {};
+        if (c.model.preferences) {
+            options.ProvisioningPreferences = c.model.preferences;
+        }
+
+        var promise = c.model.planSysId
+            ? provisionedProduct.executePlan(c.productSysId)
+            : provisionedProduct.updateProvisionedProduct(c.productSysId, c.model.launchOption, c.model.productVersion, c.model.params, options);
+
+        promise.then(function(result) {
+            if (!result.success) {
+                spUtil.addErrorMessage(result.message ? result.message : 'failed to update product');
+                c.updateRequested = false;
+                return;
+            }
+            spUtil.addInfoMessage('Update requested');
+            var productPage = 'id=aws_sc_pp_details&sys_id=' + c.productSysId;
+            $location.search(productPage);
+            c.inputsDisabled = true;
+            c.updateRequested = false;
+        }, function(err) {
+            c.recordError(err);
+            c.inputsDisabled = false;
+            c.updateRequested = false;
+        });
+    };
+
+    c.initialize();
+
+    $scope.$watch('c.data.sessionToken', c.setUserToken);
+}
+]]></client_script>
+        <controller_as>c</controller_as>
+        <css>.form-group {
+    margin-bottom: 10px;
+}
+
+.bs-callout {
+    margin: 10px 0 !important;
+    padding: 20px !important;
+    border-left-style: solid;
+    border-left-width: 10px;
+}
+
+.bs-callout-error {
+    background-color: #fdf7f7;
+    border-color: #d9534f;
+}
+
+.bs-callout-ok {
+    background-color: #f4f8fa;
+    border-color: #5bc0de;
+}
+
+.label.event {
+    float: right;
+}
+
+.panel-body &gt; div {
+    margin-bottom: 15px;
+}
+
+fa {
+    margin-right: 10px;
+}
+
+.intro {
+    padding: 20px !important
+}
+
+.arn {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.glyphicon-exclamation-sign {
+    color: #d9534f;
+}
+
+.timeline-heading a {
+    cursor: pointer;
+}
+</css>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description>Widget to render a form for updating a provisioned product</description>
+        <docs/>
+        <field_list/>
+        <has_preview>true</has_preview>
+        <id>aws-sc-update-form</id>
+        <internal>false</internal>
+        <link/>
+        <name>AWS SC Service Portal Update Form</name>
+        <option_schema/>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[// TODO: Make this typescript + Deployable annotation
+(function () {
+
+    data.warnings = [];
+    function initialize() {
+        data.sessionToken = gs.getSession().getSessionToken();
+
+        if (input) {
+            data.sys_id = input.sys_id;
+        } else {
+            data.sys_id = $sp.getParameter("sys_id");
+        }
+
+        try {
+            // Needs to be GlideRecord (vs Secure) so that the update.isEnabled check below
+            // can check that pp's identity is not nil.
+            var pp = new GlideRecord('x_126749_aws_sc_cmdb_ci_pp');
+            pp.addQuery('sys_id', data.sys_id);
+            pp.addQuery('owned_by', gs.getUserID());
+            pp.query();
+            if (pp.next()) {
+                data.productDetails = true;
+                data.productStatus = pp.awsproductstatus.getChoiceValue();
+                data.canUpdate = new ProvisionedProduct(pp).actions.update().isEnabled();
+            }
+
+            var listPage, detailPage;
+            // Needs to be GlideRecord to set breadcrumbs correctly.
+            var page = new GlideRecord('sp_page');
+            if (page.get('id', 'aws_sc_pp')) {
+                listPage = page.title.toString();
+            }
+            if (page.get('id', 'aws_sc_pp_details')) {
+                detailPage = page.title.toString();
+            }
+            if (listPage && detailPage) {
+                var name = data.productDetails ? pp.awsname.toString() : data.sys_id;
+                data.breadcrumbs = [
+                    {label: listPage, url: '?id=aws_sc_pp'},
+                    {label: name, url: '?id=aws_sc_pp_details&sys_id=' + data.sys_id},
+                    {label: "Update", url: '#'}
+                ];
+            }
+        } catch (err) {
+            gs.info('Caught exception in retrieving provisioned product details for ' +
+                data.sys_id + (err.message ? err.message : err));
+            data.warnings.push('Product not found');
+        }
+
+        var featuresObject = {};
+        var featureNames = [
+            x_126749_aws_sc.C.sysprop.launchOptionSelectable,
+            x_126749_aws_sc.C.sysprop.productVersionSelectable,
+            x_126749_aws_sc.C.sysprop.plansVisible
+        ];
+
+        featureNames.forEach(function(featureName){
+            var modifiedName = featureName.substring(16).replace(/\.([a-z])/g, function (g) { return g[1].toUpperCase(); });
+            var systemPropertyGr = new GlideRecord('sys_properties');
+            systemPropertyGr.addQuery('name', featureName);
+            systemPropertyGr.query();
+            while (systemPropertyGr.next()) {
+                featuresObject[modifiedName] = systemPropertyGr.value.toString() === "true";
+            }
+        });
+        data.globalFeatures = featuresObject;
+
+    }
+
+    initialize();
+})();
+]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-08-03 12:48:05</sys_created_on>
+        <sys_id>49acf004db7793002dc6f6fdbf961932</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AWS SC Service Portal Update Form</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sp_widget_49acf004db7793002dc6f6fdbf961932</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <template><![CDATA[<div ng-if="!data.productDetails" class="panel panel-{{::c.options.color}} intro b">
+    No product information available
+</div>
+<div ng-if="data.productDetails" class="panel panel-{{::c.options.color}} intro b">
+
+    <div ng-if="c.errs.length > 0">
+        <div ng-repeat="err in c.errs track by $index" class="bg-danger sc-error-message">
+            {{err.message ? err.message : err}}
+        </div>
+    </div>
+
+    <form name="form" ng-if="c.tokenIsSet" ng-submit="c.submitForm()">
+        <div ng-init="c.setForm(form);"></div>
+
+        <update-product-form
+            form="form"
+            product-sys-id="c.productSysId"
+            on-model-update="c.updateModel(model)"
+            on-error="c.onError(errs)"
+            inputs-disabled="c.inputsDisabled"
+            global-features="c.data.globalFeatures">
+        </update-product-form>
+
+        <hr/>
+
+        <button tabindex="0" class="btn btn-primary ng-binding" name="submit"
+                ng-disabled="!data.canUpdate || !c.model.valid || c.updateRequested || (c.inputsDisabled && !c.hasPlan)"
+                ng-click="c.clickSubmit($event)">
+            {{c.updateRequested && data.productStatus.toLocaleLowerCase() !== 'terminated' ? 'Updating ...' : 'Update'}}
+        </button>
+    </form>
+</div>
+]]></template>
+    </sp_widget>
+</record_update>

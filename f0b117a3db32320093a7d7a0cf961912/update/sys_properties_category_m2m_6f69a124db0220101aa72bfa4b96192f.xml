@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_properties_category_m2m">
+    <sys_properties_category_m2m action="INSERT_OR_UPDATE">
+        <category display_value="AWS Config">63549ad12fc5541047d8b6a62799b67c</category>
+        <order>300</order>
+        <property display_value="x_126749_aws_sc.config.dedupedelete.field.correlation" name="x_126749_aws_sc.config.dedupedelete.field.correlation">3cf7a1e0db0220101aa72bfa4b9619ba</property>
+        <sys_class_name>sys_properties_category_m2m</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-01-28 10:24:15</sys_created_on>
+        <sys_id>6f69a124db0220101aa72bfa4b96192f</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>x_126749_aws_sc.config.dedupedelete.field.correlation.AWS Config</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_properties_category_m2m_6f69a124db0220101aa72bfa4b96192f</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_properties_category_m2m>
+</record_update>

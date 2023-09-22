@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="gsw_content_information">
+    <gsw_content_information action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <article><![CDATA[<div>
+<p>In this Connector for ServiceNow release, you can now sync a set of ServiceNow tables in the CMDB to AWS Config as custom resources.</p>
+</div>
+<p>The ServiceNow tables and AWS Config custom resource mapping are as follows:</p>
+<div>
+<div>
+<table id="w879aac31b7c41c15b7"><tbody><tr><td style="text-align: center;"><strong>ServiceNow CMDB table</strong></td><td style="text-align: center;"><strong>AWS Customer Resource</strong></td></tr><tr><td><code>cmdb_ci_apache_web_server</code></td><td>Apache Web Server</td></tr><tr><td><code>cmdb_ci_app_server</code></td><td>Application Server</td></tr><tr><td><code>cmdb_ci_app_server_java</code></td><td>Java Server</td></tr><tr><td><code>cmdb_ci_app_server_tomcat</code></td><td>Tomcat Server</td></tr><tr><td><code>cmdb_ci_app_server_tomcat_war</code></td><td>Tomcat Web Application</td></tr><tr><td><code>cmdb_ci_app_server_websphere</code></td><td>IBM Websphere Application</td></tr><tr><td><code>cmdb_ci_app_server_ws_ear</code></td><td>Websphere Enterprise Archive</td></tr><tr><td><code>cmdb_ci_appl</code></td><td>Application</td></tr><tr><td><code>cmdb_ci_appl_dot_net</code></td><td>A .Net Application</td></tr><tr><td><code>cmdb_ci_appl_now_app_comp</code></td><td>ServiceNow Application Component</td></tr><tr><td><code>cmdb_ci_appl_sap</code></td><td>SAP Application</td></tr><tr><td><code>cmdb_ci_appl_sap_hana_db</code></td><td>SAP Hana Database</td></tr><tr><td><code>cmdb_ci_appl_sap_system</code></td><td>SAP System</td></tr><tr><td><code>cmdb_ci_appl_sharepoint</code></td><td>Microsoft Sharepoint Application</td></tr><tr><td><code>cmdb_ci_application_cluster</code></td><td>Application Cluster</td></tr><tr><td><code>cmdb_ci_application_server_resource</code></td><td>Application Server Resource</td></tr><tr><td><code>cmdb_ci_application_software</code></td><td>Application Software</td></tr><tr><td><code>cmdb_ci_db_mssql_database</code></td><td>MySql Database</td></tr><tr><td><code>cmdb_ci_db_mysql_instance</code></td><td>MySql Instance</td></tr><tr><td><code>cmdb_ci_kubernetes_cluster</code></td><td>Kubernetes Cluster</td></tr></tbody></table>
+</div>
+</div>
+<div>
+<p> </p>
+<p><strong>To configure select ServiceNow tables as AWS Config custom resources</strong></p>
+<ol style="list-style-position: inside;"><li>Choose <strong>New</strong>.</li><li>Choose an in scope ServiceNow table.</li><li>Choose an account and Region for the new resource type. You can select any supported Region, in addition to preconfigured Regions for the account.</li><li>Click <strong>Submit</strong>.</li></ol>
+<p>Repeat steps 1-4 above to include additional ServiceNow tables available to sync as AWS Config custom resources.</p>
+<p>The amount of time to create new AWS Config resources depends on the number of ServiceNow tables you selected. You can see resources in the <strong>Schema version</strong> field upon successful completion. The period synchronization of resources automatically includes the new AWS Config custom resource type. As details in the ServiceNow table update, this information syncs to AWS Config custom resource.</p>
+</div>]]></article>
+        <best_practice_acceptable>false</best_practice_acceptable>
+        <dependent_on_contents/>
+        <dependent_on_plugins/>
+        <dependent_on_plugins_ids/>
+        <description/>
+        <embedded_help_qualifier/>
+        <end_point>x_126749_aws_sc_resource_type_account_list.do</end_point>
+        <end_point_open_mode>1</end_point_open_mode>
+        <end_point_type>1</end_point_type>
+        <field/>
+        <filter/>
+        <filter_result/>
+        <implicit_dependent_on/>
+        <implicit_plugin_dependencies/>
+        <is_dynamic>false</is_dynamic>
+        <more_info_available>false</more_info_available>
+        <more_info_html/>
+        <order>300</order>
+        <parent display_value="Configure AWS Config integration">e8518ca41ba23010a148a9f6624bcb33</parent>
+        <parents>e8518ca41ba23010a148a9f6624bcb33,c09fcac2dbd130100f00b298f496196f</parents>
+        <plugin_id/>
+        <property_name/>
+        <property_value/>
+        <quick_startable>false</quick_startable>
+        <root_parent display_value="AWS Service Management Connector">c09fcac2dbd130100f00b298f496196f</root_parent>
+        <skippable>true</skippable>
+        <supports_child_content>false</supports_child_content>
+        <sys_class_name>gsw_content_information</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-09-16 15:00:15</sys_created_on>
+        <sys_id>57ef000b1b223010a148a9f6624bcb05</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Configure available ServiceNow tables to sync as AWS Config custom resources</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>gsw_content_information_57ef000b1b223010a148a9f6624bcb05</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <table/>
+        <title>Configure available ServiceNow tables to sync as AWS Config custom resources</title>
+        <weight>1</weight>
+    </gsw_content_information>
+    <sys_translated_text action="delete_multiple" query="documentkey=57ef000b1b223010a148a9f6624bcb05"/>
+</record_update>

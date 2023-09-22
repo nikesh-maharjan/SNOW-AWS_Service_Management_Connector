@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_properties">
+    <sys_properties action="INSERT_OR_UPDATE">
+        <choices/>
+        <description>This property is deprecated since 1.4.0 and is replaced by x_126749_aws_sc.changeRequest.state.closed.&#13;
+&#13;
+This property controls the 'state' value that will be set on a the 'Process Terminate Change Request' that has completed successfully.   It should correspond to the Change Request State value for 'Closed'.&#13;
+&#13;
+For example see https://docs.servicenow.com/bundle/istanbul-it-service-management/page/product/change-management/task/state-model-activate-tasks.html for values for Istanbul.</description>
+        <ignore_cache>false</ignore_cache>
+        <is_private>false</is_private>
+        <name>x_126749_aws_sc.termination_state_closed</name>
+        <read_roles/>
+        <suffix>termination_state_closed</suffix>
+        <sys_class_name>sys_properties</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-04-25 14:08:11</sys_created_on>
+        <sys_id>405fcebf4f211300edd48c318110c708</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>x_126749_aws_sc.termination_state_closed</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_properties_405fcebf4f211300edd48c318110c708</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <type>integer</type>
+        <value>3</value>
+        <write_roles/>
+    </sys_properties>
+    <sys_translated_text action="delete_multiple" query="documentkey=405fcebf4f211300edd48c318110c708"/>
+</record_update>

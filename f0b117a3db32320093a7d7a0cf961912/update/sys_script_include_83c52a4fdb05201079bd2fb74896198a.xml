@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.AbstractSyncProvider</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>AbstractSyncProvider</name>
+        <script><![CDATA[var AbstractSyncProvider = /** @class */ (function () {
+    function AbstractSyncProvider() {
+    }
+    AbstractSyncProvider.prototype.fromAws = function (context) {
+        var syncResults = {
+            success: true,
+            seconds: 0,
+            requests: 0
+        };
+        var accountSync = new GlideRecord('x_126749_aws_sc_account_sync');
+        this.filterAccountSync(accountSync);
+        accountSync.query();
+        while (accountSync.next()) {
+            var account_1 = accountSync.awsaccount.getRefRecord();
+            var region = accountSync.awsregion.toString();
+            try {
+                var partialResults = this.fromAwsWith(account_1, region);
+                if (partialResults.error) {
+                    this.logSyncResultWarnings(partialResults, account_1, this.providerName, this.timeout, region);
+                }
+                gs.info([
+                    "[SYNC] [STATS] [" + this.providerName + "] Finished synchronization for account \"" + account_1.awsname.toString() + "\" (" + account_1.awsaccountnumber.toString() + ") in region \"" + region + "\"",
+                    "** Success: " + partialResults.success,
+                    "** Time: " + partialResults.seconds.toFixed(1) + "s",
+                    "** Requests: " + partialResults.requests
+                ].join('\n'));
+                syncResults.success = syncResults.success && partialResults.success;
+                syncResults.seconds += partialResults.seconds;
+                syncResults.requests += partialResults.requests;
+            }
+            catch (ex) {
+                // If we end up here, it means this is an unexpected/uncaught exception. We don't want to fail the
+                // whole process, so we catch big, and log a warning
+                gs.warn("[SYNC] [" + this.providerName + "] Unexpected error occurred while synchronizing account \"" + account_1.awsname.toString() + "\" (" + account_1.awsaccountnumber.toString() + ") in region \"" + region + "\":\n" + ex.message);
+            }
+        }
+        return syncResults;
+    };
+    AbstractSyncProvider.prototype.filterAccountSync = function (accountSync) {
+        accountSync.addNotNullQuery('awsaccount');
+    };
+    AbstractSyncProvider.prototype.logSyncResultWarnings = function (partialResults, account, providerName, timeout, region) {
+        if (partialResults.error.includes('ThrottlingException')) {
+            gs.warn("[SYNC] [" + providerName + "] Synchronization of " +
+                ("account \"" + account.awsname.toString() + "\" (" + account.awsaccountnumber.toString() + ")" + (region ? " in region \"" + region + "\"" : '') + " ") +
+                ("has been throttled for over " + timeout / 60 + " minutes. ") +
+                "This means that some resources might not appear in ServiceNow until at least the next synchronization. " +
+                "There is no data lost. " +
+                "For more information, please check the \"System Logs -> AWS Request Log\" as well as CloudTrail Log on the AWS Console.");
+        }
+        gs.warn("[SYNC] [" + providerName + "] Error synchronizing " +
+            ("account \"" + account.awsname.toString() + "\" (" + account.awsaccountnumber.toString() + ")" + (region ? " in region \"" + region + "\"" : '') + ":\n") +
+            ("" + partialResults.error));
+    };
+    return AbstractSyncProvider;
+}());
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-12-17 16:09:53</sys_created_on>
+        <sys_id>83c52a4fdb05201079bd2fb74896198a</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AbstractSyncProvider</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_83c52a4fdb05201079bd2fb74896198a</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

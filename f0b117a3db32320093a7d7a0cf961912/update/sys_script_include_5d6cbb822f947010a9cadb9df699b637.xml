@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.AppRegistryRepo</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>AppRegistryRepo</name>
+        <script><![CDATA[var AppRegistryRepo = /** @class */ (function () {
+    function AppRegistryRepo() {
+    }
+    AppRegistryRepo.prototype.insertOrUpdateAttributeGroups = function (attributeGroup) {
+        var table = 'x_126749_aws_sc_cmdb_ci_appregistry_attribute_group';
+        var definitional = {
+            awsid: attributeGroup.id
+        };
+        var additional = {
+            awsattributes: attributeGroup.attributes,
+            name: attributeGroup.name
+        };
+        this.setCommonFields(attributeGroup, additional);
+        var record = Util.insertOrUpdate(table, definitional, additional);
+        this.updateTags(attributeGroup.tags || {}, record.getValue('sys_id'));
+        return record;
+    };
+    AppRegistryRepo.prototype.insertOrUpdateApplications = function (application, account, region) {
+        var table = 'x_126749_aws_sc_cmdb_ci_appregistry_application';
+        var definitional = {
+            awsid: application.id
+        };
+        var additional = {
+            awsaccount: account.sys_id,
+            awsregion: region,
+            name: application.name
+        };
+        this.setCommonFields(application, additional);
+        var record = (Util.insertOrUpdate(table, definitional, additional));
+        this.updateTags(application.tags, record.getValue('sys_id'));
+        return record;
+    };
+    AppRegistryRepo.prototype.insertOrUpdateAssociatedResource = function (resource) {
+        var definitional = {
+            awsarn: resource.arn
+        };
+        var additional = {
+            awsname: resource.name,
+            awslastsynchronisedtime: new GlideDateTime(),
+            name: resource.name
+        };
+        return Util.insertOrUpdate('x_126749_aws_sc_cmdb_ci_appregistry_resource', definitional, additional);
+    };
+    AppRegistryRepo.prototype.processLastUpdatedBefore = function (startTime) {
+        //delete any records older than the specified time
+        this.processAttributeGroupsUpdatedBefore(startTime);
+        this.processApplicationsUpdatedBefore(startTime);
+        this.processRelatedResourcesUpdatedBefore(startTime);
+    };
+    AppRegistryRepo.prototype.processAttributeGroupsUpdatedBefore = function (startTime) {
+        gs.debug("[SYNC] [AWS ServiceCatalog] Deleting any AppRegistry attribute groups older than " + startTime);
+        var attributeGroups = new GlideRecord('x_126749_aws_sc_cmdb_ci_appregistry_attribute_group');
+        attributeGroups.addQuery('awslastsynchronisedtime', '<', startTime);
+        attributeGroups.query();
+        var recCount = attributeGroups.getRowCount();
+        attributeGroups.deleteMultiple();
+        gs.debug("AppRegistry attribute groups deleted: " + recCount);
+    };
+    AppRegistryRepo.prototype.processApplicationsUpdatedBefore = function (startTime) {
+        gs.debug("[SYNC] [AWS ServiceCatalog] Deleting any AppRegistry applications older than " + startTime);
+        var apps = new GlideRecord('x_126749_aws_sc_cmdb_ci_appregistry_application');
+        apps.addQuery('awslastsynchronisedtime', '<', startTime);
+        apps.query();
+        var recCount = apps.getRowCount();
+        apps.deleteMultiple();
+        gs.debug("AppRegistry applications deleted: " + recCount);
+    };
+    AppRegistryRepo.prototype.processRelatedResourcesUpdatedBefore = function (startTime) {
+        gs.debug("[SYNC] [AWS ServiceCatalog] Deleting any AppRegistry applications older than " + startTime);
+        var resources = new GlideRecord('x_126749_aws_sc_cmdb_ci_appregistry_resource');
+        resources.addQuery('awslastsynchronisedtime', '<', startTime);
+        resources.query();
+        var recCount = resources.getRowCount();
+        resources.deleteMultiple();
+        gs.debug("AppRegistry related resources deleted: " + recCount);
+    };
+    AppRegistryRepo.prototype.updateRelationship = function (parentId, child, type) {
+        var definitional = {
+            parent: parentId,
+            type: type,
+            child: child
+        };
+        Util.insertOrUpdate('cmdb_rel_ci', definitional);
+    };
+    /**
+     *  Deletes relationships where parent is application, child is item in resourceIds and type is relationshipTypeId
+     */
+    AppRegistryRepo.prototype.deleteStaleRelationships = function (application, resourceIds, relationshipTypeId) {
+        var _this = this;
+        resourceIds.forEach(function (id) {
+            var relationshipGr = new GlideRecord('cmdb_rel_ci');
+            relationshipGr.addQuery('parent', application.getValue('sys_id'));
+            relationshipGr.addQuery('type', relationshipTypeId);
+            relationshipGr.addQuery('child', id);
+            relationshipGr.query();
+            if (relationshipGr.next()) {
+                relationshipGr.deleteRecord();
+                var appRelationshipCount = _this.getRelationshipCountForRelatedResourceRecord(id, relationshipTypeId);
+                if (appRelationshipCount === 0) {
+                    _this.deleteRelatedResourceRecord(id);
+                }
+            }
+        });
+    };
+    /**
+     *  Returns the number of relationships a record in x_126749_aws_sc_cmdb_ci_appregistry_resource has
+     *  where the relationship type is
+     */
+    AppRegistryRepo.prototype.getRelationshipCountForRelatedResourceRecord = function (relatedResourceId, relationshipTypeId) {
+        var relCount = 0;
+        var relationshipGr = new GlideRecord('cmdb_rel_ci');
+        relationshipGr.addQuery('type', relationshipTypeId);
+        relationshipGr.addQuery('child', relatedResourceId);
+        relationshipGr.query();
+        while (relationshipGr.next()) {
+            var parent_1 = relationshipGr.parent.getRefRecord();
+            if (parent_1.getValue('sys_class_name') === "x_126749_aws_sc_cmdb_ci_appregistry_application") {
+                relCount += 1;
+            }
+        }
+        return relCount;
+    };
+    AppRegistryRepo.prototype.deleteRelatedResourceRecord = function (recordId) {
+        var appRegistryApplicationGr = new GlideRecord('x_126749_aws_sc_cmdb_ci_appregistry_application');
+        appRegistryApplicationGr.addQuery('sys_id', recordId);
+        appRegistryApplicationGr.query();
+        if (appRegistryApplicationGr.next()) {
+            appRegistryApplicationGr.deleteRecord();
+        }
+    };
+    //updates tags for the specified resourceId
+    AppRegistryRepo.prototype.updateTags = function (tags, recordSysId) {
+        var keys = Object.keys(tags);
+        //First update changed tags and remove deleted ones
+        var keyValueGr = new GlideRecord('cmdb_key_value');
+        keyValueGr.addQuery('configuration_item', recordSysId);
+        keyValueGr.query();
+        while (keyValueGr.next()) {
+            //update changed tags, delete removed tags
+            var storedKey = keyValueGr.getValue('key');
+            if (keys.indexOf(storedKey) === -1) {
+                keyValueGr.deleteRecord();
+            }
+            else if (tags[storedKey] !== keyValueGr.getValue('value')) {
+                Util.setValue(keyValueGr, 'value', tags[storedKey]);
+                keyValueGr.update();
+            }
+            keys.splice(keys.indexOf(storedKey), 1);
+        }
+        //keys should now only contain new items
+        keys.forEach(function (key) {
+            keyValueGr.initialize();
+            Util.setValue(keyValueGr, 'configuration_item', recordSysId);
+            Util.setValue(keyValueGr, 'key', key);
+            Util.setValue(keyValueGr, 'value', tags[key]);
+            keyValueGr.insert();
+        });
+    };
+    AppRegistryRepo.prototype.setCommonFields = function (data, additional) {
+        additional['awsarn'] = data.arn;
+        additional['awsname'] = data.name;
+        additional['awsdescription'] = data.description;
+        additional['awscreationtime'] = data.creationTime;
+        additional['awslastupdatedtime'] = data.lastUpdateTime;
+        additional['awslastsynchronisedtime'] = new GlideDateTime();
+    };
+    return AppRegistryRepo;
+}());
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-05-25 09:18:27</sys_created_on>
+        <sys_id>5d6cbb822f947010a9cadb9df699b637</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AppRegistryRepo</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_5d6cbb822f947010a9cadb9df699b637</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

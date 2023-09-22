@@ -1,0 +1,542 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.AwsServiceCatalog</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>AwsServiceCatalog</name>
+        <script><![CDATA[/**
+ * @class AwsServiceCatalog
+ * @classdesc Make HTTP requests to AWS Service Catalog.
+ * @param region {String} An AWS region, e.g. "us-west-1"
+ * @param credential {Object} AWS account credentials.
+ * @param credential.identity {String} An AWS access key.
+ * @param credential.secret {String} An AWS secret access key.
+ * @param credential.session {String=} Required if using temporary credentials.
+ */
+var AwsServiceCatalog = /** @class */ (function (_super) {
+    Polyfill.__extends(AwsServiceCatalog, _super);
+    function AwsServiceCatalog(region, credential) {
+        var _this = _super.call(this, "servicecatalog", region, credential, true) || this;
+        /** Pattern for tokens that identity requests for provisioning and termination. */
+        _this.tokenRegex = /^[a-zA-Z0-9][a-zA-Z0-9_-]{0,127}$/;
+        _this.defaultPageSize = 20;
+        Util.assertExists(region, "region");
+        return _this;
+    }
+    AwsServiceCatalog.prototype.headers = function (action) {
+        // Request this.headers required by AWS Service Catalog are not publicly documented.
+        // Through experimentation I believe the content-type must be "application/x-amz-json-1.1".
+        // The AWS API responds 500 Server Error if there is no content type and 200 Ok with a
+        // crazy body if it's "application/json":
+        // {"Output":{"__type":"com.amazon.coral.service#UnknownOperationException","message":null},"Version":"1.0"}
+        return {
+            "Content-Type": "application/x-amz-json-1.1",
+            "X-Amz-Target": "AWS242ServiceCatalogService." + action
+        };
+    };
+    /**
+     * Returns a function accepting two arguments: a required id and an optional objec
+     * of additional API parameters. The function makes a POST request to ServiceCatalog
+     * to execute action.
+     * @param action The name of a ServiceCatalog API action.
+     * @param parameter Optional name for the ID parameter in the request. Defaults to "Id".
+     */
+    AwsServiceCatalog.prototype.describeActionWithId = function (action, id, options, parameter) {
+        parameter = parameter || "Id";
+        Util.assertExists(id, parameter);
+        var payload = Util.mergeInto(options || {}, parameter, id);
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.acceptPortfolioShare = function (portfolioId, options) {
+        Util.assertExists(portfolioId, "portfolioId");
+        var action = "AcceptPortfolioShare";
+        var payload = Util.mergeInto(options || {}, "PortfolioId", portfolioId);
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.associateBudgetWithResource = function (budgetName, resourceId) {
+        Util.assertExists(budgetName, "budgetName");
+        Util.assertExists(resourceId, "resourceId");
+        var action = "AssociateBudgetWithResource";
+        var payload = { "BudgetName": budgetName, "ResourceId": resourceId };
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    /**
+     * @see https://docs.aws.amazon.com/servicecatalog/latest/dg/API_AssociatePrincipalWithPortfolio.html
+     * @param portfolioId
+     * @param principalARN
+     * @param principalType
+     * @param [options]
+     * @returns {WrappedResponse}
+     * @memberof! AwsServiceCatalog#
+     * @alias associatePrincipalWithPortfolio
+     */
+    AwsServiceCatalog.prototype.associatePrincipalWithPortfolio = function (portfolioId, principalARN, principalType, options) {
+        Util.assertExists(portfolioId, "portfolioId");
+        Util.assertExists(principalARN, "principalARN");
+        Util.assertExists(principalType, "principalType");
+        var action = "AssociatePrincipalWithPortfolio";
+        var payload = Util.mergeInto(options || {}, "PortfolioId", portfolioId, "PrincipalARN", principalARN, "PrincipalType", principalType);
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.associateProductWithPortfolio = function (portfolioId, productId, options) {
+        Util.assertExists(portfolioId, "portfolioId");
+        Util.assertExists(productId, "productId");
+        var action = "AssociateProductWithPortfolio";
+        var payload = Util.mergeInto(options || {}, "PortfolioId", portfolioId, "ProductId", productId);
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.associateServiceActionWithProvisioningArtifact = function (productId, artifactId, actionId, options) {
+        Util.assertExists(productId, "productId");
+        Util.assertExists(artifactId, "artifactId");
+        Util.assertExists(actionId, "actionId");
+        var action = "AssociateServiceActionWithProvisioningArtifact";
+        var payload = Util.mergeInto(options || {}, "ProductId", productId, "ProvisioningArtifactId", artifactId, "ServiceActionId", actionId);
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.associateTagOptionWithResource = function (resourceId, tagOptionId) {
+        Util.assertExists(resourceId, "resourceId");
+        Util.assertExists(tagOptionId, "tagOptionId");
+        var action = "AssociateTagOptionWithResource";
+        var payload = Util.mergeInto({}, "ResourceId", resourceId, "TagOptionId", tagOptionId);
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.batchAssociateServiceActionWithProvisioningArtifact = function (actionAssociations, options) {
+        Util.assertExists(actionAssociations, "actionAssociations");
+        var action = "BatchAssociateServiceActionWithProvisioningArtifact";
+        var payload = Util.mergeInto(options || {}, "ServiceActionAssociations", actionAssociations);
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.batchDisassociateServiceActionWithProvisioningArtifact = function (actionAssociations, options) {
+        Util.assertExists(actionAssociations, "actionAssociations");
+        var action = "BatchDisassociateServiceActionWithProvisioningArtifact";
+        var payload = Util.mergeInto(options || {}, "ServiceActionAssociations", actionAssociations);
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.copyProduct = function (sourceProductArn, idempotencyToken, options) {
+        Util.assertExists(sourceProductArn, "sourceProductArn");
+        Util.assertExists(idempotencyToken, "idempotencyToken");
+        var action = "CopyProduct";
+        var payload = Util.mergeInto(options || {}, "SourceProductArn", sourceProductArn, "IdempotencyToken", idempotencyToken);
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.createConstraint = function (portfolioId, productId, type, parameters, idempotencyToken, options) {
+        Util.assertExists(portfolioId, "portfolioId");
+        Util.assertExists(productId, "productId");
+        Util.assertExists(type, "type");
+        Util.assertExists(parameters, "parameters");
+        Util.assertExists(idempotencyToken, "idempotencyToken");
+        Util.assertMatches(idempotencyToken, this.tokenRegex);
+        var action = "CreateConstraint";
+        var payload = Util.mergeInto(options || {}, "PortfolioId", portfolioId, "ProductId", productId, "Type", type, "Parameters", parameters, "IdempotencyToken", idempotencyToken);
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.createPortfolio = function (displayName, providerName, idempotencyToken, options) {
+        Util.assertExists(displayName, "displayName");
+        Util.assertExists(providerName, "providerName");
+        Util.assertExists(idempotencyToken, "idempotencyToken");
+        Util.assertMatches(idempotencyToken, this.tokenRegex);
+        var action = "CreatePortfolio";
+        var payload = Util.mergeInto(options || {}, "DisplayName", displayName, "ProviderName", providerName, "IdempotencyToken", idempotencyToken);
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.createPortfolioShare = function (accountId, portfolioId, options) {
+        Util.assertExists(accountId, "accountId");
+        Util.assertExists(portfolioId, "portfolioId");
+        var action = "CreatePortfolioShare";
+        var payload = Util.mergeInto(options || {}, "AccountId", accountId, "PortfolioId", portfolioId);
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.createProduct = function (name, owner, productType, provisioningArtifactParameters, idempotencyToken, options) {
+        Util.assertExists(name, "name");
+        Util.assertExists(owner, "owner");
+        Util.assertExists(productType, "productType");
+        Util.assertExists(provisioningArtifactParameters, "provisioningArtifactParameters");
+        Util.assertExists(idempotencyToken, "idempotencyToken");
+        Util.assertMatches(idempotencyToken, this.tokenRegex);
+        var action = "CreateProduct";
+        var payload = Util.mergeInto(options || {}, "Name", name, "Owner", owner, "ProductType", productType, "ProvisioningArtifactParameters", provisioningArtifactParameters, "IdempotencyToken", idempotencyToken);
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.createProvisionedProductPlan = function (planName, planType, provisionedProductName, productId, pathId, provisioningArtifactId, provisioningParameters, tags, idempotencyToken, options) {
+        var ae = Util.assertExists;
+        Util.assertMatches(idempotencyToken, this.tokenRegex);
+        if (tags && tags.length > 50) {
+            throw new Error("More than 50 tags specified.");
+        }
+        var action = "CreateProvisionedProductPlan";
+        var payload = Util.mergeInto(options || {}, "IdempotencyToken", idempotencyToken, 
+        // not mandatory if the product has a default path.
+        "PathId", pathId, "PlanName", ae(planName, "planName"), "PlanType", planType || 'CLOUDFORMATION', "ProductId", ae(productId, "productId"), "ProvisionedProductName", ae(provisionedProductName, "provisionedProductName"), "ProvisioningArtifactId", ae(provisioningArtifactId, "provisioningArtifactId"), "ProvisioningParameters", provisioningParameters, "Tags", tags);
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.createProvisioningArtifact = function (productId, parameters, idempotencyToken, options) {
+        Util.assertExists(productId, "productId");
+        Util.assertExists(parameters, "parameters");
+        Util.assertExists(idempotencyToken, "idempotencyToken");
+        Util.assertMatches(idempotencyToken, this.tokenRegex);
+        var action = "CreateProvisioningArtifact";
+        var payload = Util.mergeInto(options || {}, "ProductId", productId, "Parameters", parameters, "IdempotencyToken", idempotencyToken);
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.createServiceAction = function (name, definition, definitionType, idempotencyToken, options) {
+        Util.assertExists(name, "name");
+        Util.assertExists(definition, "definition");
+        Util.assertExists(definitionType, "definitionType");
+        Util.assertExists(idempotencyToken, "idempotencyToken");
+        var action = "CreateServiceAction";
+        var payload = Util.mergeInto(options || {}, "Name", name, "Definition", definition, "DefinitionType", definitionType, "IdempotencyToken", idempotencyToken);
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.createTagOption = function (key, value) {
+        Util.assertExists(key, "key");
+        Util.assertExists(value, "value");
+        var action = "CreateTagOption";
+        var payload = Util.mergeInto({}, "Key", key, "Value", value);
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.deleteConstraint = function (id, options) {
+        Util.assertExists(id, "id");
+        var action = "DeleteConstraint";
+        var payload = Util.mergeInto(options || {}, "Id", id);
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.deletePortfolio = function (id, options) {
+        Util.assertExists(id, "id");
+        var action = "DeletePortfolio";
+        var payload = Util.mergeInto(options || {}, "Id", id);
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.deletePortfolioShare = function (accountId, portfolioId, options) {
+        Util.assertExists(accountId, "accountId");
+        Util.assertExists(portfolioId, "portfolioId");
+        var action = "DeletePortfolioShare";
+        var payload = Util.mergeInto(options || {}, "AccountId", accountId, "PortfolioId", portfolioId);
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.deleteProduct = function (id, options) {
+        Util.assertExists(id, "id");
+        var action = "DeleteProduct";
+        var payload = Util.mergeInto(options || {}, "Id", id);
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    // The only currently valid option is "IgnoreErrors" (boolean)
+    AwsServiceCatalog.prototype.deleteProvisionedProductPlan = function (planId, options) {
+        var action = "DeleteProvisionedProductPlan";
+        var payload = Util.mergeInto(options || {}, "PlanId", Util.assertExists(planId, "planId"));
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.deleteProvisioningArtifact = function (productId, provisioningArtifactId, options) {
+        Util.assertExists(productId, "productId");
+        Util.assertExists(provisioningArtifactId, "provisioningArtifactId");
+        var action = "DeleteProvisioningArtifact";
+        var payload = Util.mergeInto(options || {}, "ProductId", productId, "ProvisioningArtifactId", provisioningArtifactId);
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.deleteServiceAction = function (actionId, options) {
+        Util.assertExists(actionId, "actionId");
+        var action = "DeleteServiceAction";
+        var payload = Util.mergeInto(options || {}, "Id", actionId);
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.deleteTagOption = function (id, options) {
+        Util.assertExists(id, "id");
+        var action = "DeleteTagOption";
+        var payload = Util.mergeInto(options || {}, "Id", id);
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.describeConstraint = function (id, options) {
+        return this.describeActionWithId("DescribeConstraint", id, options);
+    };
+    AwsServiceCatalog.prototype.describeCopyProductStatus = function (id, options) {
+        return this.describeActionWithId("DescribeCopyProductStatus", id, options, "CopyProductToken");
+    };
+    AwsServiceCatalog.prototype.describePortfolio = function (id, options) {
+        return this.describeActionWithId("DescribePortfolio", id, options);
+    };
+    AwsServiceCatalog.prototype.describeProduct = function (id, options) {
+        return this.describeActionWithId("DescribeProduct", id, options);
+    };
+    AwsServiceCatalog.prototype.describeProductAsAdmin = function (id, options) {
+        return this.describeActionWithId("DescribeProductAsAdmin", id, options);
+    };
+    AwsServiceCatalog.prototype.describeProductView = function (id, options) {
+        return this.describeActionWithId("DescribeProductView", id, options);
+    };
+    AwsServiceCatalog.prototype.describeProvisionedProduct = function (id, options) {
+        return this.describeActionWithId("DescribeProvisionedProduct", id, options);
+    };
+    AwsServiceCatalog.prototype.describeServiceAction = function (id, options) {
+        return this.describeActionWithId("DescribeServiceAction", id, options);
+    };
+    AwsServiceCatalog.prototype.describeProvisionedProductPlan = function (planId, options) {
+        Util.assertExists(planId, "planId");
+        var payload = Util.mergeInto(options || {}, "PlanId", planId);
+        var action = "DescribeProvisionedProductPlan";
+        return this._paginatedApi(action, payload, this.headers(action), "ResourceChanges");
+    };
+    AwsServiceCatalog.prototype.describeProvisioningArtifact = function (productId, artifactId, options) {
+        Util.assertExists(productId, "productId");
+        Util.assertExists(artifactId, "artifactId");
+        var action = "DescribeProvisioningArtifact";
+        var payload = Util.mergeInto(options || {}, "ProductId", productId, "ProvisioningArtifactId", artifactId);
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.describeProvisioningParameters = function (productId, artifactId, pathId, options) {
+        var action = "DescribeProvisioningParameters";
+        var payload = Util.mergeInto(options || {}, "ProductId", Util.assertExists(productId, "productId"), "ProvisioningArtifactId", Util.assertExists(artifactId, "artifactId"), "PathId", Util.assertExists(pathId, "pathId"));
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.describeRecord = function (recordId, options) {
+        Util.assertExists(recordId, "recordId");
+        var payload = Util.mergeInto(options || {}, "Id", recordId);
+        // My assumption is that it's the record's outputs that get paginated.
+        // We're not using a focus since in some responses (e.g when terminating
+        // a product) don't contain RecordOutputs.
+        var action = "DescribeRecord";
+        return this._paginatedApi("DescribeRecord", payload, this.headers(action));
+    };
+    AwsServiceCatalog.prototype.describeTagOption = function (id, options) {
+        return this.describeActionWithId("DescribeTagOption", id, options);
+    };
+    AwsServiceCatalog.prototype.disassociateBudgetFromResource = function (budgetName, resourceId) {
+        Util.assertExists(budgetName, "budgetName");
+        Util.assertExists(resourceId, "resourceId");
+        var action = "DisassociateBudgetFromResource";
+        var payload = { "BudgetName": budgetName, "ResourceId": resourceId };
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.disassociatePrincipalFromPortfolio = function (portfolioId, principalARN, options) {
+        Util.assertExists(portfolioId, "portfolioId");
+        Util.assertExists(principalARN, "principalARN");
+        var action = "DisassociatePrincipalFromPortfolio";
+        var payload = Util.mergeInto(options || {}, "PortfolioId", portfolioId, "PrincipalARN", principalARN);
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.disassociateProductFromPortfolio = function (portfolioId, productId, options) {
+        Util.assertExists(portfolioId, "portfolioId");
+        Util.assertExists(productId, "productId");
+        var action = "DisassociateProductFromPortfolio";
+        var payload = Util.mergeInto(options || {}, "PortfolioId", portfolioId, "ProductId", productId);
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.disassociateServiceActionFromProvisioningArtifact = function (productId, provisioningArtifactId, actionId, options) {
+        Util.assertExists(productId, "productId");
+        Util.assertExists(provisioningArtifactId, "provisioningArtifactId");
+        Util.assertExists(actionId, "actionId");
+        var action = "DisassociateServiceActionFromProvisioningArtifact";
+        var payload = Util.mergeInto(options || {}, "ProductId", productId, "ProvisioningArtifactId", provisioningArtifactId, "ServiceActionId", actionId);
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.disassociateTagOptionFromResource = function (resourceId, tagOptionId) {
+        Util.assertExists(resourceId, "resourceId");
+        Util.assertExists(tagOptionId, "tagOptionId");
+        var action = "DisassociateTagOptionFromResource";
+        var payload = Util.mergeInto({}, "ResourceId", resourceId, "TagOptionId", tagOptionId);
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.executeProvisionedProductPlan = function (planId, idempotencyToken, options) {
+        Util.assertExists(planId, "planId");
+        Util.assertExists(idempotencyToken, "idempotencyToken");
+        var action = "ExecuteProvisionedProductPlan";
+        var payload = Util.mergeInto(options || {}, "PlanId", planId, "IdempotencyToken", idempotencyToken);
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.executeProvisionedProductServiceAction = function (provisionedProductId, actionId, executeToken, options) {
+        var ae = Util.assertExists;
+        Util.assertMatches(executeToken, this.tokenRegex);
+        var action = "ExecuteProvisionedProductServiceAction";
+        var payload = Util.mergeInto(options || {}, "ProvisionedProductId", ae(provisionedProductId, "provisionedProductId"), "ServiceActionId", ae(actionId, "actionId"), "ExecuteToken", ae(executeToken, "executeToken"));
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.listAcceptedPortfolioShares = function (options) {
+        var payload = Util.mergeInto(options || {}, "PageSize", this.defaultPageSize);
+        var action = "ListAcceptedPortfolioShares";
+        return this._paginatedApi(action, payload, this.headers(action), "PortfolioDetails");
+    };
+    AwsServiceCatalog.prototype.listBudgetsForResource = function (resourceId, options) {
+        Util.assertExists(resourceId, "resourceId");
+        var payload = Util.mergeInto(options || {}, "ResourceId", resourceId, "PageSize", this.defaultPageSize);
+        var action = "ListBudgetsForResource";
+        return this._paginatedApi(action, payload, this.headers(action), "Budgets");
+    };
+    AwsServiceCatalog.prototype.listConstraintsForPortfolio = function (portfolioId, productId, options) {
+        Util.assertExists(portfolioId, "portfolioId");
+        var payload = Util.mergeInto(options || {}, "PortfolioId", portfolioId, "ProductId", productId);
+        var action = "ListConstraintsForPortfolio";
+        return this._paginatedApi(action, payload, this.headers(action), "ConstraintDetails");
+    };
+    AwsServiceCatalog.prototype.listLaunchPaths = function (productId, options) {
+        Util.assertExists(productId, "productId");
+        var payload = Util.mergeInto(options || {}, "ProductId", productId);
+        var action = "ListLaunchPaths";
+        return this._paginatedApi(action, payload, this.headers(action), "LaunchPathSummaries");
+    };
+    AwsServiceCatalog.prototype.listPortfolios = function (options) {
+        var action = "ListPortfolios";
+        var payload = Util.mergeInto(options || {}, "PageSize", this.defaultPageSize);
+        return this._paginatedApi(action, payload, this.headers(action), "PortfolioDetails");
+    };
+    AwsServiceCatalog.prototype.listPortfolioAccess = function (portfolioId, options) {
+        Util.assertExists(portfolioId, "portfolioId");
+        var payload = Util.mergeInto(options || {}, "PortfolioId", portfolioId);
+        var action = "ListPortfolioAccess";
+        return this._paginatedApi(action, payload, this.headers(action), "AccountIds");
+    };
+    AwsServiceCatalog.prototype.listProvisionedProductPlans = function (options) {
+        // Service Catalog requires a page size to list plans.
+        var payload = Util.mergeInto(options || {}, "PageSize", this.defaultPageSize);
+        var action = "ListProvisionedProductPlans";
+        return this._paginatedApi(action, payload, this.headers(action), "ProvisionedProductPlans");
+    };
+    AwsServiceCatalog.prototype.listPortfoliosForProduct = function (productId, options) {
+        Util.assertExists(productId, "productId");
+        var payload = Util.mergeInto(options || {}, "ProductId", productId);
+        var action = "ListPortfoliosForProduct";
+        return this._paginatedApi(action, payload, this.headers(action), "PortfolioDetails");
+    };
+    AwsServiceCatalog.prototype.listPrincipalsForPortfolio = function (portfolioId, options) {
+        Util.assertExists(portfolioId, "portfolioId");
+        var payload = Util.mergeInto(options || {}, "PortfolioId", portfolioId);
+        var action = "ListPrincipalsForPortfolio";
+        return this._paginatedApi(action, payload, this.headers(action), "Principals");
+    };
+    AwsServiceCatalog.prototype.listProvisioningArtifacts = function (productId, options) {
+        Util.assertExists(productId, "productId");
+        var payload = Util.mergeInto(options || {}, "ProductId", productId);
+        var action = "ListProvisioningArtifacts";
+        return this._paginatedApi(action, payload, this.headers(action), "ProvisioningArtifactDetails");
+    };
+    AwsServiceCatalog.prototype.listProvisioningArtifactsForServiceAction = function (actionId, options) {
+        var payload = Util.mergeInto(options || {}, "ServiceActionId", actionId);
+        var action = "ListProvisioningArtifactsForServiceAction";
+        return this._paginatedApi(action, payload, this.headers(action), "ProvisioningArtifactViews");
+    };
+    AwsServiceCatalog.prototype.listServiceActions = function (options) {
+        var action = "ListServiceActions";
+        return this._paginatedApi(action, options || {}, this.headers(action), "ServiceActionSummaries");
+    };
+    AwsServiceCatalog.prototype.listServiceActionsForProvisioningArtifact = function (productId, provisioningArtifactId, options) {
+        Util.assertExists(productId, "productId");
+        Util.assertExists(provisioningArtifactId, "provisioningArtifactId");
+        var payload = Util.mergeInto(options || {}, "ProductId", productId, "ProvisioningArtifactId", provisioningArtifactId);
+        var action = "ListServiceActionsForProvisioningArtifact";
+        return this._paginatedApi(action, payload, this.headers(action), "ServiceActionSummaries");
+    };
+    AwsServiceCatalog.prototype.listRecordHistory = function (options) {
+        var action = "ListRecordHistory";
+        return this._paginatedApi(action, options || {}, this.headers(action), "RecordDetails");
+    };
+    AwsServiceCatalog.prototype.listResourcesForTagOption = function (tagOptionId, options) {
+        Util.assertExists(tagOptionId, "tagOptionId");
+        var payload = Util.mergeInto(options || {}, "TagOptionId", tagOptionId);
+        var action = "ListResourcesForTagOption";
+        return this._paginatedApi(action, payload, this.headers(action), "ResourceDetails", "PageToken");
+    };
+    AwsServiceCatalog.prototype.listTagOptions = function (options) {
+        var action = "ListTagOptions";
+        return this._paginatedApi(action, options || {}, this.headers(action), "TagOptionDetails", "PageToken");
+    };
+    AwsServiceCatalog.prototype.provisionProduct = function (provisionedProductName, productId, pathId, provisioningArtifactId, provisioningParameters, tags, provisionToken, options) {
+        var ae = Util.assertExists;
+        Util.assertMatches(provisionToken, this.tokenRegex);
+        if (tags && tags.length > 50) {
+            throw new Error("More than 50 tags specified.");
+        }
+        var action = "ProvisionProduct";
+        var payload = Util.mergeInto(options || {}, 
+        // not mandatory if the product has a default path.
+        "PathId", pathId, "ProductId", ae(productId, "productId"), "ProvisionedProductName", ae(provisionedProductName, "provisionedProductName"), "ProvisioningArtifactId", ae(provisioningArtifactId, "provisioningArtifactId"), "ProvisioningParameters", provisioningParameters, "ProvisionToken", ae(provisionToken), "Tags", tags);
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.rejectPortfolioShare = function (portfolioId, options) {
+        Util.assertExists(portfolioId, "portfolioId");
+        var action = "RejectPortfolioShare";
+        var payload = Util.mergeInto(options || {}, "PortfolioId", portfolioId);
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.scanProvisionedProducts = function (options) {
+        var action = "ScanProvisionedProducts";
+        return this._paginatedApi(action, options || {}, this.headers(action), "ProvisionedProducts");
+    };
+    AwsServiceCatalog.prototype.searchProducts = function (options) {
+        var action = "SearchProducts";
+        var payload = options || {};
+        payload.PageSize = payload.PageSize || this.defaultPageSize;
+        return this._paginatedApi(action, payload, this.headers(action), "ProductViewSummaries");
+    };
+    AwsServiceCatalog.prototype.searchProductsAsAdmin = function (options) {
+        var action = "SearchProductsAsAdmin";
+        var payload = options || {};
+        payload.PageSize = payload.PageSize || this.defaultPageSize;
+        return this._paginatedApi(action, payload, this.headers(action), "ProductViewDetails");
+    };
+    AwsServiceCatalog.prototype.searchProvisionedProducts = function (options) {
+        var action = "SearchProvisionedProducts";
+        return this._paginatedApi(action, options || {}, this.headers(action), "ProvisionedProducts");
+    };
+    AwsServiceCatalog.prototype.terminateProvisionedProduct = function (productId, terminateToken, options) {
+        // terminateToken is 1-128 chars matching [a-zA-Z0-9][a-zA-Z0-9_-]*
+        var action = "TerminateProvisionedProduct";
+        var payload = Util.mergeInto(options || {}, "ProvisionedProductId", Util.assertExists(productId, "productId"), "TerminateToken", Util.assertMatches(terminateToken, this.tokenRegex));
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.updateServiceAction = function (id, options) {
+        var action = "UpdateServiceAction";
+        var payload = Util.mergeInto(options || {}, "Id", Util.assertExists(id, "id"));
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.updateConstraint = function (id, options) {
+        var action = "UpdateConstraint";
+        var payload = Util.mergeInto(options || {}, "Id", Util.assertExists(id, "id"));
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.updatePortfolio = function (id, options) {
+        var action = "UpdatePortfolio";
+        var payload = Util.mergeInto(options || {}, "Id", Util.assertExists(id, "id"));
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.updateProduct = function (id, options) {
+        var action = "UpdateProduct";
+        var payload = Util.mergeInto(options || {}, "Id", Util.assertExists(id, "id"));
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.updateProvisionedProduct = function (provisionedProductId, productId, pathId, provisioningArtifactId, provisioningParameters, updateToken, options) {
+        var ae = Util.assertExists;
+        Util.assertMatches(updateToken, this.tokenRegex);
+        var action = "UpdateProvisionedProduct";
+        var payload = Util.mergeInto(options || {}, 
+        // not mandatory if the product has a default path.
+        "PathId", pathId, "ProductId", ae(productId, "productId"), "ProvisionedProductId", ae(provisionedProductId, "provisionedProductId"), "ProvisioningArtifactId", ae(provisioningArtifactId, "provisioningArtifactId"), "ProvisioningParameters", provisioningParameters, "UpdateToken", ae(updateToken, "updateToken"));
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.updateProvisioningArtifact = function (productId, provisioningArtifactId, options) {
+        var action = "UpdateProvisioningArtifact";
+        var payload = Util.mergeInto(options || {}, "ProductId", Util.assertExists(productId, "productId"), "ProvisioningArtifactId", Util.assertExists(provisioningArtifactId, "provisioningArtifactId"));
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    AwsServiceCatalog.prototype.updateTagOption = function (id, options) {
+        var action = "UpdateTagOption";
+        var payload = Util.mergeInto(options || {}, "Id", Util.assertExists(id, "id"));
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    return AwsServiceCatalog;
+}(AwsService));
+AwsServiceCatalog.prototype.type = 'AwsServiceCatalog';
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2017-09-12 08:23:05</sys_created_on>
+        <sys_id>09d3d2d7db010300cb04d421cf961949</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AwsServiceCatalog</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_09d3d2d7db010300cb04d421cf961949</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

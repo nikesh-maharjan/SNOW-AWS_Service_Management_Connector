@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.AwsSqs</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>AwsSqs</name>
+        <script><![CDATA[var AwsSqs = /** @class */ (function (_super) {
+    Polyfill.__extends(AwsSqs, _super);
+    function AwsSqs(region, credential, timeout) {
+        var _this = _super.call(this, "sqs", region, credential, true) || this;
+        /**
+         * Fetch messages from a queue and pass each message to provided a handler.
+         *
+         * Loop to fetch up-to a maximum number of messages.
+         *
+         * @param args
+         * - accountNumber the AWS Account that owns the SQS Queue
+         * - queueName the name of the SQS Queue
+         * - maxMessages the maximum number of messages to fetch and process
+         * - messageHandler the function that will receive each message fetched
+         */
+        _this.runQueue = function (args) {
+            var accountNumber = args.accountNumber, queueName = args.queueName, maxMessages = args.maxMessages, messageHandler = args.messageHandler;
+            var messageCounter = maxMessages;
+            var batchCounter = AwsSqs.getBatchCount(maxMessages);
+            var messages = [];
+            do {
+                batchCounter--;
+                var getResponse = _this.getSqsMessages(accountNumber, queueName, messageCounter);
+                if (getResponse.haveError()) {
+                    gs.error("[SYNC] Error reading messages from queue (" + queueName + "): " + getResponse.getErrorMessage());
+                    continue;
+                }
+                messages = AwsSqs.asArray(getResponse.data());
+                messages.forEach(function (message) {
+                    messageCounter--;
+                    try {
+                        messageHandler(message);
+                    }
+                    catch (e) {
+                        gs.warn("[SYNC] Message handler failed to process message: " + e.message);
+                    }
+                    var deleteResponse = _this.deleteMessage(accountNumber, queueName, message.ReceiptHandle);
+                    if (deleteResponse.haveError()) {
+                        gs.error("[SYNC] Error deleting message from queue (" + queueName + "): " + deleteResponse.getErrorMessage());
+                    }
+                });
+            } while (messageCounter > 0 && batchCounter > 0);
+        };
+        Util.assertExists(region, "region");
+        _this.setExponentialBackoff(timeout);
+        return _this;
+    }
+    /**
+     * @see https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_ReceiveMessage.html
+     * @param accountNumber
+     * @param queueName
+     * @param maxMessages The maximum number of messages to return.
+     * Amazon SQS never returns more messages than this value
+     * (however, fewer messages might be returned).
+     * Valid values: 1 to 10.
+     * Default: 1.
+     */
+    AwsSqs.prototype.getSqsMessages = function (accountNumber, queueName, maxMessages) {
+        Util.assertExists(queueName, "queueName");
+        Util.assertExists(accountNumber, "accountNumber");
+        var action = "ReceiveMessage";
+        var payloadObj = {
+            "Action": action,
+            "MaxNumberOfMessages": Math.min(10, maxMessages),
+            "AttributeName": "All",
+        };
+        return Response.of(this._get("/" + accountNumber + "/" + queueName, "", undefined, payloadObj), "ReceiveMessageResponse.ReceiveMessageResult.Message");
+    };
+    /**
+     * @see https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_DeleteMessageBatch.html
+     * @param accountNumber
+     * @param queueName
+     * @param messagesToPurge
+     */
+    AwsSqs.prototype.deleteSqsMessages = function (accountNumber, queueName, messagesToPurge) {
+        Util.assertExists(queueName, "queueName");
+        Util.assertExists(accountNumber, "accountNumber");
+        if (messagesToPurge.length > 10) {
+            throw new Error("This method accepts only a list of 1 to 10 messages to be deleted");
+        }
+        var action = "DeleteMessageBatch";
+        var payloadObj = {
+            "Action": action,
+        };
+        messagesToPurge.forEach(function (message, index) {
+            payloadObj["DeleteMessageBatchRequestEntry." + index + ".Id"] = message.Id;
+            payloadObj["DeleteMessageBatchRequestEntry." + index + ".ReceiptHandle"] = message.ReceiptHandle;
+        });
+        return Response.of(this._get("/" + accountNumber + "/" + queueName, "", undefined, payloadObj));
+    };
+    /**
+     * @see https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_DeleteMessage.html
+     * @param accountNumber
+     * @param queueName
+     * @param receiptHandle
+     */
+    AwsSqs.prototype.deleteMessage = function (accountNumber, queueName, receiptHandle) {
+        Util.assertExists(accountNumber, "accountNumber");
+        Util.assertExists(queueName, "queueName");
+        return Response.of(this._get("/" + accountNumber + "/" + queueName, "", undefined, {
+            "Action": "DeleteMessage",
+            "ReceiptHandle": receiptHandle
+        }), "DeleteMessageResponse");
+    };
+    AwsSqs.getBatchCount = function (maxMessages) {
+        // AWS.SQS.ReceiveMessages limits to a max of 10 messages per batch
+        return Math.floor(Math.ceil(maxMessages / 10));
+    };
+    AwsSqs.asArray = function (items) {
+        if (items === undefined) {
+            return [];
+        }
+        if (!Array.isArray(items)) {
+            return [items];
+        }
+        return items;
+    };
+    return AwsSqs;
+}(AwsService));
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-10-08 13:09:28</sys_created_on>
+        <sys_id>b31dd1acdb3710101aa72bfa4b961954</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AwsSqs</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_b31dd1acdb3710101aa72bfa4b961954</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

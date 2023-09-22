@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.HealthSyncProvider</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>HealthSyncProvider</name>
+        <script><![CDATA[var HealthSyncProvider = /** @class */ (function (_super) {
+    Polyfill.__extends(HealthSyncProvider, _super);
+    function HealthSyncProvider() {
+        var _this = _super.call(this) || this;
+        _this.providerName = "AWS Health";
+        _this.timeout = 120;
+        _this.MAX_MESSAGES = 50;
+        _this.QUEUE_NAME = gs.getProperty(C.sysprop.healthSQSName);
+        return _this;
+    }
+    HealthSyncProvider.prototype.filterAccountSync = function (accountSync) {
+        _super.prototype.filterAccountSync.call(this, accountSync);
+        accountSync.addQuery('awsaccount.awsenablehealthdashboard', 'true');
+    };
+    HealthSyncProvider.prototype.fromAwsWith = function (account, region) {
+        var _this = this;
+        var syncResults = {
+            success: true,
+            seconds: 0,
+            requests: 0
+        };
+        var timer = Util.startTimer();
+        var credentials = AwsCredentials.from(account).as(AwsCredentials.User.Sync);
+        var awsSqs = this.awsSqs(region, credentials);
+        var repo = this.healthRepo();
+        try {
+            awsSqs.runQueue({
+                accountNumber: account.awsaccountnumber.toString(),
+                maxMessages: this.MAX_MESSAGES,
+                queueName: this.QUEUE_NAME,
+                messageHandler: function (message) { return _this.processMessage(message, account, repo); }
+            });
+        }
+        catch (ex) {
+            syncResults.success = false;
+            syncResults.error = ex.message;
+        }
+        syncResults.seconds = timer.elapsed();
+        syncResults.requests = awsSqs.getRequestCount();
+        return syncResults;
+    };
+    HealthSyncProvider.prototype.healthRepo = function () {
+        return new HealthRepo();
+    };
+    HealthSyncProvider.prototype.fromSn = function (context) {
+        return {
+            success: true,
+            seconds: 0,
+            requests: 0
+        };
+    };
+    HealthSyncProvider.prototype.validate = function () {
+        return true;
+    };
+    HealthSyncProvider.prototype.awsSqs = function (region, credentials) {
+        return new AwsSqs(region, credentials, this.timeout);
+    };
+    HealthSyncProvider.prototype.processMessage = function (message, account, repo) {
+        var _a, _b;
+        var maybeMessage = Util.tryParseJson(message.Body, 'SQS Health Message');
+        if (!maybeMessage.success) {
+            gs.error("[SYNC][".concat(this.providerName, "] failed to parse SQS message ").concat(maybeMessage.reason));
+            return;
+        }
+        var event = maybeMessage.result;
+        //Consider the message valid only if it has an event arn
+        if (!((_a = event.detail) === null || _a === void 0 ? void 0 : _a.eventArn)) {
+            gs.warn("[SYNC][".concat(this.providerName, "] ignoring message that does not have an event ARN. (Body: ").concat(message.Body, ")"));
+            return;
+        }
+        var detail = event.detail;
+        //Region is not sent in the SQS message: parsing the event arn to get it instead
+        //Example: `arn:aws:health:us-west-2::event...someID` -> `us-west-2`
+        var region = '';
+        var splitEventArn = detail.eventArn.split(':');
+        if ((splitEventArn === null || splitEventArn === void 0 ? void 0 : splitEventArn.length) >= 3) {
+            region = splitEventArn[3];
+        }
+        var healthEvent = repo.insertOrUpdateEvent({
+            awsaccount: account.sys_id.toString(),
+            awsarn: detail.eventArn,
+            awsregion: region,
+            awscategory: detail.eventTypeCategory || '',
+            awsdescription: ((_b = detail.eventDescription) === null || _b === void 0 ? void 0 : _b.length) > 0 && detail.eventDescription[0].latestDescription ?
+                detail.eventDescription[0].latestDescription : '',
+            awsstarttime: detail.startTime ? Util.toGlideDateTime(detail.startTime) : '',
+            awsendtime: detail.endTime ? Util.toGlideDateTime(detail.endTime) : '',
+            awslastupdatedtime: //LastUpdatedTime is no sent as part of the SQS message:
+            // try to get it in case of future evolution, or use the Event time if it's not there
+            detail.lastUpdatedTime ? this.fromISO8601ToGlideDateTime(event.time) :
+                event.time ? this.fromISO8601ToGlideDateTime(event.time) : '',
+            awsservice: detail.service || '',
+            awsstatus: detail.statusCode || '',
+            awstype: detail.eventTypeCode || '',
+            awsmetadata: detail.affectedEntities ? JSON.stringify(detail.affectedEntities) : ''
+        });
+        var affectedEntities = detail.affectedEntities;
+        repo.deleteUnrelatedResources(healthEvent, affectedEntities);
+        affectedEntities.forEach(function (entity) {
+            repo.insertOrUpdateResource({
+                awshealthevent: healthEvent.sys_id.toString(),
+                awsresourceid: entity.entityValue,
+            });
+        });
+    };
+    //For some reason, the `time` dateTime property is set as ISO8601 format compare to the other fields ("YYYY-MM-DDThh:mm:"ss.sssZ)
+    HealthSyncProvider.prototype.fromISO8601ToGlideDateTime = function (dateTime) {
+        return new GlideDateTime(dateTime.replace("T", " "));
+    };
+    return HealthSyncProvider;
+}(AbstractSyncProvider));
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2022-03-28 14:01:26</sys_created_on>
+        <sys_id>783d39c12faa01109158d7a72799b6c2</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>HealthSyncProvider</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_783d39c12faa01109158d7a72799b6c2</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

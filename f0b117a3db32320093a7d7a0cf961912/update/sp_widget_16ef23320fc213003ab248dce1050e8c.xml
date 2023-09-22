@@ -1,0 +1,666 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category/>
+        <client_script><![CDATA[function provisionedProductDetailClient(spModal, spUtil, $timeout, $rootScope, $scope, provisionedProduct) {
+    var EVENT_PLAN_REFRESH = 'aws.plan.refresh';
+    var iteration = 0;
+    /* widget controller */
+    var c = this;
+    init();
+    function displayAnyWarnings() {
+        c.data.warnings.forEach(function (e) {
+            spUtil.addErrorMessage(e);
+        });
+    }
+    function isPlanIsProgress() {
+        if (!c.data.plan) {
+            return false;
+        }
+        return c.data.plan.Status === 'CREATE_IN_PROGRESS'
+            || c.data.plan.Status === 'EXECUTE_IN_PROGRESS';
+    }
+    function init() {
+        $timeout(function () {
+            $rootScope.$broadcast('sp.update.breadcrumbs', c.data.breadcrumbs);
+        });
+        if (c.data.productDetails) {
+            var filter = "sys_id=" + c.data.productDetails.sys_id;
+            spUtil.recordWatch($scope, "x_126749_aws_sc_cmdb_ci_pp", filter, function (name, data) {
+                spUtil.update($scope);
+            });
+        }
+        c.selectedEvent = null;
+        displayAnyWarnings();
+        if (isPlanIsProgress()) {
+            loadPlan();
+        }
+    }
+    function loadPlan() {
+        provisionedProduct.loadPlan(c.data.sys_id).then(function (response) {
+            c.data.plan.Status = response.result.ProvisionedProductPlanDetails.Status;
+            c.data.plan.StatusMessage = response.result.ProvisionedProductPlanDetails.StatusMessage;
+            c.data.plan.ResourceChanges = response.result.ResourceChanges;
+            if (isPlanIsProgress()) {
+                var timeout = Math.min((2 + (2 * iteration)), 15);
+                $timeout(function () {
+                    $scope.$broadcast(EVENT_PLAN_REFRESH);
+                }, timeout * 1000);
+            }
+            else {
+                iteration = 0;
+            }
+        }).catch(function (error) {
+            var message = error.message;
+            if (!message) {
+                message = error;
+            }
+            spUtil.addErrorMessage(message);
+        });
+    }
+    // NOTE error handling below is done as an error argument function rather than
+    // a .catch as the Widget Editor complains about invalid syntax when using catch
+    c.requestTermination = function ($event) {
+        $event.preventDefault();
+        spModal.open({
+            title: 'Terminate ' + c.data.productDetails.name + '?',
+            message: 'Please confirm termination request'
+        }).then(function () {
+            c.data.terminateRequested = true;
+            c.data.canTerminate = false;
+            return c.server.update();
+        }).then(function () {
+            displayAnyWarnings();
+        }).then(function () {
+            c.data.terminateRequested = false;
+        }, function (err) {
+            // Note we have to test if (err) as this reject function gets called when the
+            // user clicks 'Cancel' on the modal, not just when an error is thrown.
+            // If the user clicks cancel the value of err is undefined.
+            if (err) {
+                var message = err.message;
+                if (!message) {
+                    message = err;
+                }
+                spUtil.addErrorMessage(message);
+            }
+        });
+    };
+    c.selectEvent = function ($event, eventSysId) {
+        $event.preventDefault();
+        var found = c.data.events.find(function (element) {
+            return element.sys_id === eventSysId;
+        });
+        if (found) {
+            found.isSelected = !found.isSelected; // toggle the display of outputs
+        }
+    };
+    c.executePlan = function () {
+        provisionedProduct.executePlan(c.data.sys_id).then(function (response) {
+            loadPlan();
+        }).catch(function (error) {
+            loadPlan();
+        });
+    };
+    c.deletePlan = function () {
+        provisionedProduct.deletePlan(c.data.sys_id).then(function (response) {
+            delete c.data.plan;
+        }).catch(function (error) {
+            spUtil.addErrorMessage(error);
+        });
+    };
+    $scope.$on(EVENT_PLAN_REFRESH, function () {
+        iteration++;
+        loadPlan();
+    });
+}
+]]></client_script>
+        <controller_as>c</controller_as>
+        <css>.form-group {
+    margin-bottom: 10px;
+}
+
+.bs-callout {
+    margin: 10px 0 !important;
+    padding: 20px !important;
+    border-left-style: solid;
+    border-left-width: 10px;
+}
+
+.bs-callout-small {
+    padding: 10px !important;
+}
+
+.bs-callout-error {
+    background-color: #fdf7f7;
+    border-color: #d9534f;
+}
+
+.bs-callout-ok {
+    background-color: #f4f8fa;
+    border-color: #5bc0de;
+}
+
+.bs-callout-success {
+    background-color: #dff0d8;
+    border-color: #4cae4c;
+}
+
+.label.event {
+    float: right;
+    margin-right: 2px;
+}
+
+.panel-body &gt; div {
+    margin-bottom: 15px;
+}
+
+fa {
+    margin-right: 10px;
+}
+
+.intro {
+    padding: 20px !important
+}
+
+.arn {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.glyphicon-exclamation-sign {
+    color: #d9534f;
+}
+
+.timeline-heading a {
+    cursor: pointer;
+}
+
+.btn-primary a {
+    color: white;
+}
+
+.event-details {
+    margin-top: 10px;
+}
+
+.event-update {
+    border-left: 1px solid #ccc;
+    margin-left: 5px;
+    padding-left: 8px;
+}
+</css>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description>Details of one AWS Service Catalog provisioned product</description>
+        <docs/>
+        <field_list/>
+        <has_preview>true</has_preview>
+        <id>aws-sc-pp-detail</id>
+        <internal>false</internal>
+        <link/>
+        <name>AWS Product Details</name>
+        <option_schema/>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[(function () {
+    function getEvents(prod) {
+        var events = [];
+        // Needs to be GlideRecord in order to determine the status of the change request.
+        var ppe = new GlideRecord('x_126749_aws_sc_pp_event');
+        ppe.addQuery('awsproduct', prod.sys_id);
+        ppe.orderByDesc('sys_created_on');
+        ppe.query();
+        while (ppe.next()) {
+            var awsStatus = ppe.awsstatus.toString();
+            var statusOk = (["FAILED", "IN_PROGRESS_IN_ERROR"].indexOf(awsStatus) < 0);
+            var changeRequestStatus = !ppe.change_request.nil() ? ppe.change_request.approval.getDisplayValue() : null;
+            var createdTimeValues = null;
+            var updatedTimeValues = null;
+            if (!ppe.awscreatedtime.nil()) {
+                var createdTime = new GlideDateTime(ppe.awscreatedtime);
+                createdTimeValues = {
+                    value: createdTime.getValue(),
+                    displayValue: createdTime.getDisplayValue(),
+                    numericValue: createdTime.getNumericValue(),
+                    tzOffset: createdTime.getTZOffset()
+                };
+            }
+            if (!ppe.awsupdatedtime.nil()) {
+                var updatedTime = new GlideDateTime(ppe.awsupdatedtime);
+                updatedTimeValues = {
+                    value: updatedTime.getValue(),
+                    displayValue: updatedTime.getDisplayValue(),
+                    numericValue: updatedTime.getNumericValue(),
+                    tzOffset: updatedTime.getTZOffset()
+                };
+            }
+            var eventDetails = {
+                sys_id: ppe.sys_id.toString(),
+                createdTime: createdTimeValues,
+                isSelected: false,
+                pathId: ppe.awspathid.toString(),
+                productId: ppe.awsproductid.toString(),
+                productStatus: prod.awsproductstatus.getChoiceValue(),
+                provisionedProductId: ppe.awsprovisionedproductid.toString(),
+                provisionedProductName: ppe.awsprovisionedproductname.toString(),
+                provisionedProductType: ppe.awsprovisionedproducttype.toString(),
+                provisioningArtifactId: ppe.awsprovisioningartifactid.toString(),
+                recordId: ppe.awsrecordid.toString(),
+                recordType: ppe.awsrecordtype.toString(),
+                status: awsStatus,
+                statusOk: statusOk,
+                syncStatus: ppe.awssyncstatus.getChoiceValue(),
+                submissionStatus: ppe.awssubmissionstatus.toString(),
+                updatedTime: updatedTimeValues,
+                changeRequestStatus: changeRequestStatus
+            };
+            events.push(eventDetails);
+        }
+        return events;
+    }
+    function getOutputs(prod) {
+        var outputs = {};
+        var ppo = new GlideRecordSecure('x_126749_aws_sc_ppo');
+        ppo.addQuery('awsppevent.awsproduct', prod.sys_id);
+        ppo.query();
+        while (ppo.next()) {
+            var owningEvent = ppo.awsppevent.toString();
+            if (!(owningEvent in outputs)) {
+                outputs[owningEvent] = [];
+            }
+            var output = {
+                "event": owningEvent,
+                "key": ppo.awskey.toString(),
+                "value": ppo.awsvalue.toString(),
+                "description": ppo.awsdescription.toString()
+            };
+            outputs[owningEvent].push(output);
+        }
+        return outputs;
+    }
+    function getErrors(prod) {
+        var errors = {};
+        var ppe = new GlideRecordSecure('x_126749_aws_sc_pp_event_error');
+        ppe.addQuery('awsppevent.awsproduct', prod.sys_id);
+        ppe.query();
+        while (ppe.next()) {
+            var owningEvent = ppe.awsppevent.toString();
+            if (!(owningEvent in errors)) {
+                errors[owningEvent] = [];
+            }
+            var errorDetails = {
+                "event": owningEvent,
+                "code": ppe.awscode.toString(),
+                "description": ppe.awsdescription.toString()
+            };
+            errors[owningEvent].push(errorDetails);
+        }
+        return errors;
+    }
+    function getPlan(prod) {
+        if (prod.awsplan.nil()) {
+            return null;
+        }
+        var createdTime = new GlideDateTime(prod.awsplan.sys_created_on);
+        var plan = {
+            Status: prod.awsplan.awsstatus.toString(),
+            StatusMessage: prod.awsplan.awsstatusmessage.toString(),
+            CreatedTime: {
+                value: createdTime.getValue(),
+                displayValue: createdTime.getDisplayValue(),
+                numericValue: createdTime.getNumericValue(),
+                tzOffset: createdTime.getTZOffset()
+            },
+            ResourceChanges: []
+        };
+        if (!prod.awsplan.awsupdatedtime.nil()) {
+            var updatedTime = new GlideDateTime(prod.awsplan.awsupdatedtime);
+            plan.UpdatedTime = {
+                value: updatedTime.getValue(),
+                displayValue: updatedTime.getDisplayValue(),
+                numericValue: updatedTime.getNumericValue(),
+                tzOffset: updatedTime.getTZOffset()
+            };
+        }
+        var ppprc = new GlideRecordSecure('x_126749_aws_sc_pp_plan_rc');
+        ppprc.addQuery('awsplan', prod.getValue('awsplan'));
+        ppprc.query();
+        while (ppprc.next()) {
+            plan.ResourceChanges.push({
+                Action: ppprc.awsaction.toString(),
+                LogicalResourceId: ppprc.awslogicalresourceid.toString(),
+                PhysicalResourceId: ppprc.awsphysicalresourceid.toString(),
+                ResourceType: ppprc.awsresourcetype.toString(),
+                Replacement: ppprc.awsreplacement.toString()
+            });
+        }
+        return plan;
+    }
+    function loadDetails(pp) {
+        var createdTime = !pp.awscreatedtime.nil() ? new GlideDateTime(pp.awscreatedtime) : null;
+        var updatedTime = !pp.sys_updated_on.nil() ? new GlideDateTime(pp.sys_updated_on) : null;
+        data.productDetails = {
+            sys_id: pp.sys_id.toString(),
+            id: pp.awsid.toString(),
+            arn: pp.awsarn.toString(),
+            identity: pp.getValue('awsidentity'),
+            lastRecordId: pp.awslastrecordid.toString(),
+            name: pp.awsname.toString(),
+            productStatus: pp.awsproductstatus.getChoiceValue(),
+            region: pp.awsregion.toString(),
+            status: pp.awsstatus.toString(),
+            statusMessage: pp.awsstatusmessage.toString(),
+            syncStatus: pp.awssyncstatus.getChoiceValue()
+        };
+        if (createdTime) {
+            data.productDetails.createdTime = {
+                value: createdTime.getValue(),
+                displayValue: createdTime.getDisplayValue(),
+                numericValue: createdTime.getNumericValue(),
+                tzOffset: createdTime.getTZOffset()
+            };
+        }
+        if (updatedTime) {
+            data.productDetails.updatedTime = {
+                value: updatedTime.getValue(),
+                displayValue: updatedTime.getDisplayValue(),
+                numericValue: updatedTime.getNumericValue(),
+                tzOffset: updatedTime.getTZOffset()
+            };
+        }
+        data.events = getEvents(pp);
+        data.outputs = getOutputs(pp);
+        data.errors = getErrors(pp);
+        data.plan = getPlan(pp);
+        var provisionedProduct = new ProvisionedProduct(pp);
+        data.canTerminate = provisionedProduct.actions.terminate().isEnabled();
+        data.canUpdate = provisionedProduct.actions.update().isEnabled();
+        data.canExecutePlan = provisionedProduct.hasPlan() && provisionedProduct.actions.executePlan().isEnabled();
+        data.canExecuteAction = provisionedProduct.actions.executeServiceAction().isEnabled();
+        data.canDeletePlan = provisionedProduct.hasPlan() && provisionedProduct.getStatus() !== "PLAN_IN_PROGRESS";
+    }
+    function requestTerminate(ppGr) {
+        var pp = new ProvisionedProduct(ppGr);
+        if (pp.actions.terminate().isEnabled()) {
+            if (pp.getStatus() === 'PLAN_IN_PROGRESS') {
+                // if there's no plan then it was deleted out-of-band.
+                if (pp.hasPlan()) {
+                    // AWS Service Catalog deletes PLAN_IN_PROGRESS provisioned products when their
+                    // associated plans are deleted.
+                    var result = pp.getPlan().deletePlan();
+                    if (result.success === false) {
+                        gs.debug(result.reason);
+                        data.warnings.push("Error terminating " + pp.getName() + ": " + result.reason);
+                        return;
+                    }
+                }
+                ProvisionedProductRepo.updateWithStatus(ppGr, ProvisionedProduct.Status.terminated);
+                gs.info("Terminated " + pp.getName());
+            }
+            else {
+                pp.actions.terminate().request();
+                gs.info('Terminate requested for ' + pp.getName());
+            }
+        }
+    }
+    function initialize() {
+        data.warnings = [];
+        var terminateProduct = false;
+        if (input) {
+            data.sys_id = input.sys_id;
+            terminateProduct = input.terminateRequested;
+        }
+        else {
+            data.sys_id = $sp.getParameter("sys_id");
+        }
+        if (!data.sys_id) {
+            gs.debug('Cannot determine sys_id for provisioned product detail');
+            data.warnings.push('Cannot determine Product ID');
+            return;
+        }
+        try {
+            // Needs to be GlideRecord in order to check that its awsidentity is not nil, and
+            // thus whether terminate and update are enabled.
+            var pp = new GlideRecord('x_126749_aws_sc_cmdb_ci_pp');
+            pp.addQuery('sys_id', data.sys_id);
+            pp.addQuery('owned_by', gs.getUserID());
+            pp.query();
+            if (pp.next()) {
+                var listPage;
+                // Needs to be GlideRecord to set breadcrumbs correctly.
+                var page = new GlideRecord('sp_page');
+                if (page.get('id', 'aws_sc_pp')) {
+                    listPage = page.title.toString();
+                    data.breadcrumbs = [
+                        { label: listPage, url: '?id=aws_sc_pp' },
+                        { label: pp.awsname.toString(), url: '#' }
+                    ];
+                }
+                if (terminateProduct) {
+                    requestTerminate(pp);
+                }
+                loadDetails(pp);
+            }
+        }
+        catch (err) {
+            gs.info('Caught exception in retrieving provisioned product details for ' +
+                data.sys_id + (err.message ? err.message : err));
+            data.warnings.push('Product not found');
+        }
+    }
+    initialize();
+})();
+]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-05-17 15:02:41</sys_created_on>
+        <sys_id>16ef23320fc213003ab248dce1050e8c</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AWS Product Details</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sp_widget_16ef23320fc213003ab248dce1050e8c</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <template><![CDATA[<!--
+    Provisioned Product Detail
+-->
+<div ng-if="!data.productDetails" class="panel panel-{{c.options.color}} intro b">
+    No product information available
+</div>
+<div ng-if="data.productDetails" class="panel panel-{{c.options.color}} intro b">
+
+    <h1>{{ data.productDetails.name }}</h1>
+
+    <div class="arn"> {{ data.productDetails.arn }}</div>
+
+    <div class="wrapper-md">
+
+        <div class="row">
+            <div class="col-xs-2">Status</div>
+            <div class="col-xs-10">
+                <div>{{ data.productDetails.productStatus }}</div>
+                <div ng-if="data.productDetails.statusMessage">({{ data.productDetails.statusMessage }})</div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-2">Created</div>
+            <div class="col-xs-10">{{ data.productDetails.createdTime.displayValue }}</div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-2">Region</div>
+            <div class="col-xs-10">{{ data.productDetails.region }}</div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-2">Sync Status</div>
+            <div class="col-xs-10">{{ data.productDetails.syncStatus }}</div>
+        </div>
+    </div>
+
+    <div class="panel panel-{{c.options.color}} b">
+        <div class="panel-heading">
+            <h4 class="panel-title">Product Events</h4>
+        </div>
+        <div class="panel-body">
+            <div ng-if="data.events.length === 0">
+                <p>No events have been recorded against this provisioned product.</p>
+            </div>
+            <div ng-if="data.events.length > 0">
+                <div class="timeline-item" ng-repeat="event in data.events">
+                    <div class="bs-callout bs-callout-{{ event.statusOk ? 'ok' : 'error' }} ">
+                        <div class="timeline-heading">
+                            <a ng-click="c.selectEvent($event, event.sys_id)">
+                                <h4 class="timeline-title">
+                                    {{ event.recordType }}
+                                    <small ng-if="event.createdTime" class="text-muted"
+                                           uib-tooltip="{{ event.createdTime.displayValue }}" tooltip-placement="top">
+                                        <i class="glyphicon glyphicon-time "/>
+                                        <sn-time-ago timestamp="event.createdTime.value"></sn-time-ago>
+                                    </small>
+                                    <span ng-if="data.outputs[event.sys_id].length > 0"
+                                          class="label event label-as-badge label-primary">
+                                        <i class="glyphicon glyphicon-log-out"></i>
+                                        {{data.outputs[event.sys_id].length}}
+                                    </span>
+                                    <span ng-if="data.errors[event.sys_id].length > 0"
+                                          class="label event label-as-badge label-danger">
+                                        <i class="glyphicon glyphicon-fire"></i>
+                                        {{data.errors[event.sys_id].length}}
+                                    </span>
+                                </h4>
+                            </a>
+
+                            <p class="text-muted event-details">
+                                <i class="glyphicon glyphicon-flag"></i>
+                                <span ng-if="!event.createdTime">{{ event.submissionStatus }}</span>
+                                {{ event.changeRequestStatus === null || event.changeRequestStatus === 'Approved' ? event.status : event.changeRequestStatus | uppercase }}
+                                <em ng-if="event.updatedTime" class="event-update"
+                                    uib-tooltip="{{ event.updatedTime.displayValue }}" tooltip-placement="top">
+                                    Last updated
+                                    <sn-time-ago timestamp="event.updatedTime.value"></sn-time-ago>
+                                </em>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div ng-if="event.isSelected" ng-repeat="errorDetail in data.errors[event.sys_id]">
+                        <div class="form-group">
+                            <span class="glyphicon glyphicon-exclamation-sign"/>
+                            <span ng-if="errorDetail.code">{{ errorDetail.code }}</span>
+                            <span ng-if="errorDetail.description">{{ errorDetail.description }}</span>
+                        </div>
+                    </div>
+
+                    <div ng-if="event.isSelected"
+                         ng-repeat="output in data.outputs[event.sys_id] | orderBy:'key' ">
+                        <div class="form-group">
+                            <label for="outputValue-{{$index}}"><strong>{{ output.key }}</strong></label>
+                            <input id="outputValue-{{$index}}" class="form-control" ng-value="output.value"
+                                   readonly="readonly"/>
+                            <div>{{ output.description }}</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default" ng-if="data.plan && data.productDetails.productStatus.toLocaleLowerCase() !== 'terminated'">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                Planned resource changes
+                <small class="pull-right" uib-tooltip="{{ data.plan.CreatedTime.displayValue }}" tooltip-placement="top">
+                    <em>Created <sn-time-ago timestamp="data.plan.CreatedTime.value"></sn-time-ago></em>
+                </small>
+            </h4>
+        </div>
+        <div class="panel-body" ng-switch="data.plan.Status">
+            <div ng-switch-when="CREATE_IN_PROGRESS">
+                <p>A plan is currently being created. This will refresh once done.</p>
+            </div>
+
+            <div ng-switch-when="EXECUTE_IN_PROGRESS">
+                <p>A plan is currently being executed. This will refresh once done.</p>
+            </div>
+
+            <div ng-switch-when="CREATE_FAILED">
+                <p class="text-danger">
+                    <span class="glyphicon glyphicon-remove-sign"></span> The plan failed to create with the following error: <samp>{{data.plan.StatusMessage || 'Unknown error'}}</samp>. Please see the events above for more information.
+                </p>
+            </div>
+
+            <div ng-switch-when="EXECUTE_FAILED">
+                <p class="text-danger">
+                    <span class="glyphicon glyphicon-remove-sign"></span> The plan failed to execute with the following error: <samp>{{data.plan.StatusMessage || 'Unknown error'}}</samp>. Please see the events above for more information.
+                </p>
+            </div>
+
+            <div ng-switch-when="CREATE_SUCCESS|EXECUTE_SUCCESS" ng-switch-when-separator="|">
+                <div class="alert alert-success" role="alert" ng-if="data.plan.Status === 'EXECUTE_SUCCESS'">
+                    <span class="glyphicon glyphicon-ok"></span>
+                    This plan was executed <span ng-if="data.plan.UpdatedTime" uib-tooltip="{{ data.plan.UpdatedTime.displayValue }}" tooltip-placement="top"><sn-time-ago timestamp="data.plan.UpdatedTime.value"></sn-time-ago></span>
+                </div>
+
+                <p ng-if="data.plan.ResourceChanges.length === 0">A plan exist for this provisioned product, but no resource changes are associated to it.</p>
+
+                <div class="timeline-item" ng-repeat="resourceChange in data.plan.ResourceChanges">
+                    <div class="bs-callout bs-callout-small"
+                         ng-class="{'bs-callout-success': resourceChange.Action.toLocaleLowerCase() === 'add',
+                                    'bs-callout-ok': resourceChange.Action.toLocaleLowerCase() === 'modify',
+                                    'bs-callout-error': resourceChange.Action.toLocaleLowerCase() === 'remove'}">
+                        <div class="timeline-heading">
+                            <h4 class="timeline-title">
+                                {{ resourceChange.LogicalResourceId }}
+                                <span ng-if="resourceChange.Replacement.toLocaleLowerCase() !== 'false'"
+                                      class="label event label-as-badge label-warning">
+                                    <i class="glyphicon glyphicon-refresh"></i>
+                                    Replacement
+                                </span>
+                            </h4>
+                        </div>
+                        <span ng-if="resourceChange.ResourceType" class="text-muted">{{ resourceChange.ResourceType }}</span>
+                        <span ng-if="resourceChange.PhysicalResourceId" class="text-muted">({{ resourceChange.PhysicalResourceId }})</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="class=b-t">
+        <!-- Do update as a link because doing it as a button with a redirect
+         action causes the whole page to reload -->
+        <div ng-if="data.canUpdate" class="btn btn-default">
+            <a ng-href="/sp?id=aws_sc_up&sys_id={{ data.sys_id }}" href="javascript:void(0)">Request Update</a>
+        </div>
+        <!-- Do execute action as a link because doing it as a button with a redirect
+         action causes the whole page to reload -->
+        <div ng-if="data.canExecuteAction" class="btn btn-default">
+            <a ng-href="/sp?id=aws_sc_pp_action&sys_id={{ data.sys_id }}"  href="javascript:void(0)">Request Self-Service Action</a>
+        </div>
+        <!-- Single button -->
+        <div class="btn-group dropup" ng-if="data.plan">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Plan <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+                <li ng-class="{'disabled': !data.canExecutePlan}"><a href="javascript:void(0)" ng-click="c.executePlan()">Execute</a></li>
+                <li role="separator" class="divider"></li>
+                <li ng-class="{'disabled': !data.canDeletePlan}"><a href="javascript:void(0)" ng-click="c.deletePlan()">Delete</a></li>
+            </ul>
+        </div>
+        <button tabindex="0" name="terminate" ng-if="data.canTerminate"
+                class="btn btn-danger" ng-click="c.requestTermination($event)">
+            Request Termination
+        </button>
+    </div>
+
+</div>
+]]></template>
+    </sp_widget>
+</record_update>

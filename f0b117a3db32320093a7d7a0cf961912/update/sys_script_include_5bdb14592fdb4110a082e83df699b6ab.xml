@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.AwsCloudTrail</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>AwsCloudTrail</name>
+        <script><![CDATA[var AwsCloudTrail = /** @class */ (function (_super) {
+    Polyfill.__extends(AwsCloudTrail, _super);
+    function AwsCloudTrail(region, credential) {
+        return _super.call(this, 'cloudtrail', region, credential, true) || this;
+    }
+    AwsCloudTrail.prototype.headers = function (action) {
+        return {
+            'Content-Type': 'application/x-amz-json-1.1',
+            'X-Amz-Target': 'com.amazonaws.cloudtrail.v20131101.CloudTrail_20131101.' + action
+        };
+    };
+    // ListEventDataStores - https://docs.aws.amazon.com/awscloudtrail/latest/APIReference/API_ListEventDataStores.html
+    AwsCloudTrail.prototype.listEventDataStores = function (request) {
+        var action = 'ListEventDataStores';
+        return this._paginatedApi(action, request || {}, this.headers(action), 'EventDataStores', 'NextToken');
+    };
+    // GetEventDataStore - https://docs.aws.amazon.com/awscloudtrail/latest/APIReference/API_GetEventDataStore.html
+    AwsCloudTrail.prototype.getEventDataStore = function (request) {
+        var action = 'GetEventDataStore';
+        return Response.of(this._post(action, request, this.headers(action)));
+    };
+    // StartQuery - https://docs.aws.amazon.com/awscloudtrail/latest/APIReference/API_StartQuery.html
+    AwsCloudTrail.prototype.startQuery = function (request) {
+        var action = 'StartQuery';
+        return Response.of(this._post(action, request, this.headers(action)));
+    };
+    // DescribeQuery - https://docs.aws.amazon.com/awscloudtrail/latest/APIReference/API_DescribeQuery.html
+    AwsCloudTrail.prototype.describeQuery = function (request) {
+        var action = 'DescribeQuery';
+        return Response.of(this._post(action, request, this.headers(action)));
+    };
+    // GetQueryResults - https://docs.aws.amazon.com/awscloudtrail/latest/APIReference/API_GetQueryResults.html
+    AwsCloudTrail.prototype.getQueryResults = function (request) {
+        var action = 'GetQueryResults';
+        return this._paginatedApi(action, request, this.headers(action), 'QueryResultRows', 'NextToken');
+    };
+    return AwsCloudTrail;
+}(AwsService));
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2022-05-05 08:21:26</sys_created_on>
+        <sys_id>5bdb14592fdb4110a082e83df699b6ab</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AwsCloudTrail</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_5bdb14592fdb4110a082e83df699b6ab</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

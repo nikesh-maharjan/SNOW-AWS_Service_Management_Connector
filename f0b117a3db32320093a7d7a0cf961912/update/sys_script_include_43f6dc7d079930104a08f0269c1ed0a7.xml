@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.AwsSupport</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>AwsSupport</name>
+        <script><![CDATA[var AwsSupport = /** @class */ (function (_super) {
+    Polyfill.__extends(AwsSupport, _super);
+    /**
+     * Only two endpoints are supported: the us-east-1 endpoint and the us-gov-west-1 endpoint
+     * To determine which region to use, we check if any govCloud region is enabled for the given account
+	 add support to china region as well
+     */
+    function AwsSupport(accountSysId, credential) {
+        var _this = this;
+        var isGovCloudEndpoint = Util.isGovCloudAccount(accountSysId);
+		var isBeijingRegionEndpoint = Util.isBeijingRegionAccount(accountSysId);
+		var isNingxiaRegionEndpoint = Util.isNingxiaRegionAccount(accountSysId);
+		
+		var region;
+                if(Util.isGovCloudAccount(accountSysId)){
+					region = "us-gov-west-1";
+				} else if(Util.isBeijingRegionAccount(accountSysId)){
+					region = "cn-north-1";
+				} else if(Util.isNingxiaRegionAccount(accountSysId)) {
+					region = "cn-northwest-1";
+				} else {
+					region = "us-east-1";
+				}
+		
+        _this = _super.call(this, 'support',region, credential, true) || this;
+        _this.useGovCloudEndpoint = isGovCloudEndpoint;
+		_this.useBeijingRegionEndpoint = isBeijingRegionEndpoint;
+		_this.useNingxiaRegionEndpoint = isNingxiaRegionEndpoint;
+        return _this;
+    }
+    AwsSupport.prototype.headers = function (action) {
+        return {
+            'Content-Type': 'application/x-amz-json-1.1',
+            'X-Amz-Target': 'AWSSupport_20130415.' + action
+        };
+    };
+    /**
+     * Returns the details of an attachment specified by passing the attachment id.
+     *
+     * @see https://docs.aws.amazon.com/awssupport/latest/APIReference/API_DescribeAttachment.html
+     * @param request
+     */
+    AwsSupport.prototype.describeAttachment = function (request) {
+        var action = "DescribeAttachment";
+        var headers = this.headers(action);
+        return Response.of(this._post(action, request, headers));
+    };
+    /**
+     * Returns a list of cases that you specify by passing one or more case IDs.
+     *
+     * @see https://docs.aws.amazon.com/awssupport/latest/APIReference/API_DescribeCases.html
+     * @param request
+     */
+    AwsSupport.prototype.describeCases = function (request) {
+        var _this = this;
+        var action = "DescribeCases";
+        var focus = "cases";
+        var pageToken = "nextToken";
+        var headers = this.headers(action);
+        var call = function (payload) {
+            return _this._post(action, payload, headers);
+        };
+        var pageFn = function (token) {
+            var pagedRequest = Object.extend({}, request);
+            pagedRequest[pageToken] = token;
+            return Response.paginated(call(pagedRequest), focus, pageFn, pageToken);
+        };
+        return Response.paginated(call(request), focus, pageFn, pageToken);
+    };
+    /**
+     * Returns all communications associated with a support case.
+     *
+     * @see https://docs.aws.amazon.com/awssupport/latest/APIReference/API_DescribeCommunications.html
+     * @param request
+     */
+    AwsSupport.prototype.describeCommunications = function (request) {
+        var _this = this;
+        var action = "DescribeCommunications";
+        var focus = "communications";
+        var pageToken = "nextToken";
+        var headers = this.headers(action);
+        var call = function (payload) {
+            return _this._post(action, payload, headers);
+        };
+        var pageFn = function (token) {
+            var pagedRequest = Object.extend({}, request);
+            pagedRequest[pageToken] = token;
+            return Response.paginated(call(pagedRequest), focus, pageFn, pageToken);
+        };
+        return Response.paginated(call(request), focus, pageFn, pageToken);
+    };
+    /**
+     * Returns the current list of AWS services and a list of service categories for each service.
+     *
+     * @see https://docs.aws.amazon.com/awssupport/latest/APIReference/API_DescribeServices.html
+     * @param request
+     */
+    AwsSupport.prototype.describeServices = function (request) {
+        var action = "DescribeServices";
+        var focus = "services";
+        var headers = this.headers(action);
+        return Response.of(this._post(action, request, headers), focus);
+    };
+    /**
+     * Creates a case in the AWS Support Center.
+     *
+     * @see https://docs.aws.amazon.com/awssupport/latest/APIReference/API_CreateCase.html
+     * @param request
+     */
+    AwsSupport.prototype.createCase = function (request) {
+        var action = "CreateCase";
+        var focus = "";
+        var headers = this.headers(action);
+        return Response.of(this._post(action, request, headers), focus);
+    };
+    /**
+     * Adds additional customer communication to an AWS Support case.
+     *
+     * @see https://docs.aws.amazon.com/awssupport/latest/APIReference/API_AddCommunicationToCase.html
+     * @param request
+     */
+    AwsSupport.prototype.addCommunicationToCase = function (request) {
+        var action = "AddCommunicationToCase";
+        var focus = "";
+        var headers = this.headers(action);
+        return Response.of(this._post(action, request, headers), focus);
+    };
+    /**
+     * Adds one or more attachments to an attachment set.
+     *
+     * @see https://docs.aws.amazon.com/awssupport/latest/APIReference/API_AddAttachmentsToSet.html
+     * @param request
+     */
+    AwsSupport.prototype.addAttachmentsToSet = function (request) {
+        var action = "AddAttachmentsToSet";
+        var focus = "";
+        var headers = this.headers(action);
+        return Response.of(this._post(action, request, headers), focus);
+    };
+    /**
+     * Resolves a support case.
+     *
+     * @see https://docs.aws.amazon.com/awssupport/latest/APIReference/API_ResolveCase.html
+     * @param request
+     */
+    AwsSupport.prototype.resolveCase = function (request) {
+        var action = "ResolveCase";
+        var focus = "";
+        var headers = this.headers(action);
+        return Response.of(this._post(action, request, headers), focus);
+    };
+    return AwsSupport;
+}(AwsService));
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-07-12 15:00:42</sys_created_on>
+        <sys_id>43f6dc7d079930104a08f0269c1ed0a7</sys_id>
+        <sys_mod_count>2</sys_mod_count>
+        <sys_name>AwsSupport</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_43f6dc7d079930104a08f0269c1ed0a7</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2023-03-14 18:59:51</sys_updated_on>
+    </sys_script_include>
+</record_update>

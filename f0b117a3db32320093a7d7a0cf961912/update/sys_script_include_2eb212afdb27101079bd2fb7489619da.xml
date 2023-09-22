@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.ProblemRepo</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>ProblemRepo</name>
+        <script><![CDATA[var ProblemRepo = /** @class */ (function () {
+    function ProblemRepo() {
+        // fields on an Problem that when changed would result in an update to any related OpsItem
+        this.mappedProblemToOpsItemFields = [
+            'description',
+            'impact',
+            'urgency',
+            'short_description',
+            'state',
+        ];
+    }
+    ProblemRepo.prototype.shouldCreateOrUpdateFromFinding = function (finding) {
+        var findingAction = gs.getProperty(C.sysprop.securityHubSyncFindingAction);
+        return (findingAction === 'Create problem' || findingAction === 'Create both (incident/problem)' || !!finding.awsproblem);
+    };
+    ProblemRepo.prototype.insertOrUpdateFromFinding = function (finding) {
+        var priorityMapping = new PriorityMapping();
+        var mappedFields = priorityMapping.getMappedFromFindingOrOpsItem(finding);
+        //for multi-choice fields we need to post the numerical value of the field
+        //instead of the string value
+        //service is a reference field to cmdb_ci_service - need to add AWS to that table and get sys_id of record
+        var additionalFields = {
+            state: undefined,
+            description: finding.awsdescription,
+            opened_at: finding.awscreatedat,
+            company: finding.awscompanyname,
+            impact: parseInt(mappedFields.impact),
+            urgency: parseInt(mappedFields.urgency),
+            category: 'software',
+            business_service: Util.getAwsServiceId('AWS Security Hub'),
+            short_description: finding.awsdescription
+        };
+        //Resolution code is required to change a Problem status to Resolved
+        //resolution_code - options fix_applied, risk_accepted, canceled, duplicate
+        if (finding.awsworkflowstatus.toString() === 'RESOLVED') {
+            additionalFields['resolution_code'] = 'fix_applied';
+            additionalFields['fix_notes'] = "Resolved by Finding " + finding.sys_id;
+            additionalFields['cause_notes'] = "Updated by Finding " + finding.sys_id;
+        }
+        var problem = this.insertOrUpdate(finding.getValue('awsproblem'), additionalFields);
+        this.updateFindingWithProblem(finding, problem);
+        return problem;
+    };
+    ProblemRepo.prototype.insertOrUpdate = function (problemSysId, problemFields) {
+        return Util.insertOrUpdate('problem', { sys_id: problemSysId }, problemFields, false);
+    };
+    ProblemRepo.prototype.updateFindingWithProblem = function (finding, problem) {
+        if (finding.getValue('awsproblem') !== problem.sys_id.toString()) {
+            gs.info('Updating finding with new problem');
+            Util.setValue(finding, 'awsproblem', problem.sys_id.toString());
+            finding.update();
+        }
+        return finding;
+    };
+    //TODO Problem creation/update working apart from:
+    // State transitions - transitioning directly from Assess to Closed should be allowed
+    // by workflow rules, but certain fields have to be populated to allow this.
+    // most are handled in this method, but further checking required.
+    // To re-enable, uncomment the code in 'insertOrUpdateProblemIfRequired' in OpsItemRepo
+    // also remember to uncomment the tests in 'test-ops-item-repo.js and 'test-problem-repo.js'
+    ProblemRepo.prototype.insertOrUpdateFromOpsItem = function (opsItem) {
+        var priorityMapping = new PriorityMapping();
+        var mappedFields = priorityMapping.getMappedFromFindingOrOpsItem(opsItem);
+        var additionalFields = {
+            opened_at: opsItem.awscreatedtime,
+            company: opsItem.awssource,
+            description: opsItem.awsdescription,
+            impact: parseInt(mappedFields.impact),
+            urgency: parseInt(mappedFields.urgency),
+            category: 'Software',
+            business_service: Util.getAwsServiceId('AWS Systems Manager - OpsCenter'),
+            short_description: opsItem.awstitle,
+            state: this.stateFromOpsItem(opsItem),
+        };
+        //Problem 'assigned_to' field must be populated to allow state changes
+        //And the assigned user must be a member of the group Problem Solving
+        var associatedProblem = opsItem.problem.nil() ? null : opsItem.problem.getRefRecord();
+        if (associatedProblem === null || associatedProblem.assigned_to.nil()) {
+            var currentUser = gs.getUser();
+            var assignedTo = currentUser.getID();
+            additionalFields['assigned_to'] = assignedTo;
+        }
+        var assignmentGroupSysId = gs.getProperty(C.sysprop.opsCenterAssignmentGroup);
+        if (assignmentGroupSysId) {
+            additionalFields['assignment_group'] = assignmentGroupSysId;
+        }
+        //Resolution code is required to change a Problem status to Resolved
+        //resolution_code - options fix_applied, risk_accepted, canceled, duplicate
+        if (opsItem.getDisplayValue('awsstatus') === 'Resolved') {
+            additionalFields['resolution_code'] = 'fix_applied';
+            additionalFields['fix_notes'] = "Closed by OpsItem " + opsItem.sys_id;
+            additionalFields['cause_notes'] = "Updated by OpsItem " + opsItem.sys_id;
+        }
+        var problem = this.insertOrUpdate(opsItem.getValue('problem'), additionalFields);
+        this.updateOpsItemWithProblem(opsItem, problem);
+        return problem;
+    };
+    ProblemRepo.prototype.updateOpsItemWithProblem = function (opsItem, problem) {
+        var hasNoProblem = !opsItem.getValue('problem');
+        if (hasNoProblem ||
+            (opsItem.getValue('problem').toString() !== problem.sys_id.toString())) {
+            gs.info('Updating opsItem with new problem');
+            Util.setValue(opsItem, 'problem', problem.sys_id.toString());
+            opsItem.update();
+        }
+    };
+    /**
+     * Checks if the user has selected to create Problems when an OpsItem is
+     * created and the Problem doesn't already exist.
+     *
+     * @param opsItem the OpsItem that has been created
+     * @param action  the action to perform when an new OpsItem is created
+     */
+    ProblemRepo.prototype.shouldCreateFromOpsItem = function (opsItem, action) {
+        var shouldBeCreatingProblems = action === 'Create problem' ||
+            action === 'Create both (incident/problem)';
+        var problemDoesNotAlreadyExist = opsItem.problem !== undefined;
+        return shouldBeCreatingProblems && problemDoesNotAlreadyExist;
+    };
+    ProblemRepo.prototype.stateFromOpsItem = function (opsItem) {
+        var opsItemStatus = opsItem.getValue('awsstatus');
+        switch (opsItemStatus) {
+            case 'Open':
+                return this.getProblemState('New');
+            case 'InProgress':
+                return this.getProblemState('Assess');
+            case 'Resolved':
+                return this.getProblemState('Resolved');
+            default:
+                return undefined;
+        }
+    };
+    ProblemRepo.prototype.getProblemState = function (label) {
+        return Util.getChoiceValueFromLabel('problem', 'problem_state', label);
+    };
+    /**
+     * Search for a Problem by the sys_id, returns undefined if no record found.
+     *
+     * @param problemId the sys_id of the Problem record
+     */
+    ProblemRepo.prototype.get = function (problemId) {
+        var problem = new GlideRecord('problem');
+        problem.addQuery('sys_id', problemId);
+        problem.query();
+        if (problem.next()) {
+            return problem;
+        }
+        return undefined;
+    };
+    ProblemRepo.prototype.isUpdatedForOpsItem = function (current, previous) {
+        return this.mappedProblemToOpsItemFields.reduce(function (acc, field) {
+            var currentValue = current.getValue(field);
+            var previousValue = previous.getValue(field);
+            return currentValue !== previousValue || acc;
+        }, false);
+    };
+    return ProblemRepo;
+}());
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-10-05 14:29:20</sys_created_on>
+        <sys_id>2eb212afdb27101079bd2fb7489619da</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>ProblemRepo</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_2eb212afdb27101079bd2fb7489619da</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

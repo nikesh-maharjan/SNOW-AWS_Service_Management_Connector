@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.SystemsManagerAjax</api_name>
+        <caller_access/>
+        <client_callable>true</client_callable>
+        <description/>
+        <name>SystemsManagerAjax</name>
+        <script><![CDATA[var SystemsManagerAjax = /** @class */ (function (_super) {
+    Polyfill.__extends(SystemsManagerAjax, _super);
+    function SystemsManagerAjax() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.documentSysIdParameter = AjaxParameterSupplier.required('sysparm_documentSysId')
+            .gr('x_126749_aws_sc_document')
+            .notNil('name');
+        _this.opsitemParameter = AjaxParameterSupplier.optional('sysparm_opsitemSysId')
+            .gr('x_126749_aws_sc_opsitem');
+        _this.changeTemplateSysIdParameter = AjaxParameterSupplier.required('sysparm_changeTemplateSysId')
+            .catItemSearch()
+            .notNil('name');
+        _this.runbookNameParameter = AjaxParameterSupplier.required('sysparm_runbookName');
+        _this.runbookVersionParameter = AjaxParameterSupplier.required('sysparm_runbookVersion');
+        return _this;
+    }
+    SystemsManagerAjax.prototype.describeDocument = function () {
+        var _this = this;
+        return this._applyWith([
+            this.documentSysIdParameter,
+        ], function (documentGr) {
+            var name = documentGr.name.toString();
+            var versionName = documentGr.awsversionname.toString();
+            var credentials = AwsCredentials.from(documentGr).as(AwsCredentials.User.End);
+            var region = documentGr.awsregion.toString();
+            var response = new AwsSystemsManager(region, credentials).describeDocument(name, undefined, versionName);
+            if (!response.haveError()) {
+                return _this._response(response.getBody());
+            }
+            else {
+                return _this._errorResponse("Error describing document: " + response.getBody());
+            }
+        });
+    };
+    SystemsManagerAjax.prototype.getDocuments = function () {
+        var _this = this;
+        return this._applyWith([
+            this.opsitemParameter
+        ], function (opsitem) {
+            var accountSysId;
+            var region;
+            var associatedDocuments = [];
+            if (opsitem) {
+                accountSysId = opsitem.awsaccount.toString();
+                region = opsitem.awsregion.toString();
+                var grAssociatedDocument = new GlideRecord('x_126749_aws_sc_opsitem_ad');
+                grAssociatedDocument.addQuery('awsopsitem', opsitem.sys_id.toString());
+                grAssociatedDocument.addNotNullQuery('configuration_item');
+                grAssociatedDocument.query();
+                while (grAssociatedDocument.next()) {
+                    associatedDocuments.push(grAssociatedDocument.configuration_item.toString());
+                }
+            }
+            var documents = [];
+            var grDocuments = new GlideRecord('x_126749_aws_sc_document');
+            if (accountSysId) {
+                grDocuments.addQuery('awsaccount', accountSysId);
+            }
+            if (region) {
+                grDocuments.addQuery('awsregion', region);
+            }
+            grDocuments.query();
+            while (grDocuments.next()) {
+                documents.push({
+                    sysId: grDocuments.sys_id.toString(),
+                    name: grDocuments.name.toString(),
+                    description: grDocuments.description.toString(),
+                    version: !grDocuments.awsversionname.nil() ? grDocuments.awsversionname.toString() : '',
+                    associated: associatedDocuments.some(function (associatedDocument) { return associatedDocument === grDocuments.sys_id.toString(); })
+                });
+            }
+            return _this._response(documents);
+        });
+    };
+    SystemsManagerAjax.prototype.describeChangeTemplate = function () {
+        var _this = this;
+        return this._applyWith([
+            this.changeTemplateSysIdParameter
+        ], function (changeTemplateGr) {
+            var name = changeTemplateGr.name.toString();
+            var meta = JSON.parse(changeTemplateGr.meta.toString());
+            var version = meta.version;
+            var awsRegion = meta.region;
+            var credentials = AwsCredentials.from(changeTemplateGr).as(AwsCredentials.User.End);
+            var awsSystemsManager = new AwsSystemsManager(awsRegion, credentials);
+            var changeTemplateDocumentResponse = awsSystemsManager.getDocument(name, version);
+            if (changeTemplateDocumentResponse.haveError()) {
+                return _this._errorResponse("Error getting the AWS Change Template \"" + name + "\" (version " + version + "): " + changeTemplateDocumentResponse.getBody());
+            }
+            var changeTemplateDocument = changeTemplateDocumentResponse.deserialize();
+            // TODO: Should we make the effort of supporting YAML?
+            if (changeTemplateDocument.DocumentFormat !== "JSON") {
+                return _this._errorResponse("Cannot parse the AWS Change Template document because its format is \"" + changeTemplateDocument.DocumentType + "\". AWS SMC supports currently AWS Change Template of format \"JSON\"");
+            }
+            var changeTemplateDocumentContent = JSON.parse(changeTemplateDocument.Content);
+            return _this._response({
+                name: name,
+                version: version,
+                runbooks: Array.isArray(changeTemplateDocumentContent.executableRunBooks)
+                    ? changeTemplateDocumentContent.executableRunBooks
+                    : []
+            });
+        });
+    };
+    SystemsManagerAjax.prototype.describeChangeTemplateRunbook = function () {
+        var _this = this;
+        return this._applyWith([
+            this.changeTemplateSysIdParameter,
+            this.runbookNameParameter,
+            this.runbookVersionParameter
+        ], function (changeTemplateGr, documentName, documentVersion) {
+            var meta = JSON.parse(changeTemplateGr.meta.toString());
+            var region = meta.region;
+            var name = documentName;
+            var version = documentVersion;
+            var credentials = AwsCredentials.from(changeTemplateGr).as(AwsCredentials.User.End);
+            var runbookResponse = new AwsSystemsManager(region, credentials).describeDocument(name, version);
+            if (!runbookResponse.haveError()) {
+                return _this._response(runbookResponse.getBody());
+            }
+            else {
+                return _this._errorResponse("Error describing runbook \"" + name + "\" (version " + version + "): " + runbookResponse.getBody());
+            }
+        });
+    };
+    return SystemsManagerAjax;
+}(AbstractAwsAjaxProcessor));
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-05-07 13:05:23</sys_created_on>
+        <sys_id>2e479c8b2fac101047d8b6a62799b6a3</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>SystemsManagerAjax</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_2e479c8b2fac101047d8b6a62799b6a3</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update>
+    <sys_ui_section caption="AWS Systems Manager Incident Manager" section_id="3b9005df1b220110282ced74604bcb3f" sys_domain="global" table="incident" version="3" view="AWS_Systems_Manager_Incident_Manager">
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>x_126749_aws_sc_awsaccount</element>
+            <position>0</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2022-04-13 10:33:50</sys_created_on>
+            <sys_id>a23723c61bb20110282ced74604bcb45</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="AWS Systems Manager Incident Manager" display_value="AWS Systems Manager Incident Manager" name="incident" sys_domain="global" view="23ddbc1f1b220110282ced74604bcba7">3b9005df1b220110282ced74604bcb3f</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-04-13 10:33:50</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>x_126749_aws_sc_awsregion</element>
+            <position>1</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2022-04-13 10:33:50</sys_created_on>
+            <sys_id>2a3723c61bb20110282ced74604bcb45</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="AWS Systems Manager Incident Manager" display_value="AWS Systems Manager Incident Manager" name="incident" sys_domain="global" view="23ddbc1f1b220110282ced74604bcba7">3b9005df1b220110282ced74604bcb3f</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-04-13 10:33:50</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>x_126749_aws_sc_awscreationtime</element>
+            <position>2</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2022-04-13 10:33:50</sys_created_on>
+            <sys_id>ae3723c61bb20110282ced74604bcb45</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="AWS Systems Manager Incident Manager" display_value="AWS Systems Manager Incident Manager" name="incident" sys_domain="global" view="23ddbc1f1b220110282ced74604bcba7">3b9005df1b220110282ced74604bcb3f</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-04-13 10:33:50</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>.split</element>
+            <position>3</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2022-04-13 10:33:50</sys_created_on>
+            <sys_id>263723c61bb20110282ced74604bcb46</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="AWS Systems Manager Incident Manager" display_value="AWS Systems Manager Incident Manager" name="incident" sys_domain="global" view="23ddbc1f1b220110282ced74604bcba7">3b9005df1b220110282ced74604bcb3f</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-04-13 10:33:50</sys_updated_on>
+            <sys_user/>
+            <type>.split</type>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>x_126749_aws_sc_awsstatus</element>
+            <position>4</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2022-04-13 10:33:50</sys_created_on>
+            <sys_id>aa3723c61bb20110282ced74604bcb46</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="AWS Systems Manager Incident Manager" display_value="AWS Systems Manager Incident Manager" name="incident" sys_domain="global" view="23ddbc1f1b220110282ced74604bcba7">3b9005df1b220110282ced74604bcb3f</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-04-13 10:33:50</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>x_126749_aws_sc_awslastupdatedtime</element>
+            <position>5</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2022-04-13 10:33:50</sys_created_on>
+            <sys_id>223723c61bb20110282ced74604bcb47</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="AWS Systems Manager Incident Manager" display_value="AWS Systems Manager Incident Manager" name="incident" sys_domain="global" view="23ddbc1f1b220110282ced74604bcba7">3b9005df1b220110282ced74604bcb3f</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-04-13 10:33:50</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>x_126749_aws_sc_awsresolvetime</element>
+            <position>6</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2022-04-13 10:33:50</sys_created_on>
+            <sys_id>a63723c61bb20110282ced74604bcb47</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="AWS Systems Manager Incident Manager" display_value="AWS Systems Manager Incident Manager" name="incident" sys_domain="global" view="23ddbc1f1b220110282ced74604bcba7">3b9005df1b220110282ced74604bcb3f</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-04-13 10:33:50</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>.end_split</element>
+            <position>7</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2022-04-13 10:33:50</sys_created_on>
+            <sys_id>2e3723c61bb20110282ced74604bcb47</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="AWS Systems Manager Incident Manager" display_value="AWS Systems Manager Incident Manager" name="incident" sys_domain="global" view="23ddbc1f1b220110282ced74604bcba7">3b9005df1b220110282ced74604bcb3f</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-04-13 10:33:50</sys_updated_on>
+            <sys_user/>
+            <type>.end_split</type>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>x_126749_aws_sc_awsincidentarn</element>
+            <position>8</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2022-04-13 10:33:50</sys_created_on>
+            <sys_id>a23723c61bb20110282ced74604bcb48</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="AWS Systems Manager Incident Manager" display_value="AWS Systems Manager Incident Manager" name="incident" sys_domain="global" view="23ddbc1f1b220110282ced74604bcba7">3b9005df1b220110282ced74604bcb3f</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-04-13 10:33:50</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>x_126749_aws_sc_awsincidenturl</element>
+            <position>9</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2022-04-13 10:33:50</sys_created_on>
+            <sys_id>2a3723c61bb20110282ced74604bcb48</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="AWS Systems Manager Incident Manager" display_value="AWS Systems Manager Incident Manager" name="incident" sys_domain="global" view="23ddbc1f1b220110282ced74604bcba7">3b9005df1b220110282ced74604bcb3f</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-04-13 10:33:50</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_section action="INSERT_OR_UPDATE">
+            <caption>AWS Systems Manager Incident Manager</caption>
+            <header>false</header>
+            <name>incident</name>
+            <roles/>
+            <sys_class_name>sys_ui_section</sys_class_name>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2022-04-04 09:22:37</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>3b9005df1b220110282ced74604bcb3f</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_name>incident</sys_name>
+            <sys_overrides/>
+            <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+            <sys_policy/>
+            <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+            <sys_update_name>sys_ui_section_3b9005df1b220110282ced74604bcb3f</sys_update_name>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+            <sys_user/>
+            <title>false</title>
+            <view display_value="AWS Systems Manager Incident Manager" name="AWS_Systems_Manager_Incident_Manager">23ddbc1f1b220110282ced74604bcba7</view>
+            <view_name/>
+        </sys_ui_section>
+    </sys_ui_section>
+</record_update>

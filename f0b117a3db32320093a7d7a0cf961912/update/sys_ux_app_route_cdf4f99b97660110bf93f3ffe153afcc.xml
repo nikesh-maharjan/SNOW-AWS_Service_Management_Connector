@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ux_app_route">
+    <sys_ux_app_route action="INSERT_OR_UPDATE">
+        <app_config display_value="AWS Service Management Connector config">efd1b51b97660110bf93f3ffe153af1a</app_config>
+        <description/>
+        <extension_point/>
+        <fields/>
+        <icon/>
+        <name>Other notifications</name>
+        <optional_parameters/>
+        <order>300</order>
+        <parent_macroponent display_value="Health Dashboard">7a32f91b97660110bf93f3ffe153af7a</parent_macroponent>
+        <parent_macroponent_composition_element_id>clbbkqeeaahhhhaaaaaarccaiiddddlyibbuccee</parent_macroponent_composition_element_id>
+        <route_type>other-notifications</route_type>
+        <screen_type display_value="Other notifications">89f4f59b97660110bf93f3ffe153afa0</screen_type>
+        <sys_class_name>sys_ux_app_route</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2022-04-04 13:11:16</sys_created_on>
+        <sys_id>cdf4f99b97660110bf93f3ffe153afcc</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Other notifications</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_ux_app_route_cdf4f99b97660110bf93f3ffe153afcc</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_ux_app_route>
+</record_update>

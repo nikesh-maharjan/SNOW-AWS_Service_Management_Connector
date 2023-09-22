@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>custom</category>
+        <client_script><![CDATA[function awsSsmAutomationPortalFormController($scope, $document, connectorAjax) {
+    /* widget controller */
+    var c = this;
+    // On Kingston, and only on Kingston, on the order page on Service Portal,
+    // the page displays a field (a text box) for the UI Page variable.
+    // This should not be shown, so we remove it manually. This can be removed
+    // once Kingston is no longer supported.
+    function removeAnyUiPageField() {
+        if (c.data.uiPageId) {
+            var uiPageDiv = document.getElementById(c.data.uiPageId);
+            if (uiPageDiv) {
+                var uiPageParent = uiPageDiv.parentElement;
+                uiPageParent.removeChild(uiPageDiv);
+            }
+        }
+    }
+    c.setUserToken = function () {
+        connectorAjax.setUserToken(c.data.sessionToken);
+        c.tokenIsSet = true;
+    };
+    var scope = $scope.$parent;
+    var documentSysId = null;
+    while (scope) {
+        if (scope.formModel) {
+            documentSysId = scope.formModel.sys_id;
+            break;
+        }
+        else {
+            scope = scope.$parent;
+        }
+    }
+    $document.get(0).scSubmissionError = function () {
+        // signal validation error to all components contained in this scope
+        $scope.$broadcast('aws-ssm:validationFailure', {});
+    };
+    if (!documentSysId) {
+        throw new Error('Could not determine document ID');
+    }
+    c.data.documentSysId = documentSysId;
+    removeAnyUiPageField();
+    c.onError = function (errs) {
+        // no action needed on this page
+    };
+    c.updateHiddenFields = function (model) {
+        $scope.page.g_form.setValue('DocumentName', model.documentName);
+        $scope.page.g_form.setValue('DocumentVersion', model.documentVersion);
+        $scope.page.g_form.setValue('Parameters', model.params);
+        $scope.page.g_form.setValue('Tags', model.tags);
+        $scope.page.g_form.setValue('IsValid', model.valid);
+    };
+    $scope.$watch('c.data.sessionToken', c.setUserToken);
+}
+]]></client_script>
+        <controller_as>c</controller_as>
+        <css/>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>false</has_preview>
+        <id>aws-ssm-automation-order-form</id>
+        <internal>false</internal>
+        <link><![CDATA[function link(scope, element, attrs, controller) {  }]]></link>
+        <name>AWS SSM Automation Service Portal Form</name>
+        <option_schema/>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[// TODO: Make this typescript + deployable annotation
+(function() {
+    var UI_PAGE_VARIABLE = 'uiPage';
+    var VARIABLE_SET = 'AWS Systems Manager Automation Variables';
+
+    data.sessionToken = gs.getSession().getSessionToken();
+
+    // The result of this query is used to remove the "UI Page" text box in Kingston.
+    var variableGr = new GlideRecord('item_option_new');
+    variableGr.addQuery('name', UI_PAGE_VARIABLE);
+    variableGr.addQuery('variable_set.name', VARIABLE_SET);
+    variableGr.query();
+    if (variableGr.next()) {
+        data.uiPageId = variableGr.sys_id.toString();
+    }
+
+})();
+]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-05-12 08:39:50</sys_created_on>
+        <sys_id>3daa0de02f7c141047d8b6a62799b6b8</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AWS SSM Automation Service Portal Form</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sp_widget_3daa0de02f7c141047d8b6a62799b6b8</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <template><![CDATA[<div ng-if="c.tokenIsSet">
+    <customize-document-form
+        document-sys-id="c.data.documentSysId"
+        on-model-update="c.updateHiddenFields(model)"
+        on-error="c.onError(errs)">
+    </customize-document-form>
+</div>
+]]></template>
+    </sp_widget>
+</record_update>

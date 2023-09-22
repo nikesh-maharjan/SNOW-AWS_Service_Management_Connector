@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_ui_policy">
+    <sys_ui_policy action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <conditions table="x_126749_aws_sc_account">awsaccountnumberISEMPTY^EQ<item endquery="false" field="awsaccountnumber" goto="false" newquery="false" operator="ISEMPTY" or="false" value=""/>
+            <item endquery="true" field="" goto="false" newquery="false" operator="=" or="false" value=""/>
+        </conditions>
+        <description/>
+        <global>true</global>
+        <inherit>false</inherit>
+        <isolate_script>true</isolate_script>
+        <model_id/>
+        <model_table/>
+        <on_load>true</on_load>
+        <order>100</order>
+        <reverse_if_false>false</reverse_if_false>
+        <run_scripts>true</run_scripts>
+        <script_false><![CDATA[function onCondition() {
+
+}]]></script_false>
+        <script_true><![CDATA[/** @Deployable({
+    table: 'sys_ui_policy',
+    column: 'script_true',
+    sysId: '834703481bc34110282ced74604bcb2d',
+    metadata: {
+        table: 'x_126749_aws_sc_account',
+        short_description: 'Hide Account Number when not available',
+        on_load: 1,
+        active: 1,
+        conditions: "awsaccountnumberISEMPTY^EQ",
+        reverse_if_false: 0,
+        run_scripts: 1
+    }
+})
+ */
+// @ts-ignore
+function onCondition() {
+    g_form.setDisplay('awsaccountnumber', false);
+}
+]]></script_true>
+        <set_values/>
+        <short_description>Hide Account Number when not available</short_description>
+        <sys_class_name>sys_ui_policy</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2022-04-19 13:23:43</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>834703481bc34110282ced74604bcb2d</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Hide Account Number when not available</sys_name>
+        <sys_overrides/>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_ui_policy_834703481bc34110282ced74604bcb2d</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <table>x_126749_aws_sc_account</table>
+        <ui_type>0</ui_type>
+        <view/>
+    </sys_ui_policy>
+</record_update>

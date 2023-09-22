@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.CloudtrailService</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>CloudtrailService</name>
+        <script><![CDATA[var CloudtrailService = /** @class */ (function () {
+    function CloudtrailService() {
+    }
+    CloudtrailService.prototype.syncFromAws = function (changeRequest) {
+        var providerName = 'AWS Systems Manager Change Manager - CloudTrail Event Lake';
+        var requestId = changeRequest.x_126749_aws_sc_awsrequestid.toString();
+        var account = changeRequest.x_126749_aws_sc_awsaccount.getRefRecord();
+        if (!account.awsenablechangemanager) {
+            gs.warn("[".concat(providerName, "] Skipping synchronization of AWS CloudTrail ") +
+                "events for Change Request of ID ".concat(requestId, ": the feature is disabled for ") +
+                "account ".concat(account.awsname));
+            return;
+        }
+        var eventDataStoreName = gs.getProperty(C.sysprop.changeManagerEventDataStoreName);
+        if (eventDataStoreName === null || eventDataStoreName === '') {
+            gs.addErrorMessage("Can't sync events for Change Request ".concat(changeRequest.x_126749_aws_sc_awsrequestid, ": ") +
+                'Event Data Store Name not set');
+            return;
+        }
+        var region = changeRequest.x_126749_aws_sc_awsregion.toString();
+        var credentials = AwsCredentials.from(account).as(AwsCredentials.User.Sync);
+        var awsCloudTrail = this.getAwsCloudTrail(region, credentials);
+        Util.foldMaybe({
+            maybe: this.findEventDataStoreId(eventDataStoreName, awsCloudTrail),
+            onSuccess: function (eventDataStoreId) {
+                gs.addInfoMessage('Starting synchronisation of AWS CloudTrail events. ' +
+                    'Please note that this might take a while.');
+                try {
+                    var workflow_1 = WorkflowTasks.syncAutomationExecutionEvents
+                        .startWorkflow(changeRequest, eventDataStoreId);
+                    gs.info("[".concat(providerName, "] Successfully requested synchronization of ") +
+                        "AWS CloudTrail events for Change Request ".concat(requestId, " from AWS. See workflow ") +
+                        "context ".concat(workflow_1.sys_id, " for the execution details"));
+                }
+                catch (ex) {
+                    gs.warn("[".concat(providerName, "] Error requesting synchronization of AWS CloudTrail ") +
+                        "events for Change Request ".concat(requestId, " from AWS: ").concat(Util.errorMessageFormat(ex.message)));
+                }
+            },
+            onError: function (error) {
+                gs.addErrorMessage(error.reason);
+            }
+        });
+    };
+    CloudtrailService.prototype.getAwsCloudTrail = function (region, credentials) {
+        return new AwsCloudTrail(region, credentials);
+    };
+    CloudtrailService.prototype.findEventDataStoreId = function (eventDataStoreName, cloudTrail) {
+        var _this = this;
+        var id = {
+            success: false,
+            reason: "Event Data Store named '".concat(eventDataStoreName, "' not found")
+        };
+        cloudTrail.listEventDataStores()
+            .forEach(function (dataStore) {
+            if (dataStore.Name === eventDataStoreName) {
+                id = { success: true, result: _this.dataStoreId(dataStore.EventDataStoreArn) };
+                return PaginationIteration.STOP;
+            }
+        });
+        return id;
+    };
+    // given ARN: "arn:aws:cloudtrail:ca-central-1:785884216041:eventdatastore/c34e3889-45f0-44c3-84f8-29dda8a9707"
+    // returns: "c34e3889-45f0-44c3-84f8-29dda8a9707"
+    CloudtrailService.prototype.dataStoreId = function (eventDataStoreArn) {
+        return eventDataStoreArn.substr(eventDataStoreArn.indexOf('/') + 1);
+    };
+    CloudtrailService.SyncChangeRequestEvents = /** @class */ (function () {
+        function class_1() {
+        }
+        class_1.prototype.runStartQuery = function (args) {
+            var changeRequestId = args.changeRequestId, automationExecutionId = args.automationExecutionId, eventDataStoreId = args.eventDataStoreId, awsCloudTrail = args.awsCloudTrail, state = args.state;
+            var maxEvents = parseInt(gs.getProperty(C.sysprop.changeManagerEventCountMax));
+            var repo = this.getCloudtrailEventRepo();
+            var latestEvent = repo.findLatestEventTime(changeRequestId);
+            var queryStatement = this.createSql({
+                changeRequestId: changeRequestId,
+                automationExecutionId: automationExecutionId,
+                eventDataStoreId: eventDataStoreId,
+                maxEvents: maxEvents,
+                latestEvent: latestEvent
+            });
+            return Util.foldMaybe({
+                maybe: this.startQuery(queryStatement, awsCloudTrail),
+                onSuccess: function (queryId) {
+                    state.stage = 'ResolveQuery';
+                    state.queryId = queryId;
+                    return { success: false, canRetry: true, message: 'Query started', state: state };
+                },
+                onError: function (error) {
+                    gs.addErrorMessage(error.reason);
+                    return { success: false, canRetry: false, message: error.reason };
+                }
+            });
+        };
+        class_1.prototype.runResolveQuery = function (args) {
+            var changeRequestId = args.changeRequestId, changeRequestSysId = args.changeRequestSysId, awsCloudTrail = args.awsCloudTrail, state = args.state, eventDataStoreId = args.eventDataStoreId;
+            var queryId = state.queryId;
+            return this.resolveQuery({
+                changeRequestId: changeRequestId,
+                changeRequestSysId: changeRequestSysId,
+                eventDataStoreId: eventDataStoreId,
+                queryId: queryId,
+                awsCloudTrail: awsCloudTrail
+            });
+        };
+        class_1.prototype.getCloudtrailEventRepo = function () {
+            return new CloudtrailEventRepo();
+        };
+        class_1.prototype.resolveQuery = function (args) {
+            var _this = this;
+            var changeRequestId = args.changeRequestId, changeRequestSysId = args.changeRequestSysId, eventDataStoreId = args.eventDataStoreId, queryId = args.queryId, awsCloudTrail = args.awsCloudTrail;
+            var monitorResult = this.monitorQuery({ changeRequestId: changeRequestId, eventDataStoreId: eventDataStoreId, queryId: queryId, awsCloudTrail: awsCloudTrail });
+            if (monitorResult.error) {
+                return monitorResult.error;
+            }
+            var repo = this.getCloudtrailEventRepo();
+            var errors = [];
+            var syncResult = awsCloudTrail.getQueryResults({
+                EventDataStore: eventDataStoreId,
+                QueryId: queryId
+            })
+                .forEach(function (resultRow) {
+                return _this.syncEvent({ resultRow: resultRow, repo: repo, changeRequestId: changeRequestId, changeRequestSysId: changeRequestSysId, errors: errors });
+            });
+            var state = {
+                stage: 'ResolveQuery',
+                queryId: queryId,
+            };
+            if (syncResult.success == false) {
+                return {
+                    success: false,
+                    canRetry: true,
+                    message: syncResult.message,
+                    state: state,
+                };
+            }
+            if (errors.length > 0) {
+                return {
+                    success: false,
+                    canRetry: true,
+                    message: "Error syncing ".concat(errors.length, " event(s) for Change Request ").concat(changeRequestId),
+                    state: state,
+                };
+            }
+            var message = "Sync finished for Change Request ".concat(changeRequestId);
+            gs.info(message);
+            gs.addInfoMessage(message);
+            return {
+                success: true,
+                message: 'completed'
+            };
+        };
+        class_1.prototype.syncEvent = function (args) {
+            var changeRequestId = args.changeRequestId, changeRequestSysId = args.changeRequestSysId, errors = args.errors, repo = args.repo, resultRow = args.resultRow;
+            try {
+                this.doSyncEvent(resultRow, repo, changeRequestId, changeRequestSysId);
+            }
+            catch (e) {
+                gs.error("Error processing row for " +
+                    "Change Request ".concat(changeRequestId, ": [").concat(e.name, "] ").concat(e.message));
+                errors.push(e.message);
+            }
+        };
+        class_1.prototype.createSql = function (args) {
+            var changeRequestId = args.changeRequestId, automationExecutionId = args.automationExecutionId, eventDataStoreId = args.eventDataStoreId, maxEvents = args.maxEvents, latestEvent = args.latestEvent;
+            var timeFilter = latestEvent
+                ? "AND eventTime > ".concat(latestEvent, " ")
+                : '';
+            return 'SELECT eventID, eventName, eventSource, eventTime, eventType, eventVersion, ' +
+                'readOnly, recipientAccountId, awsRegion, requestID, requestParameters, ' +
+                'responseElements, sourceIPAddress, userAgent, userIdentity, resources, ' +
+                'userIdentity.userName ' +
+                "FROM ".concat(eventDataStoreId, " ") +
+                'WHERE userIdentity.principalid IS NOT NULL ' +
+                'AND (' +
+                "userIdentity.arn LIKE '%ChangeRequest-".concat(changeRequestId, "%' ") +
+                "OR userIdentity.arn LIKE '%Automation-".concat(automationExecutionId, "%'") +
+                ') ' +
+                "AND userIdentity.invokedBy = 'ssm.amazonaws.com' " +
+                timeFilter +
+                "LIMIT ".concat(maxEvents);
+        };
+        class_1.prototype.monitorQuery = function (args) {
+            var changeRequestId = args.changeRequestId, eventDataStoreId = args.eventDataStoreId, queryId = args.queryId, awsCloudTrail = args.awsCloudTrail;
+            var describeResult = awsCloudTrail.describeQuery({
+                QueryId: queryId,
+                EventDataStore: eventDataStoreId
+            });
+            if (describeResult.haveError()) {
+                var message = "There was an error monitoring the query for the Change Request ".concat(changeRequestId, ": ").concat(describeResult.getErrorMessage());
+                gs.addErrorMessage(message);
+                return { error: { success: false, canRetry: false, message: message } };
+            }
+            var result = describeResult.getValue();
+            switch (result.QueryStatus) {
+                case "FAILED":
+                case "CANCELLED":
+                case "TIMED_OUT":
+                    var message = "The request for events from AWS didn't complete properly: ".concat(result.QueryStatus, " - ").concat(result.ErrorMessage);
+                    gs.addErrorMessage(message);
+                    return { error: { success: false, canRetry: false, message: message } };
+                case "FINISHED":
+                    return {}; // no error
+                case "QUEUED":
+                case "RUNNING":
+                default:
+                    return { error: {
+                            success: false,
+                            canRetry: true,
+                            message: "The request for events from AWS is not finished: ".concat(result.QueryStatus),
+                            state: {
+                                stage: 'ResolveQuery',
+                                queryId: queryId,
+                            }
+                        } };
+            }
+        };
+        // converts [{"fieldname-1":"value-1"}, {"fieldname-2":"value-2}]
+        // into {"fieldname-1":"value-1", "fieldname-2":"value-2"}
+        class_1.prototype.resultRowAsMap = function (resultRow) {
+            var result = {};
+            resultRow.forEach(function (row) { return Util.assign(result, row); });
+            return result;
+        };
+        //TODO should return a Maybe
+        class_1.prototype.resourcesAsList = function (args) {
+            var json = args.json, eventId = args.eventId, changeRequestId = args.changeRequestId;
+            var result = [];
+            var maybeParsed = Util.tryParseJson(json, 'resources');
+            if (maybeParsed.success == true) {
+                var parsed = maybeParsed.result;
+                parsed.forEach(function (resource) {
+                    result.push({
+                        arn: resource['arn'],
+                        type: resource['type'],
+                    });
+                });
+            }
+            else {
+                gs.warn("error parsing JSON resources for event ".concat(eventId, " for Change Request ").concat(changeRequestId));
+            }
+            return result;
+        };
+        class_1.prototype.startQuery = function (queryStatement, awsCloudTrail) {
+            var startResult = awsCloudTrail.startQuery({ QueryStatement: queryStatement });
+            if (startResult.haveError()) {
+                var message = 'There was an error attempting to fetch events for the ' +
+                    "Change Request: ".concat(startResult.getErrorMessage());
+                gs.addErrorMessage(message);
+                return {
+                    success: false,
+                    reason: message,
+                    isRetryable: true
+                };
+            }
+            return {
+                success: true,
+                result: startResult.getValue().QueryId
+            };
+        };
+        class_1.prototype.doSyncEvent = function (resultRow, repo, changeRequestId, changeRequestSysId) {
+            var row = this.resultRowAsMap(resultRow);
+            var event = repo.insertEvent(changeRequestSysId, row);
+            if (row['resources'] !== '') {
+                var resources = this.resourcesAsList({
+                    json: row['resources'],
+                    eventId: row['eventID'],
+                    changeRequestId: changeRequestId,
+                });
+                repo.insertResources(resources, event);
+            }
+        };
+        return class_1;
+    }()); //end SyncChangeRequestEvents
+    return CloudtrailService;
+}());
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2022-05-09 08:15:46</sys_created_on>
+        <sys_id>60f009ae2f130110d4e093acf699b642</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>CloudtrailService</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_60f009ae2f130110d4e093acf699b642</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update>
+    <sys_documentation element="object_id" label="Object Id" language="en" table="x_126749_aws_sc_cmdb_ci_config_pp">
+        <sys_documentation action="INSERT_OR_UPDATE">
+            <element>object_id</element>
+            <help/>
+            <hint/>
+            <label>Object Id</label>
+            <language>en</language>
+            <name>x_126749_aws_sc_cmdb_ci_config_pp</name>
+            <plural>Object Ids</plural>
+            <sys_class_name>sys_documentation</sys_class_name>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2020-04-30 17:12:21</sys_created_on>
+            <sys_id>a73794181b301010c059877ddc4bcb8a</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_name>Object Id</sys_name>
+            <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+            <sys_policy/>
+            <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+            <sys_update_name>sys_documentation_x_126749_aws_sc_cmdb_ci_config_pp_object_id_en</sys_update_name>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+            <url/>
+            <url_target/>
+        </sys_documentation>
+    </sys_documentation>
+</record_update>

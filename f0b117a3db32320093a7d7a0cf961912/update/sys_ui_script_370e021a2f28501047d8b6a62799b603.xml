@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ui_script">
+    <sys_ui_script action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <description/>
+        <global>false</global>
+        <ignore_in_now_experience>false</ignore_in_now_experience>
+        <name>x_126749_aws_sc.documentCatalog</name>
+        <script><![CDATA[/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// define __esModule on exports
+/******/ 	__webpack_require__.r = function(exports) {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
+/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__webpack_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = __webpack_require__(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+/******/ 		var ns = Object.create(null);
+/******/ 		__webpack_require__.r(ns);
+/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/ 		return ns;
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+/******/
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = 24);
+/******/ })
+/************************************************************************/
+/******/ ({
+
+/***/ 0:
+/***/ (function(module, exports) {
+
+module.exports = angular;
+
+/***/ }),
+
+/***/ 24:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+// EXTERNAL MODULE: external "angular"
+var external_angular_ = __webpack_require__(0);
+var external_angular_default = /*#__PURE__*/__webpack_require__.n(external_angular_);
+
+// CONCATENATED MODULE: ./documentCatalog/documentCatalog/documentCatalog_controller.js
+function DocumentCatalogController($scope, connectorAjax) {
+  var ctrl = this;
+  connectorAjax.setUserToken(ctrl.userToken);
+  ctrl.documentSysId = new GlideForm().getParameter("sysparm_id"); // Allow errors to be recorded from outside the app
+
+  document.scSubmissionError = function () {
+    // need to invoke 'apply' manually as the invocation of scSubmissionError is not performed by Angular
+    $scope.$apply(function () {
+      // signal validation error to all components contained in this scope
+      $scope.$broadcast('aws-ssm:validationFailure', {});
+    });
+  };
+
+  ctrl.onError = function (errs) {// no action needed on this page
+  };
+
+  ctrl.updateHiddenFields = function (model) {
+    g_form.setValue('DocumentName', model.documentName);
+    g_form.setValue('DocumentVersion', model.documentVersion);
+    g_form.setValue('Parameters', model.params);
+    g_form.setValue('Tags', model.tags);
+    g_form.setValue('OpsItemId', ctrl.opsitemId);
+    g_form.setValue('IsValid', model.valid);
+  };
+}
+// EXTERNAL MODULE: ./documentCatalog/documentCatalog/documentCatalog_template.html
+var documentCatalog_template = __webpack_require__(5);
+var documentCatalog_template_default = /*#__PURE__*/__webpack_require__.n(documentCatalog_template);
+
+// CONCATENATED MODULE: ./documentCatalog/documentCatalog/documentCatalog.js
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+
+
+/**
+ * A directive specifically for use within the main ServiceNow UI.
+ * It takes care of maintaining the `hiddenFields` corresponding to the variables
+ * in the variable set on the main UI page.
+ * Also it provides the function invoked to handle submission errors.
+ */
+
+var documentCatalog_DocumentCatalogDirective = function DocumentCatalogDirective() {
+  _classCallCheck(this, DocumentCatalogDirective);
+
+  return {
+    restrict: 'E',
+    scope: {},
+    controller: ['$scope', 'connectorAjax', DocumentCatalogController],
+    controllerAs: 'ctrl',
+    bindToController: {
+      userToken: "@",
+
+      /**
+       * The OpsItem ID to associate the automation execution to
+       */
+      opsitemId: '@?'
+    },
+    template: documentCatalog_template_default.a
+  };
+};
+
+
+// CONCATENATED MODULE: ./documentCatalog/documentCatalogUi.js
+
+
+external_angular_default.a.module('documentCatalog', ['awsComponents']).config(['$locationProvider', function ($locationProvider) {
+  $locationProvider.html5Mode({
+    enabled: true,
+    requireBase: false
+  });
+}]).directive('documentCatalogUi', function () {
+  return new documentCatalog_DocumentCatalogDirective();
+});
+
+/***/ }),
+
+/***/ 5:
+/***/ (function(module, exports) {
+
+module.exports = "<div ng-cloak> <customize-document-form document-sys-id=ctrl.documentSysId on-model-update=ctrl.updateHiddenFields(model) on-error=ctrl.onError(errs)> </customize-document-form> </div> ";
+
+/***/ })
+
+/******/ });]]></script>
+        <script_name>documentCatalog</script_name>
+        <sys_class_name>sys_ui_script</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-05-05 13:48:33</sys_created_on>
+        <sys_id>370e021a2f28501047d8b6a62799b603</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>x_126749_aws_sc.documentCatalog</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_ui_script_370e021a2f28501047d8b6a62799b603</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <ui_type>0</ui_type>
+        <use_scoped_format>false</use_scoped_format>
+    </sys_ui_script>
+</record_update>

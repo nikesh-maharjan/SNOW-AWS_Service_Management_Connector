@@ -1,0 +1,464 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ui_script">
+    <sys_ui_script action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <description/>
+        <global>false</global>
+        <ignore_in_now_experience>false</ignore_in_now_experience>
+        <name>x_126749_aws_sc.productCatalog</name>
+        <script><![CDATA[/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// define __esModule on exports
+/******/ 	__webpack_require__.r = function(exports) {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
+/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__webpack_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = __webpack_require__(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+/******/ 		var ns = Object.create(null);
+/******/ 		__webpack_require__.r(ns);
+/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/ 		return ns;
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+/******/
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = 18);
+/******/ })
+/************************************************************************/
+/******/ ({
+
+/***/ 0:
+/***/ (function(module, exports) {
+
+module.exports = angular;
+
+/***/ }),
+
+/***/ 1:
+/***/ (function(module, exports) {
+
+module.exports = "<div ng-cloak class=page-wrapper> <style type=text/css scoped>.page-wrapper{margin:10px 20px}.sc-error-message{padding:5px;font-size:large;font-weight:700}</style> <div ng-repeat=\"error in ctrl.errors track by $index\" class=\"bg-danger sc-error-message\"> {{error.message ? error.message : error}} </div> <form name=actionForm class=form-horizontal ng-submit=ctrl.submitForm() novalidate ng-cloak> <self-service-actions provisioned-product-sys-id=ctrl.model.provisionedProductSysId form=actionForm action=ctrl.model.action on-error=ctrl.addError(error) reset-errors=ctrl.resetErrors() inputs-disabled=ctrl.executing> </self-service-actions> <button type=submit ng-disabled=\"!ctrl.model.action || ctrl.executing || actionForm.$invalid\" class=\"btn btn-primary\">{{ ctrl.executing ? 'Executing...' : 'Execute' }}</button> </form> </div> ";
+
+/***/ }),
+
+/***/ 18:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+// EXTERNAL MODULE: external "angular"
+var external_angular_ = __webpack_require__(0);
+var external_angular_default = /*#__PURE__*/__webpack_require__.n(external_angular_);
+
+// CONCATENATED MODULE: ./productCatalog/executeSelfServiceActionUI/executeSelfServiceAction_controller.js
+function ExecuteSelfServiceActionUiController($scope, $location, connectorAjax, provisionedProduct) {
+  var ctrl = this;
+  ctrl.executing = false;
+  ctrl.model = {
+    provisionedProductSysId: $location.search()['sysparm_id'],
+    action: undefined
+  };
+  ctrl.errors = [];
+  connectorAjax.setUserToken(this.userToken);
+
+  ctrl.addError = function (error) {
+    ctrl.errors.push(error);
+  };
+
+  ctrl.resetErrors = function () {
+    ctrl.errors.length = 0;
+  };
+
+  ctrl.submitForm = function () {
+    ctrl.resetErrors();
+    ctrl.executing = true;
+    provisionedProduct.executeSelfServiceAction(ctrl.model.provisionedProductSysId, ctrl.model.action.Id, ctrl.model.action.Name, ctrl.model.action.Description).then(function (response) {
+      top.window.location.href = "/nav_to.do?uri=%2Fx_126749_aws_sc_cmdb_ci_pp.do%3Fsys_id%3D".concat(ctrl.model.provisionedProductSysId);
+    })["catch"](function (error) {
+      $scope.$applyAsync(function () {
+        ctrl.addError(error);
+      });
+    })["finally"](function () {
+      $scope.$applyAsync(function () {
+        ctrl.executing = false;
+      });
+    });
+  };
+}
+// EXTERNAL MODULE: ./productCatalog/executeSelfServiceActionUI/executeSelfServiceAction_template.html
+var executeSelfServiceAction_template = __webpack_require__(1);
+var executeSelfServiceAction_template_default = /*#__PURE__*/__webpack_require__.n(executeSelfServiceAction_template);
+
+// CONCATENATED MODULE: ./productCatalog/executeSelfServiceActionUI/executeSelfServiceAction.js
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+
+
+/**
+ * Directive for use in standard ServiceNow UI, to render the execute provisioned product action form component.
+ */
+
+var executeSelfServiceAction_ExecuteSelfServiceActionUiDirective = function ExecuteSelfServiceActionUiDirective() {
+  _classCallCheck(this, ExecuteSelfServiceActionUiDirective);
+
+  return {
+    restrict: 'E',
+    scope: {},
+    controller: ['$scope', '$location', 'connectorAjax', 'provisionedProduct', ExecuteSelfServiceActionUiController],
+    controllerAs: 'ctrl',
+    bindToController: {
+      userToken: '@'
+    },
+    template: executeSelfServiceAction_template_default.a
+  };
+};
+
+
+// CONCATENATED MODULE: ./productCatalog/productCatalogUI/productCatalog_controller.js
+function customizeProductController($scope, connectorAjax) {
+  var ctrl = this;
+  connectorAjax.setUserToken(ctrl.userToken);
+  ctrl.productSysId = new GlideForm().getParameter("sysparm_id"); // Allow errors to be recorded from outside the app
+
+  document.scSubmissionError = function () {
+    // need to invoke 'apply' manually as the invocation of scSubmissionError is not performed by Angular
+    $scope.$apply(function () {
+      // signal validation error to all components contained in this scope
+      $scope.$broadcast('aws-sc:validationFailure', {});
+    });
+  };
+
+  ctrl.onError = function (errs) {// no action needed on this page
+  };
+
+  ctrl.updateHiddenFields = function (model) {
+    g_form.setValue('ProvisionedProductSysId', model.provisionedProductSysId);
+    g_form.setValue('ProvisionedProductName', model.name);
+    g_form.setValue('ProvisioningArtifactId', model.productVersion);
+    g_form.setValue('PathId', model.launchOption);
+    g_form.setValue('ProvisioningParameters', model.params, model.params);
+    g_form.setValue('ProvisioningPreferences', model.preferences);
+    g_form.setValue('Tags', model.tags);
+    g_form.setValue('PlanId', model.plan);
+    g_form.setValue('IsValid', model.valid);
+  };
+}
+// EXTERNAL MODULE: ./productCatalog/productCatalogUI/productCatalog_template.html
+var productCatalog_template = __webpack_require__(2);
+var productCatalog_template_default = /*#__PURE__*/__webpack_require__.n(productCatalog_template);
+
+// CONCATENATED MODULE: ./productCatalog/productCatalogUI/productCatalog.js
+function productCatalog_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+
+
+/**
+ * A directive specifically for use within the main ServiceNow UI.
+ * It takes care of maintaining the `hiddenFields` corresponding to the variables
+ * in the variable set on the main UI page.
+ * Also it provides the function invoked to handle submission errors.
+ */
+
+var productCatalog_ProductCatalogUIScriptDirective = function ProductCatalogUIScriptDirective() {
+  productCatalog_classCallCheck(this, ProductCatalogUIScriptDirective);
+
+  return {
+    restrict: 'E',
+    scope: {},
+    controller: ['$scope', 'connectorAjax', customizeProductController],
+    controllerAs: 'ctrl',
+    bindToController: {
+      userToken: "@",
+      globalFeatures: "="
+    },
+    template: productCatalog_template_default.a
+  };
+};
+
+
+// CONCATENATED MODULE: ./productCatalog/updateProductUI/updateProduct_controller.js
+function updateProductController($rootScope, $scope, $location, provisionedProduct, connectorAjax) {
+  var ctrl = this;
+  connectorAjax.setUserToken(ctrl.userToken);
+  ctrl.errs = [];
+  ctrl.productSysId = $location.search()["sysparm_id"];
+  ctrl.inputsDisabled = true;
+  ctrl.updateRequested = false;
+  ctrl.hasPlan = false;
+  $scope.$on('on.plan.created', function () {
+    ctrl.hasPlan = true;
+  });
+  $scope.$on('on.plan.deleted', function () {
+    ctrl.hasPlan = false;
+  });
+  /*
+   * Capture the form so that we can mark required inputs as
+   * dirty when the form is submitted before everything is ready.
+   */
+
+  var form = undefined;
+
+  ctrl.setForm = function (f) {
+    form = f;
+  };
+
+  ctrl.onError = function (errs) {
+    ctrl.errs = errs;
+  };
+
+  ctrl.clickSubmit = function ($event) {
+    ctrl.dirtyForm();
+
+    if (form && !form.$valid || !ctrl.model.valid) {
+      $event.preventDefault();
+    }
+  };
+
+  ctrl.recordError = function (err) {
+    ctrl.errs.push(err);
+  };
+
+  ctrl.dirtyForm = function () {
+    if (form) {
+      angular.forEach(form.$error.required, function (field) {
+        field.$setDirty();
+      });
+    }
+  };
+
+  ctrl.submitForm = function () {
+    $rootScope.$broadcast('on.update.executing', true);
+    ctrl.inputsDisabled = true;
+    ctrl.updateRequested = true;
+    ctrl.errs.length = 0;
+    var options = {};
+
+    if (ctrl.model.preferences) {
+      options.ProvisioningPreferences = ctrl.model.preferences;
+    }
+
+    var promise = ctrl.model.planSysId ? provisionedProduct.executePlan(ctrl.productSysId) : provisionedProduct.updateProvisionedProduct(ctrl.productSysId, ctrl.model.launchOption, ctrl.model.productVersion, ctrl.model.params, options);
+    promise.then(function (result) {
+      if (!result.success) {
+        errs.push('update requested');
+        return;
+      }
+
+      var productPage = '/nav_to.do?uri=%2Fx_126749_aws_sc_cmdb_ci_pp.do%3Fsys_id%3D' + ctrl.productSysId;
+      top.window.location.href = productPage;
+    })["catch"](function (err) {
+      $rootScope.$broadcast('on.update.executing', false);
+      ctrl.inputsDisabled = false;
+      ctrl.recordError(err);
+    })["finally"](function () {
+      ctrl.updateRequested = false;
+    });
+  };
+
+  ctrl.updateModel = function (model) {
+    ctrl.model = model;
+  };
+}
+// EXTERNAL MODULE: ./productCatalog/updateProductUI/updateProduct_template.html
+var updateProduct_template = __webpack_require__(3);
+var updateProduct_template_default = /*#__PURE__*/__webpack_require__.n(updateProduct_template);
+
+// CONCATENATED MODULE: ./productCatalog/updateProductUI/updateProduct.js
+function updateProduct_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+
+
+/**
+ * Directive for use in standard ServiceNow UI, to render the update provisioned product form component.
+ */
+
+var updateProduct_UpdateProductUIScriptDirective = function UpdateProductUIScriptDirective() {
+  updateProduct_classCallCheck(this, UpdateProductUIScriptDirective);
+
+  return {
+    restrict: 'E',
+    scope: {},
+    controller: ['$rootScope', '$scope', '$location', 'provisionedProduct', 'connectorAjax', updateProductController],
+    controllerAs: 'ctrl',
+    bindToController: {
+      userToken: "@",
+      globalFeatures: "="
+    },
+    template: updateProduct_template_default.a
+  };
+};
+
+
+// CONCATENATED MODULE: ./productCatalog/manageProductUI/manageProduct_controller.js
+function manageProductController($scope, $location, connectorAjax, account) {
+  var ctrl = this;
+  connectorAjax.setUserToken(ctrl.userToken);
+  ctrl.errs = [];
+  ctrl.productSysId = $location.search()['sysparm_id'];
+
+  ctrl.addError = function (err) {
+    ctrl.errs.push(err);
+  };
+
+  ctrl.resetErrors = function () {
+    ctrl.errs.length = 0;
+  };
+}
+// EXTERNAL MODULE: ./productCatalog/manageProductUI/manageProduct_template.html
+var manageProduct_template = __webpack_require__(4);
+var manageProduct_template_default = /*#__PURE__*/__webpack_require__.n(manageProduct_template);
+
+// CONCATENATED MODULE: ./productCatalog/manageProductUI/manageProduct.js
+function manageProduct_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+
+
+/**
+ * Directive for use in standard ServiceNow UI, to render the management of a product.
+ */
+
+var manageProduct_ManageProductUIScriptDirective = function ManageProductUIScriptDirective() {
+  manageProduct_classCallCheck(this, ManageProductUIScriptDirective);
+
+  return {
+    restrict: 'E',
+    scope: {},
+    controller: ['$scope', '$location', 'connectorAjax', 'account', manageProductController],
+    controllerAs: 'ctrl',
+    bindToController: {
+      userToken: "@"
+    },
+    template: manageProduct_template_default.a
+  };
+};
+
+
+// CONCATENATED MODULE: ./productCatalog/productCatalogUi.js
+
+
+
+
+
+external_angular_default.a.module('productCatalog', ['awsComponents']).config(['$locationProvider', function ($locationProvider) {
+  $locationProvider.html5Mode({
+    enabled: true,
+    requireBase: false
+  });
+}]).directive('executeSelfServiceActionUi', function () {
+  return new executeSelfServiceAction_ExecuteSelfServiceActionUiDirective();
+}).directive('productCatalogUi', function () {
+  return new productCatalog_ProductCatalogUIScriptDirective();
+}).directive('updateProductUi', function () {
+  return new updateProduct_UpdateProductUIScriptDirective();
+}).directive('manageProductUi', function () {
+  return new manageProduct_ManageProductUIScriptDirective();
+});
+
+/***/ }),
+
+/***/ 2:
+/***/ (function(module, exports) {
+
+module.exports = "<div ng-cloak> <customize-product-form product-sys-id=ctrl.productSysId on-model-update=ctrl.updateHiddenFields(model) on-error=ctrl.onError(errs) global-features=ctrl.globalFeatures> </customize-product-form> </div> ";
+
+/***/ }),
+
+/***/ 3:
+/***/ (function(module, exports) {
+
+module.exports = "<div ng-cloak class=update-wrapper> <style type=text/css scoped>.update-wrapper{margin:10px 20px}.sc-error-message{padding:5px;font-size:large;font-weight:700}</style> <div ng-if=\"ctrl.errs.length > 0\"> <div ng-repeat=\"err in ctrl.errs track by $index\" class=\"bg-danger sc-error-message\"> {{err.message ? err.message : err}} </div> </div> <form name=form class=form-horizontal ng-submit=ctrl.submitForm() ng-cloak ng-disabled=true> <div ng-init=ctrl.setForm(form);></div> <update-product-form form=form product-sys-id=ctrl.productSysId on-model-update=ctrl.updateModel(model) on-error=ctrl.onError(errs) inputs-disabled=ctrl.inputsDisabled global-features=ctrl.globalFeatures> </update-product-form> <hr/> <button type=submit ng-click=ctrl.clickSubmit($event) ng-disabled=\"!ctrl.model.valid || ctrl.updateRequested || (ctrl.inputsDisabled && !ctrl.hasPlan)\"> Update </button> </form> </div> ";
+
+/***/ }),
+
+/***/ 4:
+/***/ (function(module, exports) {
+
+module.exports = "<div ng-cloak class=manage-wrapper> <style type=text/css scoped>.manage-wrapper{margin:10px 20px}.sc-error-message{padding:5px;font-size:large;font-weight:700}</style> <div ng-if=\"ctrl.errs.length > 0\"> <div ng-repeat=\"err in ctrl.errs track by $index\" class=\"bg-danger sc-error-message\"> {{err.message ? err.message : err}} </div> </div> <manage-product product-sys-id=ctrl.productSysId on-error=ctrl.addError(error) reset-errors=ctrl.resetErrors()> </manage-product> </div> ";
+
+/***/ })
+
+/******/ });]]></script>
+        <script_name>productCatalog</script_name>
+        <sys_class_name>sys_ui_script</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2017-10-02 11:29:05</sys_created_on>
+        <sys_id>b63e35b9dbed0300a5d3ddd0cf961924</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>x_126749_aws_sc.productCatalog</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_ui_script_b63e35b9dbed0300a5d3ddd0cf961924</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <ui_type>0</ui_type>
+        <use_scoped_format>false</use_scoped_format>
+    </sys_ui_script>
+</record_update>

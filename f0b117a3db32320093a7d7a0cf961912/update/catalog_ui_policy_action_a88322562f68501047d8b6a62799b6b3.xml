@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="catalog_ui_policy_action">
+    <catalog_ui_policy_action action="INSERT_OR_UPDATE">
+        <catalog_item/>
+        <catalog_variable>IO:3a3a18822fa8101047d8b6a62799b6cc</catalog_variable>
+        <cleared>false</cleared>
+        <disabled>true</disabled>
+        <field/>
+        <mandatory>ignore</mandatory>
+        <order>10</order>
+        <sys_class_name>catalog_ui_policy_action</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-05-05 15:22:11</sys_created_on>
+        <sys_id>a88322562f68501047d8b6a62799b6b3</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>DocumentName</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>catalog_ui_policy_action_a88322562f68501047d8b6a62799b6b3</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <table/>
+        <ui_policy display_value="Requested Item variables policy for an AWS Systems Manager Automation Document">84c226162f68501047d8b6a62799b66e</ui_policy>
+        <variable>DocumentName</variable>
+        <variable_set display_value="AWS Systems Manager Automation Variables">9ee9988e2f68101047d8b6a62799b6b3</variable_set>
+        <visible>true</visible>
+    </catalog_ui_policy_action>
+</record_update>

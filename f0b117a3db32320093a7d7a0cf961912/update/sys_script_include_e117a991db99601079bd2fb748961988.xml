@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.OpsItemRepo</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>OpsItemRepo</name>
+        <script><![CDATA[var OpsItemRepo = /** @class */ (function () {
+    function OpsItemRepo() {
+        // fields on OpsItem that when changed should be mapped to other tables
+        this.mappedOpsItemFields = [
+            'awstitle',
+            'awsdescription',
+            'awscreatedtime',
+            'awsstatus',
+            'awsseverity',
+            'awspriority',
+        ];
+    }
+    OpsItemRepo.prototype.updateFromProblemOrIncident = function (opsItem, source, isSourceNowResolved) {
+        //check update times to avoid circular updates
+        //adding 1s to opsItem update time avoids situation where opsItem update is
+        //at time 00s 999ms and source update time is at 01s 001ms
+        var opsItemUpdateTime = new GlideDateTime(opsItem.sys_updated_on);
+        opsItemUpdateTime.addSeconds(1);
+        if (new GlideDateTime(source.sys_updated_on).after(opsItemUpdateTime)) {
+            var priorityMapping = new PriorityMapping();
+            var mappedFields = priorityMapping.getMappedFromTask(source, opsItem);
+            var severity = mappedFields.opsItemSeverity ? mappedFields.opsItemSeverity.toString() : '';
+            var priority = mappedFields.opsItemPriority ? mappedFields.opsItemPriority.toString() : '';
+            var status = this.mapStatusToAws(source.state.getDisplayValue());
+            // Is OpsItem Updated?
+            var isPriorityChanged = opsItem.awspriority.toString() !== priority;
+            var isSeverityChanged = opsItem.awsseverity.toString() !== severity;
+            var isStatusChanged = opsItem.awsstatus.toString() !== status;
+            var isTitleChanged = opsItem.awstitle.toString() !== source.short_description.toString();
+            var isDescriptionChanged = opsItem.awsdescription.toString() !== source.description.toString();
+            var isOpsItemUpdateNeeded = isPriorityChanged
+                || isSeverityChanged
+                || isStatusChanged
+                || isTitleChanged
+                || isDescriptionChanged;
+            if (isOpsItemUpdateNeeded) {
+                var additionalFields = {
+                    'awsseverity': severity,
+                    'awspriority': priority,
+                    'awsstatus': status,
+                    'awsdescription': source.description.toString(),
+                    'awstitle': source.short_description.toString(),
+                };
+                var definitional = {
+                    'sys_id': opsItem.sys_id.toString()
+                };
+                Util.insertOrUpdate('x_126749_aws_sc_opsitem', definitional, additionalFields);
+            }
+        }
+    };
+    OpsItemRepo.prototype.createOrUpdate = function (opsItem, account, region, incidentSysId) {
+        if (incidentSysId === void 0) { incidentSysId = undefined; }
+        try {
+            var definitional = {
+                awsopsitemid: opsItem.OpsItemId
+            };
+            var additional = {
+                awsaccount: account.sys_id.toString(),
+                awscategory: opsItem.Category,
+                awscreatedby: opsItem.CreatedBy,
+                awscreatedtime: Util.toGlideDateTime(opsItem.CreatedTime),
+                awsdescription: opsItem.Description,
+                awslastmodifiedby: opsItem.LastModifiedBy,
+                awslastmodifiedtime: Util.toGlideDateTime(opsItem.LastModifiedTime),
+                awslastsyncfromaws: new GlideDateTime(),
+                awsoperationaldata: JSON.stringify(opsItem.OperationalData, null, 2),
+                awsdeduplicationstring: JSON.parse((opsItem.OperationalData && opsItem.OperationalData.hasOwnProperty('/aws/dedup') ? opsItem.OperationalData['/aws/dedup'] : {}).Value || '{}').dedupString,
+                awspriority: opsItem.Priority,
+                awsregion: region,
+                awsseverity: opsItem.Severity,
+                awssource: opsItem.Source,
+                awsstatus: opsItem.Status,
+                awstitle: opsItem.Title,
+                awsversion: opsItem.Version,
+                awstype: opsItem.OpsItemType,
+            };
+            if (incidentSysId) {
+                additional['incident'] = incidentSysId;
+            }
+            return Util.insertOrUpdate('x_126749_aws_sc_opsitem', definitional, additional);
+        }
+        catch (e) {
+            gs.debug("Error processing opsItem ".concat(opsItem.OpsItemId, " ").concat(e.message));
+        }
+    };
+    /**
+     * Checks if any interesting fields have changed between the two OpsItems.
+     *
+     * @param current  the OpsItem record after being updated
+     * @param previous the OpsItem record before it was updated
+     */
+    OpsItemRepo.prototype.isOpsItemUpdated = function (current, previous) {
+        return this.isRecordUpdated(current, previous, this.mappedOpsItemFields);
+    };
+    OpsItemRepo.prototype.isRecordUpdated = function (current, previous, fields) {
+        for (var _i = 0, fields_1 = fields; _i < fields_1.length; _i++) {
+            var field = fields_1[_i];
+            var currentValue = current.getValue(field);
+            var previousValue = previous.getValue(field);
+            if (currentValue !== previousValue) {
+                return true;
+            }
+        }
+        return false;
+    };
+    //NOTE: The creation of a Problem from OpsItem has been disabled by request.
+    //The  method 'insertOrUpdateFromOpsItem' is functional though there may still
+    //be issues with required fields in the Problem not being populated.
+    //Further notes above that method
+    OpsItemRepo.prototype.insertOrUpdateProblemIfRequired = function (current, previous) {
+        var problemRepo = new ProblemRepo();
+        var problem = !current.problem.nil() ? current.problem.getRefRecord() : undefined;
+        var opsItemUpdated = this.isOpsItemUpdated(current, previous);
+        if ((problem && opsItemUpdated)) {
+            //Check update times to avoid circular updates between opsItems and problems
+            //Adding a second to the problem updated time and using onOrAfter avoids
+            //an edge case where the problem is updated at 00s 999ms and the opsItem
+            //is updated at 01s 000ms
+            var problemUpdateTime = new GlideDateTime(problem.sys_updated_on);
+            problemUpdateTime.addSeconds(1);
+            var problemDoesNotExist = current.problem.nil();
+            // if (problemDoesNotExist ||
+            //     new GlideDateTime(current.sys_updated_on).onOrAfter(problemUpdateTime)
+            // ) {
+            //     problemRepo.insertOrUpdateFromOpsItem(current);
+            // }
+        }
+    };
+    OpsItemRepo.prototype.insertOrUpdateIncidentIfRequired = function (current, previous) {
+        var incidentRepo = new IncidentRepo();
+        var incident = !current.incident.nil() ? current.incident.getRefRecord() : undefined;
+        var opsItemUpdated = this.isOpsItemUpdated(current, previous);
+        var shouldCreateFromOpsItem = incidentRepo.shouldCreateFromOpsItem(current);
+        if ((incident && opsItemUpdated) ||
+            shouldCreateFromOpsItem) {
+            var incidentDoesNotExist = incident === undefined;
+            //Check update times to avoid circular updates between opsItems and incidents
+            //Adding a second to the incident updated time and using onOrAfter avoids
+            //an edge case where the incident is updated at 00s 999ms and the opsItem
+            //is updated at 01s 000ms
+            var incidentUpdateTime = (incident && incident.sys_updated_on)
+                ? new GlideDateTime(incident.sys_updated_on)
+                : new GlideDateTime();
+            incidentUpdateTime.addSeconds(1);
+            if (incidentDoesNotExist ||
+                new GlideDateTime(current.sys_updated_on).onOrAfter(incidentUpdateTime)) {
+                incidentRepo.insertOrUpdateFromOpsItem(current);
+            }
+        }
+    };
+    /**
+     * Searches for an OpsItem that relates to the Incident, caller should check
+     * that the returned OpsItem is valid by calling its `.isValidRecord()`
+     * method.
+     *
+     * @param incident the ServiceNow Incident GlideRecord
+     */
+    OpsItemRepo.prototype.findForIncident = function (incident) {
+        var opsItem = new GlideRecord('x_126749_aws_sc_opsitem');
+        return opsItem.get('incident', incident.sys_id) ? opsItem : null;
+    };
+    /**
+     * Maps a SNOW Status to an AWS Status.
+     *
+     * Ref: https://docs.aws.amazon.com/systems-manager/latest/APIReference/API_UpdateOpsItem.html#systemsmanager-UpdateOpsItem-request-Status
+     *
+     * @param state the SNOW STATUS
+     * @private
+     */
+    OpsItemRepo.prototype.mapStatusToAws = function (state) {
+        var mapStates = {
+            'New': 'Open',
+            'Assess': 'InProgress',
+            'Root Cause Analysis': 'InProgress',
+            'Fix in Progress': 'InProgress',
+            'On Hold': 'Open',
+            'In Progress': 'InProgress',
+            'Resolved': 'Resolved',
+            'Closed': 'Resolved',
+            'Cancelled': 'Resolved',
+        };
+        return mapStates[state];
+    };
+    OpsItemRepo.mayView = function (opsItemSysId) {
+        if (Util.isCurrentUserOpsCenterManager()) {
+            return true;
+        }
+        var user = gs.getUser();
+        var incident;
+        if (opsItemSysId) {
+            var opsItemGr = new GlideRecord('x_126749_aws_sc_opsitem');
+            if (opsItemGr.get(opsItemSysId) && opsItemGr.isValidRecord()) {
+                incident = !opsItemGr.incident.nil()
+                    ? opsItemGr.incident.getRefRecord()
+                    : undefined;
+            }
+        }
+        if (incident && !incident.assignment_group.nil()) {
+            var group = incident.assignment_group.getRefRecord();
+            if (user.isMemberOf(group.name.toString())) {
+                return true;
+            }
+        }
+        if (incident && !incident.assigned_to.nil()) {
+            var assignedUser = incident.assigned_to.getRefRecord();
+            if (assignedUser.sys_id.toString() === gs.getUserID()) {
+                return true;
+            }
+        }
+        return false;
+    };
+    return OpsItemRepo;
+}());
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-12-24 11:22:14</sys_created_on>
+        <sys_id>e117a991db99601079bd2fb748961988</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>OpsItemRepo</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_e117a991db99601079bd2fb748961988</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

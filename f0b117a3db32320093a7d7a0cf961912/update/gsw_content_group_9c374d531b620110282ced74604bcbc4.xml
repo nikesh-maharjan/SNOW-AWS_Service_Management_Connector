@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="gsw_content_group">
+    <gsw_content_group action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <checksum>QGZepWipCInS4RYwg+ljKxsnR8Q=</checksum>
+        <child_can_have_roles>false</child_can_have_roles>
+        <children_layout>1</children_layout>
+        <dependent_on_contents/>
+        <dependent_on_plugins/>
+        <dependent_on_plugins_ids/>
+        <description><![CDATA[<p>Users can view and resolve AWS Incident Manager incidents as ServiceNow incidents via a dual sync powered by AWS Systems Manager Incident Manger.</p>
+<p><em>Note: Make sure <strong>Integrate with AWS Systems Manager Incident Manager</strong> checkbox is checked on each AWS account opted into the connector. If you are not using the integration, skip this section.</em></p>]]></description>
+        <display_child_max_num/>
+        <done_status_text/>
+        <hide_getting_started>false</hide_getting_started>
+        <icon>164d499b1b620110282ced74604bcb0a</icon>
+        <implicit_dependent_on/>
+        <implicit_plugin_dependencies/>
+        <is_root_content>false</is_root_content>
+        <order>1200</order>
+        <parent display_value="AWS Service Management Connector">c09fcac2dbd130100f00b298f496196f</parent>
+        <parents>c09fcac2dbd130100f00b298f496196f</parents>
+        <progress_text/>
+        <roles/>
+        <root_intro_frame_link/>
+        <root_parent display_value="AWS Service Management Connector">c09fcac2dbd130100f00b298f496196f</root_parent>
+        <skippable>true</skippable>
+        <supports_child_content>true</supports_child_content>
+        <sys_class_name>gsw_content_group</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2022-04-04 09:51:36</sys_created_on>
+        <sys_id>9c374d531b620110282ced74604bcbc4</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Configure AWS Systems Manager Incident Manager</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>gsw_content_group_9c374d531b620110282ced74604bcbc4</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <title>Configure AWS Systems Manager Incident Manager</title>
+        <weight>1</weight>
+    </gsw_content_group>
+    <sys_translated_text action="delete_multiple" query="documentkey=9c374d531b620110282ced74604bcbc4"/>
+    <sys_attachment action="INSERT_OR_UPDATE">
+        <average_image_color>#dc427c</average_image_color>
+        <chunk_size_bytes>700000</chunk_size_bytes>
+        <compressed>true</compressed>
+        <content_type>image/png</content_type>
+        <file_name>icon</file_name>
+        <hash>8049067f24ed32269adb31ae8dd3816d6868fe4ffffbf9d86de7cb03560f3126</hash>
+        <image_height>64</image_height>
+        <image_width>64</image_width>
+        <size_bytes>6013</size_bytes>
+        <size_compressed>6036</size_compressed>
+        <state>available</state>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2022-04-04 10:17:57</sys_created_on>
+        <sys_id>164d499b1b620110282ced74604bcb0a</sys_id>
+        <sys_mod_count>3</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-04-04 10:17:57</sys_updated_on>
+        <table_name>ZZ_YYgsw_content_group</table_name>
+        <table_sys_id>9c374d531b620110282ced74604bcbc4</table_sys_id>
+    </sys_attachment>
+    <sys_attachment_doc action="INSERT_OR_UPDATE">
+        <data>H4sIAAAAAAAAAA==</data>
+        <length>16</length>
+        <position>0</position>
+        <sys_attachment display_value="icon" sys_id="164d499b1b620110282ced74604bcb0a">164d499b1b620110282ced74604bcb0a</sys_attachment>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2022-04-04 10:17:57</sys_created_on>
+        <sys_id>564d499b1b620110282ced74604bcb0a</sys_id>
+    </sys_attachment_doc>
+    <sys_attachment_doc action="INSERT_OR_UPDATE">
+        <data>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</data>
+        <length>8036</length>
+        <position>1</position>
+        <sys_attachment display_value="icon" sys_id="164d499b1b620110282ced74604bcb0a">164d499b1b620110282ced74604bcb0a</sys_attachment>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2022-04-04 10:17:57</sys_created_on>
+        <sys_id>d64d499b1b620110282ced74604bcb0a</sys_id>
+    </sys_attachment_doc>
+</record_update>

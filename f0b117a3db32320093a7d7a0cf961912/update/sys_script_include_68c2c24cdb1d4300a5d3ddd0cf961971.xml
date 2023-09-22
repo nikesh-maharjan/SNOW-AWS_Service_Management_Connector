@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.ProductUserCriteria</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>ProductUserCriteria</name>
+        <script><![CDATA[/**
+ * ProductUserCriteria answers whether a user holds a role or group that may view
+ * a product.
+ * @namespace
+ */
+/**
+ @Deployable({
+     table: 'sys_script_include',
+     column: 'script',
+     sysId: '68c2c24cdb1d4300a5d3ddd0cf961971',
+     metadata: {
+         name: 'ProductUserCriteria'
+     }
+ })
+ */
+var ProductUserCriteria = (function () {
+    /**
+     * Checks if the given user has the permission to view the given product.
+     *
+     * @param {string} userId The sys id of a user.
+     * @param {string} productSysId Optional The sys id of a product.
+     * @return {boolean} True if either
+     *      - userId is a member of a any (allowed to order) group assigned to the related portfolio (in case of productSysId set)
+     *      - userId is a member of a any (allowed to order) group assigned to any portfolio (in case of productSysId not set)
+     *      False otherwise
+     * @memberof ProductUserCriteria
+     */
+    function mayView(userId, productSysId) {
+        if (!userId) {
+            return false;
+        }
+        // Filter the allowed group to the specific portfolio, if a product is given
+        var productFilter;
+        if (productSysId) {
+            productFilter = new GlideRecord('x_126749_aws_sc_product');
+            if (!productFilter.get(productSysId)) {
+                return false;
+            }
+            if (productFilter.awsportfolio.nil()) {
+                return false;
+            }
+        }
+        var portfolioGroups = new GlideRecord('x_126749_aws_sc_portfolio_groups');
+        if (productFilter) {
+            portfolioGroups.addQuery('portfolio', productFilter.awsportfolio);
+        }
+        portfolioGroups.query();
+        while (portfolioGroups.next()) {
+            if (portfolioGroups.group.nil()) {
+                continue;
+            }
+            var group = portfolioGroups.group.getRefRecord();
+            if (!group) {
+                continue;
+            }
+            if (gs.getUser().isMemberOf(group.name.toString())) {
+                return true;
+            }
+        }
+        return false;
+    }
+    /**
+     * @param productId The sys id of a product.
+     * @returns {string} A script that calls {@link mayView} that is suitable for a User Criteria.
+     * @memberof ProductUserCriteria
+     * @name create
+     */
+    function createUserCriteriaScript(productId) {
+        return 'x_126749_aws_sc.ProductUserCriteria.mayView(gs.getUserID(), "' + productId + '");';
+    }
+    return {
+        create: createUserCriteriaScript,
+        mayView: mayView,
+    };
+})();
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2017-09-14 15:03:52</sys_created_on>
+        <sys_id>68c2c24cdb1d4300a5d3ddd0cf961971</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>ProductUserCriteria</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_68c2c24cdb1d4300a5d3ddd0cf961971</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

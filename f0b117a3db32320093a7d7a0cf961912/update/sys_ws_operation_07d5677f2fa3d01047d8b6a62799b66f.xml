@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ws_operation">
+    <sys_ws_operation action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <consumes>application/json</consumes>
+        <consumes_customized>true</consumes_customized>
+        <default_operation_uri/>
+        <enforce_acl>634ee8502fffd01047d8b6a62799b691</enforce_acl>
+        <http_method>POST</http_method>
+        <name>Key rotation</name>
+        <operation_script><![CDATA[// @Deployable({table: 'sys_ws_operation', column: 'operation_script', sysId: '07d5677f2fa3d01047d8b6a62799b66f'})
+(function process(apiRequest, apiResponse) {
+    var checkUserCredentialsInputs = function (userCredentials, name) {
+        if (!userCredentials.accessKey || !userCredentials.secretAccessKey) {
+            throw new Error("Credentials for \"" + name + "\" are missing");
+        }
+        if (userCredentials.accessKey.length > 128) {
+            throw new Error("Access key for \"" + name + "\" is too long");
+        }
+        if (userCredentials.secretAccessKey.length > 255) {
+            throw new Error("Secret access key for \"" + name + "\" is too long");
+        }
+    };
+    var validateKeyRotationRequest = function (keyRotationRequest) {
+        if (!keyRotationRequest.name) {
+            throw new Error('AWS account name is missing');
+        }
+        if (!keyRotationRequest.accountNumber) {
+            throw new Error('AWS account number is missing');
+        }
+        var account = new GlideRecord('x_126749_aws_sc_account');
+        account.addQuery('awsname', keyRotationRequest.name);
+        account.addQuery('awsaccountnumber', keyRotationRequest.accountNumber);
+        account.query();
+        if (!account.hasNext()) {
+            throw new Error("AWS account with name '" + keyRotationRequest.name + "' and number '" + keyRotationRequest.accountNumber + "' does not exists");
+        }
+        if (account.getRowCount() !== 1) {
+            throw new Error("Cannot find an exact match for AWS account with name '" + keyRotationRequest.name + "' and number '" + keyRotationRequest.accountNumber + "'");
+        }
+        if (keyRotationRequest.syncUser) {
+            checkUserCredentialsInputs(keyRotationRequest.syncUser, 'syncUser');
+        }
+        if (keyRotationRequest.endUser) {
+            checkUserCredentialsInputs(keyRotationRequest.endUser, 'endUser');
+        }
+        account.next();
+        return account;
+    };
+    var queryParams = apiRequest.queryParams;
+    var shouldValidate = queryParams.hasOwnProperty('validate') && queryParams.validate.length === 1
+        ? queryParams.validate[0] === 'true'
+        : true;
+    var responseBody;
+    var overallSuccess = true;
+    if (Array.isArray(apiRequest.body.data)) {
+        responseBody = apiRequest.body.data.map(function (keyRotationRequest) {
+            var keyRotationResponse = {
+                name: keyRotationRequest.name,
+                accountNumber: keyRotationRequest.accountNumber,
+                success: true
+            };
+            try {
+                var account = validateKeyRotationRequest(keyRotationRequest);
+                if (keyRotationRequest.syncUser) {
+                    account.awsaccesskeysyncuser.setValue(keyRotationRequest.syncUser.accessKey);
+                    account.awssecretaccesskeysyncuser.setDisplayValue(keyRotationRequest.syncUser.secretAccessKey);
+                }
+                if (keyRotationRequest.endUser) {
+                    account.awsaccesskeyenduser.setValue(keyRotationRequest.endUser.accessKey);
+                    account.awssecretaccesskeyenduser.setDisplayValue(keyRotationRequest.endUser.secretAccessKey);
+                }
+                var errors = shouldValidate ? AwsCredentials.from(account).validate() : [];
+                if (errors.length > 0) {
+                    throw errors;
+                }
+                var result = account.update();
+                if (result === null) {
+                    throw new Error("Unexpected error while updating the AWS account with name '" + keyRotationRequest.name + "' and number '" + keyRotationRequest.accountNumber);
+                }
+                ['syncUser', 'endUser'].forEach(function (k) {
+                    if (keyRotationRequest.hasOwnProperty(k)) {
+                        gs.info("\"" + k + "\" key [" + keyRotationRequest[k].accessKey + "] for account \"" + keyRotationRequest.name + "\" (" + keyRotationRequest.accountNumber + ") has been updated");
+                    }
+                });
+            }
+            catch (ex) {
+                keyRotationResponse.success = false;
+                keyRotationResponse.detail = ex instanceof Error ? ex.message : ex;
+                overallSuccess = false;
+            }
+            return keyRotationResponse;
+        });
+    }
+    else {
+        overallSuccess = false;
+        responseBody = {
+            detail: 'Invalid payload body. Expected format: Array<{name: string, accountNumber: string, syncUser?: { accessKey: string, secretAccessKey: string }, endUser?: { accessKey: string, secretAccessKey: string }>'
+        };
+    }
+    apiResponse.setContentType('application/json');
+    apiResponse.setStatus(overallSuccess ? 200 : 400);
+    apiResponse.setBody(responseBody);
+})(request, response);
+]]></operation_script>
+        <operation_uri>/api/x_126749_aws_sc/account/rotation</operation_uri>
+        <produces>application/json</produces>
+        <produces_customized>true</produces_customized>
+        <relative_path>/rotation</relative_path>
+        <request_example>[&#13;
+    {&#13;
+        "name": "AWS account display name in ServiceNow",&#13;
+        "accountNumber": "123456789",&#13;
+        "syncUser": {&#13;
+            "accessKey": "AKIAIOSSYNCUSEREXAMPLE",&#13;
+            "secretAccessKey": "wJalrXUtnFEMI/SYNCUSER/bPxRfiCYEXAMPLEKEY"&#13;
+        }&#13;
+        "endUser": {&#13;
+            "accessKey": "AKIAIOSENDUSEREXAMPLE",&#13;
+            "secretAccessKey": "wJalrXUtnFEMI/ENDUSER/bPxRfiCYEXAMPLEKEY"&#13;
+        }&#13;
+    }&#13;
+]</request_example>
+        <requires_acl_authorization>true</requires_acl_authorization>
+        <requires_authentication>true</requires_authentication>
+        <requires_snc_internal_role>true</requires_snc_internal_role>
+        <short_description>Allows account administrators to rotate keys for sync and/or end-users</short_description>
+        <sys_class_name>sys_ws_operation</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-10-06 15:13:12</sys_created_on>
+        <sys_id>07d5677f2fa3d01047d8b6a62799b66f</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Key rotation</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>protected</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_ws_operation_07d5677f2fa3d01047d8b6a62799b66f</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <web_service_definition display_value="AWS Account API">28dfdb7b2fa3d01047d8b6a62799b66c</web_service_definition>
+        <web_service_version/>
+    </sys_ws_operation>
+</record_update>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_fix">
+    <sys_script_fix action="INSERT_OR_UPDATE">
+        <before>false</before>
+        <description>Fix script to migrate ELBv2 data from legacy table cmdb_ci_lb_service with discovery_source "AWS Service Management Connector" to the new table cmdb_ci_cloud_load_balancer (legacy records will not be deleted).</description>
+        <name>AWS SMC - Migrate ELB data</name>
+        <record_for_rollback>false</record_for_rollback>
+        <script><![CDATA[/**
+ @Deployable({
+    table: 'sys_script_fix',
+    column: 'script',
+    sysId: 'e24180ca2fc2301084a1d6ab2799b6c3'
+    metadata: {
+         name: 'AWS SMC - Migrate ELB data',
+         global: true,
+         description: 'Fix script to migrate ELBv2 data from legacy table cmdb_ci_lb_service with discovery_source "AWS Service Management Connector" to the new table cmdb_ci_cloud_load_balancer (legacy records will not be deleted).'
+      }
+    })
+ */
+migrateElbData();
+function migrateElbData() {
+    //search for every record in table cmdb_ci_lb_service with discovery_source = 'AWS Service Management Connector'
+    var legacyRecord = new GlideRecord('cmdb_ci_lb_service');
+    legacyRecord.addQuery('discovery_source', C.displayName);
+    legacyRecord.query();
+    while (legacyRecord.next()) {
+        if (!isRecordAlreadyMigrated(legacyRecord)) {
+            var newRecord = new GlideRecord('cmdb_ci_cloud_load_balancer');
+            if (migrateData(legacyRecord, newRecord)) {
+                gs.debug("[AWS SMC] Successfully created ELB record " + newRecord.name + " in table cmdb_ci_cloud_load_balancer");
+                migrateRelationship(legacyRecord, newRecord);
+            }
+            else {
+                gs.error("[AWS SMC] Failed to create ELB record in table cmdb_ci_cloud_load_balancer \n                from ELB legacy record " + legacyRecord.name + " in table cmdb_ci_lb_service.\n                You will need to create it and its relationship manually ");
+            }
+        }
+    }
+}
+//Verify if record having the legacyRecord dns_name already exists in ServiceNow to prevent duplicates
+function isRecordAlreadyMigrated(legacyRecord) {
+    var cloudLoadBalancerGr = new GlideRecord('cmdb_ci_cloud_load_balancer');
+    cloudLoadBalancerGr.addQuery('object_id', legacyRecord.getValue('object_id'));
+    cloudLoadBalancerGr.query();
+    return cloudLoadBalancerGr.hasNext();
+}
+//copy the existing properties to table cmdb_ci_cloud_load_balancer
+function migrateData(legacyRecord, newRecord) {
+    newRecord.initialize();
+    Util.setValue(newRecord, 'terminated_on', legacyRecord.getValue('terminated_on'));
+    Util.setValue(newRecord, 'name', legacyRecord.getValue('name'));
+    Util.setValue(newRecord, 'dns_name', legacyRecord.getValue('fqdn'));
+    Util.setValue(newRecord, 'operational_status', legacyRecord.getValue('operational_status'));
+    Util.setValue(newRecord, 'discovery_source', legacyRecord.getValue('discovery_source'));
+    Util.setValue(newRecord, 'object_id', legacyRecord.getValue('object_id'));
+    Util.setValue(newRecord, 'correlation_id', legacyRecord.getValue('correlation_id'));
+    return newRecord.insert();
+}
+//search for every relationship the legacy record has as either a child or a parent and copy existing relationship for new record
+function migrateRelationship(legacyRecord, newRecord) {
+    var cmdbRelationship = new GlideRecord('cmdb_rel_ci');
+    cmdbRelationship.addQuery('child', legacyRecord.sys_id).addOrCondition('parent', legacyRecord.sys_id);
+    cmdbRelationship.query();
+    while (cmdbRelationship.next()) {
+        if (cmdbRelationship.child.toString() === legacyRecord.sys_id.toString()) {
+            var childRecord = Util.insertOrUpdate('cmdb_rel_ci', {
+                parent: cmdbRelationship.parent,
+                type: cmdbRelationship.getValue('type'),
+                child: newRecord.sys_id
+            });
+            if (childRecord.sys_id && childRecord.sys_id.toString() !== '') {
+                gs.debug("[AWS SMC] Successfully created CI relationship " + childRecord.sys_id + " in table cmdb_rel_ci for ELB record " + newRecord.name);
+            }
+            else {
+                gs.error("[AWS SMC] Failed to create a CI relationship from ELB legacy record " + legacyRecord.name + ". \n                You will need to create it manually between the ELB data " + newRecord.sys_id + " in table cmdb_ci_cloud_load_balancer\n                and the relationship " + cmdbRelationship.sys_id + " in table cmdb_rel_ci");
+            }
+        }
+        else if (cmdbRelationship.parent.toString() === legacyRecord.sys_id.toString()) {
+            var parentRecord = Util.insertOrUpdate('cmdb_rel_ci', {
+                parent: newRecord.sys_id,
+                type: cmdbRelationship.getValue('type'),
+                child: cmdbRelationship.child
+            });
+            if (parentRecord.sys_id && parentRecord.sys_id.toString() !== '') {
+                gs.debug("[AWS SMC] Successfully created CI relationship " + parentRecord.sys_id + " in table cmdb_rel_ci for ELB record " + newRecord.name);
+            }
+            else {
+                gs.error("[AWS SMC] Failed to create a CI relationship from ELB legacy record " + legacyRecord.name + ". \n                You will need to create it manually between the ELB data " + newRecord.sys_id + " in table cmdb_ci_cloud_load_balancer\n                and the relationship " + cmdbRelationship.sys_id + " in table cmdb_rel_ci");
+            }
+        }
+    }
+}
+]]></script>
+        <sys_class_name>sys_script_fix</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-08-19 14:51:01</sys_created_on>
+        <sys_id>e24180ca2fc2301084a1d6ab2799b6c3</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AWS SMC - Migrate ELB data</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_fix_e24180ca2fc2301084a1d6ab2799b6c3</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <unloadable>false</unloadable>
+    </sys_script_fix>
+</record_update>

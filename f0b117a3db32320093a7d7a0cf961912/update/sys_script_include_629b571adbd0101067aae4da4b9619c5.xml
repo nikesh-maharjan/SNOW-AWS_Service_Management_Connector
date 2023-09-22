@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.AwsConfig</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>AwsConfig</name>
+        <script><![CDATA[/**
+ * @class AwsConfig
+ * @classdesc Make HTTP requests to AWS Config service.
+ * @param credential {Object} AWS account credentials.
+ * @param credential.identity {String} An AWS access key.
+ * @param credential.secret {String} An AWS secret access key.
+ * @param credential.session {String=} Required if using temporary credentials.
+ * @param region {String} the region to retrieve config info from
+ */
+var AwsConfig = /** @class */ (function(_super) {
+    Polyfill.__extends(AwsConfig, _super);
+
+    function AwsConfig(region, credential, apiVersion) {
+        var _this = _super.call(this, "config", region, credential, false) || this;
+        _this.limit = 100;
+        _this.apiVersion = apiVersion || "2010-05-15";
+        return _this;
+    }
+    AwsConfig.prototype.headers = function(action) {
+        // Request this.headers required by AWS Config are not publicly documented.
+        // The headers sent by the cli are as shown below.
+        return {
+            "Content-Type": "application/x-amz-json-1.1",
+            "X-Amz-Target": "StarlingDoveService." + action
+        };
+    };
+    /**
+     * Return configuration details of the specified resource
+     * @see https://docs.aws.amazon.com/cli/latest/reference/configservice/get-resource-config-history.html
+     * @param resourceType {String} the type of resource. E.G. AWS::EC2::Instance
+     * @param resourceId {String} the id of the resource
+     * @returns {WrappedResponse}
+     * @memberof! AwsConfig#
+     * @alias getResourceConfigHistory
+     */
+    AwsConfig.prototype.getResourceConfigHistory = function(resourceType, resourceId) {
+        Util.assertExists(resourceType, "resourceType");
+        Util.assertExists(resourceId, "resourceId");
+        var action = "GetResourceConfigHistory";
+        var payload = {
+            "resourceType": resourceType,
+            "resourceId": resourceId,
+            "pageSize": 1
+        };
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    
+	AwsConfig.prototype.BatchGetResourceConfig = function(resourceType, resourceId ) {
+
+        var action = "BatchGetResourceConfig";
+        var payload = {
+
+            "resourceKeys": [{
+                "resourceId": resourceId,
+                "resourceType": resourceType
+            }]
+
+        };
+		return Response.of(this._post(action, payload, this.headers(action)));
+    };
+
+    /**
+     * @see https://docs.aws.amazon.com/pt_br/config/latest/APIReference/API_ListDiscoveredResources.html
+     * @param resourceType
+     * @param resourceName
+     * @param resourceIds
+     */
+    AwsConfig.prototype.listDiscoveredResources = function(resourceType, resourceName, resourceIds) {
+        Util.assertExists(resourceType, "resourceType");
+        var action = "ListDiscoveredResources";
+        var payload = {
+            resourceType: resourceType,
+            resourceName: resourceName,
+            resourceIds: resourceIds,
+            includeDeletedResources: true,
+            limit: this.limit
+        };
+        return this._paginatedApi(action, payload, this.headers(action), "resourceIdentifiers");
+    };
+    /**
+     * @see https://docs.aws.amazon.com/pt_br/config/latest/APIReference/API_PutResourceConfig.html
+     * @param resourceType
+     * @param resourceId
+     * @param schemaVersionId
+     * @param configuration
+     * @param resourceName
+     * @param tags
+     */
+    AwsConfig.prototype.putResourceConfig = function(resourceType, resourceId, schemaVersionId, configuration, resourceName, tags) {
+        Util.assertExists(resourceType, "resourceType");
+        Util.assertExists(resourceId, "resourceId");
+        Util.assertExists(schemaVersionId, "schemaVersionId");
+        Util.assertExists(configuration, "configuration");
+        var action = "PutResourceConfig";
+        var payload = {
+            ResourceType: resourceType,
+            ResourceId: resourceId,
+            SchemaVersionId: schemaVersionId,
+            Configuration: JSON.stringify(configuration),
+            ResourceName: resourceName,
+            Tags: tags
+        };
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    /**
+     * @see https://docs.aws.amazon.com/pt_br/config/latest/APIReference/API_SelectResourceConfig.html
+     * @param expression
+     */
+    AwsConfig.prototype.selectResourceConfig = function(expression) {
+        Util.assertExists(expression, "expression");
+        var action = "SelectResourceConfig";
+        var payload = {
+            Expression: expression,
+            Limit: this.limit
+        };
+        return this._paginatedApi(action, payload, this.headers(action), "Results", 'NextToken');
+    };
+    /**
+     * @see https://docs.aws.amazon.com/pt_br/config/latest/APIReference/API_SelectAggregateResourceConfig.html
+     * @param configurationAggregatorName
+     * @param expression
+     */
+    AwsConfig.prototype.selectAggregateResourceConfig = function(configurationAggregatorName, expression) {
+        Util.assertExists(expression, "expression");
+        Util.assertExists(configurationAggregatorName, "configurationAggregatorName");
+        var action = "SelectAggregateResourceConfig";
+        var payload = {
+            ConfigurationAggregatorName: configurationAggregatorName,
+            Expression: expression,
+            Limit: this.limit
+        };
+        return this._paginatedApi(action, payload, this.headers(action), "Results", 'NextToken');
+    };
+    return AwsConfig;
+}(AwsService));]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-04-23 09:14:56</sys_created_on>
+        <sys_id>629b571adbd0101067aae4da4b9619c5</sys_id>
+        <sys_mod_count>4</sys_mod_count>
+        <sys_name>AwsConfig</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_629b571adbd0101067aae4da4b9619c5</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2023-03-06 04:39:39</sys_updated_on>
+    </sys_script_include>
+</record_update>

@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.SupportServicesSyncProvider</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>SupportServicesSyncProvider</name>
+        <script><![CDATA[var SupportServicesSyncProvider = /** @class */ (function (_super) {
+    Polyfill.__extends(SupportServicesSyncProvider, _super);
+    function SupportServicesSyncProvider() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.providerName = 'AWS Support (Services)';
+        _this.timeout = 60;
+        return _this;
+    }
+    SupportServicesSyncProvider.prototype.fromAws = function (context) {
+        var syncResults = {
+            success: true,
+            seconds: 0,
+            requests: 0
+        };
+        var account = new GlideRecord("x_126749_aws_sc_account");
+        account.addQuery('awsenablesupport', 'true');
+        account.query();
+        while (account.next()) {
+            try {
+                var partialResults = this.fromAwsWith(account);
+                if (partialResults.error) {
+                    this.logSyncResultWarnings(partialResults, account, this.providerName, this.timeout);
+                }
+                gs.info([
+                    "[SYNC] [STATS] [".concat(this.providerName, "] Finished synchronization for ") +
+                        "account \"".concat(account.awsname.toString(), "\" (").concat(account.awsaccountnumber.toString(), ")"),
+                    "** Success: ".concat(partialResults.success),
+                    "** Time: ".concat(partialResults.seconds.toFixed(1), "s"),
+                    "** Requests: ".concat(partialResults.requests)
+                ].join('\n'));
+                syncResults.success = syncResults.success && partialResults.success;
+                syncResults.seconds += partialResults.seconds;
+                syncResults.requests += partialResults.requests;
+            }
+            catch (ex) {
+                // If we end up here, it means this is an unexpected/uncaught exception. We don't want to fail the
+                // whole process to we catch big, and log a warning
+                gs.warn("[SYNC] [".concat(this.providerName, "] Unexpected error occurred while synchronizing ") +
+                    "account \"".concat(account.awsname.toString(), "\" (").concat(account.awsaccountnumber.toString(), "):\n") +
+                    "".concat(ex.message));
+            }
+        }
+        return syncResults;
+    };
+    SupportServicesSyncProvider.prototype.fromAwsWith = function (account) {
+        var syncResults = {
+            success: true,
+            seconds: 0,
+            requests: 0
+        };
+        var timer = Util.startTimer();
+        var awsSupport = SupportService.getAwsSupport(account);
+        try {
+            gs.info("[SYNC] [".concat(this.providerName, "] Performing synchronization of AWS Services and Categories for ") +
+                "account \"".concat(account.awsname.toString(), "\""));
+            //Sync services and categories
+            var servicesResults = this.syncServices(awsSupport, account);
+            syncResults.success = syncResults.success && servicesResults.success;
+        }
+        catch (ex) {
+            syncResults.success = false;
+            syncResults.error = ex.message;
+        }
+        syncResults.requests = awsSupport.getRequestCount();
+        syncResults.seconds = timer.elapsed();
+        return syncResults;
+    };
+    SupportServicesSyncProvider.prototype.fromSn = function () {
+        var syncResults = {
+            success: true,
+            seconds: 0,
+            requests: 0,
+        };
+        return syncResults;
+    };
+    //This method is called by the business rule push-support-case-to-aws-support
+    // to push a single support case to AWS using a workflow
+    SupportServicesSyncProvider.prototype.pushSupportCase = function (incident) {
+        var account = incident.x_126749_aws_sc_awsaccount.getRefRecord();
+        if (!account.awsenablesupport) {
+            gs.warn("[SYNC] [".concat(this.providerName, "] Skipping synchronization of ServiceNow Incident ").concat(incident.sys_id, " to AWS Support: the feature is disabled for account ").concat(account.awsname));
+            return;
+        }
+        try {
+            var workflow_1 = WorkflowTasks.pushSupportCaseToAws.startWorkflow(incident.sys_id.toString(), incident.x_126749_aws_sc_awsaccount.toString(), incident.x_126749_aws_sc_awscategory.toString(), incident.x_126749_aws_sc_awsservice.toString(), incident.short_description.toString(), new PriorityMapping().getMappedFromSnowSupportCase(incident).severityCode.toString(), incident.description.toString(), this.getCaseCommunicationEmails(incident));
+            gs.info("[SYNC] [".concat(this.providerName, "] Successfully requested synchronization of ServiceNow Incident \"").concat(incident.sys_id, "\" to AWS Support, for account \"").concat(account.awsname, "\". See workflow context ").concat(workflow_1.sys_id, " for the execution details"));
+        }
+        catch (ex) {
+            gs.warn("[SYNC] [".concat(this.providerName, "] Error requesting synchronization of ServiceNow Incident \"").concat(incident.sys_id, "\" to AWS Support, for account \"").concat(account.awsname, "\": ").concat(Util.errorMessageFormat(ex.message)));
+        }
+        this.checkForAttachments(incident, false);
+    };
+    //Function to handle any attachment uploaded on Incident Support Case creation, if any
+    SupportServicesSyncProvider.prototype.checkForAttachments = function (supportCase, isIntermediateTableMode) {
+        if (isIntermediateTableMode === void 0) { isIntermediateTableMode = false; }
+        var attachmentsGr = new GlideRecord('sys_attachment');
+        attachmentsGr.addQuery('table_sys_id', supportCase.sys_id);
+        attachmentsGr.query();
+        while (attachmentsGr.next()) {
+            if (!isIntermediateTableMode) {
+                new SupportService().pushAttachmentToAwsSupportCase(supportCase, attachmentsGr);
+            }
+            else {
+                new SupportService().addAttachmentToCaseFromSmcSupportCase(supportCase, attachmentsGr);
+            }
+        }
+    };
+    SupportServicesSyncProvider.prototype.createCaseFromSmcSupportCase = function (smcSupportCase) {
+        var account = smcSupportCase.x_126749_aws_sc_awsaccount.getRefRecord();
+        if (!account.awsenablesupport) {
+            gs.warn("[SYNC] [".concat(this.providerName, "] Skipping synchronization of ServiceNow SMC Support Case ").concat(smcSupportCase.sys_id, " to AWS Support: the feature is disabled for account ").concat(account.awsname));
+            return;
+        }
+        try {
+            var awsCommunicationEmails = [];
+            if (smcSupportCase.x_126749_aws_sc_awscasecommunicationemails) {
+                awsCommunicationEmails = smcSupportCase.x_126749_aws_sc_awscasecommunicationemails.split(',').map(function (item) { return item.trim(); });
+            }
+            var workflow_2 = WorkflowTasks.pushSupportCaseToAws.startWorkflow(smcSupportCase.sys_id.toString(), smcSupportCase.x_126749_aws_sc_awsaccount.toString(), smcSupportCase.x_126749_aws_sc_awscategory.toString(), smcSupportCase.x_126749_aws_sc_awsservice.toString(), smcSupportCase.x_126749_aws_sc_awssubject.toString(), smcSupportCase.x_126749_aws_sc_awsseverity.toString(), smcSupportCase.x_126749_aws_sc_description.toString(), awsCommunicationEmails);
+            gs.info("[SYNC] [".concat(this.providerName, "] Successfully requested synchronization of ServiceNow SMC Support Case \"").concat(smcSupportCase.sys_id, "\" to AWS Support, for account \"").concat(account.awsname, "\". See workflow context ").concat(workflow_2.sys_id, " for the execution details"));
+        }
+        catch (ex) {
+            gs.warn("[SYNC] [".concat(this.providerName, "] Error requesting synchronization of ServiceNow SMC Support Case \"").concat(smcSupportCase.sys_id, "\" to AWS Support, for account \"").concat(account.awsname, "\": ").concat(Util.errorMessageFormat(ex.message)));
+        }
+        this.checkForAttachments(smcSupportCase, true);
+    };
+    //This method is called by the business rule resolve-support-case-to-aws-support
+    // to resolve a support case to AWS using a workflow
+    SupportServicesSyncProvider.prototype.resolveSupportCase = function (incident) {
+        var account = incident.x_126749_aws_sc_awsaccount.getRefRecord();
+        if (!account.awsenablesupport) {
+            gs.warn("[SYNC] [".concat(this.providerName, "] Skipping synchronization of ServiceNow Incident ").concat(incident.sys_id, " to AWS Support: the feature is disabled for account ").concat(account.awsname));
+            return;
+        }
+        try {
+            var workflow_3 = WorkflowTasks.resolveSupportCaseToAws.startWorkflow(incident.sys_id.toString(), incident.x_126749_aws_sc_awsaccount.toString(), incident.x_126749_aws_sc_awscaseidentifier.toString());
+            gs.info("[SYNC] [".concat(this.providerName, "] Successfully requested resolution of ServiceNow Incident \"").concat(incident.sys_id, "\" to AWS Support, for account \"").concat(account.awsname, "\". See workflow context ").concat(workflow_3.sys_id, " for the execution details"));
+        }
+        catch (ex) {
+            gs.warn("[SYNC] [".concat(this.providerName, "] Error requesting resolution of ServiceNow Incident \"").concat(incident.sys_id, "\" to AWS Support, for account \"").concat(account.awsname, "\": ").concat(Util.errorMessageFormat(ex.message)));
+        }
+    };
+    SupportServicesSyncProvider.prototype.validate = function () {
+        return true;
+    };
+    SupportServicesSyncProvider.prototype.syncServices = function (awsSupport, account) {
+        var timer = Util.startTimer();
+        var success = true;
+        var response = awsSupport.describeServices({});
+        if (response.haveError()) {
+            success = false;
+        }
+        else {
+            var body = response.deserialize();
+            body.services.forEach(function (serviceAws) {
+                // We technically support AMS advance customers. However, these customers have heavily customised incident
+                // procedures so the decision was to deactivate these services/categories until a solution or migration
+                // path can be found (once deactivated, they will no longer appear on the incident form as available options).
+                // With the exception of the services used for AMS Accelerate
+                var shouldBeActive = !serviceAws.code.startsWith('sentinel-') ||
+                    serviceAws.code === 'sentinel-report-incident' ||
+                    serviceAws.code === 'sentinel-service-request';
+                var serviceFields = {
+                    awsname: serviceAws.name,
+                    awslastsynctime: timer.started,
+                };
+                if (!shouldBeActive) {
+                    serviceFields.awsactive = false;
+                }
+                var serviceSnow = Util.upsert({
+                    table: "x_126749_aws_sc_support_case_service",
+                    key: {
+                        awscode: serviceAws.code,
+                        awsaccount: account.sys_id.toString()
+                    },
+                    fields: serviceFields,
+                    defaults: {
+                        awsactive: shouldBeActive
+                    }
+                });
+                serviceAws.categories.forEach(function (categoryAws) {
+                    var categoryFields = {
+                        awsname: categoryAws.name,
+                        awslastsynctime: timer.started,
+                    };
+                    if (!shouldBeActive) {
+                        categoryFields.awsactive = false;
+                    }
+                    Util.upsert({
+                        table: "x_126749_aws_sc_support_case_category",
+                        key: {
+                            awscode: categoryAws.code,
+                            awsservice: serviceSnow.getValue('sys_id')
+                        },
+                        fields: categoryFields,
+                        defaults: {
+                            awsactive: shouldBeActive,
+                            awsservice: serviceSnow.sys_id,
+                        }
+                    });
+                });
+            });
+            this.deleteExpiredServices(timer.started, account.sys_id.toString());
+        }
+        return {
+            success: success,
+            seconds: timer.elapsed(),
+            requests: 1,
+        };
+    };
+    SupportServicesSyncProvider.prototype.deleteExpiredServices = function (started, accountSysId) {
+        var s = new GlideRecord("x_126749_aws_sc_support_case_service");
+        s.addQuery('awslastsynctime', '<', started);
+        s.addQuery('awsaccount', accountSysId);
+        s.query();
+        if (s.hasNext()) {
+            s.deleteMultiple();
+        }
+        var c = new GlideRecord("x_126749_aws_sc_support_case_category");
+        c.addQuery('awslastsynctime', '<', started);
+        //Join query to get only Categories linked to Service with current synched Account
+        c.addJoinQuery('x_126749_aws_sc_support_case_service', 'awsservice', 'sys_id')
+            .addCondition('awsaccount', accountSysId);
+        c.query();
+        if (c.hasNext()) {
+            c.deleteMultiple();
+        }
+    };
+    /**
+     * Get 'Additional Contact' email address following a hierarchy.
+     * Search for email in custom field, then caller field, then assigned to field, then assignment group manager field.
+     * Default is system property
+     * @param incident the ServiceNow Incident
+     */
+    SupportServicesSyncProvider.prototype.getCaseCommunicationEmails = function (incident) {
+        if (incident.x_126749_aws_sc_awscasecommunicationemails) {
+            return incident.x_126749_aws_sc_awscasecommunicationemails.split(',').map(function (item) { return item.trim(); });
+        }
+        if (incident.caller_id && !incident.caller_id.nil()) {
+            var caller = incident.caller_id.getRefRecord();
+            if (caller.email) {
+                return [caller.email.toString()];
+            }
+        }
+        if (incident.assigned_to && !incident.assigned_to.nil()) {
+            var assignedTo = incident.assigned_to.getRefRecord();
+            if (assignedTo.email) {
+                return [assignedTo.email.toString()];
+            }
+        }
+        if (incident.assignment_group && !incident.assignment_group.nil()) {
+            var assignmentGroup = incident.assignment_group.getRefRecord();
+            if (!assignmentGroup.manager.nil()) {
+                var manager = assignmentGroup.manager.getRefRecord();
+                if (manager.email) {
+                    return [manager.email.toString()];
+                }
+            }
+        }
+        return [];
+    };
+    return SupportServicesSyncProvider;
+}(AbstractSyncProvider));
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-07-12 12:14:39</sys_created_on>
+        <sys_id>58c0b36d2fd1301084a1d6ab2799b608</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>SupportServicesSyncProvider</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_58c0b36d2fd1301084a1d6ab2799b608</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

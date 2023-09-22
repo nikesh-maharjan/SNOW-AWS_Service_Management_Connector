@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.SystemsManagerSyncProvider</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>SystemsManagerSyncProvider</name>
+        <script><![CDATA[var SystemsManagerSyncProvider = /** @class */ (function (_super) {
+    Polyfill.__extends(SystemsManagerSyncProvider, _super);
+    function SystemsManagerSyncProvider(syncTypes) {
+        if (syncTypes === void 0) { syncTypes = [
+            SystemsManagerSyncProvider.SyncType.ChangeTemplates,
+            SystemsManagerSyncProvider.SyncType.Runbooks
+        ]; }
+        var _this = _super.call(this) || this;
+        _this.providerName = 'AWS Systems Manager';
+        _this.timeout = 600;
+        _this.syncTypes = syncTypes;
+        // This is to include a 3rd party library, in this case marked to convert markdown to HTML.
+        gs.include('Marked');
+        return _this;
+    }
+    SystemsManagerSyncProvider.prototype.filterAccountSync = function (accountSync) {
+        _super.prototype.filterAccountSync.call(this, accountSync);
+        var requiresSystemsManager = this.isSyncTypeRunbooks();
+        var requiresChangeManager = this.isSyncTypeChangeTemplates();
+        if (requiresSystemsManager && requiresChangeManager) {
+            // if BOTH flags are set then filter to accounts with EITHER feature enabled
+            accountSync.addQuery('awsaccount.awsenablesystemsmanager', 'true')
+                .addOrCondition('awsaccount.awsenablechangemanager', 'true');
+        }
+        else {
+            // only filter to accounts with the required feature enabled
+            if (requiresSystemsManager) {
+                accountSync.addQuery('awsaccount.awsenablesystemsmanager', 'true');
+            }
+            else if (requiresChangeManager) {
+                accountSync.addQuery('awsaccount.awsenablechangemanager', 'true');
+            }
+            else {
+                // should never end up here are we always have at least one of the
+                // SyncTypes selected, so at least one of the features should be
+                // required to select a filter.
+                throw Error("Configuration error - no account filter selected");
+            }
+        }
+    };
+    SystemsManagerSyncProvider.prototype.isSyncTypeRunbooks = function () {
+        return this.syncTypes.indexOf(SystemsManagerSyncProvider.SyncType.Runbooks) > -1;
+    };
+    SystemsManagerSyncProvider.prototype.isSyncTypeChangeTemplates = function () {
+        return this.syncTypes.indexOf(SystemsManagerSyncProvider.SyncType.ChangeTemplates) > -1;
+    };
+    SystemsManagerSyncProvider.prototype.fromAws = function (context) {
+        var start = new GlideDateTime();
+        // We want to process only the enabled accounts for AWS Systems Manager Automation or AWS Systems Manager Change Manager
+        var syncResults = _super.prototype.fromAws.call(this, context);
+        // But we also need to delete previous records if the integration becomes disabled, or the records are outdated.
+        // Otherwise, the documents will still be there which is unwanted.
+        if (syncResults.success) {
+            this._processRecordsLastUpdatedBefore(start);
+        }
+        return syncResults;
+    };
+    SystemsManagerSyncProvider.prototype.fromAwsWith = function (account, region) {
+        var syncResults = {
+            success: true,
+            seconds: 0,
+            requests: 0
+        };
+        var timer = Util.startTimer();
+        var credentials = AwsCredentials.from(account).as(AwsCredentials.User.Sync);
+        var systemsManager = this.getSystemsManager(region, credentials);
+        try {
+            this.syncDocuments(account, region, systemsManager);
+        }
+        catch (ex) {
+            syncResults.success = false;
+            syncResults.error = ex.message;
+        }
+        finally {
+            syncResults.seconds = timer.elapsed();
+            syncResults.requests = systemsManager.getRequestCount();
+        }
+        return syncResults;
+    };
+    SystemsManagerSyncProvider.prototype.fromSn = function () {
+        var syncResults = {
+            success: true,
+            seconds: 0,
+            requests: 0,
+        };
+        return syncResults;
+    };
+    SystemsManagerSyncProvider.prototype.validate = function () {
+        var existAWSChangeRequestChoiceType = Util.getChoiceLabelFromValue('change_request', 'type', 'AWSChangeRequest');
+        if (!existAWSChangeRequestChoiceType) {
+            gs.error("[SYNC] [".concat(this.providerName, "] Synchronization job cannot run because the choice type \n            \"AWSChangeRequest\" is missing. Please create it within the global scope for the table \"change_request\""));
+            return false;
+        }
+        return true;
+    };
+    SystemsManagerSyncProvider.prototype.syncDocuments = function (account, region, awsSystemsManager) {
+        var _this = this;
+        var values = [];
+        account.awsenablesystemsmanager && this.isSyncTypeRunbooks() && values.push("Automation");
+        account.awsenablechangemanager && this.isSyncTypeChangeTemplates() && values.push("Automation.ChangeTemplate");
+        if (values.length == 0) {
+            gs.debug("[SYNC] [".concat(this.providerName, "] Not Synchronizing Documents in \"").concat(account.awsname, "\""));
+            return;
+        }
+        var filters = [{
+                "Key": "DocumentType",
+                "Values": values,
+            }];
+        var startTime = new GlideDateTime();
+        gs.debug("[SYNC] [".concat(this.providerName, "] Synchronizing Documents in \"").concat(account.awsname, "\", starting at ").concat(startTime));
+        var documentRepo = new DocumentRepo();
+        var changeTemplateRepo = new ChangeTemplateRepo();
+        var repos = {
+            'Automation': documentRepo,
+            'Automation.ChangeTemplate': changeTemplateRepo
+        };
+        this.listDocuments(account.awsname.toString(), awsSystemsManager, filters)
+            .filter(function (document) { return _this.isValidAutomationDocument(document) || _this.isValidChangeTemplate(document, awsSystemsManager); })
+            .forEach(function (document) { return _this.syncDocument(repos, document, region, awsSystemsManager, account); });
+    };
+    SystemsManagerSyncProvider.prototype.isValidAutomationDocument = function (document) {
+        return document.DocumentType === 'Automation';
+    };
+    SystemsManagerSyncProvider.prototype.isValidChangeTemplate = function (document, awsSystemsManager) {
+        if (document.DocumentType === "Automation.ChangeTemplate"
+            && document.ReviewStatus === "APPROVED") {
+            var response_1 = awsSystemsManager.getDocument(document.Name, document.DocumentVersion);
+            if (!response_1.haveError()) {
+                var fullDocument = response_1.deserialize();
+                var content = JSON.parse(fullDocument.Content);
+                var isAutoApproved = content.autoApprovable || false;
+                var runbooks = content.executableRunBooks;
+                return isAutoApproved
+                    && runbooks
+                    && Array.isArray(runbooks)
+                    && runbooks.length > 0;
+            }
+        }
+        return false;
+    };
+    SystemsManagerSyncProvider.prototype.isUpdated = function (document, record) {
+        var _a, _b, _c, _d, _e, _f, _g;
+        // an updated document should update at least one of these
+        return document.VersionName !== ((_a = record.awsversionname) === null || _a === void 0 ? void 0 : _a.toString()) ||
+            document.DocumentVersion !== ((_b = record.awsdocumentversion) === null || _b === void 0 ? void 0 : _b.toString()) ||
+            ((_c = document.CreatedDate) === null || _c === void 0 ? void 0 : _c.toString()) !== ((_d = record.awscreateddate) === null || _d === void 0 ? void 0 : _d.toString()) ||
+            document.DisplayName !== ((_e = record.awsdisplayname) === null || _e === void 0 ? void 0 : _e.toString()) ||
+            document.ReviewStatus !== ((_f = record.awsreviewstatus) === null || _f === void 0 ? void 0 : _f.toString()) ||
+            document.Author !== ((_g = record.awsauthor) === null || _g === void 0 ? void 0 : _g.toString()) ||
+            // can't reliably determine if there is an update when using these versions, so assume it was updated:
+            document.DocumentVersion === 'LATEST' ||
+            document.DocumentVersion === '$LATEST' ||
+            document.DocumentVersion === 'DEFAULT' ||
+            document.DocumentVersion === '$DEFAULT';
+    };
+    SystemsManagerSyncProvider.prototype.listDocuments = function (accountName, awsSystemsManager, filters) {
+        var result = awsSystemsManager.listDocuments({ Filters: filters }).collectAll();
+        if (!result.success) {
+            gs.error("[SYNC] ".concat(this.providerName, " Error loading Documents in ").concat(accountName, ": ").concat(result.message, "\n                Filters: ").concat(JSON.stringify(filters)));
+        }
+        var documents = result.all;
+        if (!documents) {
+            gs.error("[SYNC] ".concat(this.providerName, " Error parsing ListDocuments result: ").concat(JSON.stringify(result)));
+            return [];
+        }
+        gs.debug("[SYNC] [".concat(this.providerName, "] ListDocuments found ").concat(documents.length, " documents"));
+        return documents;
+    };
+    SystemsManagerSyncProvider.prototype.describeDocument = function (documentName, awsSystemsManager) {
+        var response = awsSystemsManager.describeDocument(documentName);
+        if (!response.haveError()) {
+            var data = response.deserialize();
+            return data.Document;
+        }
+        gs.error("[SYNC] [".concat(this.providerName, "] Unable to DescribeDocument: ").concat(documentName, ": ").concat(response.getErrorMessage(), " : ").concat(response.getBody()));
+        return null;
+    };
+    SystemsManagerSyncProvider.prototype.syncDocument = function (repos, document, region, awsSystemsManager, account) {
+        switch (document.DocumentType) {
+            case "Automation":
+                this.syncAutomationDocument(repos[document.DocumentType], document, region, awsSystemsManager, account);
+                break;
+            case "Automation.ChangeTemplate":
+                this.syncChangeTemplateDocument(repos[document.DocumentType], awsSystemsManager, document, account, region);
+                break;
+            default:
+                throw new Error("Try to synchronize \"".concat(document.Name, "\" (").concat(document.DocumentVersion, ") but documents of type \"").concat(document.DocumentType, "\" are not supported"));
+        }
+    };
+    SystemsManagerSyncProvider.prototype.syncAutomationDocument = function (repo, document, region, awsSystemsManager, account) {
+        var _this = this;
+        var _a = this.findCategories(), automationCategory = _a.automationCategory, changeTemplateCategory = _a.changeTemplateCategory;
+        var refs = {
+            catalog: this.findCatalog(),
+            automationCategory: automationCategory,
+            changeTemplateCategory: changeTemplateCategory,
+            automationWorkflow: this.findAutomationWorkflow(),
+            changeTemplateWorkflow: this.findChangeRequestWorkflow()
+        };
+        repo.findByFieldValue({
+            'name': document.Name,
+            'awsaccount': account.sys_id.toString(),
+            'awsregion': region
+        }).forEach(function (record) {
+            if (_this.isUpdated(document, record)) {
+                _this.updateRecord(record, document, region, awsSystemsManager);
+                repo.update(record);
+                gs.debug("[SYNC] [".concat(_this.providerName, "] Updated ").concat(document.Name));
+            }
+        }).ifNone(function () {
+            var record = _this.createRecord(repo, account, region, document, awsSystemsManager, refs);
+            repo.insert(record);
+            gs.debug("[SYNC] [".concat(_this.providerName, "] Inserted ").concat(document.Name));
+        });
+    };
+    SystemsManagerSyncProvider.prototype.syncChangeTemplateDocument = function (repo, awsSystemsManager, document, account, region) {
+        repo.insertOrUpdate(awsSystemsManager, document, account, region);
+    };
+    // TODO: This should be in the document repo for separation of concerns
+    SystemsManagerSyncProvider.prototype.createRecord = function (repo, account, region, document, awsSystemsManager, refs) {
+        var record = repo.initialiseNewRecord();
+        Util.setValue(record, "awsaccount", account.sys_id.toString());
+        Util.setValue(record, "awsregion", region);
+        Util.setValue(record, "name", document.Name);
+        Util.setValue(record, "awstype", document.DocumentType);
+        Util.setValue(record, 'sc_catalogs', refs.catalog);
+        Util.setValue(record, "category", document.DocumentType === "Automation.ChangeTemplate" ? refs.changeTemplateCategory : refs.automationCategory);
+        Util.setValue(record, "workflow", document.DocumentType === "Automation.ChangeTemplate" ? refs.changeTemplateWorkflow : refs.automationWorkflow);
+        this.updateRecord(record, document, region, awsSystemsManager);
+        return record;
+    };
+    SystemsManagerSyncProvider.prototype.updateRecord = function (record, documentIdentifier, region, awsSystemsManager) {
+        Util.setValue(record, "awslastsynctime", new GlideDateTime());
+        Util.setValue(record, "awsowner", documentIdentifier.Owner);
+        Util.setValue(record, "awstargettype", documentIdentifier.TargetType);
+        Util.setValue(record, "awsversionname", documentIdentifier.VersionName);
+        Util.setValue(record, "awsplatformtypes", documentIdentifier.PlatformTypes);
+        Util.setValue(record, "awsdocumentversion", documentIdentifier.DocumentVersion);
+        Util.setValue(record, "awscreateddate", documentIdentifier.CreatedDate);
+        Util.setValue(record, "awsdisplayname", documentIdentifier.DisplayName);
+        Util.setValue(record, "awsreviewstatus", documentIdentifier.ReviewStatus);
+        Util.setValue(record, "awsauthor", documentIdentifier.Author);
+        // TODO: How to optimise this? Currently the sync is listing all the document and forEach, is doing 1 request to get the description
+        // Also if it is a Change Template then this request was already performed
+        var document = this.describeDocument(documentIdentifier.Name, awsSystemsManager);
+        if (document != null) {
+            Util.setValue(record, "description", this._formatDescription(document, record.awsaccount.getRefRecord(), region));
+            Util.setValue(record, "short_description", Util.getShortDescription(document.Description));
+        }
+    };
+    /**
+     * Delete all Products, Portfolios and Identities that haven't been updated since glideDateTime.
+     */
+    SystemsManagerSyncProvider.prototype._processRecordsLastUpdatedBefore = function (startTime) {
+        gs.debug("[SYNC] [".concat(this.providerName, "] Deleting Documents older than \"").concat(startTime, "\""));
+        var documentRepo = new DocumentRepo();
+        var changeTemplateRepo = new ChangeTemplateRepo();
+        // Rely on cascade deletion rules for the deletion of unwanted product-portfolio and
+        // portfolio-identity associations.
+        this.isSyncTypeRunbooks() && documentRepo.deleteExpired(startTime);
+        this.isSyncTypeChangeTemplates() && changeTemplateRepo.deleteExpired(startTime);
+    };
+    SystemsManagerSyncProvider.prototype.getSystemsManager = function (region, credentials) {
+        var awsSystemsManager = new AwsSystemsManager(region, credentials);
+        awsSystemsManager.setExponentialBackoff(this.timeout);
+        return awsSystemsManager;
+    };
+    SystemsManagerSyncProvider.prototype._formatDescription = function (document, account, region) {
+        var description = [];
+        if (document.Description) {
+            description.push(document.Description, '');
+        }
+        description.push("Available from:", "- Region \"".concat(region, "\""), "- AWS account \"".concat(account.awsname, "\" (").concat(account.awsaccountnumber, ")"));
+        // If using ServiceNow's Debugger 'marked' may throw an error
+        return marked(description.join('\n'));
+    };
+    SystemsManagerSyncProvider.prototype.findCatalog = function () {
+        var catalog_title = 'Service Catalog';
+        var catalog = new GlideRecord("sc_catalog");
+        catalog.addQuery('title', catalog_title);
+        catalog.query();
+        if (!catalog.next()) {
+            gs.error("[SYNC] ".concat(this.providerName, " Service Catalog catalog with title '").concat(catalog_title, "' not found"));
+        }
+        return catalog && catalog.sys_id && catalog.sys_id.toString();
+    };
+    SystemsManagerSyncProvider.prototype.findCategories = function () {
+        var automationCategoryTitle = 'AWS Systems Manager Change Manager';
+        var automation = new GlideRecord("sc_category");
+        automation.addQuery('title', automationCategoryTitle);
+        automation.query();
+        if (!automation.next()) {
+            gs.error("[SYNC] ".concat(this.providerName, " Service Catalog category with title '").concat(automationCategoryTitle, "' not found"));
+        }
+        var changeTemplateCategoryTitle = 'AWS Systems Manager Change Manager';
+        var change = new GlideRecord("sc_category");
+        change.addQuery('title', changeTemplateCategoryTitle);
+        change.query();
+        if (!change.next()) {
+            gs.error("[SYNC] ".concat(this.providerName, " Service Catalog category with title '").concat(changeTemplateCategoryTitle, "' not found"));
+        }
+        return {
+            automationCategory: automation && automation.sys_id && automation.sys_id.toString(),
+            changeTemplateCategory: change && change.sys_id && change.sys_id.toString(),
+        };
+    };
+    SystemsManagerSyncProvider.prototype.findChangeRequestWorkflow = function () {
+        var workflow_name = "AWS Service Catalog - Approve Change Request";
+        var workflow = new GlideRecord("wf_workflow");
+        workflow.addQuery("name", workflow_name);
+        workflow.query();
+        if (!workflow.next()) {
+            gs.error("[SYNC] ".concat(this.providerName, " Workflow with name '").concat(workflow_name, "' not found"));
+        }
+        return workflow && workflow.sys_id && workflow.sys_id.toString();
+    };
+    SystemsManagerSyncProvider.prototype.findAutomationWorkflow = function () {
+        var workflow = DocumentRepo.getExecutionWorkflow();
+        return workflow.sys_id.toString();
+    };
+    return SystemsManagerSyncProvider;
+}(AbstractSyncProvider));
+(function (SystemsManagerSyncProvider) {
+    var SyncType;
+    (function (SyncType) {
+        SyncType[SyncType["ChangeTemplates"] = 0] = "ChangeTemplates";
+        SyncType[SyncType["Runbooks"] = 1] = "Runbooks";
+    })(SyncType = SystemsManagerSyncProvider.SyncType || (SystemsManagerSyncProvider.SyncType = {}));
+})(SystemsManagerSyncProvider || (SystemsManagerSyncProvider = {}));
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-12-17 16:10:15</sys_created_on>
+        <sys_id>f0e5a28fdb05201079bd2fb7489619f6</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>SystemsManagerSyncProvider</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_f0e5a28fdb05201079bd2fb7489619f6</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

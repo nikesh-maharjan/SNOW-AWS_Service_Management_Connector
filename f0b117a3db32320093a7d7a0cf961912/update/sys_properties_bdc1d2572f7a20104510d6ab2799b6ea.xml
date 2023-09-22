@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_properties">
+    <sys_properties action="INSERT_OR_UPDATE">
+        <choices/>
+        <description>Interval, in minutes, between the execution of full Config synchronization.</description>
+        <ignore_cache>false</ignore_cache>
+        <is_private>false</is_private>
+        <name>x_126749_aws_sc.config.fullSyncIntervalMinutes</name>
+        <read_roles/>
+        <suffix>config.fullSyncIntervalMinutes</suffix>
+        <sys_class_name>sys_properties</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-03-15 09:11:40</sys_created_on>
+        <sys_id>bdc1d2572f7a20104510d6ab2799b6ea</sys_id>
+        <sys_mod_count>2</sys_mod_count>
+        <sys_name>x_126749_aws_sc.config.fullSyncIntervalMinutes</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_properties_bdc1d2572f7a20104510d6ab2799b6ea</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2023-04-14 18:41:48</sys_updated_on>
+        <type>integer</type>
+        <value>720</value>
+        <write_roles/>
+    </sys_properties>
+    <sys_translated_text action="delete_multiple" query="documentkey=bdc1d2572f7a20104510d6ab2799b6ea"/>
+</record_update>

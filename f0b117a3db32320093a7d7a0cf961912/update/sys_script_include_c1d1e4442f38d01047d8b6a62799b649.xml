@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.AutomationExecution</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>AutomationExecution</name>
+        <script><![CDATA[var AutomationExecution = /** @class */ (function () {
+    function AutomationExecution(automationExecution) {
+        Util.assertExists(automationExecution, 'automationExecution');
+        this.automationExecution = automationExecution;
+    }
+    /**
+     * Create an AutomationExecution instance from a sys ID.
+     * @param sysId {String}
+     * @returns {AutomationExecution} A AutomationExecution instance or null if no automation execution exists with the given ID.
+     * @memberof! AutomationExecution
+     * @alias from
+     */
+    AutomationExecution.from = function (sysId) {
+        var automationExecutionGr = new GlideRecord('x_126749_aws_sc_cmdb_ci_ae');
+        if (automationExecutionGr.get(sysId)) {
+            return new AutomationExecution(automationExecutionGr);
+        }
+        return null;
+    };
+    /**
+     * Tests whether userId is the owner of any automation execution.
+     * @param userId {string} The sys_id of a user.
+     * @returns {boolean}
+     * @memberof! ProvisionedProduct
+     * @alias isOwner
+     */
+    AutomationExecution.isOwner = function (userId) {
+        Util.assertExists(userId, "userId");
+        var automationExecutionGr = new GlideRecord('x_126749_aws_sc_cmdb_ci_ae');
+        automationExecutionGr.addQuery('owned_by', userId);
+        automationExecutionGr.setLimit(1);
+        automationExecutionGr.query();
+        return automationExecutionGr.hasNext();
+    };
+    /**
+     * @returns {string} The AWS region that this automation execution exists in.
+     * @memberof! AutomationExecution
+     * @alias getRegion
+     */
+    AutomationExecution.prototype.getRegion = function () {
+        return this.automationExecution.awsregion.toString();
+    };
+    /**
+     * @returns {servicenow.Account} The AWS account that this automation execution exists in.
+     * @memberof! AutomationExecution
+     * @alias getAccount
+     */
+    AutomationExecution.prototype.getAccount = function () {
+        return this.automationExecution.awsaccount.getRefRecord();
+    };
+    /**
+     * @returns {string} The ServiceNow id for this automation execution.
+     * @memberof! AutomationExecution
+     * @alias getSysId
+     */
+    AutomationExecution.prototype.getSysId = function () {
+        return this.automationExecution.sys_id.toString();
+    };
+    /**
+     * @return {GlideRecord} The GlideRecord object backing this automation execution.
+     * @memberof! AutomationExecution
+     * @alias gr
+     */
+    AutomationExecution.prototype.gr = function () {
+        return this.automationExecution;
+    };
+    /**
+     * @returns {servicenow.AutomationDocument} The GlideRecord object backing the automation execution from which it is from, or null if it cannot be determine.
+     * @memberof! AutomationExecution
+     * @alias getDocument
+     */
+    AutomationExecution.prototype.getDocument = function () {
+        var reqItemGr = new GlideRecord('sc_req_item');
+        reqItemGr.addQuery('configuration_item', '=', this.getSysId());
+        reqItemGr.query();
+        if (reqItemGr.next() && !reqItemGr.cat_item.nil()) {
+            return reqItemGr.cat_item.getRefRecord();
+        }
+        return null;
+    };
+    AutomationExecution.prototype.sync = function () {
+        try {
+            var credentials = AwsCredentials.from(this.automationExecution).as(AwsCredentials.User.Sync);
+            var sm = this._getSystemsManager(this.automationExecution.awsregion.toString(), credentials);
+            var response_1 = sm.getAutomationExecution(this.automationExecution.awsautomationexecutionid.toString());
+            Util.setValue(this.automationExecution, 'awslastsynctime', new GlideDateTime());
+            if (!response_1.haveError()) {
+                var data = response_1.deserialize().AutomationExecution;
+                gs.debug("[AWS SMC] AutomationExecution.sync data: " + JSON.stringify(data));
+                Util.setValue(this.automationExecution, 'awsautomationexecutionstatus', data.AutomationExecutionStatus);
+                Util.setValue(this.automationExecution, 'awscurrentaction', data.CurrentAction);
+                Util.setValue(this.automationExecution, 'awscurrentstepname', data.CurrentStepName);
+                Util.setValue(this.automationExecution, 'awsdocumentname', data.DocumentName);
+                Util.setValue(this.automationExecution, 'awsdocumentversion', data.DocumentVersion);
+                Util.setValue(this.automationExecution, 'awsexecutedby', data.ExecutedBy);
+                data.ExecutionEndTime && Util.setValue(this.automationExecution, 'awsexecutionendtime', Util.toGlideDateTime(data.ExecutionEndTime));
+                data.ExecutionStartTime && Util.setValue(this.automationExecution, 'awsexecutionstarttime', Util.toGlideDateTime(data.ExecutionStartTime));
+                Util.setValue(this.automationExecution, 'awsfailuremessage', data.FailureMessage);
+                Util.setValue(this.automationExecution, 'awsmode', data.Mode);
+                Util.setValue(this.automationExecution, 'awssyncstatus', 1 /* OK */);
+                this._storeOutputs(data.Outputs);
+                this._storeSteps(data.StepExecutions);
+                this._updateChangeTaskStatus(data.AutomationExecutionStatus);
+            }
+            else {
+                gs.debug("[AWS SMC] AutomationExecution.sync api.error: " + response_1.getErrorMessage());
+                Util.setValue(this.automationExecution, 'awsstatusmessage', response_1.getErrorMessage());
+                Util.setValue(this.automationExecution, 'awssyncstatus', 2 /* ERROR */);
+            }
+        }
+        catch (ex) {
+            gs.debug("[AWS SMC] AutomationExecution.sync error: " + ex.message);
+            Util.setValue(this.automationExecution, 'awsstatusmessage', ex.message);
+            Util.setValue(this.automationExecution, 'awssyncstatus', 3 /* AUTH_FAILURE */);
+        }
+        this.automationExecution.update();
+    };
+    AutomationExecution.prototype._updateChangeTaskStatus = function (status) {
+        var pendingStatuses = ['Pending', 'PendingApproval', 'PendingChangeCalendarOverride'];
+        var waitingStatuses = ['Waiting', 'Approved', 'Scheduled', 'ChangeCalendarOverrideApproved'];
+        var inProgressStatuses = ['InProgress', 'RunbookInProgress', 'Cancelling'];
+        var cancelledStatuses = ['Cancelled'];
+        var changeTask = new GlideRecord('change_task');
+        changeTask.addQuery('cmdb_ci', this.automationExecution.sys_id);
+        changeTask.query();
+        if (changeTask.next()) {
+            var choiceLabel = pendingStatuses.indexOf(status) > -1 ? 'Pending'
+                : waitingStatuses.indexOf(status) > -1 ? 'Waiting'
+                    : inProgressStatuses.indexOf(status) > -1 ? 'InProgress'
+                        : cancelledStatuses.indexOf(status) > -1 ? 'Cancelled'
+                            : 'Closed';
+            var stateValue = Util.getChoiceValueFromLabel('change_task', 'state', choiceLabel);
+            Util.setValue(changeTask, 'state', stateValue);
+            if (choiceLabel === 'Closed') {
+                Util.setValue(changeTask, 'close_code', Util.getChoiceValueFromLabel('change_request', 'close_code', 'Successful'));
+                Util.setValue(changeTask, 'close_notes', "The Automation Execution was completed with Status as " + status);
+            }
+            changeTask.update();
+            //Check if the OpsItem was synched and finished before the Automation Execution synchronisation
+            new OpsCenterSyncProvider().updateChangeRequestStatusFromOpsItem(changeTask);
+        }
+    };
+    AutomationExecution.prototype._getSystemsManager = function (region, credentials) {
+        return new AwsSystemsManager(region, credentials);
+    };
+    AutomationExecution.prototype._storeOutputs = function (outputs) {
+        if (!outputs) {
+            return;
+        }
+        for (var key in outputs) {
+            if (!outputs.hasOwnProperty(key)) {
+                continue;
+            }
+            var value = JSON.stringify(outputs[key]);
+            var gro = new GlideRecord('x_126749_aws_sc_ae_output');
+            gro.addQuery('awsdocumentexecution', this.getSysId());
+            gro.addQuery('awskey', key);
+            gro.query();
+            if (gro.next()) {
+                Util.setValue(gro, 'awsvalue', value);
+                gro.update();
+            }
+            else {
+                gro.initialize();
+                Util.setValue(gro, 'awsdocumentexecution', this.getSysId());
+                Util.setValue(gro, 'awskey', key);
+                Util.setValue(gro, 'awsvalue', value);
+                gro.insert();
+            }
+        }
+    };
+    AutomationExecution.prototype._storeSteps = function (steps) {
+        var _this = this;
+        if (!steps) {
+            return;
+        }
+        steps.forEach(function (step, index) {
+            var grs = new GlideRecord('x_126749_aws_sc_ae_step');
+            grs.addQuery('awsdocumentexecution', _this.getSysId());
+            grs.addQuery('awsstepexecutionid', step.StepExecutionId);
+            grs.query();
+            if (grs.next()) {
+                Util.setValue(grs, 'awsstepstatus', step.StepStatus);
+                Util.setValue(grs, 'awsexecutionendtime', Util.toGlideDateTime(step.ExecutionEndTime));
+                Util.setValue(grs, 'awsexecutionstarttime', Util.toGlideDateTime(step.ExecutionStartTime));
+                Util.setValue(grs, 'awsinputs', JSON.stringify(step.Inputs));
+                Util.setValue(grs, 'awsoutputs', JSON.stringify(step.Outputs));
+                grs.update();
+            }
+            else {
+                grs.initialize();
+                Util.setValue(grs, 'awsdocumentexecution', _this.getSysId());
+                Util.setValue(grs, 'awsstepexecutionid', step.StepExecutionId);
+                Util.setValue(grs, 'awsaction', step.Action);
+                Util.setValue(grs, 'awsstepname', step.StepName);
+                Util.setValue(grs, 'awsstepindex', index + 1);
+                Util.setValue(grs, 'awsstepstatus', step.StepStatus);
+                Util.setValue(grs, 'awsexecutionendtime', Util.toGlideDateTime(step.ExecutionEndTime));
+                Util.setValue(grs, 'awsexecutionstarttime', Util.toGlideDateTime(step.ExecutionStartTime));
+                Util.setValue(grs, 'awsinputs', JSON.stringify(step.Inputs));
+                Util.setValue(grs, 'awsoutputs', JSON.stringify(step.Outputs));
+                grs.insert();
+            }
+        });
+    };
+    return AutomationExecution;
+}());
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-05-10 16:24:41</sys_created_on>
+        <sys_id>c1d1e4442f38d01047d8b6a62799b649</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AutomationExecution</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_c1d1e4442f38d01047d8b6a62799b649</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

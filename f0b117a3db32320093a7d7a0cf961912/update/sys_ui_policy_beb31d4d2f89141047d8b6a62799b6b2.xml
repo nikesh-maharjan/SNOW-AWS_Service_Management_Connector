@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_ui_policy">
+    <sys_ui_policy action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <conditions table="x_126749_aws_sc_tags">awsselectable=true^EQ<item endquery="false" field="awsselectable" goto="false" newquery="false" operator="=" or="false" value="true"/>
+            <item endquery="true" field="" goto="false" newquery="false" operator="=" or="false" value=""/>
+        </conditions>
+        <description/>
+        <global>true</global>
+        <inherit>false</inherit>
+        <isolate_script>true</isolate_script>
+        <model_id/>
+        <model_table/>
+        <on_load>true</on_load>
+        <order>100</order>
+        <reverse_if_false>true</reverse_if_false>
+        <run_scripts>true</run_scripts>
+        <script_false><![CDATA[function onCondition() {
+	g_form.setMandatory('awsvalue', true);
+	g_form.setDisplay('awsvalue', true);
+	
+	g_form.clearValue('awstable');
+	g_form.setMandatory('awstable', false);
+	g_form.setDisplay('awstable', false);
+	
+	g_form.clearValue('awsfield');
+	g_form.setMandatory('awsfield', false);
+	g_form.setDisplay('awsfield', false);
+	
+	g_form.clearValue('awstablefilter');
+	g_form.setDisplay('awstablefilter', false);
+}]]></script_false>
+        <script_true><![CDATA[function onCondition() {
+	g_form.clearValue('awsvalue');
+	g_form.setMandatory('awsvalue', false);
+	g_form.setDisplay('awsvalue', false);
+	
+	g_form.setMandatory('awstable', true);
+	g_form.setDisplay('awstable', true);
+	
+	g_form.setMandatory('awsfield', true);
+	g_form.setDisplay('awsfield', true);
+	
+	g_form.setDisplay('awstablefilter', true);
+}]]></script_true>
+        <set_values/>
+        <short_description>Display table, field and filter if tag is selectable</short_description>
+        <sys_class_name>sys_ui_policy</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-05-26 08:56:39</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>beb31d4d2f89141047d8b6a62799b6b2</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Display table, field and filter if tag is selectable</sys_name>
+        <sys_overrides/>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_ui_policy_beb31d4d2f89141047d8b6a62799b6b2</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <table>x_126749_aws_sc_tags</table>
+        <ui_type>0</ui_type>
+        <view/>
+    </sys_ui_policy>
+</record_update>

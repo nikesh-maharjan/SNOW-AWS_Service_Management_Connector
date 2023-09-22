@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.AwsAccountAjax</api_name>
+        <caller_access/>
+        <client_callable>true</client_callable>
+        <description/>
+        <name>AwsAccountAjax</name>
+        <script><![CDATA[/**
+ @Deployable({
+     table: 'sys_script_include',
+     column: 'script',
+     sysId: 'e05a67eddb782300833b711ebf9619e7'
+ })
+ */
+var AwsAccountAjax = (function () {
+    var accountParameter = AjaxParameterSupplier.required('sysparm_account');
+    var accountRecord = accountParameter.gr('x_126749_aws_sc_account');
+    var productParameter = AjaxParameterSupplier.required('sysparm_product');
+    var productRecord = productParameter.gr('x_126749_aws_sc_product')
+        .notNil('awsregion')
+        .notNil('awsproductid');
+    function summariseWorkflowContext(wf) {
+        // GlideRecord booleans behave weirdly.
+        return {
+            active: wf.active ? true : false,
+            ended: wf.ended.getDisplayValue(),
+            result: wf.result.toString(),
+            started: wf.started.getDisplayValue(),
+            state: wf.state.toString(),
+            sys_id: wf.sys_id.toString(),
+        };
+    }
+    var Processor = /** @class */ (function (_super) {
+        Polyfill.__extends(Processor, _super);
+        function Processor() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        Processor.prototype.deleteProduct = function () {
+            return this._applyWith([
+                productRecord,
+            ], function (product) {
+                var wf = WorkflowTasks.deleteProduct.startWorkflow(product.sys_id.toString());
+                if (wf) {
+                    return this._response(summariseWorkflowContext(wf));
+                }
+                else {
+                    return this._errorResponse("Unable to delete product");
+                }
+            });
+        };
+        Processor.prototype.deleteProvisioningArtifact = function () {
+            var _this = this;
+            return this._applyWith([
+                productRecord,
+                AjaxParameterSupplier.required("sysparm_provisioningArtifact")
+            ], function (product, provisioningArtifact) {
+                var sc = _this._getServiceCatalog(product.awsregion.toString(), AwsCredentials.from(product).as(AwsCredentials.User.Sync));
+                var response = sc.deleteProvisioningArtifact(product.awsid.toString(), provisioningArtifact);
+                if (!response.haveError()) {
+                    return _this._response(response.getBody());
+                }
+                else {
+                    return _this._errorResponse("Error deleting provisioning artifact: ", response.getBody());
+                }
+            });
+        };
+        Processor.prototype.describeProductAsAdmin = function () {
+            var _this = this;
+            return this._applyWith([
+                productRecord
+            ], function (product) {
+                var sc = _this._getServiceCatalog(product.awsregion.toString(), AwsCredentials.from(product).as(AwsCredentials.User.Sync));
+                var response = sc.describeProductAsAdmin(product.awsproductid.toString());
+                if (!response.haveError()) {
+                    return _this._response(response.getBody());
+                }
+                else {
+                    return _this._errorResponse("Error describing product", response.getBody());
+                }
+            });
+        };
+        Processor.prototype.disassociateProductFromPortfolio = function () {
+            var _this = this;
+            return this._applyWith([
+                productRecord,
+                AjaxParameterSupplier.required('sysparm_portfolio')
+                    .gr('x_126749_aws_sc_portfolio')
+                    .notNil('awsid')
+            ], function (product, portfolio) {
+                var productId = product.awsproductid.toString(), portfolioId = portfolio.awsid.toString();
+                var sc = _this._getServiceCatalog(product.awsregion.toString(), AwsCredentials.from(product).as(AwsCredentials.User.Sync));
+                var response = sc.disassociateProductFromPortfolio(portfolioId, productId);
+                if (!response.haveError()) {
+                    // Delete the connector's association of the two.
+                    var portfolioProductGr = new GlideRecord('x_126749_aws_sc_portfolio_products');
+                    portfolioProductGr.addQuery('awsportfolio', portfolio.sys_id.toString());
+                    portfolioProductGr.addQuery('awsproduct', product.sys_id.toString());
+                    portfolioProductGr.deleteMultiple();
+                    return _this._response(response.getBody());
+                }
+                else {
+                    return _this._errorResponse("Error disassociating product from portfolio", response.getBody());
+                }
+            });
+        };
+        Processor.prototype.disassociateTagOptionFromProduct = function () {
+            var _this = this;
+            return this._applyWith([
+                productRecord,
+                AjaxParameterSupplier.required('sysparm_tagOption')
+            ], function (product, tagOption) {
+                var sc = _this._getServiceCatalog(product.awsregion.toString(), AwsCredentials.from(product).as(AwsCredentials.User.Sync));
+                var response = sc.disassociateTagOptionFromResource(product.awsid.toString(), tagOption);
+                if (!response.haveError()) {
+                    return _this._response(response.getBody());
+                }
+                else {
+                    return _this._errorResponse("Error disassociating product from product", response.getBody());
+                }
+            });
+        };
+        Processor.prototype.getInvokeWorkflowTaskStatus = function () {
+            return this._applyWith([
+                AjaxParameterSupplier.required('sysparm_workflow')
+                    .gr('wf_context')
+                    .then(function (wf) {
+                    // Reject the parameter if it's not a query for an instance of Invoke Workflow Tasks.
+                    if (wf.workflow.name.toString() !== WorkflowTasks.WORKFLOW_NAME) {
+                        return new Error('No such task: ' + wf.sys_id.toString());
+                    }
+                    return wf;
+                })
+            ], function (wf) {
+                return this._response(summariseWorkflowContext(wf));
+            });
+        };
+        Processor.prototype.listProductPortfolios = function () {
+            var _this = this;
+            // Note that the parameters are the raw sys_ids, not GlideRecord instances.
+            return this._applyWith([
+                productRecord
+            ], function (product) {
+                var portfolio = !product.awsportfolio.nil() ? product.awsportfolio.getRefRecord() : null;
+                var summaries = [];
+                if (portfolio !== null) {
+                    summaries.push({
+                        sys_id: portfolio.sys_id.toString(),
+                        region: portfolio.awsregion.toString(),
+                        // AWS Service Catalog properties
+                        ARN: portfolio.awsarn.toString(),
+                        CreatedTime: portfolio.awscreatedtime.getDisplayValue(),
+                        Description: portfolio.awsdescription.toString(),
+                        DisplayName: portfolio.awsdisplayname.toString(),
+                        Id: portfolio.awsid.toString(),
+                        ProviderName: portfolio.awsprovidername.toString(),
+                        Type: portfolio.awstype.toString()
+                    });
+                }
+                return _this._response({ portfolios: summaries });
+            });
+        };
+        Processor.prototype.validateAccount = function () {
+            var _this = this;
+            return this._applyWith([
+                accountRecord
+            ], function (account) {
+                var validateResults = AwsCredentials.from(account).validate();
+                if (validateResults.length === 0) {
+                    return _this._response(JSON.stringify("Successfully validated AWS Account in each referenced region."));
+                }
+                else {
+                    // ServiceNow throws an error if you reference Util from Array.map:
+                    // Illegal access to package_private script include Util: caller not in scope x_126749_aws_sc
+                    var areErrors = validateResults.some(_this.isError());
+                    var summary = validateResults.map(function (e) {
+                        return "<li><strong>".concat(Util.escapeText(e.service), " in ").concat(Util.escapeText(e.region), "</strong>: ").concat(Util.escapeText(e.error), "</li>");
+                    }).join('');
+                    return areErrors
+                        ? _this._errorResponse("Error validating AWS account in one or more regions:<ul>".concat(summary, "</ul>"))
+                        : _this._response(JSON.stringify("Successfully validated AWS Account in each referenced region.<br/>Notes:<br/><ul>".concat(summary, "</ul>")));
+                }
+            });
+        };
+        Processor.prototype.isError = function () {
+            return function (result) { return result.level === AwsCredentials.ValidateResultLevel.ERROR; };
+        };
+        return Processor;
+    }(AbstractAwsAjaxProcessor));
+    Processor.prototype.type = 'AwsAccountAjax';
+    return Processor;
+})();
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-09-27 10:18:22</sys_created_on>
+        <sys_id>e05a67eddb782300833b711ebf9619e7</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AwsAccountAjax</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_e05a67eddb782300833b711ebf9619e7</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

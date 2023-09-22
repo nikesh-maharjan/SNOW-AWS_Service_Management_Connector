@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="gsw_content_information">
+    <gsw_content_information action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <article><![CDATA[<p>Review the available settings and recommendations in the table below.</p>
+<div>
+<div>
+<table id="w880aac31b7c39b5b6b3"><tbody><tr><td style="text-align: center;"><strong>Available settings</strong></td><td>
+<p style="text-align: center;"><strong>Description</strong></p>
+</td></tr><tr><td>The name of the S3 bucket from where to get the resource provider ZIP files</td><td>
+<p>The S3 bucket for custom resources from ServiceNow that populates AWS config.</p>
+<p>Default and hard coded value: <code>cmdb-resource-providers</code></p>
+<div>
+<div>Note</div>
+<div>
+<p>We do not recommend changing this setting.</p>
+</div>
+</div>
+</td></tr><tr><td>Name of the Discovery Source for synchronization with AWS Config</td><td>
+<p>The setting that correlates the Discovery source in ServiceNow.</p>
+<p>Default and hard coded value: AWS Service Management Connector</p>
+<div>
+<div>Note</div>
+<div>
+<p>We do not recommend changing this setting.</p>
+</div>
+</div>
+</td></tr><tr><td>What field to use for correlation ID</td><td>
+<p>Administrators use this setting to specify which column contains the correlation ID for each AWS Config.</p>
+<p>The correlation ID disambiguates AWS Config item that might have the same resource ID (such as SQS queues). It consists of the comma separated string of:</p>
+<div>
+<ul style="list-style-type: disc; list-style-position: inside;" type="disc"><li>
+<p>Source account number</p>
+</li><li>
+<p>Source Region</p>
+</li><li>
+<p>Resource type, such as AWS::EC2::Instance</p>
+</li><li>
+<p>Resource ID</p>
+</li></ul>
+</div>
+<p>Default: <code>correlation_id</code></p>
+</td></tr></tbody></table>
+</div>
+</div>]]></article>
+        <best_practice_acceptable>false</best_practice_acceptable>
+        <dependent_on_contents/>
+        <dependent_on_plugins/>
+        <dependent_on_plugins_ids/>
+        <description/>
+        <embedded_help_qualifier/>
+        <end_point>system_properties_ui.do?sysparm_title=AWS%20Config&amp;sysparm_category=AWS%20Config</end_point>
+        <end_point_open_mode>1</end_point_open_mode>
+        <end_point_type>1</end_point_type>
+        <field/>
+        <filter/>
+        <filter_result/>
+        <implicit_dependent_on/>
+        <implicit_plugin_dependencies/>
+        <is_dynamic>false</is_dynamic>
+        <more_info_available>false</more_info_available>
+        <more_info_html/>
+        <order>100</order>
+        <parent display_value="Configure AWS Config integration">e8518ca41ba23010a148a9f6624bcb33</parent>
+        <parents>e8518ca41ba23010a148a9f6624bcb33,c09fcac2dbd130100f00b298f496196f</parents>
+        <plugin_id/>
+        <property_name/>
+        <property_value/>
+        <quick_startable>false</quick_startable>
+        <root_parent display_value="AWS Service Management Connector">c09fcac2dbd130100f00b298f496196f</root_parent>
+        <skippable>true</skippable>
+        <supports_child_content>false</supports_child_content>
+        <sys_class_name>gsw_content_information</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-09-08 19:32:44</sys_created_on>
+        <sys_id>716180e41ba23010a148a9f6624bcb8b</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Configure the new AWS Config integration System Properties</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>gsw_content_information_716180e41ba23010a148a9f6624bcb8b</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <table/>
+        <title>Configure the new AWS Config integration System Properties</title>
+        <weight>1</weight>
+    </gsw_content_information>
+    <sys_translated_text action="delete_multiple" query="documentkey=716180e41ba23010a148a9f6624bcb8b"/>
+</record_update>

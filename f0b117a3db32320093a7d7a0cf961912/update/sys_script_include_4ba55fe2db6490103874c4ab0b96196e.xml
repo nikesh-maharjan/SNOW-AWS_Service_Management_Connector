@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.Ec2ResourceType</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>Ec2ResourceType</name>
+        <script><![CDATA[var Ec2ResourceType = /** @class */ (function (_super) {
+    Polyfill.__extends(Ec2ResourceType, _super);
+    function Ec2ResourceType() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Ec2ResourceType.prototype.rules = function () {
+        return [{
+                order: 10,
+                syncType: ConfigSyncProvider.SYNC_DIR.FROM_AWS_CONFIG,
+                externalResourceType: 'AWS::EC2::Instance',
+                externalResourceId: 'resourceId',
+                snTable: 'cmdb_ci_vm_instance',
+                syncFromAws: this.syncFromAws,
+            }];
+    };
+    Ec2ResourceType.prototype.fields = function () {
+        var _this = this;
+        return [{
+                mode: ConfigSyncProvider.FieldMode.FromAws,
+                snField: 'vm_inst_id',
+                awsField: 'data.instanceId'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromAws,
+                snField: 'mac_address',
+                transformFromAws: function (object) { return ((object.data.networkInterfaces || [])[0] || {}).macAddress || ''; }
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromAws,
+                snField: 'name',
+                transformFromAws: function (object, context) {
+                    var name = ((object.data.tags || []).filter(function (tag) { return tag.key === 'Name'; })[0] || {}).value;
+                    return (context && context.resourceIdAsName) || !name
+                        ? object.item.resourceId : name;
+                }
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromAws,
+                snField: 'state',
+                transformFromAws: function (object) { return _this.getState(object); }
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromAws,
+                snField: 'cpus',
+                transformFromAws: function (object) { return object.data.cpuOptions ? object.data.cpuOptions.coreCount * object.data.cpuOptions.threadsPerCore : 0; }
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromAws,
+                snField: 'disks',
+                transformFromAws: function (object) { return (object.data.blockDeviceMappings || []).length; }
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromAws,
+                snField: 'dns_domain',
+                awsField: 'data.publicDnsName'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromAws,
+                snField: 'fqdn',
+                awsField: 'data.publicDnsName'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromAws,
+                snField: 'ip_address',
+                transformFromAws: function (object) {
+                    var ips = [];
+                    if (object.data.publicIpAddress) {
+                        ips.push(object.data.publicIpAddress);
+                    }
+                    if (object.data.privateIpAddress) {
+                        ips.push(object.data.privateIpAddress);
+                    }
+                    return ips.join(',');
+                }
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromAws,
+                snField: 'nics',
+                transformFromAws: function (object) { return (object.data.networkInterfaces || []).length; }
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromAws,
+                snField: 'disks_size',
+                transformFromAws: function (object) {
+                    var diskSize = 0;
+                    var volumeIds = (object.item.relationships || [])
+                        .filter(function (relationship) { return relationship.resourceType === 'AWS::EC2::Volume'; })
+                        .map(function (relationship) { return relationship.resourceId; });
+                    var storrageVolumeGr = new GlideRecord('cmdb_ci_storage_volume');
+                    storrageVolumeGr.addQuery('object_id', 'IN', volumeIds);
+                    storrageVolumeGr.query();
+                    while (storrageVolumeGr.next()) {
+                        diskSize += storrageVolumeGr.size_bytes;
+                    }
+                    return diskSize > 0 ? diskSize / 1073741824 : diskSize;
+                }
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromAws,
+                snField: 'terminated_on',
+                awsField: 'item.resourceDeletionTime'
+            }];
+    };
+    Ec2ResourceType.prototype.relationships = function () {
+        return [
+            {
+                resourceType: new VpcResourceType(),
+                relationship: ConfigSyncProvider.RelationshipType.Contains,
+                reverse: true
+            },
+            {
+                resourceType: new EbsVolumeResourceType(),
+                relationship: ConfigSyncProvider.RelationshipType.ProvidesStorageFor,
+                reverse: true
+            },
+            {
+                relationship: ConfigSyncProvider.RelationshipType.ProvisionedFrom,
+                externalResourceType: 'Instance Type',
+                snTable: 'cmdb_ci_compute_template',
+                documentationOnly: true
+            },
+            {
+                relationship: ConfigSyncProvider.RelationshipType.HostedOn,
+                externalResourceType: 'AWS::Region',
+                snTable: 'cmdb_ci_aws_datacenter',
+                documentationOnly: true
+            }, {
+                relationship: ConfigSyncProvider.RelationshipType.Contains,
+                externalResourceType: 'Availability Zone',
+                snTable: 'cmdb_ci_availability_zone',
+                documentationOnly: true
+            }
+        ];
+    };
+    Ec2ResourceType.prototype.syncFromAwsAddRelationships = function (context, config, resourceSysId) {
+        // Process relationships to instance type
+        var provisionedFromSysId = this.getRelationTypeSysId(ConfigSyncProvider.RelationshipType.ProvisionedFrom);
+        var ec2InstanceTypeSysId = this.getInstanceTypeSysId(context, config);
+        this.updateRelationship(resourceSysId, ec2InstanceTypeSysId, provisionedFromSysId);
+        // Process relationships to AWS regions
+        this.addHostedOnRegionRelationship(context, config, resourceSysId);
+        // Process relationships to AWS Availability Zones
+        this.processAwsAvailabilityZonesRelationships(context, config, resourceSysId);
+    };
+    Ec2ResourceType.prototype.getState = function (config) {
+        if (!config.data.hasOwnProperty('state')) {
+            return 'terminated';
+        }
+        switch (parseInt(config.data.state.code)) {
+            case 0:
+                return 'scheduled';
+            case 16:
+                return 'on';
+            case 32:
+                return 'terminating';
+            case 48:
+                return 'terminated';
+            case 64:
+                return 'stopping';
+            case 80:
+                return 'off';
+            default:
+                return 'retired';
+        }
+    };
+    Ec2ResourceType.prototype.getInstanceTypeSysId = function (context, config) {
+        //returns sys_id of the record containing the instance type and adds it if it is not present
+        var computeTemplateGr = new GlideRecord('cmdb_ci_compute_template');
+        computeTemplateGr.addQuery('object_id', config.data.instanceType);
+        computeTemplateGr.query();
+        if (computeTemplateGr.next()) {
+            return computeTemplateGr.sys_id;
+        }
+        else {
+            computeTemplateGr.initialize();
+            Util.setValue(computeTemplateGr, 'object_id', config.data.instanceType);
+            Util.setValue(computeTemplateGr, 'name', config.data.instanceType);
+            Util.setValue(computeTemplateGr, 'vcpus', config.data.cpuOptions ? config.data.cpuOptions.coreCount * config.data.cpuOptions.threadsPerCore : 0);
+            Util.setValue(computeTemplateGr, 'cores', config.data.cpuOptions ? config.data.cpuOptions.coreCount : 0);
+            Util.setValue(computeTemplateGr, 'discovery_source', context.connectorName);
+            Util.setValue(computeTemplateGr, 'first_discovered', new GlideDateTime());
+            return computeTemplateGr.insert();
+        }
+    };
+    return Ec2ResourceType;
+}(AbstractResourceType));
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-05-06 13:39:39</sys_created_on>
+        <sys_id>4ba55fe2db6490103874c4ab0b96196e</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Ec2ResourceType</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_4ba55fe2db6490103874c4ab0b96196e</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

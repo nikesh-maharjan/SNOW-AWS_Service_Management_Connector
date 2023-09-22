@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_script">
+    <sys_script action="INSERT_OR_UPDATE">
+        <abort_action>false</abort_action>
+        <access>package_private</access>
+        <action_delete>false</action_delete>
+        <action_insert>true</action_insert>
+        <action_query>false</action_query>
+        <action_update>true</action_update>
+        <active>true</active>
+        <add_message>false</add_message>
+        <advanced>true</advanced>
+        <change_fields>false</change_fields>
+        <client_callable>false</client_callable>
+        <collection>cmdb_ci_app_server</collection>
+        <condition>current &amp;&amp; current.getTableName() === 'cmdb_ci_app_server'</condition>
+        <description/>
+        <execute_function>false</execute_function>
+        <filter_condition/>
+        <is_rest>false</is_rest>
+        <message/>
+        <name>Push Application Server To AWS Config</name>
+        <order>100</order>
+        <priority>100</priority>
+        <rest_method/>
+        <rest_method_text/>
+        <rest_service/>
+        <rest_service_text/>
+        <rest_variables/>
+        <role_conditions/>
+        <script><![CDATA[// Push .NET Application To AWS Config
+// @Deployable({table: 'sys_script', column: 'script', sysId: 'ab040d3a2f7f101047d8b6a62799b644', metadata: {name: "Push .NET Application To AWS Config", order: '100', action_update: 'true', action_insert: 'true', when: 'async_always', condition: "current && current.getTableName() === 'cmdb_ci_appl_dot_net'"}})
+// Push Apache Web Server To AWS Config
+// @Deployable({table: 'sys_script', column: 'script', sysId: 'efd149b62f7f101047d8b6a62799b68c', metadata: {name: "Push Apache Web Server To AWS Config", order: '100', action_update: 'true', action_insert: 'true', when: 'async_always', condition: "current && current.getTableName() === 'cmdb_ci_apache_web_server'"}})
+// Push Application Cluster To AWS Config
+// @Deployable({table: 'sys_script', column: 'script', sysId: '3e62c5f62f7f101047d8b6a62799b60a', metadata: {name: "Push Application Cluster To AWS Config", order: '100', action_update: 'true', action_insert: 'true', when: 'async_always', condition: "current && current.getTableName() === 'cmdb_ci_application_cluster'"}})
+// Push Application Server Resource To AWS
+// @Deployable({table: 'sys_script', column: 'script', sysId: '2762c5f62f7f101047d8b6a62799b650', metadata: {name: "Push Application Server Resource To AWS", order: '100', action_update: 'true', action_insert: 'true', when: 'async_always', condition: "current && current.getTableName() === 'cmdb_ci_application_server_resource'"}})
+// Push Application Server To AWS Config
+// @Deployable({table: 'sys_script', column: 'script', sysId: 'f6d249f62f7f101047d8b6a62799b69a', metadata: {name: "Push Application Server To AWS Config", order: '100', action_update: 'true', action_insert: 'true', when: 'async_always', condition: "current && current.getTableName() === 'cmdb_ci_app_server'"}})
+// Push Application Software To AWS Config
+// @Deployable({table: 'sys_script', column: 'script', sysId: '87b249f62f7f101047d8b6a62799b660', metadata: {name: "Push Application Software To AWS Config", order: '100', action_update: 'true', action_insert: 'true', when: 'async_always', condition: "current && current.getTableName() === 'cmdb_ci_application_software'"}})
+// Push Application To AWS Config
+// @Deployable({table: 'sys_script', column: 'script', sysId: '19224db62f7f101047d8b6a62799b600', metadata: {name: "Push Application To AWS Config", order: '100', action_update: 'true', action_insert: 'true', when: 'async_always', condition: "current && current.getTableName() === 'cmdb_ci_appl'"}})
+// Push IBM Websphere EAR To AWS Config
+// @Deployable({table: 'sys_script', column: 'script', sysId: '9a6349f62f7f101047d8b6a62799b6fa', metadata: {name: "Push IBM Websphere EAR To AWS Config", order: '100', action_update: 'true', action_insert: 'true', when: 'async_always', condition: "current && current.getTableName() === 'cmdb_ci_app_server_ws_ear'"}})
+// Push IBM Websphere To AWS Config
+// @Deployable({table: 'sys_script', column: 'script', sysId: '0e43813a2f7f101047d8b6a62799b6e3', metadata: {name: "Push IBM Websphere To AWS Config", order: '100', action_update: 'true', action_insert: 'true', when: 'async_always', condition: "current && current.getTableName() === 'cmdb_ci_app_server_websphere'"}})
+// Push JavaServer To AWS Config
+// @Deployable({table: 'sys_script', column: 'script', sysId: '1993cdf62f7f101047d8b6a62799b67b', metadata: {name: "Push JavaServer To AWS Config", order: '100', action_update: 'true', action_insert: 'true', when: 'async_always', condition: "current && current.getTableName() === 'cmdb_ci_app_server_java'"}})
+// Push Kubernetes Cluster To AWS Config
+// @Deployable({table: 'sys_script', column: 'script', sysId: '88c3053a2f7f101047d8b6a62799b6aa', metadata: {name: "Push Kubernetes Cluster To AWS Config", order: '100', action_update: 'true', action_insert: 'true', when: 'async_always', condition: "current && current.getTableName() === 'cmdb_ci_kubernetes_cluster'"}})
+// Push Kubernetes Pod To AWS Config
+// @Deployable({table: 'sys_script', column: 'script', sysId: '5be349f62f7f101047d8b6a62799b6e1', metadata: {name: "Push Kubernetes Pod To AWS Config", order: '100', action_update: 'true', action_insert: 'true', when: 'async_always', condition: "current && current.getTableName() === 'cmdb_ci_kubernetes_pod'"}})
+// Push MS IIS Web Server To AWS Config
+// @Deployable({table: 'sys_script', column: 'script', sysId: 'a334893a2f7f101047d8b6a62799b661', metadata: {name: "Push MS IIS Web Server To AWS Config", order: '100', action_update: 'true', action_insert: 'true', when: 'async_always', condition: "current && current.getTableName() === 'cmdb_ci_microsoft_iis_web_server'"}})
+// Push MS SQL Database To AWS Config
+// @Deployable({table: 'sys_script', column: 'script', sysId: '9b64417a2f7f101047d8b6a62799b6ff', metadata: {name: "Push MS SQL Database To AWS Config", order: '100', action_update: 'true', action_insert: 'true', when: 'async_always', condition: "current && current.getTableName() === 'cmdb_ci_db_mssql_database'"}})
+// Push MS SQL Server To AWS Config
+// @Deployable({table: 'sys_script', column: 'script', sysId: 'd5b4457a2f7f101047d8b6a62799b635', metadata: {name: "Push MS SQL Server To AWS Config", order: '100', action_update: 'true', action_insert: 'true', when: 'async_always', condition: "current && current.getTableName() === 'cmdb_ci_db_mssql_server'"}})
+// Push MySQL Instance To AWS Config
+// @Deployable({table: 'sys_script', column: 'script', sysId: 'ced4457a2f7f101047d8b6a62799b608', metadata: {name: "Push MySQL Instance To AWS Config", order: '100', action_update: 'true', action_insert: 'true', when: 'async_always', condition: "current && current.getTableName() === 'cmdb_ci_db_mysql_instance'"}})
+// Push Nginx Web Server To AWS Config
+// @Deployable({table: 'sys_script', column: 'script', sysId: 'c415417a2f7f101047d8b6a62799b6c7', metadata: {name: "Push Nginx Web Server To AWS Config", order: '100', action_update: 'true', action_insert: 'true', when: 'async_always', condition: "current && current.getTableName() === 'cmdb_ci_nginx_web_server'"}})
+// Push SAP Application To AWS Config
+// @Deployable({table: 'sys_script', column: 'script', sysId: '8565457a2f7f101047d8b6a62799b63d', metadata: {name: "Push SAP Application To AWS Config", order: '100', action_update: 'true', action_insert: 'true', when: 'async_always', condition: "current && current.getTableName() === 'cmdb_ci_appl_sap'"}})
+// Push SAP Hana Db To AWS Config
+// @Deployable({table: 'sys_script', column: 'script', sysId: 'e7854d3a2f7f101047d8b6a62799b614', metadata: {name: "Push SAP Hana Db To AWS Config", order: '100', action_update: 'true', action_insert: 'true', when: 'async_always', condition: "current && current.getTableName() === 'cmdb_ci_appl_sap_hana_db'"}})
+// Push SAP System To AWS Config
+// @Deployable({table: 'sys_script', column: 'script', sysId: 'eeb501ba2f7f101047d8b6a62799b693', metadata: {name: "Push SAP System To AWS Config", order: '100', action_update: 'true', action_insert: 'true', when: 'async_always', condition: "current && current.getTableName() === 'cmdb_ci_appl_sap_system'"}})
+// Push Service To AWS Config
+// @Deployable({table: 'sys_script', column: 'script', sysId: '3af2c5f62f7f101047d8b6a62799b614', metadata: {name: "Push Service To AWS Config", order: '100', action_update: 'true', action_insert: 'true', when: 'async_always', condition: "current && current.getTableName() === 'cmdb_ci_service'"}})
+// Push ServiceNow Application To AWS Config
+// @Deployable({table: 'sys_script', column: 'script', sysId: 'bbd54d7a2f7f101047d8b6a62799b673', metadata: {name: "Push ServiceNow Application To AWS Config", order: '100', action_update: 'true', action_insert: 'true', when: 'async_always', condition: "current && current.getTableName() === 'cmdb_ci_appl_now_app'"}})
+// Push ServiceNow Component To AWS Config
+// @Deployable({table: 'sys_script', column: 'script', sysId: '1e5685ba2f7f101047d8b6a62799b64f', metadata: {name: "Push ServiceNow Component To AWS Config", order: '100', action_update: 'true', action_insert: 'true', when: 'async_always', condition: "current && current.getTableName() === 'cmdb_ci_appl_now_app_comp'"}})
+// Push SharePoint to AWS config
+// @Deployable({table: 'sys_script', column: 'script', sysId: '377681ba2f7f101047d8b6a62799b6bb', metadata: {name: "Push SharePoint to AWS Config", order: '100', action_update: 'true', action_insert: 'true', when: 'async_always', condition: "current && current.getTableName() === 'cmdb_ci_appl_sharepoint'"}})
+// Push Tomcat To AWS Config
+// @Deployable({table: 'sys_script', column: 'script', sysId: '8e1e20fa2f3f101047d8b6a62799b6c3', metadata: {name: "Push Tomcat To AWS Config", order: '100', action_update: 'true', action_insert: 'true', when: 'async_always', condition: "current && current.getTableName() === 'cmdb_ci_app_server_tomcat'"}})
+// Push Tomcat War To AWS Config
+// @Deployable({table: 'sys_script', column: 'script', sysId: '3b9149b62f7f101047d8b6a62799b688', metadata: {name: "Push Tomcat War To AWS Config", order: '100', action_update: 'true', action_insert: 'true', when: 'async_always', condition: "current && current.getTableName() === 'cmdb_ci_app_server_tomcat_war'"}})
+// Push Web Application To AWS Config
+// @Deployable({table: 'sys_script', column: 'script', sysId: 'bf130df62f7f101047d8b6a62799b668', metadata: {name: "Push Web Application To AWS Config", order: '100', action_update: 'true', action_insert: 'true', when: 'async_always', condition: "current && current.getTableName() === 'cmdb_ci_web_application'"}})
+/**
+ * Starts the synchronization process for the current GlideRecord on the current ServiceNow table
+ * @param current the current record of the current ServiceNow table
+ * @param previous the previous record of the current ServiceNow table
+ */
+(function executeRule(current, previous /*null when async*/) {
+    new ConfigSyncProvider().fromSnWith(current);
+})(current, previous);
+]]></script>
+        <sys_class_name>sys_script</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-10-15 11:00:53</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>f6d249f62f7f101047d8b6a62799b69a</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Push Application Server To AWS Config</sys_name>
+        <sys_overrides/>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_f6d249f62f7f101047d8b6a62799b69a</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <template/>
+        <when>async_always</when>
+    </sys_script>
+    <sys_translated_text action="delete_multiple" query="documentkey=f6d249f62f7f101047d8b6a62799b69a"/>
+</record_update>

@@ -1,0 +1,3606 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ui_script">
+    <sys_ui_script action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <description/>
+        <global>false</global>
+        <ignore_in_now_experience>false</ignore_in_now_experience>
+        <name>x_126749_aws_sc.awsComponents</name>
+        <script><![CDATA[/******/ (() => { // webpackBootstrap
+      /******/ 	"use strict";
+      /******/ 	// The require scope
+      /******/ 	var __webpack_require__ = {};
+      /******/
+      /************************************************************************/
+      /******/ 	/* webpack/runtime/compat get default export */
+      /******/ 	(() => {
+      /******/ 		// getDefaultExport function for compatibility with non-harmony modules
+      /******/ 		__webpack_require__.n = (module) => {
+      /******/ 			var getter = module && module.__esModule ?
+      /******/ 				() => (module['default']) :
+      /******/ 				() => (module);
+      /******/ 			__webpack_require__.d(getter, { a: getter });
+      /******/ 			return getter;
+      /******/ 		};
+      /******/ 	})();
+      /******/
+      /******/ 	/* webpack/runtime/define property getters */
+      /******/ 	(() => {
+      /******/ 		// define getter functions for harmony exports
+      /******/ 		__webpack_require__.d = (exports, definition) => {
+      /******/ 			for(var key in definition) {
+      /******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
+      /******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+      /******/ 				}
+      /******/ 			}
+      /******/ 		};
+      /******/ 	})();
+      /******/
+      /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+      /******/ 	(() => {
+      /******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+      /******/ 	})();
+      /******/
+      /************************************************************************/
+      var __webpack_exports__ = {};
+
+      ;// CONCATENATED MODULE: external "angular"
+      const external_angular_namespaceObject = angular;
+      var external_angular_default = /*#__PURE__*/__webpack_require__.n(external_angular_namespaceObject);
+      ;// CONCATENATED MODULE: ./awsComponents/customizeProductForm/customizeProductForm_controller.js
+      function customizeProductController($scope, productAspect) {
+      var ctrl = this;
+      ctrl.errs = [];
+      ctrl.model = {};
+      ctrl.model.name = ''; // Disable plans until we know whether the product involves StackSets or not.
+
+      ctrl.isPossiblyStackSet = true;
+      /*
+      * Capture the form so that scSubmissionError can mark required inputs as
+      * dirty when the form is submitted before everything is ready.
+      */
+
+      var form = undefined;
+
+      ctrl.setForm = function (f) {
+      form = f;
+      };
+
+      var isNumber = function isNumber(object, key) {
+      return object && object.hasOwnProperty(key) && Number.isInteger(object[key]);
+      };
+
+      $scope.$on('aws-sc:validationFailure', function () {
+      ctrl.dirtyForm();
+      ctrl.onInputChanged();
+      });
+
+      ctrl.dirtyForm = function () {
+      if (form) {
+      angular.forEach(form.$error.required, function (field) {
+      field.$setDirty();
+      });
+      }
+      }; // Values that are reset when a different user role is chosen.
+
+
+      ctrl.resetOptions = function () {
+      ctrl.model.productVersion = '';
+      ctrl.model.launchOption = '';
+      ctrl.resetParameters();
+      }; // Values that are reset when launch path or artifact is chosen.
+
+
+      ctrl.resetParameters = function () {
+      ctrl.isPossiblyStackSet = true;
+      ctrl.model.params = undefined;
+      ctrl.model.tags = undefined;
+      ctrl.model.preferences = {};
+      };
+
+      ctrl.onInputChanged = function () {
+      var m = ctrl.model;
+      var isStackSet = productAspect.mayHaveStackSetConstraint(ctrl.productSysId, m.launchOption, m.productVersion, m.provisionedProductSysId);
+      isStackSet.then(function (maybeStackSet) {
+      if (!maybeStackSet) {
+      ctrl.isPossiblyStackSet = false;
+      }
+      }); // Check that the preferences are valid, only when the product has a stackset constraint.
+
+      var isValidPreferences = ctrl.isPossiblyStackSet ? m.preferences && (isNumber(m.preferences, 'StackSetMaxConcurrencyCount') || isNumber(m.preferences, 'StackSetMaxConcurrencyPercentage')) && (isNumber(m.preferences, 'StackSetFailureToleranceCount') || isNumber(m.preferences, 'StackSetFailureTolerancePercentage')) && Array.isArray(m.preferences.StackSetAccounts) && m.preferences.StackSetAccounts.length > 0 && Array.isArray(m.preferences.StackSetRegions) && m.preferences.StackSetRegions.length > 0 : true; // Calculate IsValid and set it on the model
+
+      var allInputsValid = m.name && m.productVersion && m.launchOption && isValidPreferences && Array.isArray(m.params) && Array.isArray(m.tags) && // Sanity check tag structure
+      m.tags.every(function (t) {
+      return t.Key && t.Value;
+      }) && form.$valid;
+      ctrl.onModelUpdate({
+      model: {
+      provisionedProductSysId: m.provisionedProductSysId || '',
+      name: m.name || '',
+      productVersion: m.productVersion || '',
+      launchOption: m.launchOption || '',
+      params: angular.toJson(m.params) || '',
+      preferences: angular.toJson(m.preferences) || '',
+      tags: angular.toJson(m.tags) || '',
+      valid: allInputsValid ? "Yes" : "No"
+      }
+      });
+      };
+
+      ctrl.recordError = function (err) {
+      ctrl.errs.push(err);
+      ctrl.onError({
+      errs: ctrl.errs
+      });
+      };
+
+      ctrl.onEditName = function () {
+      ctrl.onInputChanged();
+      };
+
+      function getDateStamp() {
+      function lpad(number) {
+      var pad = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '0';
+      var width = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 2;
+      return (pad + number).slice(-width);
+      }
+
+      var date = new Date();
+      return lpad(date.getMonth() + 1) + lpad(date.getDate()) + lpad(date.getHours()) + lpad(date.getMinutes()) + lpad(date.getSeconds());
+      }
+
+      ctrl.setDefaultName = function () {
+      if (!ctrl.model.name) {
+      productAspect.getProvisioningArtifacts(ctrl.productSysId).then(function (provisioningArtifacts) {
+      return provisioningArtifacts.result.ProductViewSummary.Name.replace(/[^a-zA-Z0-9._-]/g, '_');
+      }).then(function (sanitizedName) {
+      ctrl.model.name = "".concat(sanitizedName, "-").concat(getDateStamp());
+      });
+      }
+      };
+
+      ctrl.onSelectLaunchPath = function (selected) {
+      ctrl.model.launchOption = selected.Id;
+      ctrl.resetParameters();
+      ctrl.onInputChanged();
+      };
+
+      ctrl.onSelectProvisioningArtifact = function (selected) {
+      ctrl.model.productVersion = selected.Id;
+      ctrl.resetParameters();
+      ctrl.onInputChanged();
+      };
+
+      ctrl.onParameterChange = function (params) {
+      ctrl.model.params = params;
+      ctrl.onInputChanged();
+      };
+
+      ctrl.onTagsChange = function (tags) {
+      ctrl.model.tags = tags;
+      ctrl.onInputChanged();
+      };
+
+      ctrl.onPlanCreating = function (planSysId, provisionedProductSysId) {
+      ctrl.model.provisionedProductSysId = provisionedProductSysId;
+      ctrl.onInputChanged();
+      };
+
+      ctrl.onPlanDeleted = function () {
+      delete ctrl.model.provisionedProductSysId;
+      ctrl.onInputChanged();
+      };
+
+      $scope.$watch('ctrl.model', function () {
+      ctrl.onInputChanged();
+      }, true); // Set default name
+
+      ctrl.setDefaultName();
+      }
+      ;
+      ;// CONCATENATED MODULE: ./awsComponents/customizeProductForm/customizeProductForm_template.html
+      // Module
+      var code = "<div ng-cloak> <style scoped>.sc-error-message{padding:5px;font-size:large;font-weight:700}</style> <div class=\"row\"> <div class=\"col-sm-12\"> <div ng-if=\"ctrl.errs.length > 0\"> <div ng-repeat=\"err in ctrl.errs track by $index\" class=\"bg-danger sc-error-message\"> {{err.message ? err.message : err}} </div> </div> </div> </div> <form name=\"form\" class=\"form-horizontal aws-order-product\" ng-cloak> <div ng-init=\"ctrl.setForm(form);\"></div> <div class=\"row\"> <div class=\"col-sm-12\"> <h3>Product Name <small class=\"icon-required text-danger\"></small></h3> <p> Specify a provisioned product name and then select the version that describes the provisioned product that you want to create. </p> </div> </div> <div class=\"form-group\"> <div class=\"row\"> <label for=\"product\" class=\"col-sm-2 control-label\">Name</label> <div class=\"col-sm-offfset-2 col-sm-10\"> <input type=\"text\" name=\"nameInput\" class=\"form-control\" id=\"product\" ng-model=\"ctrl.model.name\" ng-model-options=\"{ debounce: 250 }\" ng-change=\"ctrl.onEditName()\" ng-minlength=\"1\" ng-maxlength=\"128\" ng-pattern=\"/^[a-zA-Z0-9][a-zA-Z0-9._-]*$/\" ng-disabled=\"ctrl.inputsDisabled || !ctrl.globalFeatures.productNameEditable\" required> </div> </div> <div class=\"col-sm-offset-2 col-sm-10\" role=\"alert\" ng-show=\"!form.nameInput.$valid && form.nameInput.$dirty\"> <div class=\"bg-danger\"> <p ng-show=\"!form.nameInput.$error.maxlength\"> Names must begin with a letter or a number and may contain only letters, numbers, dots, dashes and underscores. </p> <p ng-show=\"form.nameInput.$error.maxlength\"> Names must be 128 characters or less. </p> </div> </div> </div> <launch-paths product-sys-id=\"ctrl.productSysId\" on-select=\"ctrl.onSelectLaunchPath(selected)\" on-error=\"ctrl.recordError(err)\" inputs-disabled=\"ctrl.inputsDisabled\" launch-paths-visible=\"ctrl.globalFeatures.launchOptionSelectable\"> </launch-paths> <provisioning-artifacts product-sys-id=\"ctrl.productSysId\" on-select=\"ctrl.onSelectProvisioningArtifact(selected)\" on-error=\"ctrl.recordError(err)\" inputs-disabled=\"ctrl.inputsDisabled\" product-version-visible=\"ctrl.globalFeatures.productVersionSelectable\"> </provisioning-artifacts> <div ng-show=\"ctrl.model.productVersion && ctrl.model.launchOption\"> <stack-set product-sys-id=\"ctrl.productSysId\" launch-option=\"ctrl.model.launchOption\" product-version=\"ctrl.model.productVersion\" provisioning-preferences=\"ctrl.model.preferences\" form=\"form\" on-error=\"ctrl.recordError(err)\" inputs-disabled=\"ctrl.inputsDisabled\"> </stack-set> <parameters product-sys-id=\"ctrl.productSysId\" form=\"form\" launch-option=\"ctrl.model.launchOption\" product-version=\"ctrl.model.productVersion\" on-param-change=\"ctrl.onParameterChange(params)\" on-error=\"ctrl.recordError(err)\" inputs-disabled=\"ctrl.inputsDisabled\"> </parameters> <tags product-sys-id=\"ctrl.productSysId\" form=\"form\" launch-option=\"ctrl.model.launchOption\" product-version=\"ctrl.model.productVersion\" current-tags=\"ctrl.model.tags\" on-error=\"ctrl.recordError(err)\" inputs-disabled=\"ctrl.inputsDisabled\" tags-visible=\"ctrl.globalFeatures.tagsConfigurable\" selectable-tags-shown=\"true\"> </tags> </div> <div ng-if=\"!ctrl.isPossiblyStackSet\"> <plan product-sys-id=\"ctrl.productSysId\" product-model=\"ctrl.model\" form=\"form\" on-plan-creating=\"ctrl.onPlanCreating(planSysId, provisionedProductSysId)\" on-plan-deleted=\"ctrl.onPlanDeleted()\" on-error=\"ctrl.recordError(err)\" inputs-disabled=\"ctrl.inputsDisabled\" plans-visible=\"ctrl.globalFeatures.plansVisible\"> </plan> </div> </form> </div> ";
+      // Exports
+      /* harmony default export */ const customizeProductForm_template = (code);
+      ;// CONCATENATED MODULE: ./awsComponents/customizeProductForm/customizeProductForm.js
+      function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+      function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+      function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+
+
+      /**
+      * A directive to render the form with the inputs to capture the details of what product the user wants to order.
+      * This directive doesn't have any knowledge of any custom integration hooks on the page it is embedded in,
+      * such as hidden fields.
+      */
+
+      var CustomizeProductFormDirective = /*#__PURE__*/_createClass(function CustomizeProductFormDirective() {
+      _classCallCheck(this, CustomizeProductFormDirective);
+
+      return {
+      restrict: 'E',
+      scope: {},
+      controller: ['$scope', 'productAspect', customizeProductController],
+      controllerAs: 'ctrl',
+      bindToController: {
+      /**
+      * The sys_id of the product catalog item
+      */
+      productSysId: '=',
+
+      /**
+      A callback function which will be supplied the choices made on the form
+      each time one of its inputs changes. It must have signature fn(model) where
+      model will be populated with keys as follows:
+      {
+      name: '...',
+      productVersion: '...',
+      launchOption: '...',
+      params: [ {"Key": "...", "Value": "..."}, ... ]
+      tags: [ {"Key": "...", "Value": "..."}, ... ]
+      }
+      */
+      onModelUpdate: '&',
+
+      /**
+      A callback function which will be supplied any errors that the form detects
+      It must have signature fn(errs) where errs is a list of error strings.
+      */
+      onError: '&',
+
+      /**
+      Global features controlling which sections of the form are visible
+      */
+      globalFeatures: '='
+      },
+      template: customizeProductForm_template
+      };
+      });
+
+
+      ;// CONCATENATED MODULE: ./awsComponents/updateProductForm/updateProductForm_controller.js
+      function updateProductFormController($scope, provisionedProduct, productAspect) {
+      var ctrl = this;
+
+      ctrl.initialize = function () {
+      ctrl.rolesLoaded = false;
+      ctrl.errs = [];
+      ctrl.model = {};
+      ctrl.model.name = '';
+      ctrl.isProductValidForUpdate = false;
+      ctrl.isPossiblyStackSet = true;
+      provisionedProduct.loadCurrentAspectValues(ctrl.productSysId).then(function (response) {
+      if (!response.success) {
+      throw new Error(response.message);
+      }
+
+      ctrl.aspects = response.result;
+      var status = ctrl.aspects.ProductStatus.toLocaleLowerCase();
+
+      switch (status) {
+      case 'preprovisioning':
+      case 'provisioning':
+      case 'terminating':
+      case 'terminated':
+      break;
+
+      default:
+      ctrl.inputsDisabled = false;
+      ctrl.isProductValidForUpdate = true;
+      }
+      })["catch"](function (err) {
+      ctrl.recordError(err);
+      });
+      };
+
+      ctrl.resetParameters = function () {
+      ctrl.isPossiblyStackSet = true;
+      ctrl.model.params = undefined;
+      ctrl.model.preferences = {};
+      };
+
+      ctrl.onInputChanged = function () {
+      var m = ctrl.model;
+      var isStackSet = productAspect.mayHaveStackSetConstraint(undefined, m.launchOption, m.productVersion, ctrl.productSysId);
+      isStackSet.then(function (maybeStackSet) {
+      if (!maybeStackSet) {
+      ctrl.isPossiblyStackSet = false;
+      }
+      });
+      var valid = m.launchOption && m.productVersion && m.params && m.params.every(function (e) {
+      return e.Value || e.UsePreviousValue;
+      }) && m.preferences;
+      ctrl.onModelUpdate({
+      model: {
+      planSysId: m.planSysId,
+      launchOption: m.launchOption,
+      productVersion: m.productVersion,
+      params: m.params,
+      preferences: m.preferences,
+      valid: valid
+      }
+      });
+      };
+
+      ctrl.recordError = function (err) {
+      ctrl.errs.push(err);
+      ctrl.onError({
+      errs: ctrl.errs
+      });
+      };
+
+      ctrl.onSelectLaunchPath = function (selected) {
+      ctrl.model.launchOption = selected.Id;
+      ctrl.resetParameters();
+      ctrl.onInputChanged();
+      };
+
+      ctrl.onSelectProvisioningArtifact = function (selected) {
+      ctrl.model.productVersion = selected.Id;
+      ctrl.resetParameters();
+      ctrl.onInputChanged();
+      };
+
+      ctrl.onParameterChange = function (params) {
+      ctrl.model.params = params;
+      ctrl.onInputChanged();
+      };
+
+      ctrl.onPlanCreated = function (planSysId, provisionedProductSysId) {
+      ctrl.model.planSysId = planSysId;
+      ctrl.onInputChanged();
+      };
+
+      ctrl.onPlanDeleted = function () {
+      delete ctrl.model.planSysId;
+      ctrl.onInputChanged();
+      };
+
+      ctrl.initialize();
+      }
+      ;// CONCATENATED MODULE: ./awsComponents/updateProductForm/updateProductForm_template.html
+      // Module
+      var updateProductForm_template_code = "<div ng-cloak> <div class=\"row\"> <div class=\"col-sm-12\"> <h2 ng-cloak>Update {{ctrl.aspects.ProvisionedProductName}}</h2> </div> </div> <div ng-if=\"!ctrl.isProductValidForUpdate && ctrl.aspects\"> <div class=\"alert alert-warning\"> <p>This product cannot be updated because it is {{ctrl.aspects.ProductStatus.toLocaleLowerCase()}}.</p> </div> </div> <div ng-if=\"ctrl.isProductValidForUpdate\"> <launch-paths provisioned-product-sys-id=\"ctrl.productSysId\" initial-selection=\"ctrl.aspects.PathId\" on-select=\"ctrl.onSelectLaunchPath(selected)\" on-error=\"ctrl.recordError(err)\" inputs-disabled=\"ctrl.inputsDisabled\" launch-paths-visible=\"ctrl.globalFeatures.launchOptionSelectable\"> </launch-paths> <provisioning-artifacts provisioned-product-sys-id=\"ctrl.productSysId\" initial-selection=\"ctrl.aspects.ProvisioningArtifactId\" on-select=\"ctrl.onSelectProvisioningArtifact(selected)\" on-error=\"ctrl.recordError(err)\" inputs-disabled=\"ctrl.inputsDisabled\" product-version-visible=\"ctrl.globalFeatures.productVersionSelectable\"> </provisioning-artifacts> <div ng-show=\"ctrl.model.productVersion || ctrl.model.launchOption\"> <stack-set provisioned-product-sys-id=\"ctrl.productSysId\" launch-option=\"ctrl.model.launchOption\" product-version=\"ctrl.model.productVersion\" provisioning-preferences=\"ctrl.model.preferences\" form=\"ctrl.form\" on-error=\"ctrl.recordError(err)\" inputs-disabled=\"ctrl.inputsDisabled\"> </stack-set> <parameters provisioned-product-sys-id=\"ctrl.productSysId\" is-update=\"true\" form=\"ctrl.form\" launch-option=\"ctrl.model.launchOption\" product-version=\"ctrl.model.productVersion\" on-param-change=\"ctrl.onParameterChange(params)\" on-error=\"ctrl.recordError(err)\" inputs-disabled=\"ctrl.inputsDisabled\"> </parameters> </div> <div ng-if=\"!ctrl.isPossiblyStackSet\"> <plan provisioned-product-sys-id=\"ctrl.productSysId\" product-model=\"ctrl.model\" form=\"ctrl.form\" on-plan-created=\"ctrl.onPlanCreated(planSysId, provisionedProductSysId)\" on-plan-deleted=\"ctrl.onPlanDeleted()\" on-error=\"ctrl.recordError(err)\" inputs-disabled=\"ctrl.inputsDisabled\"> </plan> </div> </div> </div> ";
+      // Exports
+      /* harmony default export */ const updateProductForm_template = (updateProductForm_template_code);
+      ;// CONCATENATED MODULE: ./awsComponents/updateProductForm/updateProductForm.js
+      function updateProductForm_defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+      function updateProductForm_createClass(Constructor, protoProps, staticProps) { if (protoProps) updateProductForm_defineProperties(Constructor.prototype, protoProps); if (staticProps) updateProductForm_defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+      function updateProductForm_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+
+
+      /**
+      * A directive to render the _contents_ for a form with the inputs to capture the
+      * details of what product the user wants to order. It does not render the form itself so
+      * that it can be re-used in a separate form on the main UI and the Service Portal, each
+      * with custom submit behaviour.
+      * This directive doesn't have any knowledge of any custom integration
+      * hooks on the page it is embedded in, such as hidden fields.
+      */
+
+      var UpdateProductFormDirective = /*#__PURE__*/updateProductForm_createClass(function UpdateProductFormDirective() {
+      updateProductForm_classCallCheck(this, UpdateProductFormDirective);
+
+      return {
+      restrict: 'E',
+      scope: {},
+      controller: ['$scope', 'provisionedProduct', 'productAspect', updateProductFormController],
+      controllerAs: 'ctrl',
+      bindToController: {
+      /**
+      * The sys_id of the provisioned product
+      */
+      productSysId: '=',
+
+      /**
+      * The form controller for the form holding the <update-product-form>
+      */
+      form: '=',
+
+      /**
+      A callback function which will be supplied the choices made on the form
+      each time one of its inputs changes. It must have signature fn(model) where
+      model will be populated with keys as follows:
+      {
+      productVersion: '...',
+      launchOption: '...',
+      params: [ {"Key": "...", "Value": "..."}, ... ]
+      }
+      */
+      onModelUpdate: '&',
+
+      /**
+      A callback function which will be supplied any errors that the form detects
+      It must have signature fn(errs) where errs is a list of error strings.
+      */
+      onError: '&',
+
+      /**
+      * A reference to a boolean flag to indicate whether inputs are disabled or not.
+      */
+      inputsDisabled: '=',
+
+      /**
+      Global features controlling which sections of the form are visible
+      */
+      globalFeatures: '='
+      },
+      template: updateProductForm_template
+      };
+      });
+
+
+      ;// CONCATENATED MODULE: ./awsComponents/launchPaths/launchPaths_controller.js
+      function LaunchPathsController($scope, $q, productAspect) {
+      var ctrl = this;
+      ctrl.loading = false;
+      ctrl.loadingMore = false;
+      ctrl.selection = null;
+      ctrl.launchPaths = []; // handle selection of new value from options
+
+      ctrl.newValueSelected = function () {
+      var selected = ctrl.launchPaths.find(function (opt) {
+      return opt.Id === ctrl.selection;
+      }); // invoke callback from client
+
+      ctrl.onSelect({
+      selected: selected
+      });
+      };
+      /**
+      * Loads launch paths page-by-page until needle is found or there are no more pages.
+      * Loads and returns a single page of launch paths if needle is unset.
+      * @param [pageToken] {string} Page to start searching from.
+      * @param [needle] {string} Optional launch path ID to search for.
+      * @param [accumulator] {object}
+      * @returns {*}
+      */
+
+
+      ctrl.searchLaunchPaths = function (pageToken, needle, accumulator) {
+      accumulator = accumulator || {
+      nextPageToken: undefined,
+      selection: undefined,
+      values: []
+      };
+      var deferred = $q.defer();
+      productAspect.getLaunchPaths(ctrl.productSysId, ctrl.provisionedProductSysId, pageToken).then(function (response) {
+      response = response.result;
+      var containsNeedle = false;
+      var lps = response.LaunchPathSummaries;
+
+      if (Array.isArray(lps)) {
+      accumulator.values = accumulator.values.concat(lps);
+      containsNeedle = needle && lps.some(function (elem) {
+      return elem.Id === needle;
+      });
+      }
+
+      accumulator.nextPageToken = response.NextPageToken;
+
+      if (!needle || containsNeedle || !response.NextPageToken) {
+      accumulator.values.sort(function (a, b) {
+      return a.Name.localeCompare(b.Name);
+      });
+
+      if (containsNeedle) {
+      accumulator.selection = needle;
+      } else if (accumulator.values.length > 0) {
+      accumulator.selection = accumulator.values[0].Id;
+      }
+
+      deferred.resolve(accumulator);
+      } else {
+      deferred.resolve(ctrl.searchLaunchPaths(response.NextPageToken, needle, accumulator));
+      }
+      })["catch"](function (e) {
+      deferred.reject(e);
+      });
+      return deferred.promise;
+      };
+      /**
+      * Loads the first batch of launch paths and selects the first path in the response.
+      */
+
+
+      ctrl.loadLaunchPaths = function () {
+      ctrl.launchPaths = [];
+      ctrl.loading = true;
+      ctrl.searchLaunchPaths(undefined, ctrl.initialSelection).then(function (result) {
+      ctrl.pageToken = result.nextPageToken;
+      ctrl.launchPaths = result.values;
+
+      if (result.selection) {
+      ctrl.selection = result.selection;
+      ctrl.newValueSelected();
+      }
+
+      if (!ctrl.launchPaths || ctrl.launchPaths.length === 0) {
+      ctrl.onError({
+      err: "No launch paths specified for this product"
+      });
+      }
+      })["catch"](function (err) {
+      ctrl.onError({
+      err: err
+      });
+      })["finally"](function () {
+      ctrl.loading = false;
+      });
+      };
+
+      ctrl.loadMore = function () {
+      ctrl.loadingMore = true;
+      ctrl.searchLaunchPaths(ctrl.pageToken).then(function (result) {
+      ctrl.launchPaths = ctrl.launchPaths.concat(result.values);
+      ctrl.pageToken = result.nextPageToken;
+      })["catch"](function (err) {
+      ctrl.onError({
+      err: err
+      });
+      })["finally"](function () {
+      ctrl.loadingMore = false;
+      });
+      };
+
+      $scope.$watchGroup(['ctrl.loadOn', 'ctrl.provisionedProductSysId', 'ctrl.initialSelection'], ctrl.loadLaunchPaths);
+      }
+      ;// CONCATENATED MODULE: ./awsComponents/launchPaths/launchPaths_template.html
+      // Module
+      var launchPaths_template_code = "<div ng-hide=\"!ctrl.launchPathsVisible\"> <div class=\"row\" ng-if=\"ctrl.loading || ctrl.launchPaths.length > 1\"> <div class=\"col-sm-12\"> <h3>Launch Option <small class=\"icon-required text-danger\"></small> </h3> </div> </div> <div class=\"row\" ng-if=\"ctrl.loading\"> <div class=\"col-sm-offset-2 col-sm-10\"> <p>Loading...</p> </div> </div> <div class=\"form-group\" ng-if=\"!ctrl.loading && ctrl.launchPaths.length > 1\"> <div class=\"row\"> <div class=\"col-sm-offset-2 col-sm-10\"> <div class=\"radio\" ng-repeat=\"option in ctrl.launchPaths track by option.Id\"> <label> <input type=\"radio\" name=\"launchRadio\" required ng-model=\"ctrl.selection\" ng-change=\"ctrl.newValueSelected()\" ng-value=\"option.Id\" ng-disabled=\"ctrl.inputsDisabled\"> {{option.Name}} </label> <div class=\"help-block\" ng-show=\"option.ConstraintSummaries.length > 0\"> <p>Rules:</p> <ul> <li ng-repeat=\"constraint in option.ConstraintSummaries\">{{constraint.Description}}</li> </ul> </div> </div> </div> </div> </div> <div class=\"row\"> <div class=\"col-sm-offset-2 col-sm-10\" ng-if=\"ctrl.pageToken\"> <p> <button type=\"button\" class=\"btn btn-primary\" ng-click=\"ctrl.loadMore()\" ng-disabled=\"ctrl.loadingMore || ctrl.inputsDisabled\"> {{ctrl.loadingMore ? 'Loading...' : 'Load More'}} </button> </p> </div> </div> </div> ";
+      // Exports
+      /* harmony default export */ const launchPaths_template = (launchPaths_template_code);
+      ;// CONCATENATED MODULE: ./awsComponents/launchPaths/launchPaths.js
+      function launchPaths_defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+      function launchPaths_createClass(Constructor, protoProps, staticProps) { if (protoProps) launchPaths_defineProperties(Constructor.prototype, protoProps); if (staticProps) launchPaths_defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+      function launchPaths_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+
+
+
+      var LaunchPaths = /*#__PURE__*/launchPaths_createClass(function LaunchPaths() {
+      launchPaths_classCallCheck(this, LaunchPaths);
+
+      return {
+      scope: {},
+      controller: ['$scope', '$q', 'productAspect', LaunchPathsController],
+      controllerAs: 'ctrl',
+      bindToController: {
+      /**
+      * The sys_id of the product catalog item
+      */
+      productSysId: '=',
+
+      /**
+      * Optional. The provisioned product sys_id, where the directive is used with a provisioned product.
+      */
+      provisionedProductSysId: '=',
+
+      /**
+      * Optional ID of the launch path to select first
+      */
+      initialSelection: '=',
+
+      /**
+      * Callback that will be invoked when the launch path changes.
+      * The function is invoked with one argument that must be named "selected".
+      */
+      onSelect: '&',
+
+      /**
+      * An arbitrary object that this controller will watch in order to reload launch paths,
+      * in addition to identity and session id.
+      */
+      loadOn: '=',
+
+      /**
+      * Callback to be supplied an error object upon an error in operation.
+      * The function is invoked with one argument that must be named "err".
+      */
+      onError: '&',
+
+      /**
+      * A reference to a boolean flag to indicate whether inputs are disabled or not.
+      */
+      inputsDisabled: '=',
+
+      /**
+      * A reference to a boolean flag to indicate whether the control should select the default launch path.
+      */
+      launchPathsVisible: '='
+      },
+      template: launchPaths_template
+      };
+      });
+
+
+      ;// CONCATENATED MODULE: ./awsComponents/locationGuard/locationGuard.js
+      function locationGuard_defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+      function locationGuard_createClass(Constructor, protoProps, staticProps) { if (protoProps) locationGuard_defineProperties(Constructor.prototype, protoProps); if (staticProps) locationGuard_defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+      function locationGuard_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+      /**
+      * A directive to transclude its content conditionally based on the page location matching an expected value.
+      * It will check the `$location` against a regex and will transclude its content only if the location matches.
+      */
+      var LocationGuard = /*#__PURE__*/locationGuard_createClass(function LocationGuard() {
+      locationGuard_classCallCheck(this, LocationGuard);
+
+      return {
+      scope: {},
+      bindToController: {
+      ifLocationMatches: '='
+      },
+      controller: ['$location', function ($location) {
+      var ctrl = this;
+      var locRgx = new RegExp(ctrl.ifLocationMatches);
+      ctrl.accessGranted = locRgx.test($location.absUrl());
+      }],
+      controllerAs: 'ctrl',
+      transclude: true,
+      template: "\n                <div ng-if=\"ctrl.accessGranted\">\n                   <div ng-transclude></div>\n                </div>\n            "
+      };
+      });
+
+
+      ;// CONCATENATED MODULE: ./awsComponents/provisioningArtifacts/provisioningArtifacts_controller.js
+      function ProvisioningArtifactsController($scope, $q, productAspect) {
+      var ctrl = this;
+      ctrl.loading = false;
+      ctrl.loadingMore = false;
+      ctrl.selection = null;
+      ctrl.pageToken = null;
+      ctrl.artifactVersions = []; // handle selection of new value from options
+
+      ctrl.newValueSelected = function () {
+      var selected = ctrl.artifactVersions.find(function (opt) {
+      return opt.Id === ctrl.selection;
+      }); // invoke callback from client
+
+      ctrl.onSelect({
+      selected: selected
+      });
+      };
+
+      ctrl.loadProvisioningArtifacts = function () {
+      ctrl.artifactVersions = [];
+      ctrl.loading = true;
+      productAspect.getProvisioningArtifacts(ctrl.productSysId, ctrl.provisionedProductSysId).then(function (artifacts) {
+      var pas = artifacts.result.ProvisioningArtifacts;
+
+      if (pas && Array.isArray(pas)) {
+      pas.sort(function (a, b) {
+      return a.Name.localeCompare(b.Name);
+      });
+      ctrl.artifactVersions = pas;
+
+      if (ctrl.initialSelection) {
+      var containsInitialSelection = pas.some(function (elem) {
+      return elem.Id === ctrl.initialSelection;
+      });
+      ctrl.selection = containsInitialSelection ? ctrl.initialSelection : pas[0].Id;
+      } else {
+      ctrl.selection = pas[0].Id;
+      }
+
+      ctrl.newValueSelected();
+      }
+      })["catch"](function (err) {
+      ctrl.onError({
+      err: err
+      });
+      })["finally"](function () {
+      ctrl.loading = false;
+      });
+      };
+
+      $scope.$watchGroup(['ctrl.loadOn', 'ctrl.provisionedProductSysId'], ctrl.loadProvisioningArtifacts);
+      }
+      ;// CONCATENATED MODULE: ./awsComponents/provisioningArtifacts/provisioningArtifacts_template.html
+      // Module
+      var provisioningArtifacts_template_code = "<div ng-hide=\"!ctrl.productVersionVisible\"> <div class=\"row\" ng-if=\"ctrl.loading || ctrl.artifactVersions.length > 1\"> <div class=\"col-sm-12\"> <h3>Product Version <small class=\"icon-required text-danger\"></small> </h3> </div> </div> <div class=\"row\" ng-if=\"ctrl.loading\"> <div class=\"col-sm-offset-2 col-sm-10\"> <p>Loading...</p> </div> </div> <div class=\"form-group\" ng-if=\"!ctrl.loading && ctrl.artifactVersions.length > 1\"> <div class=\"row\"> <div class=\"col-sm-offset-2 col-sm-10\"> <div class=\"radio\" ng-repeat=\"version in ctrl.artifactVersions track by version.Id\"> <label> <input type=\"radio\" name=\"versionRadio\" required ng-model=\"ctrl.selection\" ng-change=\"ctrl.newValueSelected()\" ng-value=\"version.Id\" ng-disabled=\"ctrl.inputsDisabled\"> {{version.Name}} </label> <span class=\"help-block\">{{version.Description}}</span> </div> </div> </div> </div> </div> ";
+      // Exports
+      /* harmony default export */ const provisioningArtifacts_template = (provisioningArtifacts_template_code);
+      ;// CONCATENATED MODULE: ./awsComponents/provisioningArtifacts/provisioningArtifacts.js
+      function provisioningArtifacts_defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+      function provisioningArtifacts_createClass(Constructor, protoProps, staticProps) { if (protoProps) provisioningArtifacts_defineProperties(Constructor.prototype, protoProps); if (staticProps) provisioningArtifacts_defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+      function provisioningArtifacts_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+
+
+
+      var ProvisioningArtifacts = /*#__PURE__*/provisioningArtifacts_createClass(function ProvisioningArtifacts() {
+      provisioningArtifacts_classCallCheck(this, ProvisioningArtifacts);
+
+      return {
+      scope: {},
+      controller: ['$scope', '$q', 'productAspect', ProvisioningArtifactsController],
+      controllerAs: 'ctrl',
+      bindToController: {
+      /**
+      * The sys_id of the product catalog item
+      */
+      productSysId: '=',
+
+      /**
+      * Optional. The provisioned product sys_id, where the directive is used with a provisioned product.
+      */
+      provisionedProductSysId: '=',
+
+      /**
+      * Optional ID of the provisioning artifact to select first
+      */
+      initialSelection: '=',
+
+      /**
+      * An arbitrary object that this controller will watch in order to reload artifacts,
+      * in addition to identity and session id.
+      */
+      loadOn: '=',
+
+      /**
+      * Callback to be invoked when the provisioning artifact changes.
+      * The function is invoked with one argument that must be named "selected".
+      */
+      onSelect: '&',
+
+      /**
+      * Callback to be supplied an error object upon an error in operation.
+      * The function is invoked with one argument that must be named "err".
+      */
+      onError: '&',
+
+      /**
+      * A reference to a boolean flag to indicate whether inputs are disabled or not.
+      */
+      inputsDisabled: '=',
+
+      /**
+      * A reference to a boolean flag to indicate whether the section is shown or not.
+      */
+      productVersionVisible: '='
+      },
+      template: provisioningArtifacts_template
+      };
+      });
+
+
+      ;// CONCATENATED MODULE: ./awsComponents/parameters/parameters_controller.js
+      function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+
+      function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+
+      function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+
+      function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+      function ParametersController($scope, $q, productAspect, documentAjax, ec2Ajax, route53Ajax) {
+      var ctrl = this;
+      ctrl.loading = false;
+
+      ctrl.isShowFieldAsRequired = function (group, index) {
+      var param = ctrl.paramGroups.find(function (grp) {
+      return grp.Label === group;
+      });
+
+      if (!param.UsePreviousValue) {
+      var parameterName = param.Key;
+      var upvFieldName = 'upv-' + parameterName;
+
+      if (ctrl.form[parameterName] && ctrl.form[upvFieldName]) {
+      var valueRequiredButNotPresent = ctrl.form[parameterName].$error.required; // Ignore the error when the form is freshly rendered.
+
+      var valueIsDirty = ctrl.form[parameterName].$dirty;
+      var usePreviousValueExistsAndIsDirty = ctrl.form[upvFieldName] && ctrl.form[upvFieldName].$dirty;
+      return valueRequiredButNotPresent && (valueIsDirty || usePreviousValueExistsAndIsDirty);
+      }
+      }
+
+      return false;
+      };
+
+      ctrl.loadParameters = function () {
+      var promise = $q.resolve(); // Get parameters for Service Catalog Product
+
+      if ((ctrl.productSysId || ctrl.provisionedProductSysId) && ctrl.launchOption && ctrl.productVersion) {
+      promise = productAspect.getProvisioningParameters(ctrl.productSysId, ctrl.launchOption, ctrl.productVersion, ctrl.provisionedProductSysId).then(function (params) {
+      var result = params.result;
+      var rules = result.UsageInstructions ? result.UsageInstructions.find(function (e) {
+      return e.Type === "rules";
+      }) : undefined;
+      var constraints = rules ? JSON.parse(rules.Value) : [];
+      var metadata = result.UsageInstructions ? result.UsageInstructions.find(function (e) {
+      return e.Type === "metadata";
+      }) : undefined;
+      var metadataValue = metadata ? JSON.parse(metadata.Value) : undefined;
+      var paramGroupData = metadataValue ? metadataValue["AWS::CloudFormation::Interface"]["ParameterGroups"] || [] : [];
+      var paramLabels = metadataValue ? metadataValue["AWS::CloudFormation::Interface"]["ParameterLabels"] || {} : {};
+      var stackParameters = result.StackParameters;
+
+      if (ctrl.isUpdate && !Array.isArray(stackParameters)) {
+      ctrl.stackParameterWarning = "Could not retrieve current parameter values, using default values";
+      }
+
+      var awsListTypes = ["List<AWS::EC2::AvailabilityZone::Name>", "List<AWS::EC2::VPC::Id>", "List<AWS::EC2::Instance::Id>", "List<AWS::EC2::KeyPair::KeyName>", "List<AWS::EC2::SecurityGroup::GroupName>", "List<AWS::EC2::SecurityGroup::Id>", "List<AWS::EC2::Subnet::Id>", "List<AWS::EC2::Volume::Id>", "List<AWS::Route53::HostedZone::Id>"];
+      var parameters = result.ProvisioningArtifactParameters.map(function (param) {
+      var _param$ParameterConst;
+
+      var allowedValues = param.ParameterConstraints && Array.isArray(param.ParameterConstraints.AllowedValues) ? param.ParameterConstraints.AllowedValues : [];
+      var stackParameter = ctrl.isUpdate && Array.isArray(stackParameters) ? stackParameters.find(function (sp) {
+      return sp.ParameterKey === param.ParameterKey;
+      }) : undefined;
+      var existingValue = stackParameter && !param.IsNoEcho && (allowedValues.length === 0 || allowedValues.indexOf(stackParameter.ParameterValue) >= 0) ? stackParameter.ParameterValue : undefined;
+      var isTypeahead = awsListTypes.some(function (item) {
+		  var returnValue = param.ParameterType == '' ? false : item.includes(param.ParameterType) && item !== param.ParameterType;
+		  return returnValue;
+      });
+      var isMultiTypeAhead = awsListTypes.indexOf(param.ParameterType) > -1;
+      var initialValue = existingValue !== undefined ? existingValue : isMultiTypeAhead ? param.DefaultValue || [] : param.DefaultValue;
+      return _objectSpread(_objectSpread({}, param), {}, {
+      AltName: (paramLabels[param.ParameterKey] || {})["default"],
+      GroupName: "Ungrouped Parameters",
+      //if the parameter belongs to a group we'll set this later
+      UseTypeahead: isTypeahead,
+      UseTypeaheadMulti: isMultiTypeAhead,
+      Value: (param.ParameterType === 'Number' || param.ParameterType === 'number') ? parseInt(initialValue) : initialValue,
+      IsExistingKey: !!existingValue,
+      Key: param.ParameterKey,
+      AllowedValues: allowedValues,
+      AllowedPattern: param.ParameterConstraints && param.ParameterConstraints.AllowedPattern ? param.ParameterConstraints.AllowedPattern : undefined,
+      ConstraintDescription: param.ParameterConstraints && param.ParameterConstraints.ConstraintDescription ? param.ParameterConstraints.ConstraintDescription : undefined,
+      MinValue: param.ParameterConstraints && param.ParameterConstraints.MinValue ? parseInt(param.ParameterConstraints.MinValue) : undefined,
+      MaxValue: param.ParameterConstraints && param.ParameterConstraints.MaxValue ? parseInt(param.ParameterConstraints.MaxValue) : undefined,
+      MinLength: param.ParameterConstraints && param.ParameterConstraints.MinLength ? parseInt(param.ParameterConstraints.MinLength) : undefined,
+      MaxLength: param.ParameterConstraints && param.ParameterConstraints.MaxLength ? parseInt(param.ParameterConstraints.MaxLength) : undefined,
+      MultiselectKey: ctrl.getTypeaheadItemId(param),
+      //Value required if the Parameter is not a String, or is a Dropdown, or has a minLength, or has an Allowed pattern
+      ValueRequired: allowedValues && allowedValues.length || param.ParameterType !== "String" || param.ParameterConstraints && parseInt(param.ParameterConstraints.MinLength) > 0 || ((_param$ParameterConst = param.ParameterConstraints) === null || _param$ParameterConst === void 0 ? void 0 : _param$ParameterConst.AllowedPattern)
+      });
+      }); //paramGroupData has the parameters in the correct order
+
+      var paramGroups = paramGroupData.map(function (pg) {
+      var mappedParameters = pg.Parameters.map(function (paramKey) {
+      return parameters.find(function (paramDef) {
+      return paramDef.ParameterKey === paramKey;
+      });
+      }).filter(function (param) {
+      return param !== undefined;
+      }).map(function (param) {
+      return _objectSpread(_objectSpread({}, param), {}, {
+      GroupName: pg.Label["default"]
+      });
+      }); //remove parameters which are in this group. Anything left over is ungrouped
+
+      parameters = parameters.filter(function (param) {
+      return !pg.Parameters.includes(param.ParameterKey);
+      });
+      return {
+      Parameters: mappedParameters,
+      Label: pg.Label["default"]
+      };
+      }); //If some parameters are ungrouped we set the label to 'Other parameters'
+      //but if none are grouped we set it to null
+
+      if (parameters.length > 0) {
+      paramGroups.push({
+      Parameters: parameters,
+      Label: result.ProvisioningArtifactParameters.length === parameters.length ? null : "Other parameters"
+      });
+      } //filter paramGroups to remove any groups where the Parameter array is empty
+
+
+      paramGroups = paramGroups.filter(function (pgrp) {
+      return pgrp.Parameters.length > 0;
+      });
+      ctrl.paramConstraints = constraints;
+      ctrl.paramGroups = paramGroups;
+      ctrl.onModelUpdate();
+      });
+      } // Get parameter for System Manager Automation Document
+
+
+      if (ctrl.documentSysId) {
+      promise = documentAjax.describeDocument(ctrl.documentSysId).then(function (response) {
+      if (!response.success) {
+      throw new Error('Failed to retrieve parameters');
+      }
+
+      var defaultGroup = 'Ungrouped Parameters';
+      var parameters = response.result.Document.Parameters || [];
+      ctrl.paramGroups = [{
+      Label: null,
+      Parameters: parameters.map(function (parameter) {
+      return {
+      AllowedValues: [],
+      Description: parameter.Description,
+      IsExistingKey: false,
+      IsNoEcho: false,
+      Key: parameter.Name,
+      ParameterType: parameter.Type === 'Integer' ? 'Number' : 'String',
+      UsePreviousValue: false,
+      Value: parameter.DefaultValue,
+      GroupName: defaultGroup
+      };
+      }) || []
+      }];
+      ctrl.onModelUpdate();
+      });
+      } // Get parameter for System Manager Automation Document
+
+
+      if (ctrl.runbookName && ctrl.runbookVersion && ctrl.changeTemplateSysId) {
+      promise = documentAjax.describeChangeTemplateRunbook(ctrl.changeTemplateSysId, ctrl.runbookName, ctrl.runbookVersion).then(function (response) {
+      if (!response.success) {
+      throw new Error('Failed to retrieve parameters');
+      }
+
+      var defaultGroup = 'Ungrouped Parameters';
+      var parameters = response.result.Document.Parameters || [];
+      ctrl.paramGroups = [{
+      Label: null,
+      Parameters: parameters.map(function (parameter) {
+      return {
+      AllowedValues: [],
+      Description: parameter.Description,
+      IsExistingKey: false,
+      IsNoEcho: false,
+      Key: parameter.Name,
+      ParameterType: parameter.Type === 'Integer' ? 'Number' : 'String',
+      UsePreviousValue: false,
+      Value: parameter.DefaultValue,
+      GroupName: defaultGroup
+      };
+      }) || []
+      }];
+      ctrl.onModelUpdate();
+      });
+      }
+
+      ctrl.loading = true;
+      return promise["catch"](function (err) {
+      ctrl.onError({
+      err: err
+      });
+      })["finally"](function () {
+      ctrl.loading = false;
+      });
+      };
+
+      ctrl.onModelUpdate = function () {
+      var params = [];
+      angular.forEach(ctrl.paramGroups, function (pGroup) {
+      angular.forEach(pGroup.Parameters, function (pValue) {
+      var p = {
+      Key: pValue.Key,
+      IsNoEcho: pValue.IsNoEcho
+      };
+
+      if (pValue.UsePreviousValue === 'true') {
+      p.UsePreviousValue = true;
+      } else {
+      if (Array.isArray(pValue.Value)) {
+      //convert to array of strings then convert to csv list
+      var valueArray = pValue.Value.map(function (item) {
+      return _typeof(item) === 'object' ? item[ctrl.getTypeaheadItemId(pValue)] : item;
+      });
+      p.Value = valueArray.join(',');
+      } else {
+      p.Value = pValue.Value;
+      }
+      }
+
+      params.push(p);
+      });
+      });
+      ctrl.onParamChange({
+      params: params
+      });
+      };
+
+      ctrl.getTypeaheadItemId = function (parameter) {
+      switch (parameter.ParameterType) {
+      case "AWS::EC2::AvailabilityZone::Name":
+      case "List<AWS::EC2::AvailabilityZone::Name>":
+      return 'zoneName';
+
+      case "AWS::EC2::VPC::Id":
+      case "List<AWS::EC2::VPC::Id>":
+      return 'vpcId';
+
+      case "AWS::EC2::Instance::Id":
+      case "List<AWS::EC2::Instance::Id>":
+      return 'instanceId';
+
+      case "AWS::EC2::KeyPair::KeyName":
+      case "List<AWS::EC2::KeyPair::KeyName>":
+      return 'keyName';
+
+      case "AWS::EC2::SecurityGroup::GroupName":
+      case "List<AWS::EC2::SecurityGroup::GroupName>":
+      return 'groupName';
+
+      case "AWS::EC2::SecurityGroup::Id":
+      case "List<AWS::EC2::SecurityGroup::Id>":
+      return 'groupId';
+
+      case "AWS::EC2::Subnet::Id":
+      case "List<AWS::EC2::Subnet::Id>":
+      return 'subnetId';
+
+      case "AWS::EC2::Volume::Id":
+      case "List<AWS::EC2::Volume::Id>":
+      return 'volumeId';
+
+      case "AWS::Route53::HostedZone::Id":
+      case "List<AWS::Route53::HostedZone::Id>":
+      return 'Id';
+
+      default:
+      return "";
+      }
+      };
+
+      ctrl.getTypeaheadItemTemplate = function (parameter) {
+      switch (parameter.ParameterType) {
+      case "AWS::EC2::VPC::Id":
+      case "List<AWS::EC2::VPC::Id>":
+      return "vpcId.html";
+
+      case "AWS::EC2::Instance::Id":
+      case "List<AWS::EC2::Instance::Id>":
+      return "instanceId.html";
+
+      case "AWS::EC2::KeyPair::KeyName":
+      case "List<AWS::EC2::KeyPair::KeyName>":
+      return "keyPair.html";
+
+      case "AWS::EC2::SecurityGroup::GroupName":
+      case "List<AWS::EC2::SecurityGroup::GroupName>":
+      return "securityGroupName.html";
+
+      case "AWS::EC2::SecurityGroup::Id":
+      case "List<AWS::EC2::SecurityGroup::Id>":
+      return "securityGroupId.html";
+
+      case "AWS::EC2::Subnet::Id":
+      case "List<AWS::EC2::Subnet::Id>":
+      return "subnet.html";
+
+      case "AWS::EC2::Volume::Id":
+      case "List<AWS::EC2::Volume::Id>":
+      return "volume.html";
+
+      case "AWS::Route53::HostedZone::Id":
+      case "List<AWS::Route53::HostedZone::Id>":
+      return "hostedZone.html";
+
+      default:
+      return undefined;
+      }
+      };
+
+      ctrl.getSelectableValues = function (parameter, $viewValue) {
+      switch (parameter.ParameterType) {
+      case "AWS::EC2::AvailabilityZone::Name":
+      case "List<AWS::EC2::AvailabilityZone::Name>":
+      return ec2Ajax.describeAvailabilityZones(ctrl.productSysId, $viewValue, true).then(function (response) {
+      if (!response.success) {
+      throw new Error(response.result);
+      }
+
+      return response.result.map(function (item) {
+      item.keyForMulti = item.zoneName;
+      return item;
+      });
+      });
+
+      case "AWS::EC2::VPC::Id":
+      case "List<AWS::EC2::VPC::Id>":
+      return ec2Ajax.describeVpcs(ctrl.productSysId, $viewValue, true).then(function (response) {
+      if (!response.success) {
+      throw new Error(response.result);
+      }
+
+      return response.result.map(function (item) {
+      item.keyForMulti = item.vpcId;
+      return item;
+      });
+      });
+
+      case 'AWS::EC2::Instance::Id':
+      case "List<AWS::EC2::Instance::Id>":
+      return ec2Ajax.describeInstances(ctrl.productSysId, $viewValue, true).then(function (response) {
+      if (!response.success) {
+      throw new Error(response.result);
+      }
+
+      return response.result.map(function (item) {
+      var element = item.instancesSet.item;
+      var details = [];
+      var nameTag = element.tagSet.item.find(function (item) {
+      return item.key === "Name";
+      });
+
+      if (nameTag) {
+      details.push(nameTag.value);
+      }
+
+      details.push(element.instanceType);
+      element.details = details.join(' :: ');
+      element.keyForMulti = element.instanceId;
+      return element;
+      });
+      });
+
+      case "AWS::EC2::KeyPair::KeyName":
+      case "List<AWS::EC2::KeyPair::KeyName>":
+      return ec2Ajax.describeKeyPairs(ctrl.productSysId, $viewValue, true).then(function (response) {
+      if (!response.success) {
+      throw new Error(response.result);
+      }
+
+      return response.result.map(function (item) {
+      item.keyForMulti = item.keyName;
+      return item;
+      });
+      });
+
+      case "AWS::EC2::SecurityGroup::GroupName":
+      case "List<AWS::EC2::SecurityGroup::GroupName>":
+      return ec2Ajax.describeSecurityGroups(ctrl.productSysId, $viewValue, 'group-name', true).then(function (response) {
+      if (!response.success) {
+      throw new Error(response.result);
+      }
+
+      return response.result.map(function (item) {
+      var details = [];
+
+      if (item.groupDescription !== item.groupName) {
+      details.push(item.groupDescription);
+      }
+
+      details.push("In ".concat(item.vpcId));
+      item.details = details.join(' :: ');
+      item.keyForMulti = item.groupName;
+      return item;
+      });
+      });
+
+      case "AWS::EC2::SecurityGroup::Id":
+      case "List<AWS::EC2::SecurityGroup::Id>":
+      return ec2Ajax.describeSecurityGroups(ctrl.productSysId, $viewValue, 'group-id', true).then(function (response) {
+      if (!response.success) {
+      throw new Error(response.result);
+      }
+
+      return response.result.map(function (item) {
+      var details = [];
+
+      if (item.groupDescription !== item.groupName) {
+      details.push(item.groupDescription);
+      }
+
+      details.push("In ".concat(item.vpcId));
+      item.details = details.join(' :: ');
+      item.keyForMulti = item.groupName;
+      return item;
+      });
+      });
+
+      case "AWS::EC2::Subnet::Id":
+      case "List<AWS::EC2::Subnet::Id>":
+      return ec2Ajax.describeSubnets(ctrl.productSysId, $viewValue, true).then(function (response) {
+      if (!response.success) {
+      throw new Error(response["return"]);
+      }
+
+      return response.result.map(function (item) {
+      var details = [];
+      details.push("CIDR ".concat(item.cidrBlock, " in ").concat(item.availabilityZone));
+      details.push(item.vpcId);
+      item.details = details.join(' :: ');
+      item.keyForMulti = item.subnetId;
+      return item;
+      });
+      });
+
+      case 'AWS::EC2::Volume::Id':
+      case "List<AWS::EC2::Volume::Id>":
+      return ec2Ajax.describeVolumes(ctrl.productSysId, $viewValue, true).then(function (response) {
+      if (!response.success) {
+      throw new Error(response.result);
+      }
+
+      return response.result.map(function (item) {
+      item.keyForMulti = item.volumeId;
+      return item;
+      });
+      });
+
+      case "AWS::Route53::HostedZone::Id":
+      case "List<AWS::Route53::HostedZone::Id>":
+      return route53Ajax.listHostedZones(ctrl.productSysId, true).then(function (response) {
+      if (!response.success) {
+      throw new Error(response["return"]);
+      }
+
+      return response.result.map(function (item) {
+      item.Id = item.Id.replace('/hostedzone/', '');
+      item.keyForMulti = item.Id;
+      return item;
+      });
+      });
+
+      default:
+      return Promise.resolve([]);
+      }
+      };
+
+      $scope.$watchGroup(['ctrl.launchOption', 'ctrl.productVersion', 'ctrl.runbookName', 'ctrl.runbookVersion'], ctrl.loadParameters);
+      $scope.$watch('ctrl.paramGroups', function () {
+      ctrl.onModelUpdate();
+      });
+      }
+      ;// CONCATENATED MODULE: ./awsComponents/parameters/parameters_template.html
+      // Module
+      var parameters_template_code = "<script type=\"text/ng-template\" id=\"vpcId.html\"> <a>\n        <span ng-bind-html=\"data ? $highlight($getDisplayText()) : match.model.vpcId | uibTypeaheadHighlight:query\"></span>\n        <span ng-if=\"data && data.isDefault === 'true' || match && match.model.isDefault === 'true'\">(default)</span>\n    </a> </script> <script type=\"text/ng-template\" id=\"instanceId.html\"> <div\n        ng-style=\"{\n                        display: 'flex',\n                        flexDirection: 'column',\n                        paddingLeft: '5px',\n                        paddingRight: '5px',\n                        paddingBottom: '5px'\n                    }\"\n    >\n        <span ng-bind-html=\"data ? $highlight($getDisplayText()) : match.model.instanceId | uibTypeaheadHighlight:query\"></span>\n        <span ng-style=\"{fontStyle: 'italic'}\">{{data ? data.details : match.model.details}}</span>\n    </div> </script> <script type=\"text/ng-template\" id=\"keyPair.html\"> <div\n        ng-style=\"{\n                        display: 'flex',\n                        flexDirection: 'column',\n                        paddingLeft: '5px',\n                        paddingRight: '5px',\n                        paddingBottom: '5px'\n                    }\"\n    >\n        <span ng-bind-html=\"data ? $highlight($getDisplayText()) : match.model.keyName | uibTypeaheadHighlight:query\"></span>\n        <span ng-style=\"{fontStyle: 'italic'}\">{{data ? data.keyFingerprint : match.model.keyFingerprint}}</span>\n    </div> </script> <script type=\"text/ng-template\" id=\"securityGroupName.html\"> <div\n        ng-style=\"{\n                        display: 'flex',\n                        flexDirection: 'column',\n                        paddingLeft: '5px',\n                        paddingRight: '5px',\n                        paddingBottom: '5px'\n                    }\"\n    >\n        <div>\n            <span ng-bind-html=\"data ? $highlight($getDisplayText()) : match.model.groupName | uibTypeaheadHighlight:query\"></span>\n            <span> ({{data ? data.groupId : match.model.groupId}})</span>\n        </div>\n        <span ng-style=\"{fontStyle: 'italic'}\">{{data ? data.details : match.model.details}}</span>\n    </div> </script> <script type=\"text/ng-template\" id=\"securityGroupId.html\"> <div\n        ng-style=\"{\n                        display: 'flex',\n                        flexDirection: 'column',\n                        paddingLeft: '5px',\n                        paddingRight: '5px',\n                        paddingBottom: '5px'\n                    }\"\n    >\n        <div>\n            <span ng-bind-html=\"data ? $highlight($getDisplayText()) : match.model.groupId | uibTypeaheadHighlight:query\"></span>\n            <span> ({{data ? data.groupName : match.model.groupName}})</span>\n        </div>\n        <span ng-style=\"{fontStyle: 'italic'}\">{{data ? data.details : match.model.details}}</span>\n    </div> </script> <script type=\"text/ng-template\" id=\"subnet.html\"> <div\n        ng-style=\"{\n                        display: 'flex',\n                        flexDirection: 'column',\n                        paddingLeft: '5px',\n                        paddingRight: '5px',\n                        paddingBottom: '5px'\n                    }\"\n    >\n        <span ng-bind-html=\"data ? $highlight($getDisplayText()) : match.model.subnetId | uibTypeaheadHighlight:query\"></span>\n        <span ng-style=\"{fontStyle: 'italic'}\">{{data ? data.details : match.model.details}}</span>\n    </div> </script> <script type=\"text/ng-template\" id=\"volume.html\"> <div\n        ng-style=\"{\n                        display: 'flex',\n                        flexDirection: 'column',\n                        paddingLeft: '5px',\n                        paddingRight: '5px',\n                        paddingBottom: '5px'\n                    }\"\n    >\n        <span ng-bind-html=\"data ? $highlight($getDisplayText()) : match.model.volumeId | uibTypeaheadHighlight:query\"></span>\n        <span ng-style=\"{fontStyle: 'italic'}\">{{data ? data.size : match.model.size}}GB :: {{data ? data.volumeType : match.model.volumeType}}</span>\n    </div> </script> <script type=\"text/ng-template\" id=\"hostedZone.html\"> <a>\n        <span ng-bind-html=\"data ? $highlight($getDisplayText()) : match.model.Id | uibTypeaheadHighlight:query\"></span>\n        <span>{{data ? data.Name : match.model.Name}}</span>\n    </a> </script> <style>tags-input{display:block}tags-input *,tags-input :after,tags-input :before{-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box}tags-input .host{position:relative;margin-top:5px;margin-bottom:5px;height:100%}tags-input .host:active{outline:0}tags-input .tags{-moz-appearance:textfield;-webkit-appearance:textfield;padding:1px;overflow:hidden;word-wrap:break-word;cursor:text;background-color:#fff;border:1px solid #a9a9a9;box-shadow:1px 1px 1px 0 #d3d3d3 inset;height:100%}tags-input .tags.focused{outline:0;-webkit-box-shadow:0 0 3px 1px rgba(5,139,242,.6);-moz-box-shadow:0 0 3px 1px rgba(5,139,242,.6);box-shadow:0 0 3px 1px rgba(5,139,242,.6)}tags-input .tags .tag-list{margin:0;padding:0;list-style-type:none}tags-input .tags .tag-item{margin:2px;padding:0 5px;display:inline-block;float:left;font:13px \"Helvetica Neue\",Helvetica,Arial,sans-serif;height:26px;line-height:25px;border:1px solid #acacac;border-radius:3px;background:-webkit-linear-gradient(top,#f0f9ff 0,#cbebff 47%,#a1dbff 100%);background:linear-gradient(to bottom,#f0f9ff 0,#cbebff 47%,#a1dbff 100%)}tags-input .tags .tag-item.selected{background:-webkit-linear-gradient(top,#febbbb 0,#fe9090 45%,#ff5c5c 100%);background:linear-gradient(to bottom,#febbbb 0,#fe9090 45%,#ff5c5c 100%)}tags-input .tags .tag-item .remove-button{margin:0 0 0 5px;padding:0;border:none;background:0 0;cursor:pointer;vertical-align:middle;font:bold 13px Arial,sans-serif;color:#585858}tags-input .tags .tag-item .remove-button:active{color:red}tags-input .tags .input{border:0;outline:0;margin:2px;padding:0;padding-left:5px;float:left;height:26px;font:13px \"Helvetica Neue\",Helvetica,Arial,sans-serif}tags-input .tags .input.invalid-tag{color:red}tags-input .tags .input::-ms-clear{display:none}tags-input.ng-invalid .tags{-webkit-box-shadow:0 0 3px 1px rgba(255,0,0,.6);-moz-box-shadow:0 0 3px 1px rgba(255,0,0,.6);box-shadow:0 0 3px 1px rgba(255,0,0,.6)}tags-input[disabled] .host:focus{outline:0}tags-input[disabled] .tags{background-color:#eee;cursor:default}tags-input[disabled] .tags .tag-item{opacity:.65;background:-webkit-linear-gradient(top,#f0f9ff 0,rgba(203,235,255,.75) 47%,rgba(161,219,255,.62) 100%);background:linear-gradient(to bottom,#f0f9ff 0,rgba(203,235,255,.75) 47%,rgba(161,219,255,.62) 100%)}tags-input[disabled] .tags .tag-item .remove-button{cursor:default}tags-input[disabled] .tags .tag-item .remove-button:active{color:#585858}tags-input[disabled] .tags .input{background-color:#eee;cursor:default}tags-input .autocomplete{margin-top:5px;position:absolute;padding:5px 0;z-index:999;width:100%;background-color:#fff;border:1px solid rgba(0,0,0,.2);-webkit-box-shadow:0 5px 10px rgba(0,0,0,.2);-moz-box-shadow:0 5px 10px rgba(0,0,0,.2);box-shadow:0 5px 10px rgba(0,0,0,.2)}tags-input .autocomplete .suggestion-list{margin:0;padding:0;list-style-type:none;max-height:280px;overflow-y:auto;position:relative}tags-input .autocomplete .suggestion-item{padding:5px 10px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font:13px \"Helvetica Neue\",Helvetica,Arial,sans-serif;color:#000;background-color:#fff}tags-input .autocomplete .suggestion-item.selected{color:#fff;background-color:#0097cf}tags-input .autocomplete .suggestion-item.selected em{color:#fff;background-color:#0097cf}tags-input .autocomplete .suggestion-item em{font:normal bold 16px \"Helvetica Neue\",Helvetica,Arial,sans-serif;color:#000;background-color:#fff}</style> <div class=\"row\"> <div class=\"col-sm-12\"> <h3>Parameters <small class=\"icon-required text-danger\" ng-if=\"!ctrl.loading && ctrl.productSysId && ctrl.paramGroups.length > 0\"></small></h3> <div class=\"bg-danger\" ng-if=\"ctrl.stackParameterWarning\"> <p>{{ ctrl.stackParameterWarning }}</p> </div> <p ng-show=\"ctrl.loading\">Loading...</p> <p ng-show=\"!ctrl.loading && ctrl.paramGroups.length > 0 && ctrl.paramGroups[0].Parameters.length > 0\"> Specify values or use the default values for the parameters. </p> <p ng-show=\"!ctrl.loading && ctrl.paramGroups.length > 0 && ctrl.paramGroups[0].Parameters.length === 0\"> <span ng-if=\"ctrl.productSysId\">This product</span> <span ng-if=\"ctrl.documentSysId\">This automation document</span> has no parameters. </p> <div class=\"bg-info\" ng-repeat=\"(constraintKey, value) in ctrl.paramConstraints\" ng-show=\"!ctrl.loading\"> <p>{{constraintKey}}</p> <ul> <li ng-repeat=\"a in value.Assertions\">{{a.AssertDescription}}</li> </ul> </div> </div> </div> <div ng-repeat=\"parameterGroup in ctrl.paramGroups\" ng-show=\"!ctrl.loading\"> <div class=\"parameter-group-label\" ng-if=\"ctrl.paramGroups.length > 1 || (ctrl.paramGroups.length === 1 && ctrl.paramGroups[0].Label !== null)\"> <h4>{{parameterGroup.Label}}</h4> <hr> </div> <div class=\"form-group\" ng-repeat=\"parameter in parameterGroup.Parameters\" ng-class=\"{'has-error': !ctrl.form[parameter.Key].$valid && ctrl.form[parameter.Key].$dirty}\"> <div class=\"row\"> <label for=\"{{parameter.Key}}\" class=\"col-sm-2 control-label\"> {{parameter.AltName != undefined ? parameter.AltName : parameter.Key}} </label> <div class=\"col-sm-10\"> <input type=\"text\" class=\"form-control\" placeholder=\"{{parameter.Value}}\" name=\"{{parameter.Key}}\" id=\"{{parameter.Key}}\" ng-model=\"parameter.Value\" ng-if=\"(parameter.ParameterType === 'String' || parameter.ParameterType === 'string' || parameter.ParameterType === 'bool' || parameter.ParameterType === '' || parameter.ParameterType === 'any' || parameter.ParameterType.includes('map') || parameter.ParameterType.includes('list')) && !parameter.UseTypeahead && !parameter.UseTypeaheadMulti && !parameter.IsNoEcho && parameter.AllowedValues.length === 0\" ng-change=\"ctrl.onModelUpdate()\" ng-minlength=\"parameter.MinLength\" ng-maxlength=\"parameter.MaxLength\" ng-pattern=\"parameter.AllowedPattern\" ng-disabled=\"ctrl.inputsDisabled || parameter.UsePreviousValue\" ng-required=\"ctrl.productSysId && parameter.ValueRequired && (!ctrl.isUpdate || !parameter.UsePreviousValue)\"/> <input type=\"number\" class=\"form-control\" placeholder=\"{{parameter.Value}}\" name=\"{{parameter.Key}}\" id=\"{{parameter.Key}}\" ng-model=\"parameter.Value\" ng-if=\"(parameter.ParameterType === 'Number' || parameter.ParameterType === 'number') && !parameter.UseTypeahead && !parameter.UseTypeaheadMulti && !parameter.IsNoEcho && parameter.AllowedValues.length === 0\" ng-change=\"ctrl.onModelUpdate()\" ng-minlength=\"parameter.MinLength\" ng-maxlength=\"parameter.MaxLength\" min=\"{{parameter.MinValue}}\" max=\"{{parameter.MaxValue}}\" ng-disabled=\"ctrl.inputsDisabled || parameter.UsePreviousValue\" ng-required=\"ctrl.productSysId && parameter.ValueRequired && (!ctrl.isUpdate || !parameter.UsePreviousValue)\"/> <input type=\"text\" class=\"form-control\" autocomplete=\"off\" placeholder=\"{{parameter.Value}}\" name=\"{{parameter.Key}}\" id=\"{{parameter.Key}}\" ng-model=\"parameter.Value\" ng-model-options=\"{ debounce: 250 }\" ng-if=\"parameter.UseTypeahead && !parameter.IsNoEcho && parameter.AllowedValues.length === 0\" ng-change=\"ctrl.onModelUpdate()\" ng-minlength=\"parameter.MinLength\" ng-maxlength=\"parameter.MaxLength\" ng-pattern=\"parameter.AllowedPattern\" ng-disabled=\"ctrl.inputsDisabled || parameter.UsePreviousValue\" ng-required=\"ctrl.productSysId && parameter.ValueRequired && (!ctrl.isUpdate || !parameter.UsePreviousValue)\" uib-typeahead=\"value[ctrl.getTypeaheadItemId(parameter)] as value[ctrl.getTypeaheadItemId(parameter)] for value in ctrl.getSelectableValues(parameter, $viewValue)\" typeahead-append-to-body=\"true\" typeahead-editable=\"false\" typeahead-loading=\"loadingSelectableValues\" typeahead-no-results=\"noSelectableValues\" typeahead-show-hint=\"true\" typeahead-min-length=\"0\" typeahead-select-on-blur=\"true\" typeahead-on-select=\"ctrl.onModelUpdate()\" typeahead-template-url=\"{{ctrl.getTypeaheadItemTemplate(parameter)}}\"/> <div class=\"help-control\" ng-show=\"loadingSelectableValues\"> <i class=\"glyphicon glyphicon-refresh\"></i> Loading values... </div> <div class=\"help-control\" ng-show=\"noSelectableValues\"> <i class=\"glyphicon glyphicon-remove\"></i> No Results Found </div> <tags-input ng-model=\"parameter.Value\" key-property=\"keyForMulti\" display-property=\"{{ctrl.getTypeaheadItemId(parameter)}}\" placeholder=\"Select from the list below\" add-from-autocomplete-only=\"true\" on-tag-added=\"ctrl.onModelUpdate()\" on-tag-removed=\"ctrl.onModelUpdate()\" ng-if=\"parameter.UseTypeaheadMulti\"> <auto-complete source=\"ctrl.getSelectableValues(parameter, $query)\" display-property=\"{{ctrl.getTypeaheadItemId(parameter)}}\" min-length=\"1\" load-on-focus=\"true\" select-first-match=\"true\" load-on-empty=\"true\" template=\"{{ctrl.getTypeaheadItemTemplate(parameter)}}\"></auto-complete> </tags-input> <input type=\"password\" class=\"form-control\" name=\"{{parameter.Key}}\" id=\"{{parameter.Key}}\" ng-model=\"parameter.Value\" ng-model-options=\"{ debounce: 250 }\" ng-if=\"parameter.IsNoEcho && (parameter.ParameterType === 'String' || parameter.ParameterType === 'string' || parameter.ParameterType === '') && parameter.AllowedValues.length === 0\" ng-change=\"ctrl.onModelUpdate()\" ng-minlength=\"parameter.MinLength\" ng-maxlength=\"parameter.MaxLength\" ng-pattern=\"parameter.AllowedPattern\" ng-disabled=\"ctrl.inputsDisabled || parameter.UsePreviousValue\" ng-required=\"ctrl.productSysId && parameter.ValueRequired && (!ctrl.isUpdate || !parameter.UsePreviousValue)\"/> <select id=\"{{parameter.Key}}\" name=\"{{parameter.Key}}\" ng-model=\"parameter.Value\" ng-if=\"parameter.AllowedValues.length > 0\" ng-change=\"ctrl.onModelUpdate()\" ng-disabled=\"ctrl.inputsDisabled || parameter.UsePreviousValue\" ng-required=\"ctrl.productSysId && (!ctrl.isUpdate || !parameter.UsePreviousValue)\"> <option value=\"{{opt}}\" ng-repeat=\"opt in parameter.AllowedValues\"> {{opt}} </option> </select> </div> <div class=\"col-sm-offset-2 col-sm-10 help-block\"> <p ng-show=\"ctrl.form[parameter.Key].$valid\"> {{parameter.Description}} </p> <p ng-if=\"ctrl.form[parameter.Key].$invalid && ctrl.form[parameter.Key].$dirty\" class=\"bg-danger\"> <span ng-if=\"parameter.ConstraintDescription\"> {{parameter.ConstraintDescription}} </span> <span ng-if=\"!parameter.ConstraintDescription && ctrl.form[parameter.Key].$error.required\"> A value is required </span> <span ng-if=\"!parameter.ConstraintDescription && (ctrl.form[parameter.Key].$error.min || ctrl.form[parameter.Key].$error.max)\"> Value entered should be {{parameter.MinValue ? 'greater than ' + parameter.MinValue + ' ': ''}} {{parameter.MinValue && parameter.MaxValue ? 'and ': ''}} {{parameter.MaxValue ? 'less than ' + parameter.MaxValue : ''}} </span> <span ng-if=\"!parameter.ConstraintDescription && (ctrl.form[parameter.Key].$error.minlength || ctrl.form[parameter.Key].$error.maxlength)\"> Value entered should be {{parameter.MinLength ? 'longer than ' + parameter.MinLength + ' characters ': ''}} {{parameter.MinLength && parameter.MaxLength ? 'and ': ''}} {{parameter.MaxLength ? 'shorter than '+ parameter.MaxLength : ' characters'}} </span> <span ng-if=\"!parameter.ConstraintDescription && ctrl.form[parameter.Key].$error.pattern\"> Value entered should match the pattern {{parameter.AllowedPattern.toString()}} </span> </p> <div ng-if=\"ctrl.isUpdate && parameter.IsNoEcho && parameter.IsExistingKey\"> <input id=\"upv-{{parameter.Key}}\" type=\"checkbox\" ng-model=\"parameter.UsePreviousValue\" ng-change=\"ctrl.onModelUpdate();\"/> <label for=\"upv-{{parameter.Key}}\"> Use existing value </label> </div> </div> </div> <div class=\"row\"> <div class=\"col-sm-offset-2 col-sm-10\" role=\"alert\" ng-show=\"ctrl.isShowFieldAsRequired(parameterGroup.Label, $index)\"> <div class=\"bg-danger\"><p>Required field</p></div> </div> </div> </div> </div> ";
+      // Exports
+      /* harmony default export */ const parameters_template = (parameters_template_code);
+      ;// CONCATENATED MODULE: ./awsComponents/parameters/parameters.js
+      function parameters_defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+      function parameters_createClass(Constructor, protoProps, staticProps) { if (protoProps) parameters_defineProperties(Constructor.prototype, protoProps); if (staticProps) parameters_defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+      function parameters_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+
+
+
+      var Parameters = /*#__PURE__*/parameters_createClass(function Parameters() {
+      parameters_classCallCheck(this, Parameters);
+
+      return {
+      scope: {},
+      controller: ['$scope', '$q', 'productAspect', 'documentAjax', 'ec2Ajax', 'route53Ajax', ParametersController],
+      controllerAs: 'ctrl',
+      bindToController: {
+      /**
+      * The sys_id of the product catalog item
+      */
+      productSysId: '=',
+
+      /**
+      * The sys_id of the automation document catalog item
+      */
+      documentSysId: '=',
+
+      /**
+      * The name of an AWS runbook to get the parameters for
+      */
+      runbookName: '=',
+
+      /**
+      * The version of an AWS runbook to get the parameters for
+      */
+      runbookVersion: '=',
+
+      /**
+      * The sys ID of the change template to get the runbook parameters for
+      */
+      changeTemplateSysId: '=',
+
+      /**
+      * The form controller for the form holding the <provisioning-parameters>
+      */
+      form: '=',
+
+      /**
+      * Boolean, are the parameters those of an existing product to be updated.
+      */
+      isUpdate: '=',
+
+      /**
+      * Optional. The provisioned product sys_id, where the directive is used with a provisioned product.
+      */
+      provisionedProductSysId: '=?',
+
+      /**
+      * The launch option
+      */
+      launchOption: '=?',
+
+      /**
+      * The product version
+      */
+      productVersion: '=?',
+
+      /**
+      * Callback to be invoked when one of the parameter values changes.
+      * The function is invoked with one argument that must be named "params".
+      * The parameters are supplied as a list of {Key, Value} objects.
+      */
+      onParamChange: '&',
+
+      /**
+      * Callback to be supplied an error object upon error in operation.
+      * The function is invoked with one argument that must be named "err".
+      */
+      onError: '&',
+
+      /**
+      * A reference to a boolean flag to indicate whether inputs are disabled or not.
+      */
+      inputsDisabled: '='
+      },
+      template: parameters_template
+      };
+      });
+
+
+      ;// CONCATENATED MODULE: ./awsComponents/selfServiceActions/selfServiceActions_controller.js
+      function SelfServiceActionsController($scope, provisionedProduct) {
+      var ctrl = this;
+      $scope.$watchGroup(['ctrl.provisionedProductSysId'], function () {
+      provisionedProduct.loadCurrentAspectValues(ctrl.provisionedProductSysId).then(function (response) {
+      if (!response.success) {
+      onError(response.message);
+      }
+
+      ctrl.aspects = response.result;
+      })["catch"](function (err) {
+      $scope.$applyAsync(function () {
+      onError(err);
+      });
+      });
+      ctrl.loadProductActions();
+      });
+
+      ctrl.loadProductActions = function ($event) {
+      if ($event) {
+      $event.stopPropagation();
+      $event.preventDefault();
+      }
+
+      resetErrors();
+      ctrl.selfServiceActions = null;
+      provisionedProduct.loadSelfServiceActions(ctrl.provisionedProductSysId).then(function (response) {
+      ctrl.selfServiceActions = response.result.ServiceActionSummaries;
+      $scope.$applyAsync(function () {
+      ctrl.form.$setDirty();
+      });
+      })["catch"](function (err) {
+      $scope.$applyAsync(function () {
+      ctrl.selfServiceActions = undefined;
+      onError(err);
+      });
+      });
+      };
+
+      ctrl.isInvalid = function () {
+      return ctrl.form.actionRadio.$invalid;
+      };
+
+      function onError(error) {
+      if (ctrl.onError) {
+      ctrl.onError.call(null, {
+      error: error
+      });
+      }
+      }
+
+      function resetErrors() {
+      if (ctrl.resetErrors) {
+      ctrl.resetErrors.call();
+      }
+      }
+      }
+      ;// CONCATENATED MODULE: ./awsComponents/selfServiceActions/selfServiceActions_template.html
+      // Module
+      var selfServiceActions_template_code = "<div class=\"row\"> <div class=\"col-sm-12\"> <h3>Self-Service Actions<span ng-if=\"ctrl.aspects\">: {{ctrl.aspects.ProvisionedProductName}}</span></h3> </div> </div> <div class=\"row\" ng-if=\"!ctrl.selfServiceActions\"> <div class=\"col-sm-offset-2 col-sm-10\"> <p ng-if=\"ctrl.selfServiceActions === null\">Loading...</p> <p ng-if=\"ctrl.selfServiceActions === undefined\">Could not load self-service actions <button ng-click=\"ctrl.loadProductActions($event)\">Retry</button></p> </div> </div> <div class=\"row\" ng-if=\"ctrl.selfServiceActions\"> <div class=\"col-sm-offset-2 col-sm-10\" ng-if=\"ctrl.selfServiceActions.length > 0\"> <div class=\"radio\" ng-repeat=\"productAction in ctrl.selfServiceActions track by productAction.Id\"> <div class=\"form-group\"> <label> <input type=\"radio\" name=\"actionRadio\" required ng-model=\"ctrl.action\" ng-value=\"productAction\" ng-disabled=\"ctrl.inputsDisabled\"> {{productAction.Name}} </label> <p class=\"help-block\" ng-if=\"productAction.Description && productAction.Description.length > 0\">{{productAction.Description}}</p> </div> </div> <p class=\"text-danger\" ng-if=\"!ctrl.action\"> Select a self-service action. </p> </div> <div class=\"col-sm-offset-2 col-sm-10\" ng-if=\"ctrl.selfServiceActions.length === 0\"> <p>There are no self-service actions associated with this product.</p> </div> </div> ";
+      // Exports
+      /* harmony default export */ const selfServiceActions_template = (selfServiceActions_template_code);
+      ;// CONCATENATED MODULE: ./awsComponents/selfServiceActions/selfServiceActions.js
+      function selfServiceActions_defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+      function selfServiceActions_createClass(Constructor, protoProps, staticProps) { if (protoProps) selfServiceActions_defineProperties(Constructor.prototype, protoProps); if (staticProps) selfServiceActions_defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+      function selfServiceActions_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+
+
+
+      var SelfServiceActions = /*#__PURE__*/selfServiceActions_createClass(function SelfServiceActions() {
+      selfServiceActions_classCallCheck(this, SelfServiceActions);
+
+      return {
+      scope: {},
+      controller: ['$scope', 'provisionedProduct', SelfServiceActionsController],
+      controllerAs: 'ctrl',
+      bindToController: {
+      /**
+      * The sys_id of the product catalog item
+      */
+      provisionedProductSysId: '=',
+
+      /**
+      * The form to bind to
+      */
+      form: '=',
+
+      /**
+      * The action model
+      */
+      action: '=',
+
+      /**
+      * Callback to be supplied an error object upon an error in operation.
+      * The function is invoked with one argument that must be named "err".
+      */
+      onError: '&',
+
+      /**
+      * Callback to be reset global errors add via the onError callback.
+      */
+      resetErrors: '&',
+
+      /**
+      * A reference to a boolean flag to indicate whether inputs are disabled or not.
+      */
+      inputsDisabled: '='
+      },
+      template: selfServiceActions_template
+      };
+      });
+
+
+      ;// CONCATENATED MODULE: ./awsComponents/tags/tags_controller.js
+      function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+      function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+      function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+      function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+
+      function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+      function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+      function TagsController($scope, $q, productAspect, tagAjax) {
+      var ctrl = this;
+      ctrl.loading = false;
+      ctrl.selectableTagModelOptions = {
+      debounce: {
+      "default": 500,
+      blur: 250
+      },
+      getterSetter: true
+      };
+
+      ctrl.reset = function () {
+      ctrl.currentTags = []; // Tags defined by a TagOption from AWS with only one possible value
+      // entries like { "Key": "...", "Value": "..." }
+
+      ctrl.fixedValueTags = []; // Tags defined by a TagOption from AWS with multiple possible values
+      // entries like { "Key": "...", "Values": [  "one", "two", "three" ] }
+
+      ctrl.multiValueTags = []; // Model of chosen value for multi value tags. A map of Key to currently selected value.
+
+      ctrl.multiValueTagModel = {}; // Tags added on the ServiceNow UI by the end user when ordering the product
+      // entries like { "Key": "...", "Value": "..." }
+
+      ctrl.userDefinedTags = []; // Tags defined by the ServiceNow admin, which requires the end user to choose a value
+      // entries like { "Key: "...", "Value": "...", "sysId": "..." }
+
+      ctrl.selectableTags = []; // a small form for capturing user added tags
+
+      ctrl.formData = {
+      key: null,
+      value: null
+      };
+      };
+
+      ctrl.tagKeyChange = function () {
+      if (!ctrl.formData.key) {
+      ctrl.formData.value = ''; // setting the $error to false explicitly as the $setPristine() and $setUntouched() don't do this
+
+      ctrl.form.tagValueInput.$error.cleanvalue = false;
+      ctrl.form.tagValueInput.$setPristine();
+      ctrl.form.tagValueInput.$setUntouched();
+      }
+      };
+
+      ctrl.validateTagKey = function (viewValue) {
+      var enteredKey = viewValue ? viewValue.trim() : "";
+      var all = ctrl.currentTags;
+
+      for (var c = 0; c < all.length; c++) {
+      var existing = all[c];
+
+      if (existing.Key === enteredKey) {
+      ctrl.keyInputError = "Tag is already present";
+      return false;
+      }
+      }
+
+      return true;
+      };
+
+      ctrl.validateTagValue = function (viewValue) {
+      // only validate value if key is valid
+      if (!ctrl.formData.key || !ctrl.formData.key.trim()) {
+      return true;
+      } // now validate value
+
+
+      var enteredValue = viewValue ? viewValue.trim() : "";
+
+      if (enteredValue.length === 0) {
+      ctrl.valueInputError = "A tag must have a value";
+      return false;
+      }
+
+      return true;
+      };
+
+      ctrl.computeAllTags = function () {
+      var tags = [].concat(_toConsumableArray(ctrl.fixedValueTags), _toConsumableArray(ctrl.userDefinedTags));
+      angular.forEach(ctrl.multiValueTagModel, function (val, key) {
+      tags.push({
+      "Key": key,
+      "Value": val
+      });
+      });
+      angular.forEach(ctrl.selectableTags, function (tag) {
+      tags.push({
+      "Key": tag.Key,
+      "Value": tag.Value
+      });
+      });
+      ctrl.currentTags = tags;
+      };
+
+      ctrl.loadTags = function () {
+      var promises = [];
+
+      if ((ctrl.productSysId || ctrl.provisionedProductSysId) && ctrl.launchOption && ctrl.productVersion) {
+      promises.push($q.all([// Get the tag options
+      productAspect.getProvisioningParameters(ctrl.productSysId, ctrl.launchOption, ctrl.productVersion, ctrl.provisionedProductSysId), // Get any tags defined within ServiceNow
+      productAspect.getAdditionalTags(ctrl.productSysId, ctrl.provisionedProductSysId)]).then(function (responses) {
+      var provisioningParams = responses[0];
+      var automatedTags = responses[1];
+      var knownTags = {};
+      var tagOptions = provisioningParams.result.TagOptions;
+      tagOptions.forEach(function (tag) {
+      if (tag.Values.length > 1) {
+      ctrl.multiValueTags.push(tag);
+      ctrl.multiValueTagModel[tag.Key] = tag.Values[0];
+      } else if (tag.Values.length === 1) {
+      ctrl.fixedValueTags.push({
+      "Key": tag.Key,
+      "Value": tag.Values[0]
+      });
+      } else {
+      throw new Error("Invalid tag " + tag.Key + " without values");
+      }
+
+      knownTags[tag.Key] = true;
+      });
+
+      if (automatedTags.success) {
+      automatedTags.result.forEach(function (snTag) {
+      // Don't override official tags with values from ServiceNow
+      if (!(snTag in knownTags)) {
+      // ServiceNow tags are simple labels, transform to AWS tag by setting value
+      // to blank (must be non-empty) string
+      ctrl.fixedValueTags.push({
+      "Key": snTag,
+      "Value": " "
+      });
+      knownTags[snTag] = true;
+      }
+      });
+      }
+      }));
+      }
+
+      if (ctrl.selectableTagsShown) {
+      promises.push(tagAjax.getSelectableTags(ctrl.productSysId).then(function (tags) {
+      if (!tags.success) {
+      throw new Error(tags.result);
+      }
+
+      ctrl.selectableTags = tags.result.map(function (tag) {
+      return {
+      Key: tag.key,
+      SysId: tag.sysId
+      };
+      });
+      }));
+      }
+
+      ctrl.reset();
+      ctrl.loading = true;
+      $q.all(promises)["catch"](function (err) {
+      ctrl.onError({
+      err: err
+      });
+      })["finally"](function () {
+      ctrl.loading = false;
+      });
+      };
+
+      ctrl.addTag = function () {
+      ctrl.tagInputError = false;
+      ctrl.userDefinedTags.push({
+      Key: ctrl.formData.key.trim(),
+      Value: ctrl.formData.value.trim()
+      });
+      ctrl.formData.key = '';
+      ctrl.formData.value = '';
+      };
+
+      ctrl.removeTag = function (tag) {
+      ctrl.userDefinedTags = ctrl.userDefinedTags.filter(function (el) {
+      return el.Key != tag.Key;
+      });
+      };
+
+      ctrl.getSelectableTagValues = function (tag, search) {
+      return tagAjax.getSelectableTagValues(tag.SysId, search).then(function (response) {
+      if (!response.success) {
+      throw new Error(response.result);
+      }
+
+      return response.result;
+      });
+      };
+
+      ctrl.reset();
+      $scope.$watchGroup(['ctrl.launchOption', 'ctrl.productVersion'], ctrl.loadTags);
+      $scope.$watchCollection('ctrl.fixedValueTags', ctrl.computeAllTags);
+      $scope.$watchCollection('ctrl.userDefinedTags', ctrl.computeAllTags);
+      $scope.$watch('ctrl.selectableTags', ctrl.computeAllTags, true);
+      $scope.$watch('ctrl.multiValueTagModel', ctrl.computeAllTags, true);
+      }
+      ;// CONCATENATED MODULE: ./awsComponents/tags/tags_template.html
+      // Module
+      var tags_template_code = "<div ng-hide=\"!ctrl.tagsVisible\"> <div class=\"row\"> <div class=\"col-sm-12\"> <h3>Tags</h3> <p ng-show=\"ctrl.loading\">Loading...</p> <p ng-show=\"!ctrl.loading && ctrl.productSysId\"> The following TagOptions are added by the administrator to either Product or Portfolio. Some TagOptions may have multiple values and you are required to select the most applicable value. <a href=\"https://docs.aws.amazon.com/servicecatalog/latest/adminguide/tagoptions.html\" target=\"_blank\">Learn more here</a>. </p> </div> </div> <div class=\"row\"> <div class=\"col-sm-12\"> <table class=\"table\" ng-show=\"!ctrl.loading\"> <thead> <tr> <th>KEY</th> <th>VALUE</th> </tr> </thead> <tbody> <tr ng-repeat=\"tag in ctrl.fixedValueTags\"> <td>{{tag.Key}}</td> <td>{{tag.Value}}</td> <td> <button type=\"button\" class=\"btn btn-danger btn-sm\" disabled=\"disabled\"> <span class=\"glyphicon glyphicon-remove\"></span> </button> </td> </tr> <tr ng-repeat=\"tag in ctrl.multiValueTags\"> <td>{{tag.Key}}</td> <td> <select ng-model=\"ctrl.multiValueTagModel[tag.Key]\" ng-change=\"ctrl.tagValueChange()\" ng-disabled=\"ctrl.inputsDisabled\" class=\"form-control input-sm\"> <option value=\"{{opt}}\" ng-repeat=\"opt in tag.Values | orderBy\">{{opt}}</option> </select> </td> <td> <button type=\"button\" class=\"btn btn-danger btn-sm\" disabled=\"disabled\"> <span class=\"glyphicon glyphicon-remove\"></span> </button> </td> </tr> <tr ng-repeat=\"tag in ctrl.selectableTags\"> <td>{{tag.Key}}</td> <td> <input ng-model=\"tag.Value\" ng-model-options=\"ctrl.selectableTagModelOptions\" ng-disabled=\"ctrl.inputsDisabled\" ng-required=\"true\" uib-typeahead=\"value for value in ctrl.getSelectableTagValues(tag, $viewValue)\" typeahead-append-to-body=\"true\" typeahead-editable=\"false\" typeahead-loading=\"loadingSelectableValues\" typeahead-no-results=\"noSelectableValues\" typeahead-show-hint=\"true\" typeahead-min-length=\"0\" class=\"form-control input-sm\"/> <div class=\"help-control\" ng-show=\"loadingSelectableValues\"> <i class=\"glyphicon glyphicon-refresh\"></i> Loading values... </div> <div class=\"help-control\" ng-show=\"noSelectableValues\"> <i class=\"glyphicon glyphicon-remove\"></i> No Results Found </div> </td> <td></td> </tr> <tr ng-repeat=\"tag in ctrl.userDefinedTags\"> <td>{{tag.Key}}</td> <td>{{tag.Value}}</td> <td> <button type=\"button\" class=\"btn btn-danger btn-sm\" ng-click=\"ctrl.removeTag(tag)\" ng-disabled=\"ctrl.inputsDisabled\"> <span class=\"glyphicon glyphicon-remove\"></span> </button> </td> </tr> <tr> <td> <input id=\"tagKeyInput\" class=\"form-control input-sm\" ng-model=\"ctrl.formData.key\" name=\"tagKeyInput\" ng-change=\"ctrl.tagKeyChange()\" ng-disabled=\"ctrl.inputsDisabled\"> </td> <td> <input id=\"tagValueInput\" class=\"form-control input-sm\" ng-model=\"ctrl.formData.value\" name=\"tagValueInput\" ng-disabled=\"ctrl.inputsDisabled\"> </td> <td> <button type=\"button\" class=\"btn btn-primary btn-sm\" ng-click=\"ctrl.addTag()\" ng-disabled=\"!ctrl.formData.key || !ctrl.formData.key.trim()\n                       || !ctrl.formData.value || !ctrl.formData.value.trim()\n                       || ctrl.form.tagKeyInput.$error.cleankey\n                       || ctrl.form.tagValueInput.$error.cleanvalue\n                       || ctrl.inputsDisabled\"> <span class=\"glyphicon glyphicon-plus\"></span> </button> </td> </tr> </tbody> </table> <div role=\"alert\" ng-show=\"ctrl.form.tagKeyInput.$error.cleankey\"> <div class=\"bg-danger\"><p>{{ctrl.keyInputError}}</p></div> </div> <div role=\"alert\" ng-show=\"ctrl.form.tagValueInput.$error.cleanvalue\"> <div class=\"bg-danger\"><p>{{ctrl.valueInputError}}</p></div> </div> </div> </div> </div> ";
+      // Exports
+      /* harmony default export */ const tags_template = (tags_template_code);
+      ;// CONCATENATED MODULE: ./awsComponents/tags/tags.js
+      function tags_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+      function tags_defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+      function tags_createClass(Constructor, protoProps, staticProps) { if (protoProps) tags_defineProperties(Constructor.prototype, protoProps); if (staticProps) tags_defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+
+
+
+      var Tags = /*#__PURE__*/function () {
+      function Tags() {
+      tags_classCallCheck(this, Tags);
+
+      return {
+      scope: {},
+      link: this.link,
+      controller: ['$scope', '$q', 'productAspect', 'tagAjax', TagsController],
+      controllerAs: 'ctrl',
+      bindToController: {
+      /**
+      * The sys_id of the product catalog item
+      */
+      productSysId: '=',
+
+      /**
+      * The form controller for the form holding this directive
+      */
+      form: '=',
+
+      /**
+      * Optional. The provisioned product sys_id, where the directive is used with a provisioned product.
+      */
+      provisionedProductSysId: '=',
+
+      /**
+      * The launch option
+      */
+      launchOption: '=',
+
+      /**
+      * The product version
+      */
+      productVersion: '=',
+
+      /**
+      * The tags associated to the product or automation document
+      */
+      currentTags: '=',
+
+      /**
+      * A reference to a boolean flag to indicate whether inputs are disabled or not.
+      */
+      inputsDisabled: '=?',
+
+      /**
+      * callback to be supplied an error message upon error in operation
+      */
+      onError: '&',
+
+      /**
+      * A reference to a boolean flag to indicate whether the tags section is visible or not.
+      */
+      tagsVisible: '=?',
+
+      /**
+      * A reference to a boolean flag to indicate whether the selectable tags are visible or not.
+      */
+      selectableTagsShown: '=?'
+      },
+      template: tags_template
+      };
+      }
+
+      tags_createClass(Tags, [{
+      key: "link",
+      value: function link(scope, elm, attrs, ctrl) {
+      var keymc = elm.find('input#tagKeyInput').controller('ngModel');
+
+      keymc.$validators.cleankey = function (modelValue, viewValue) {
+      return keymc.$isEmpty(modelValue) || ctrl.validateTagKey(viewValue);
+      };
+
+      var valuemc = elm.find('input#tagValueInput').controller('ngModel');
+
+      valuemc.$validators.cleanvalue = function (modelValue, viewValue) {
+      return ctrl.validateTagValue(viewValue);
+      };
+      }
+      }]);
+
+      return Tags;
+      }();
+
+
+      ;// CONCATENATED MODULE: ./awsComponents/productAspectProvider/productAspect.provider.js
+      function productAspectProvider() {
+      return {
+      $get: ['$q', 'requestService', 'connectorAjax', function ($q, requestService, connectorAjax) {
+      return new ProductAspectAPI($q, requestService, connectorAjax);
+      }]
+      };
+      }
+
+      function ProductAspectAPI($q, requestService, connectorAjax) {
+      var promiseCache = {};
+
+      function cacheKey() {
+      var k = '';
+
+      for (var i = 0; i < arguments.length; i++) {
+      k += arguments[i];
+      }
+
+      return k;
+      }
+
+      function getAdditionalTags(productSysId, provisionedProductSysId) {
+      var key = "tag-" + cacheKey.apply(null, arguments);
+
+      if (!(key in promiseCache)) {
+      var req = connectorAjax.createRequest("x_126749_aws_sc.ServiceCatalogAjax");
+      req.addParam("sysparm_name", "getAdditionalTags");
+      req.addParam("sysparm_productSysId", productSysId);
+      req.addParam("sysparm_provisionedProductSysId", provisionedProductSysId);
+      promiseCache[key] = requestService.makeRequest(req).promise;
+      }
+
+      return promiseCache[key];
+      }
+
+      function getLaunchPaths(productSysId, provisionedProductSysId, pageToken) {
+      var key = "lp-" + cacheKey.apply(null, arguments);
+
+      if (!(key in promiseCache)) {
+      var paths = connectorAjax.createRequest("x_126749_aws_sc.ServiceCatalogAjax");
+      paths.addParam("sysparm_name", "getLaunchPaths");
+      paths.addParam("sysparm_productSysId", productSysId);
+      paths.addParam("sysparm_provisionedProductSysId", provisionedProductSysId);
+
+      if (pageToken) {
+      paths.addParam("sysparm_pageToken", pageToken);
+      }
+
+      promiseCache[key] = requestService.makeRequest(paths).promise;
+      }
+
+      return promiseCache[key];
+      }
+
+      function getProvisioningArtifacts(productSysId, provisionedProductSysId, pageToken) {
+      var key = "pa-" + cacheKey.apply(null, arguments);
+
+      if (!(key in promiseCache)) {
+      var artifacts = connectorAjax.createRequest("x_126749_aws_sc.ServiceCatalogAjax");
+      artifacts.addParam("sysparm_name", "getProvisioningArtifacts");
+      artifacts.addParam("sysparm_productSysId", productSysId);
+      artifacts.addParam("sysparm_provisionedProductSysId", provisionedProductSysId);
+
+      if (pageToken) {
+      artifacts.addParam("sysparm_pageToken", pageToken);
+      }
+
+      promiseCache[key] = requestService.makeRequest(artifacts).promise;
+      }
+
+      return promiseCache[key];
+      }
+
+      function getProvisioningParameters(productSysId, launchPathId, provisioningArtifactId, provisionedProductSysId) {
+      var key = "pp-" + cacheKey.apply(null, arguments);
+
+      if (!(key in promiseCache)) {
+      var req = connectorAjax.createRequest("x_126749_aws_sc.ServiceCatalogAjax");
+      req.addParam("sysparm_name", "getProvisioningParameters");
+      req.addParam("sysparm_productSysId", productSysId);
+      req.addParam("sysparm_launchPathId", launchPathId);
+      req.addParam("sysparm_provisioningArtifactId", provisioningArtifactId);
+      req.addParam("sysparm_provisionedProductSysId", provisionedProductSysId);
+      promiseCache[key] = requestService.makeRequest(req).promise;
+      }
+
+      return promiseCache[key];
+      }
+      /**
+      * @param productId
+      * @param launchPathId
+      * @param provisioningArtifactId
+      * @param identitySysId
+      * @param provisionedProductSysId
+      * @returns
+      *     A promise that resolves to true if this combination of parameters might lead to
+      *     a product with a StackSet constraint and false if it definitely won't.
+      */
+
+
+      function mayHaveStackSetConstraint(productId, launchPathId, provisioningArtifactId, provisionedProductSysId) {
+      if (!productId && !provisionedProductSysId || !launchPathId || !provisioningArtifactId) {
+      return $q.resolve(true);
+      }
+
+      var deferred = $q.defer();
+      var params = getProvisioningParameters(productId, launchPathId, provisioningArtifactId, provisionedProductSysId);
+      params.then(function (r) {
+      // Looking for this structure:
+      // {"result":{"ConstraintSummaries":[{"Type":"STACKSET"}]
+      if (r.result && Array.isArray(r.result.ConstraintSummaries)) {
+      deferred.resolve(r.result.ConstraintSummaries.some(function (summary) {
+      return summary.Type === 'STACKSET';
+      }));
+      } else {
+      deferred.resolve(true);
+      }
+      })["catch"](function (err) {
+      deferred.reject(err);
+      });
+      return deferred.promise;
+      }
+
+      return {
+      getAdditionalTags: getAdditionalTags,
+      getLaunchPaths: getLaunchPaths,
+      getProvisioningArtifacts: getProvisioningArtifacts,
+      getProvisioningParameters: getProvisioningParameters,
+      mayHaveStackSetConstraint: mayHaveStackSetConstraint
+      };
+      }
+      ;// CONCATENATED MODULE: ./awsComponents/provisionedProductProvider/provisionedProduct.provider.js
+      function provisionedProductProvider() {
+      return {
+      $get: ['requestService', 'connectorAjax', function (requestService, connectorAjax) {
+      return new ProvisionedProductAPI(requestService, connectorAjax);
+      }]
+      };
+      }
+
+      function ProvisionedProductAPI(requestService, connectorAjax) {
+      function createPlan(provisionedProductSysId, productSysId, planParameters, forceCreate) {
+      var req = connectorAjax.createRequest("x_126749_aws_sc.ProvisionedProductAjax");
+      req.addParam("sysparm_name", "createPlan");
+      req.addParam("sysparm_provisionedProductSysId", provisionedProductSysId);
+      req.addParam("sysparm_productId", productSysId);
+      req.addParam("sysparm_planParameters", JSON.stringify(planParameters));
+      req.addParam("sysparm_forceCreate", !!forceCreate);
+      return requestService.makeRequest(req).promise;
+      }
+
+      function deletePlan(provisionedProductSysId, productSysId) {
+      var req = connectorAjax.createRequest("x_126749_aws_sc.ProvisionedProductAjax");
+      req.addParam("sysparm_name", "deletePlan");
+      req.addParam("sysparm_provisionedProductSysId", provisionedProductSysId);
+      req.addParam("sysparm_productSysId", productSysId);
+      return requestService.makeRequest(req).promise;
+      }
+
+      function executePlan(provisionedProductSysId) {
+      var req = connectorAjax.createRequest("x_126749_aws_sc.ProvisionedProductAjax");
+      req.addParam("sysparm_name", "executePlan");
+      req.addParam("sysparm_provisionedProductSysId", provisionedProductSysId);
+      return requestService.makeRequest(req).promise;
+      }
+
+      function loadCurrentAspectValues(provisionedProductSysId) {
+      var req = connectorAjax.createRequest("x_126749_aws_sc.ProvisionedProductAjax");
+      req.addParam("sysparm_name", "getProductAspectValues");
+      req.addParam("sysparm_provisionedProductSysId", provisionedProductSysId);
+      return requestService.makeRequest(req).promise;
+      }
+
+      function loadPlan(provisionedProductSysId, productSysId) {
+      var req = connectorAjax.createRequest("x_126749_aws_sc.ProvisionedProductAjax");
+      req.addParam("sysparm_name", "describePlan");
+      req.addParam("sysparm_provisionedProductSysId", provisionedProductSysId);
+      req.addParam("sysparm_productSysId", productSysId);
+      return requestService.makeRequest(req).promise;
+      }
+
+      function loadSelfServiceActions(provisionedProductSysId) {
+      var paths = connectorAjax.createRequest("x_126749_aws_sc.ProvisionedProductAjax");
+      paths.addParam("sysparm_name", "getProductActions");
+      paths.addParam("sysparm_provisionedProductSysId", provisionedProductSysId);
+      return requestService.makeRequest(paths).promise;
+      }
+
+      function executeSelfServiceAction(provisionedProductSysId, actionId, actionName, actionDescription) {
+      var req = connectorAjax.createRequest("x_126749_aws_sc.ProvisionedProductAjax");
+      req.addParam("sysparm_name", "executeServiceAction");
+      req.addParam("sysparm_executeServiceActionParams", JSON.stringify({
+      "ServiceActionId": actionId,
+      "ServiceActionName": actionName,
+      "ServiceActionDescription": actionDescription
+      }));
+      req.addParam("sysparm_provisionedProductSysId", provisionedProductSysId);
+      return requestService.makeRequest(req).promise;
+      }
+
+      function updateProvisionedProduct(provisionedProductSysId, launchPathId, provisioningArtifactId, provisioningParameters, options) {
+      var req = connectorAjax.createRequest("x_126749_aws_sc.ProvisionedProductAjax");
+      req.addParam("sysparm_name", "updateProvisionedProduct");
+      req.addParam("sysparm_updateParams", JSON.stringify(Object.assign(options || {}, {
+      "PathId": launchPathId,
+      "ProvisioningArtifactId": provisioningArtifactId,
+      "ProvisioningParameters": provisioningParameters
+      })));
+      req.addParam("sysparm_provisionedProductSysId", provisionedProductSysId);
+      return requestService.makeRequest(req).promise;
+      }
+
+      return {
+      createPlan: createPlan,
+      deletePlan: deletePlan,
+      executePlan: executePlan,
+      loadCurrentAspectValues: loadCurrentAspectValues,
+      loadPlan: loadPlan,
+      loadSelfServiceActions: loadSelfServiceActions,
+      executeSelfServiceAction: executeSelfServiceAction,
+      updateProvisionedProduct: updateProvisionedProduct
+      };
+      }
+      ;// CONCATENATED MODULE: ./awsComponents/documentAjaxProvider/documentAjax.provider.js
+      function documentAjaxProvider() {
+      return {
+      $get: ['$q', 'requestService', 'connectorAjax', function ($q, requestService, connectorAjax) {
+      return new DocumentAPI($q, requestService, connectorAjax);
+      }]
+      };
+      }
+
+      function DocumentAPI($q, requestService, connectorAjax) {
+      var promiseCache = {};
+
+      function cacheKey() {
+      var k = '';
+
+      for (var i = 0; i < arguments.length; i++) {
+      k += JSON.stringify(arguments[i]);
+      }
+
+      return k;
+      }
+
+      function describeDocument(documentSysId) {
+      var key = "describe-document-".concat(cacheKey.apply(null, arguments));
+
+      if (!(key in promiseCache)) {
+      var req = connectorAjax.createRequest('x_126749_aws_sc.SystemsManagerAjax');
+      req.addParam('sysparm_name', 'describeDocument');
+      req.addParam('sysparm_documentSysId', documentSysId);
+      promiseCache[key] = requestService.makeRequest(req).promise;
+      }
+
+      return promiseCache[key];
+      }
+
+      function getDocuments(opts) {
+      var key = "get-documents-".concat(cacheKey.apply(null, arguments));
+
+      if (!(key in promiseCache)) {
+      var req = connectorAjax.createRequest('x_126749_aws_sc.SystemsManagerAjax');
+      req.addParam('sysparm_name', 'getDocuments');
+
+      if (opts.opsitemSysId) {
+      req.addParam('sysparm_opsitemSysId', opts.opsitemSysId);
+      }
+
+      promiseCache[key] = requestService.makeRequest(req).promise;
+      }
+
+      return promiseCache[key];
+      }
+
+      function describeChangeTemplate(changeTemplateSysId) {
+      var key = "describe-change-template-".concat(cacheKey.apply(null, arguments));
+
+      if (!(key in promiseCache)) {
+      var req = connectorAjax.createRequest('x_126749_aws_sc.SystemsManagerAjax');
+      req.addParam('sysparm_name', 'describeChangeTemplate');
+      req.addParam('sysparm_changeTemplateSysId', changeTemplateSysId);
+      promiseCache[key] = requestService.makeRequest(req).promise;
+      }
+
+      return promiseCache[key];
+      }
+
+      function describeChangeTemplateRunbook(changeTemplateSysId, runbookName, runbookVersion) {
+      var key = "get-change-template-runbooks-".concat(cacheKey.apply(null, arguments));
+
+      if (!(key in promiseCache)) {
+      var req = connectorAjax.createRequest('x_126749_aws_sc.SystemsManagerAjax');
+      req.addParam('sysparm_name', 'describeChangeTemplateRunbook');
+      req.addParam('sysparm_changeTemplateSysId', changeTemplateSysId);
+      req.addParam('sysparm_runbookName', runbookName);
+      req.addParam('sysparm_runbookVersion', runbookVersion);
+      promiseCache[key] = requestService.makeRequest(req).promise;
+      }
+
+      return promiseCache[key];
+      }
+
+      return {
+      describeDocument: describeDocument,
+      getDocuments: getDocuments,
+      describeChangeTemplate: describeChangeTemplate,
+      describeChangeTemplateRunbook: describeChangeTemplateRunbook
+      };
+      }
+      ;// CONCATENATED MODULE: ./awsComponents/connectorAjaxClient/connectorAjax.js
+      function connectorAjaxProvider() {
+      return {
+      $get: ['$q', '$http', function ($q, $http) {
+      return new connectorAjaxAPI($q, $http);
+      }]
+      };
+      }
+      /**
+      * A stand-in for GlideAjax, required because GlideAjax isn't supported on widgets in the Service Portal in general
+      * (though it does work on the Service Catalog order page).
+      */
+
+      function connectorAjaxAPI($q, $http) {
+      var tokenHolder = {};
+
+      var ConnectorAjax = function ConnectorAjax(className) {
+      this.processor = className;
+      this.scope = className.split('.')[0];
+      this.params = [];
+      };
+
+      ConnectorAjax.prototype.parseXml = function (xml) {
+      var parser = new DOMParser();
+      return parser.parseFromString(xml, "application/xml");
+      }; // For convenience, turn the result of our request into a structure that
+      // can be used with the existing requestService.makeRequest
+
+
+      ConnectorAjax.prototype.imitationGlideAjaxResponse = function (response) {
+      var parsed = this.parseXml(response.data);
+      return {
+      responseXML: parsed
+      };
+      };
+
+      ConnectorAjax.prototype.addParam = function (param, value) {
+      if (param && value) {
+      this.params.push({
+      "param": param,
+      "value": value
+      });
+      }
+      };
+
+      ConnectorAjax.prototype.getXML = function (responseHandler) {
+      var ajax = this;
+      ajax.addParam("sysparm_processor", ajax.processor);
+      ajax.addParam("sysparm_scope", ajax.scope);
+      var content = ajax.params.reduce(function (body, e) {
+      return (body ? body + "&" : "") + e.param + "=" + e.value;
+      }, "");
+      var config = {
+      "headers": {
+      "Accept": "application/xml, text/xml",
+      "Content-Type": "application/x-www-form-urlencoded",
+      "X-UserToken": getUserToken()
+      }
+      };
+      $http.post('/xmlhttp.do', content, config).then(function (response) {
+      responseHandler(ajax.imitationGlideAjaxResponse(response));
+      })["catch"](function (response) {
+      responseHandler({
+      "success": false,
+      "response": response
+      });
+      });
+      };
+
+      function createRequest(className) {
+      return new ConnectorAjax(className);
+      }
+
+      function setUserToken(token) {
+      tokenHolder.userToken = token;
+      }
+
+      function getUserToken() {
+      return tokenHolder.userToken;
+      }
+
+      return {
+      createRequest: createRequest,
+      setUserToken: setUserToken,
+      getUserToken: getUserToken
+      };
+      }
+      ;// CONCATENATED MODULE: ./awsComponents/requestServiceProvider/requestService.js
+      function requestServiceProvider() {
+      return {
+      $get: ['$q', function ($q) {
+      return new RequestServiceAPI($q);
+      }]
+      };
+      }
+
+      function RequestServiceAPI($q) {
+      function makeRequest(request) {
+      var deferred = $q.defer();
+      request.getXML(function (response) {
+      if (!response.responseXML || !response.responseXML.documentElement.getAttribute("answer")) {
+      return deferred.reject("Unexpected response from the server");
+      }
+
+      var xmlResponseAnswer = response.responseXML.documentElement.getAttribute("answer");
+      var answer = JSON.parse(xmlResponseAnswer);
+
+      if (!answer.success) {
+      return deferred.reject(answer.message);
+      }
+
+      return deferred.resolve(answer);
+      });
+      return deferred;
+      }
+
+      return {
+      makeRequest: makeRequest
+      };
+      }
+      ;// CONCATENATED MODULE: ./awsComponents/accountProvider/account.provider.js
+      function accountProvider() {
+      return {
+      $get: ['requestService', 'connectorAjax', function (requestService, connectorAjax) {
+      return new AccountAPI(requestService, connectorAjax);
+      }]
+      };
+      }
+
+      function AccountAPI(requestService, connectorAjax) {
+      var promiseCache = {};
+
+      function cacheKey() {
+      var k = '';
+
+      for (var i = 0; i < arguments.length; i++) {
+      k += arguments[i];
+      }
+
+      return k;
+      }
+
+      function deleteProduct(productSysId) {
+      var req = connectorAjax.createRequest('x_126749_aws_sc.AwsAccountAjax');
+      req.addParam('sysparm_name', 'deleteProduct');
+      req.addParam('sysparm_product', productSysId);
+      return requestService.makeRequest(req).promise;
+      }
+
+      function deleteProvisioningArtifact(productSysId, provisioningArtifactSysId) {
+      var req = connectorAjax.createRequest('x_126749_aws_sc.AwsAccountAjax');
+      req.addParam('sysparm_name', 'deleteProvisioningArtifact');
+      req.addParam('sysparm_product', productSysId);
+      req.addParam('sysparm_provisioningArtifact', provisioningArtifactSysId);
+      return requestService.makeRequest(req).promise;
+      }
+
+      function describeProductAsAdmin(productSysId) {
+      var key = 'desc-prod-' + cacheKey.apply(null, arguments);
+
+      if (!(key in promiseCache)) {
+      var req = connectorAjax.createRequest('x_126749_aws_sc.AwsAccountAjax');
+      req.addParam('sysparm_name', 'describeProductAsAdmin');
+      req.addParam('sysparm_product', productSysId);
+      promiseCache[key] = requestService.makeRequest(req).promise;
+      }
+
+      return promiseCache[key];
+      }
+
+      function disassociateProductFromPortfolio(productSysId, portfolioSysId) {
+      var req = connectorAjax.createRequest('x_126749_aws_sc.AwsAccountAjax');
+      req.addParam('sysparm_name', 'disassociateProductFromPortfolio');
+      req.addParam('sysparm_product', productSysId);
+      req.addParam('sysparm_portfolio', portfolioSysId);
+      return requestService.makeRequest(req).promise;
+      }
+
+      function disassociateTagOptionFromProduct(productSysId, tagOptionSysId) {
+      var req = connectorAjax.createRequest('x_126749_aws_sc.AwsAccountAjax');
+      req.addParam('sysparm_name', 'disassociateTagOptionFromProduct');
+      req.addParam('sysparm_product', productSysId);
+      req.addParam('sysparm_tagOption', tagOptionSysId);
+      return requestService.makeRequest(req).promise;
+      }
+
+      function getInvokeWorkflowTaskStatus(workflow) {
+      var req = connectorAjax.createRequest('x_126749_aws_sc.AwsAccountAjax');
+      req.addParam('sysparm_name', 'getInvokeWorkflowTaskStatus');
+      req.addParam('sysparm_workflow', workflow);
+      return requestService.makeRequest(req).promise;
+      }
+
+      function listProductPortfolios(productSysId) {
+      var key = 'list-port-' + cacheKey.apply(null, arguments);
+
+      if (!(key in promiseCache)) {
+      var req = connectorAjax.createRequest('x_126749_aws_sc.AwsAccountAjax');
+      req.addParam('sysparm_name', 'listProductPortfolios');
+      req.addParam('sysparm_product', productSysId);
+      promiseCache[key] = requestService.makeRequest(req).promise;
+      }
+
+      return promiseCache[key];
+      }
+
+      function listResourceRelationships(productSysId) {
+      var key = 'list-rel-' + cacheKey.apply(null, arguments);
+
+      if (!(key in promiseCache)) {
+      var req = connectorAjax.createRequest('x_126749_aws_sc.AwsAccountAjax');
+      req.addParam('sysparm_name', 'listResourceRelationships');
+      req.addParam('sysparm_product', productSysId);
+      promiseCache[key] = requestService.makeRequest(req).promise;
+      }
+
+      return promiseCache[key];
+      }
+
+      return {
+      deleteProduct: deleteProduct,
+      deleteProvisioningArtifact: deleteProvisioningArtifact,
+      describeProductAsAdmin: describeProductAsAdmin,
+      disassociateProductFromPortfolio: disassociateProductFromPortfolio,
+      disassociateTagOptionFromProduct: disassociateTagOptionFromProduct,
+      getInvokeWorkflowTaskStatus: getInvokeWorkflowTaskStatus,
+      listProductPortfolios: listProductPortfolios,
+      listResourceRelationships: listResourceRelationships
+      };
+      }
+      ;// CONCATENATED MODULE: ./awsComponents/tagProvider/tag.provider.js
+      function tagProvider() {
+      return {
+      $get: ['requestService', 'connectorAjax', function (requestService, connectorAjax) {
+      return new TagAPI(requestService, connectorAjax);
+      }]
+      };
+      }
+
+      function TagAPI(requestService, connectorAjax) {
+      var promiseCache = {};
+
+      function cacheKey() {
+      var k = '';
+
+      for (var i = 0; i < arguments.length; i++) {
+      k += arguments[i];
+      }
+
+      return k;
+      }
+
+      function getSelectableTags(productId) {
+      var key = "selectable-tags";
+
+      if (!(key in promiseCache)) {
+      var req = connectorAjax.createRequest('x_126749_aws_sc.TagAjax');
+      req.addParam('sysparm_name', 'getSelectableTags');
+      req.addParam('sysparm_product_id', productId);
+      return requestService.makeRequest(req).promise;
+      }
+
+      return promiseCache[key];
+      }
+
+      function getSelectableTagValues(tagSysId, search) {
+      var key = "selectable-tag-values-".concat(cacheKey.apply(null, arguments));
+
+      if (!(key in promiseCache)) {
+      var req = connectorAjax.createRequest('x_126749_aws_sc.TagAjax');
+      req.addParam('sysparm_name', 'getSelectableTagValues');
+      req.addParam('sysparm_tagSysId', tagSysId);
+      req.addParam('sysparm_search', search);
+      return requestService.makeRequest(req).promise;
+      }
+
+      return promiseCache[key];
+      }
+
+      return {
+      getSelectableTags: getSelectableTags,
+      getSelectableTagValues: getSelectableTagValues
+      };
+      }
+      ;// CONCATENATED MODULE: ./awsComponents/ec2Provider/ec2.provider.js
+      function ec2Provider() {
+      return {
+      $get: ['requestService', 'connectorAjax', function (requestService, connectorAjax) {
+      return new Ec2API(requestService, connectorAjax);
+      }]
+      };
+      }
+
+      function Ec2API(requestService, connectorAjax) {
+      var promiseCache = {};
+
+      function cacheKey() {
+      var k = '';
+
+      for (var i = 0; i < arguments.length; i++) {
+      k += arguments[i];
+      }
+
+      return k;
+      }
+
+      function describeAvailabilityZones(productSysId, inputText, isAwsParameterLookup) {
+      var key = 'availability-zones' + productSysId + inputText;
+
+      if (key in promiseCache) {
+      return promiseCache[key];
+      }
+
+      var req = getRequest('describeAvailabilityZones', productSysId, inputText, isAwsParameterLookup);
+      promiseCache[key] = requestService.makeRequest(req).promise;
+      return promiseCache[key];
+      }
+
+      function describeKeyPairs(productSysId, inputText, isAwsParameterLookup) {
+      var key = 'key-pair' + productSysId + inputText;
+
+      if (key in promiseCache) {
+      return promiseCache[key];
+      }
+
+      var req = getRequest('describeKeyPairs', productSysId, inputText, isAwsParameterLookup);
+      promiseCache[key] = requestService.makeRequest(req).promise;
+      return promiseCache[key];
+      }
+
+      function describeSecurityGroups(productSysId, inputText, searchBy, isAwsParameterLookup) {
+      var key = 'security-groups' + searchBy + productSysId + inputText;
+
+      if (key in promiseCache) {
+      return promiseCache[key];
+      }
+
+      var req = getRequest('describeSecurityGroups', productSysId, inputText, isAwsParameterLookup);
+      req.addParam('sysparm_searchBy', searchBy);
+      promiseCache[key] = requestService.makeRequest(req).promise;
+      return promiseCache[key];
+      }
+
+      function describeVpcs(productSysId, inputText, isAwsParameterLookup) {
+      var key = 'vpcs' + productSysId + inputText;
+
+      if (key in promiseCache) {
+      return promiseCache[key];
+      }
+
+      var req = getRequest('describeVpcs', productSysId, inputText, isAwsParameterLookup);
+      promiseCache[key] = requestService.makeRequest(req).promise;
+      return promiseCache[key];
+      }
+
+      function describeSubnets(productSysId, inputText, isAwsParameterLookup) {
+      var key = 'subnets' + productSysId + inputText;
+
+      if (key in promiseCache) {
+      return promiseCache[key];
+      }
+
+      var req = getRequest('describeSubnets', productSysId, inputText, isAwsParameterLookup);
+      promiseCache[key] = requestService.makeRequest(req).promise;
+      return promiseCache[key];
+      }
+
+      function describeInstances(productSysId, inputText, isAwsParameterLookup) {
+      var key = 'instances' + productSysId + inputText;
+
+      if (key in promiseCache) {
+      return promiseCache[key];
+      }
+
+      var req = getRequest('describeInstances', productSysId, inputText, isAwsParameterLookup);
+      promiseCache[key] = requestService.makeRequest(req).promise;
+      return promiseCache[key];
+      }
+
+      function describeVolumes(productSysId, inputText, isAwsParameterLookup) {
+      var key = 'volumes' + productSysId + inputText;
+
+      if (key in promiseCache) {
+      return promiseCache[key];
+      }
+
+      var req = getRequest('describeVolumes', productSysId, inputText, isAwsParameterLookup);
+      promiseCache[key] = requestService.makeRequest(req).promise;
+      return promiseCache[key];
+      }
+
+      function getRequest(name, productSysId, inputText, isAwsParameterLookup) {
+      var req = connectorAjax.createRequest('x_126749_aws_sc.Ec2Ajax');
+      req.addParam('sysparm_name', name);
+      req.addParam('sysparm_productSysId', productSysId);
+      req.addParam('sysparm_search', inputText);
+      req.addParam('sysparm_awsParameterLookup', isAwsParameterLookup === true);
+      return req;
+      }
+
+      return {
+      describeAvailabilityZones: describeAvailabilityZones,
+      describeVpcs: describeVpcs,
+      describeInstances: describeInstances,
+      describeKeyPairs: describeKeyPairs,
+      describeSecurityGroups: describeSecurityGroups,
+      describeSubnets: describeSubnets,
+      describeVolumes: describeVolumes
+      };
+      }
+      ;// CONCATENATED MODULE: ./awsComponents/route53Provider/route53.provider.js
+      function route53Provider() {
+      return {
+      $get: ['requestService', 'connectorAjax', function (requestService, connectorAjax) {
+      return new Route53Ajax(requestService, connectorAjax);
+      }]
+      };
+      }
+
+      function Route53Ajax(requestService, connectorAjax) {
+      var promiseCache = {};
+
+      function listHostedZones(projectSysId, isAwsParameterLookup) {
+      var key = 'hosted-zone' + projectSysId;
+
+      if (key in promiseCache) {
+      return promiseCache[key];
+      }
+
+      var req = getRequest('listHostedZones', projectSysId, isAwsParameterLookup);
+      promiseCache[key] = requestService.makeRequest(req).promise;
+      return promiseCache[key];
+      }
+
+      function getRequest(name, productSysId, isAwsParameterLookup) {
+      var req = connectorAjax.createRequest('x_126749_aws_sc.Route53Ajax');
+      req.addParam('sysparm_name', name);
+      req.addParam('sysparm_productSysId', productSysId);
+      req.addParam('sysparm_awsParameterLookup', isAwsParameterLookup === true);
+      return req;
+      }
+
+      return {
+      listHostedZones: listHostedZones
+      };
+      }
+      ;// CONCATENATED MODULE: ./awsComponents/manageProduct/manageProduct_controller.js
+      function ManageProductController($scope, $q, account) {
+      var ctrl = this;
+      ctrl.loading = false;
+      ctrl.hasError = false;
+      /**
+      * Loads details of this product. It includes portfolios, tags, tags options and versions
+      */
+
+      ctrl.loadProductDetails = function () {
+      ctrl._resetError();
+
+      ctrl.loading = true;
+      ctrl.hasError = false;
+      $q.all([account.describeProductAsAdmin(ctrl.productSysId), account.listProductPortfolios(ctrl.productSysId)]).then(function (responses) {
+      if (responses.some(function (response) {
+      return !response.success;
+      })) {
+      throw new Error(responses.find(function (response) {
+      return !response.success;
+      }).message);
+      } // response[0] contains the response from the first promise. response[1] contains the second
+
+
+      ctrl.product = responses[0].result;
+      ctrl.product.portfolios = responses[1].result.portfolios;
+      })["catch"](function (error) {
+      ctrl.hasError = true;
+
+      ctrl._addError(error);
+      })["finally"](function () {
+      ctrl.loading = false;
+      });
+      };
+
+      ctrl.deleteProduct = function () {
+      var message = ['<p><b>Deleting this product will also do the following</b>:<ul>', '<li>remove the product from all AWS Service Catalog portfolios</li>', '<li>delete all product versions in AWS Service Catalog</li>', '<li>delete all associated tags in AWS Service Catalog</li>', '<li>disassociate the product from all AWS Service Catalog tag options</li>', '</ul></p>', '<p>Are you sure you want to continue?</p>'].join('');
+      var modal = new GlideModal('glide_confirm_basic');
+      modal.setTitle("Delete ".concat(ctrl.product.ProductViewDetail.ProductViewSummary.Name));
+      modal.setPreference('warning', true);
+      modal.setPreference('title', message); // We've written `() => { ctrl.onDelete() }` rather than simply `ctrl.onDelete` because
+      // modal.render() triggers an AJAX request that includes the full body of the onPromptComplete
+      // function and (through painful experimentation) we found that when, as in _onDelete, the
+      // function contains the character '<' the server throws a NullPointerException and the modal
+      // is not rendered!
+
+      modal.setPreference('onPromptComplete', function () {
+      return ctrl._onDelete();
+      });
+      modal.render();
+      };
+
+      ctrl.isProductSharedWithAccount = function () {
+      return ctrl.product && ctrl.product.portfolios && ctrl.product.portfolios.length > 0 && ctrl.product.portfolios[0].Type.toLocaleLowerCase() === 'shared';
+      };
+
+      ctrl._addError = function (error) {
+      if (ctrl.onError) {
+      ctrl.onError({
+      error: error
+      });
+      }
+      };
+
+      ctrl._resetError = function () {
+      if (ctrl.resetErrors) {
+      ctrl.resetErrors();
+      }
+      };
+
+      function waitForTaskCompletion(promise) {
+      var deferred = $q.defer();
+      promise.then(function (response) {
+      var result = response.result;
+
+      if (!result.active) {
+      deferred.resolve(result);
+      } else {
+      setTimeout(function () {
+      var poll = account.getInvokeWorkflowTaskStatus(result.sys_id);
+      deferred.resolve(waitForTaskCompletion(poll));
+      }, 1000);
+      }
+      })["catch"](function (e) {
+      deferred.reject(e);
+      });
+      return deferred.promise;
+      }
+
+      ctrl._onDelete = function () {
+      ctrl._resetError();
+
+      ctrl.deleting = true;
+      var name = ctrl.product.ProductViewDetail.ProductViewSummary.Name;
+      new GlideForm().addInfoMessage("Deleting ".concat(name, " ..."));
+      waitForTaskCompletion(account.deleteProduct(ctrl.productSysId)).then(function (response) {
+      var opResult = response.result;
+
+      if (opResult === "success") {
+      var href = '/nav_to.do?uri=%2Fx_126749_aws_sc_product_list.do';
+      var msg = "Product ".concat(name, " has been deleted! <a href=\"#\" onclick=\"top.window.location.href='").concat(href, "'\">View all products</a>");
+      new GlideForm().addInfoMessage(msg);
+      } else {
+      var _msg = "Product ".concat(name, " could not be deleted. Please try again or contact your system administrator if this problem persists.");
+
+      new GlideForm().addErrorMessage(_msg);
+      }
+      })["catch"](function (error) {
+      ctrl._addError(error);
+
+      ctrl.deleting = false;
+      });
+      };
+
+      $scope.$watchGroup(['ctrl.loadOn', 'ctrl.productSysId'], ctrl.loadProductDetails);
+      }
+      ;// CONCATENATED MODULE: ./awsComponents/manageProduct/manageProduct_template.html
+      // Module
+      var manageProduct_template_code = "<style scoped>.table .checkbox{margin:0}section{padding-top:15px}section .table{margin-bottom:0}section .table th:first-child{width:30%}section .table-footer{background-color:#f5f5f5;padding:10px;border-top:1px solid #e3e3e3;margin-bottom:20px}</style> <h1 ng-if=\"ctrl.loading && !ctrl.hasError\">Loading ...</h1> <div ng-if=\"ctrl.product && !ctrl.loading && !ctrl.hasError\"> <h1 class=\"form-inline\"> Manage product: {{ctrl.product.ProductViewDetail.ProductViewSummary.Name}} </h1> <p class=\"lead\">Owned by {{ctrl.product.ProductViewDetail.ProductViewSummary.Owner}}</p> <p>{{ctrl.product.ProductViewDetail.ProductViewSummary.ShortDescription}}</p> <section> <header> <h3>Portfolios</h3> </header> <p ng-if=\"!ctrl.product.portfolios || ctrl.product.portfolios.length === 0\"> <em>This product is not attached to any portfolio</em> </p> <div ng-if=\"ctrl.product.portfolios.length > 0\"> <table class=\"table\"> <thead> <tr> <th>Name</th> <th>Description</th> </tr> </thead> <tbody> <tr ng-repeat=\"portfolio in ctrl.product.portfolios | orderBy:'DisplayName' track by portfolio.ARN\"> <td> <strong>{{portfolio.DisplayName}}</strong> </td> <td> <em>{{portfolio.Description}}</em> </td> </tr> </tbody> </table> </div> </section> <section> <header> <h3>Versions</h3> </header> <p ng-if=\"!ctrl.product.ProvisioningArtifactSummaries || ctrl.product.ProvisioningArtifactSummaries.length === 0\"> <em>This product has no versions.</em> </p> <div ng-if=\"ctrl.product.ProvisioningArtifactSummaries.length > 0\"> <table class=\"table\"> <thead> <tr> <th>Name</th> <th>Description</th> </tr> </thead> <tbody> <tr ng-repeat=\"version in ctrl.product.ProvisioningArtifactSummaries | orderBy:'Name' track by version.Id\"> <td> <strong>{{version.Name}}</strong> </td> <td> <em>{{version.Description}}</em> </td> </tr> </tbody> </table> </div> </section> <section> <header> <h3>Tags</h3> </header> <p ng-if=\"!ctrl.product.Tags || ctrl.product.Tags.length === 0\"> <em>This product has no tags.</em> </p> <div ng-if=\"ctrl.product.Tags.length > 0\"> <table class=\"table\"> <thead> <tr> <th>Key</th> <th>Value</th> </tr> </thead> <tbody> <tr ng-repeat=\"tag in ctrl.product.Tags | orderBy:'Key' track by tag.Key\"> <td> <strong>{{tag.Key}}</strong> </td> <td> <code>{{tag.Value}}</code> </td> </tr> </tbody> </table> </div> </section> <section> <header> <h3>Tag Options</h3> </header> <p ng-if=\"!ctrl.product.TagOptions || ctrl.product.TagOptions.length === 0\"> <em>This product has no tag options.</em> </p> <div ng-if=\"ctrl.product.TagOptions.length > 0\"> <table class=\"table\"> <thead> <tr> <th>Key</th> <th>Value</th> </tr> </thead> <tbody> <tr ng-repeat=\"tagOption in ctrl.product.TagOptions | orderBy:['Key','Value'] track by tagOption.Id\" ng-class=\"{'text-muted': !tagOption.Active}\"> <td> <strong>{{tagOption.Key}}</strong> <span ng-if=\"!tagOption.Active\">(Inactive)</span> </td> <td> <code>{{tagOption.Value}}</code> </td> </tr> </tbody> </table> </div> </section> <section> <hr> <button class=\"btn btn-danger\" ng-click=\"ctrl.deleteProduct()\" ng-if=\"!ctrl.isProductSharedWithAccount()\" ng-disabled=\"ctrl.deleting\"> Delete Product </button> <p ng-if=\"ctrl.isProductSharedWithAccount()\"> <em>This product cannot be deleted because it is shared to {{ctrl.account.AccountName}} from another account.</em> </p> </section> </div> ";
+      // Exports
+      /* harmony default export */ const manageProduct_template = (manageProduct_template_code);
+      ;// CONCATENATED MODULE: ./awsComponents/manageProduct/manageProduct.js
+      function manageProduct_defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+      function manageProduct_createClass(Constructor, protoProps, staticProps) { if (protoProps) manageProduct_defineProperties(Constructor.prototype, protoProps); if (staticProps) manageProduct_defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+      function manageProduct_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+
+
+      /**
+      * A directive to render the form with the inputs to capture the details of what product actions the user wants to execute.
+      * This directive doesn't have any knowledge of any custom integration hooks on the page it is embedded in,
+      * such as hidden fields.
+      */
+
+      var ManageProduct = /*#__PURE__*/manageProduct_createClass(function ManageProduct() {
+      manageProduct_classCallCheck(this, ManageProduct);
+
+      return {
+      restrict: 'E',
+      scope: {},
+      controller: ['$scope', '$q', 'account', ManageProductController],
+      controllerAs: 'ctrl',
+      bindToController: {
+      /**
+      * The sys_id of the product catalog item
+      */
+      productSysId: '=',
+
+      /**
+      A callback function which will be supplied any errors that the form detects
+      It must have signature fn(errs) where errs is a list of error strings.
+      */
+      onError: '&',
+
+      /**
+      A callback function which will reset any errors already displayed.
+      */
+      resetErrors: '&'
+      },
+      template: manageProduct_template
+      };
+      });
+
+
+      ;// CONCATENATED MODULE: ./awsComponents/integer/integer.js
+      function integer_defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+      function integer_createClass(Constructor, protoProps, staticProps) { if (protoProps) integer_defineProperties(Constructor.prototype, protoProps); if (staticProps) integer_defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+      function integer_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+      var Integer = /*#__PURE__*/integer_createClass(function Integer() {
+      integer_classCallCheck(this, Integer);
+
+      var INTEGER_REGEXP = /^-?\d+$/;
+      return {
+      require: 'ngModel',
+      link: function link(scope, elm, attrs, ctrl) {
+      ctrl.$validators.integer = function (modelValue, viewValue) {
+      if (scope.$eval(attrs.integer) === false) {
+      // consider integer="false" as disabling the check, so valid
+      return true;
+      }
+
+      if (ctrl.$isEmpty(modelValue)) {
+      // consider empty models to be valid
+      return true;
+      }
+
+      if (INTEGER_REGEXP.test(viewValue)) {
+      // it is valid
+      return true;
+      } // it is invalid
+
+
+      return false;
+      };
+      }
+      };
+      });
+
+
+      ;// CONCATENATED MODULE: ./awsComponents/stackSet/stackSet_controller.js
+      function StackSetController($scope, $q, productAspect) {
+      var ctrl = this;
+      ctrl.types = ['number', 'percentage'];
+      ctrl.states = {
+      LOADING: 0,
+      LOADED: 1,
+      ERROR: 2
+      };
+      ctrl.accounts = [];
+      ctrl.regions = [];
+      ctrl.type = {
+      concurrentAccounts: ctrl.types[0],
+      failureTolerance: ctrl.types[0]
+      };
+      ctrl.state = ctrl.states.LOADING;
+      $scope.$watchGroup(['ctrl.loadOn', 'ctrl.productSysId', 'ctrl.launchOption', 'ctrl.productVersion', 'ctrl.provisionedProductSysId'], function () {
+      ctrl.loadConstraints();
+      });
+      $scope.$watch('ctrl.concurrentAccounts', function () {
+      if (ctrl.hasStackSetConstraints()) {
+      if (ctrl.type.concurrentAccounts === ctrl.types[0]) {
+      ctrl.provisioningPreferences.StackSetMaxConcurrencyCount = ctrl.concurrentAccounts;
+      delete ctrl.provisioningPreferences.StackSetMaxConcurrencyPercentage;
+      }
+
+      if (ctrl.type.concurrentAccounts === ctrl.types[1]) {
+      ctrl.provisioningPreferences.StackSetMaxConcurrencyPercentage = ctrl.concurrentAccounts;
+      delete ctrl.provisioningPreferences.StackSetMaxConcurrencyCount;
+      }
+      }
+      });
+      $scope.$watch('ctrl.failureTolerance', function () {
+      if (ctrl.hasStackSetConstraints()) {
+      if (ctrl.type.failureTolerance === ctrl.types[0]) {
+      ctrl.provisioningPreferences.StackSetFailureToleranceCount = ctrl.failureTolerance;
+      delete ctrl.provisioningPreferences.StackSetFailureTolerancePercentage;
+      }
+
+      if (ctrl.type.failureTolerance === ctrl.types[1]) {
+      ctrl.provisioningPreferences.StackSetFailureTolerancePercentage = ctrl.failureTolerance;
+      delete ctrl.provisioningPreferences.StackSetFailureToleranceCount;
+      }
+      }
+      });
+
+      ctrl.loadConstraints = function ($event) {
+      if ($event) {
+      $event.stopPropagation();
+      $event.preventDefault();
+      }
+
+      if (!ctrl.launchOption || !ctrl.productVersion) {
+      return;
+      }
+
+      resetErrors();
+      ctrl.constraintSummaries = null;
+      ctrl.state = ctrl.states.LOADING;
+      productAspect.getProvisioningParameters(ctrl.productSysId, ctrl.launchOption, ctrl.productVersion, ctrl.provisionedProductSysId).then(function (response) {
+      ctrl.state = ctrl.states.LOADED;
+      ctrl.constraintSummaries = response.result.ConstraintSummaries;
+
+      if (ctrl.hasStackSetConstraints()) {
+      var provisioningPreferences = response.result.ProvisioningArtifactPreferences;
+      ctrl.provisioningPreferences = provisioningPreferences;
+      ctrl.accounts = Array.from(provisioningPreferences.StackSetAccounts);
+      ctrl.regions = Array.from(provisioningPreferences.StackSetRegions);
+      }
+
+      $scope.$applyAsync(function () {
+      ctrl.form.$setDirty();
+      });
+      })["catch"](function (err) {
+      $scope.$applyAsync(function () {
+      ctrl.state = ctrl.states.ERROR;
+      onError(err);
+      });
+      });
+      };
+
+      ctrl.getMax = function (field) {
+      return ctrl.type[field] === ctrl.types[0] ? ctrl.provisioningPreferences.StackSetAccounts ? ctrl.provisioningPreferences.StackSetAccounts.length : 0 : 100;
+      };
+
+      ctrl.hasStackSetConstraints = function () {
+      return ctrl.state === ctrl.states.LOADED && ctrl.constraintSummaries.some(function (summary) {
+      return summary.Type === 'STACKSET';
+      });
+      };
+
+      ctrl.toggleAccount = function (account) {
+      var index = ctrl.provisioningPreferences.StackSetAccounts.indexOf(account);
+
+      if (index > -1) {
+      ctrl.provisioningPreferences.StackSetAccounts.splice(index, 1);
+      } else {
+      ctrl.provisioningPreferences.StackSetAccounts.push(account);
+      }
+      };
+
+      ctrl.toggleRegion = function (region) {
+      var index = ctrl.provisioningPreferences.StackSetRegions.indexOf(region);
+
+      if (index > -1) {
+      ctrl.provisioningPreferences.StackSetRegions.splice(index, 1);
+      } else {
+      ctrl.provisioningPreferences.StackSetRegions.push(region);
+      }
+      };
+
+      function onError(error) {
+      if (ctrl.onError) {
+      ctrl.onError.call(null, {
+      error: error
+      });
+      }
+      }
+
+      function resetErrors() {
+      if (ctrl.resetErrors) {
+      ctrl.resetErrors.call();
+      }
+      }
+      }
+      ;// CONCATENATED MODULE: ./awsComponents/stackSet/stackSet_template.html
+      // Module
+      var stackSet_template_code = "<div class=\"row\" ng-if=\"!ctrl.hasStackSetConstraints()\"> <div class=\"col-sm-12\"> <p ng-if=\"ctrl.state === ctrl.states.ERROR\">Could not retrieve constraints for this product <button ng-click=\"ctrl.loadConstraints($event)\">Retry</button></p> </div> </div> <div ng-if=\"ctrl.hasStackSetConstraints()\"> <div class=\"row\"> <div class=\"col-sm-12\"> <h3>StackSet Preferences <small class=\"icon-required text-danger\"></small></h3> </div> </div> <div class=\"row\"> <div class=\"col-sm-12\"> <p> An AWS Service Catalog StackSet enables provisioning of products in one or more regions and one or more accounts. This product will be launched into the following accounts: </p> <table class=\"table\"> <thead> <tr> <td>Account</td> <td>Region</td> </tr> </thead> <tbody> <tr ng-repeat=\"account in ctrl.accounts track by account\"> <td> <div class=\"checkbox\"> <label> <input type=\"checkbox\" ng-checked=\"ctrl.provisioningPreferences.StackSetAccounts.includes(account)\" ng-click=\"ctrl.toggleAccount(account)\"/> {{account}} </label> </div> </td> <td> <div class=\"checkbox\" ng-repeat=\"region in ctrl.regions track by region\"> <label> <input type=\"checkbox\" ng-disabled=\"!ctrl.provisioningPreferences.StackSetAccounts.includes(account)\" ng-checked=\"ctrl.provisioningPreferences.StackSetRegions.includes(region)\" ng-click=\"ctrl.toggleRegion(region)\"/> {{region}} </label> </div> </td> </tr> </tbody> </table> <div class=\"alert alert-danger\" ng-if=\"ctrl.provisioningPreferences.StackSetAccounts.length < 1\">At least one account must be selected.</div> <div class=\"alert alert-danger\" ng-if=\"ctrl.provisioningPreferences.StackSetRegions.length < 1\">At least one region must be selected.</div> </div> </div> <div class=\"form-group\" ng-class=\"{'has-error': ctrl.form.concurrentAccounts.$invalid && (ctrl.form.concurrentAccounts.$touched || ctrl.form.concurrentAccounts.$dirty)}\"> <div class=\"row\"> <label for=\"concurrentAccount\" class=\"col-sm-2 control-label\">Maximum concurrent accounts</label> <div class=\"col-sm-10\"> <div class=\"input-group\"> <input type=\"number\" name=\"concurrentAccounts\" class=\"form-control\" id=\"concurrentAccount\" ng-model=\"ctrl.concurrentAccounts\" ng-disabled=\"ctrl.inputsDisabled || ctrl.provisioningPreferences.StackSetAccounts.length < 1\" min=\"1\" max=\"{{ctrl.getMax('concurrentAccounts')}}\" required integer/> <div class=\"input-group-btn\"> <button ng-disabled=\"ctrl.inputsDisabled\" type=\"button\" class=\"btn btn-default dropdown-toggle\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">By {{ctrl.type.concurrentAccounts}} <span class=\"caret\"></span></button> <ul class=\"dropdown-menu dropdown-menu-right\"> <li ng-repeat=\"option in ctrl.types track by option\"> <a href=\"#\" ng-click=\"ctrl.type.concurrentAccounts = option; $event.preventDefault();\">By {{option}}</a> </li> </ul> </div> </div> <span class=\"help-block\"> Number of accounts per region to which you can deploy products at one time. For 'By number' the minimum is 1 and the maximum is the number of accounts. For 'By percentage' the minimum is 1 and the maximum is 100. </span> <div class=\"alert alert-danger\" ng-if=\"ctrl.form.concurrentAccounts.$invalid && (ctrl.form.concurrentAccounts.$touched || ctrl.form.concurrentAccounts.$dirty)\"> <p ng-if=\"ctrl.form.concurrentAccounts.$error.min || ctrl.form.concurrentAccounts.$error.max\"> The value must be <ng-pluralize count=\"ctrl.getMax('concurrentAccounts')\" when=\"{'one': 'exactly 1',\n                                           'other': 'between 1 and {}'}\"></ng-pluralize> </p> <p ng-if=\"ctrl.form.concurrentAccounts.$error.integer\"> The value must be an integer </p> <p ng-if=\"ctrl.form.concurrentAccounts.$error.required\"> This field is required </p> </div> </div> </div> </div> <div class=\"form-group\" ng-class=\"{'has-error': ctrl.form.failureTolerance.$invalid && (ctrl.form.failureTolerance.$touched || ctrl.form.failureTolerance.$dirty)}\"> <div class=\"row\"> <label for=\"failureTolerance\" class=\"col-sm-2 control-label\">Failure tolerance</label> <div class=\"col-sm-10\"> <div class=\"input-group\"> <input type=\"number\" name=\"failureTolerance\" class=\"form-control\" id=\"failureTolerance\" ng-model=\"ctrl.failureTolerance\" ng-disabled=\"ctrl.inputsDisabled || ctrl.provisioningPreferences.StackSetAccounts.length < 1\" min=\"0\" max=\"{{ctrl.getMax('failureTolerance')}}\" required integer/> <div class=\"input-group-btn\"> <button ng-disabled=\"ctrl.inputsDisabled\" type=\"button\" class=\"btn btn-default dropdown-toggle\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">By {{ctrl.type.failureTolerance}} <span class=\"caret\"></span></button> <ul class=\"dropdown-menu dropdown-menu-right\"> <li ng-repeat=\"option in ctrl.types track by option\"> <a href=\"#\" ng-click=\"ctrl.type.failureTolerance = option; $event.preventDefault();\">By {{option}}</a> </li> </ul> </div> </div> <span class=\"help-block\"> Number of accounts, per region, for which deployments can fail before CloudFormation stops the operation in that region. If CloudFormation stops the operation in one region, it does not continue in other regions. For 'By number' the minimum is 0 and the maximum is the number of accounts. For 'By percentage' the minimum is 0 and the maximum is 100. </span> <div class=\"alert alert-danger\" ng-if=\"ctrl.form.failureTolerance.$invalid && (ctrl.form.failureTolerance.$touched || ctrl.form.failureTolerance.$dirty)\"> <p ng-if=\"ctrl.form.failureTolerance.$error.min || ctrl.form.failureTolerance.$error.max\"> The value must be between 0 and {{ctrl.getMax('failureTolerance')}} </p> <p ng-if=\"ctrl.form.failureTolerance.$error.integer\"> The value must be an integer </p> <p ng-if=\"ctrl.form.failureTolerance.$error.required\"> This field is required </p> </div> </div> </div> </div> </div> ";
+      // Exports
+      /* harmony default export */ const stackSet_template = (stackSet_template_code);
+      ;// CONCATENATED MODULE: ./awsComponents/stackSet/stackSet.js
+      function stackSet_defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+      function stackSet_createClass(Constructor, protoProps, staticProps) { if (protoProps) stackSet_defineProperties(Constructor.prototype, protoProps); if (staticProps) stackSet_defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+      function stackSet_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+
+
+
+      var StackSet = /*#__PURE__*/stackSet_createClass(function StackSet() {
+      stackSet_classCallCheck(this, StackSet);
+
+      return {
+      scope: {},
+      controller: ['$scope', '$q', 'productAspect', StackSetController],
+      controllerAs: 'ctrl',
+      bindToController: {
+      /**
+      * The sys_id of the product catalog item
+      */
+      productSysId: '=',
+
+      /**
+      * The launch option
+      */
+      launchOption: '=',
+
+      /**
+      * The product version
+      */
+      productVersion: '=',
+
+      /**
+      * Optional. The provisioned product sys_id, where the directive is used with a provisioned product.
+      */
+      provisionedProductSysId: '=',
+
+      /**
+      * The provisioning preferences object to update
+      */
+      provisioningPreferences: '=',
+
+      /**
+      * The form controller for the form holding this directive
+      */
+      form: '=',
+
+      /**
+      * An arbitrary object that this controller will watch in order to reload provisioning artifact parameters,
+      * in addition to identity and session id.
+      */
+      loadOn: '=',
+
+      /**
+      * Callback to be supplied an error object upon an error in operation.
+      * The function is invoked with one argument that must be named "err".
+      */
+      onError: '&',
+
+      /**
+      * A reference to a boolean flag to indicate whether inputs are disabled or not.
+      */
+      inputsDisabled: '='
+      },
+      template: stackSet_template
+      };
+      });
+
+
+      ;// CONCATENATED MODULE: ./awsComponents/plan/plan_controller.js
+      var EVENT_ON_PLAN_CREATING = 'on.plan.creating';
+      var EVENT_ON_PLAN_CREATING_FAILED = 'on.plan.creating.failed';
+      var EVENT_ON_PLAN_CREATED = 'on.plan.created';
+      var EVENT_ON_PLAN_DELETING = 'on.plan.deleting';
+      var EVENT_ON_PLAN_DELETING_FAILED = 'on.plan.deleting.failed';
+      var EVENT_ON_PLAN_DELETED = 'on.plan.deleted';
+      function PlanController($rootScope, $scope, $q, $timeout, provisionedProduct) {
+      var ctrl = this;
+      var idempotencyToken = Math.random().toString(36).substring(2);
+      var iteration = 0;
+      var planSysId = null;
+      var planProvisionedProductSysId = null;
+      ctrl.states = {
+      NO_PLAN: 0,
+      LOADED: 1,
+      ERROR: 2,
+      CREATE_IN_PROGRESS: 3,
+      DELETE_IN_PROGRESS: 4
+      };
+      ctrl.state = ctrl.states.NO_PLAN;
+      $scope.$on('on.update.executing', function (event, isExecuting) {
+      ctrl.isUpdateExecuting = isExecuting;
+      });
+
+      ctrl.createPlan = function () {
+      $rootScope.$broadcast(EVENT_ON_PLAN_CREATING, planProvisionedProductSysId);
+      ctrl.inputsDisabled = true;
+      ctrl.state = ctrl.states.CREATE_IN_PROGRESS;
+      var planParameters = {
+      IdempotencyToken: idempotencyToken,
+      PathId: ctrl.productModel.launchOption,
+      ProvisionedProductName: ctrl.productModel.name,
+      ProvisioningArtifactId: ctrl.productModel.productVersion,
+      ProvisioningParameters: ctrl.productModel.params.map(function (param) {
+      delete param.IsNoEcho;
+      return param;
+      }),
+      Tags: ctrl.productModel.tags
+      };
+      provisionedProduct.createPlan(ctrl.provisionedProductSysId, ctrl.productSysId, planParameters, true).then(function (response) {
+      planSysId = response.result.planSysId;
+      planProvisionedProductSysId = response.result.provisionedProductSysId;
+
+      if (ctrl.onPlanCreating) {
+      ctrl.onPlanCreating({
+      planSysId: planSysId,
+      provisionedProductSysId: planProvisionedProductSysId
+      });
+      }
+
+      ctrl.loadPlan();
+      })["catch"](function (error) {
+      $rootScope.$broadcast(EVENT_ON_PLAN_CREATING_FAILED, planProvisionedProductSysId);
+      ctrl.inputsDisabled = false;
+      ctrl.state = ctrl.states.NO_PLAN;
+      onError(error);
+      });
+      };
+
+      ctrl.deletePlan = function ($event) {
+      $rootScope.$broadcast(EVENT_ON_PLAN_DELETING, planProvisionedProductSysId, planSysId);
+
+      if ($event) {
+      $event.preventDefault();
+      $event.stopPropagation();
+      }
+
+      var oldState = ctrl.state;
+      ctrl.state = ctrl.states.DELETE_IN_PROGRESS;
+      provisionedProduct.deletePlan(planProvisionedProductSysId, ctrl.productSysId).then(function (response) {
+      $rootScope.$broadcast(EVENT_ON_PLAN_DELETED, planProvisionedProductSysId, planSysId);
+      idempotencyToken = Math.random().toString(36).substring(2);
+      planSysId = null;
+      planProvisionedProductSysId = null;
+      iteration = 0;
+      ctrl.state = ctrl.states.NO_PLAN;
+      ctrl.inputsDisabled = false;
+
+      if (ctrl.onPlanDeleted) {
+      ctrl.onPlanDeleted();
+      }
+      })["catch"](function (error) {
+      $rootScope.$broadcast(EVENT_ON_PLAN_DELETING_FAILED, planProvisionedProductSysId, planSysId);
+      onError(error);
+      ctrl.state = oldState;
+      });
+      };
+
+      ctrl.loadPlan = function () {
+      if (!planSysId) {
+      ctrl.state = ctrl.states.NO_PLAN;
+      return;
+      }
+
+      provisionedProduct.loadPlan(planProvisionedProductSysId, ctrl.productSysId).then(function (response) {
+      ctrl.plan = response.result;
+
+      if (!ctrl.plan) {
+      ctrl.state = ctrl.states.NO_PLAN;
+      return;
+      }
+
+      ctrl.planStatus = ctrl.plan.ProvisionedProductPlanDetails.Status;
+
+      if (isPlanIsProgress()) {
+      ctrl.state = ctrl.states.CREATE_IN_PROGRESS;
+      var timeout = Math.min(2 + 2 * iteration, 15);
+      $timeout(function () {
+      iteration++;
+      ctrl.loadPlan();
+      }, timeout * 1000);
+      } else {
+      $rootScope.$broadcast(EVENT_ON_PLAN_CREATED, planProvisionedProductSysId, planSysId);
+      ctrl.state = ctrl.states.LOADED;
+
+      if (ctrl.onPlanCreated) {
+      ctrl.onPlanCreated({
+      planSysId: planSysId,
+      provisionedProductSysId: planProvisionedProductSysId
+      });
+      }
+      }
+      })["catch"](function (error) {
+      $scope.$applyAsync(function () {
+      ctrl.state = ctrl.states.ERROR;
+      onError(error);
+      });
+      });
+      };
+
+      function isPlanIsProgress() {
+      if (!ctrl.plan) {
+      return false;
+      }
+
+      var status = ctrl.plan.ProvisionedProductPlanDetails.Status;
+      return status === 'CREATE_IN_PROGRESS' || status === 'EXECUTE_IN_PROGRESS';
+      }
+
+      function onError(error) {
+      if (ctrl.onError) {
+      ctrl.onError.call(null, {
+      err: error
+      });
+      }
+      }
+      }
+      ;// CONCATENATED MODULE: ./awsComponents/plan/plan_template.html
+      // Module
+      var plan_template_code = "<div class=\"row\" ng-hide=\"!ctrl.plansVisible\"> <div class=\"col-sm-12\"> <h3>Resource Changes (Optional)</h3> <p> You can create a plan to preview what resources will be created when you place your order, or which resources will change if you request an update. <a href=\"https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-changesets-create.html\" target=\"_blank\">Learn more here</a>. </p> </div> <div class=\"col-sm-12\" ng-if=\"ctrl.state === ctrl.states.CREATE_IN_PROGRESS\"> <h4 ng-switch=\"ctrl.planStatus\"> <span class=\"icon-loading\"></span> <span ng-switch-when=\"EXECUTE_IN_PROGRESS\">A plan is currently being executed. This will refresh once done.</span> <span ng-switch-default>A plan is currently being created. This will refresh once done.</span> </h4> </div> <div class=\"col-sm-12\" ng-if=\"ctrl.state === ctrl.states.LOADED && ctrl.planStatus === 'CREATE_FAILED'\"> <div class=\"alert alert-warning\"> <p><strong>Plan creation failed</strong></p> <p>{{ctrl.plan.ProvisionedProductPlanDetails.StatusMessage}}</p> </div> </div> <div class=\"col-sm-12\" ng-if=\"ctrl.state === ctrl.states.LOADED && ctrl.planStatus === 'CREATE_SUCCESS'\"> <p>Created on <samp>{{ctrl.plan.ProvisionedProductPlanDetails.CreatedTime | date:'medium'}}</samp></p> <p ng-if=\"ctrl.plan.ResourceChanges.length === 0\"> The plan will cause no resource changes. </p> <table class=\"table\" ng-if=\"ctrl.plan.ResourceChanges.length > 0\"> <thead> <tr> <th>Action</th> <th>Logical ID</th> <th>AWS resource type</th> <th>Replacement?</th> </tr> </thead> <tbody> <tr ng-repeat=\"change in ctrl.plan.ResourceChanges track by change.LogicalResourceId\"> <td> <span class=\"label\" ng-class=\"{'label-success': change.Action.toLocaleLowerCase() === 'add',\n                                     'label-danger': change.Action.toLocaleLowerCase() === 'delete',\n                                     'label-warning': change.Action.toLocaleLowerCase() === 'modify'}\"> {{change.Action}} </span> </td> <td>{{change.LogicalResourceId}}</td> <td>{{change.ResourceType}}</td> <td>{{change.Replacement}}</td> </tr> </tbody> </table> </div> <div class=\"col-sm-12\" ng-if=\"ctrl.state === ctrl.states.NO_PLAN\"> <button type=\"button\" class=\"btn btn-primary\" ng-click=\"ctrl.createPlan()\" ng-disabled=\"ctrl.form.$invalid\"> Create plan </button> </div> <div class=\"col-sm-12\" ng-if=\"ctrl.state === ctrl.states.LOADED || ctrl.state === ctrl.states.DELETE_IN_PROGRESS\"> <button type=\"button\" class=\"btn btn-danger\" ng-click=\"ctrl.deletePlan()\" ng-disabled=\"ctrl.state === ctrl.states.DELETE_IN_PROGRESS || ctrl.isUpdateExecuting\"> {{ctrl.state === ctrl.states.DELETE_IN_PROGRESS ? 'Deleting ...' : 'Delete plan'}} </button> </div> </div> ";
+      // Exports
+      /* harmony default export */ const plan_template = (plan_template_code);
+      ;// CONCATENATED MODULE: ./awsComponents/plan/plan.js
+      function plan_defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+      function plan_createClass(Constructor, protoProps, staticProps) { if (protoProps) plan_defineProperties(Constructor.prototype, protoProps); if (staticProps) plan_defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+      function plan_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+
+
+
+      var Plan = /*#__PURE__*/plan_createClass(function Plan() {
+      plan_classCallCheck(this, Plan);
+
+      return {
+      scope: {},
+      controller: ['$rootScope', '$scope', '$q', '$timeout', 'provisionedProduct', PlanController],
+      controllerAs: 'ctrl',
+      bindToController: {
+      /**
+      * The sys_id of the product catalog item
+      */
+      productSysId: '=?',
+
+      /**
+      * The provisioned product sys_id, where the directive is used with a provisioned product.
+      */
+      provisionedProductSysId: '=',
+
+      /**
+      * The model that holds all data about the current form values
+      */
+      productModel: '=',
+
+      /**
+      * A reference to a boolean flag to indicate whether inputs are disabled or not.
+      */
+      inputsDisabled: '=?',
+
+      /**
+      * A reference to a boolean flag to indicate whether the plans section is visible or not.
+      */
+      plansVisible: '=',
+
+      /**
+      * The form controller for the form holding this directive
+      */
+      form: '=?',
+
+      /**
+      * Callback that will be invoked when a request to create a plan on AWS is made successfully.
+      * The function is invoked with two arguments, named "planSysId" and
+      * "provisionedProductSysId" respectively.
+      */
+      onPlanCreating: '&?',
+
+      /**
+      * Callback that will be invoked when a plan is created.
+      * The function is invoked with two arguments, named "planSysId" and
+      * "provisionedProductSysId" respectively.
+      */
+      onPlanCreated: '&?',
+
+      /**
+      * Callback that will be invoked when a plan is deleted.
+      * The function is invoked with zero arguments.
+      */
+      onPlanDeleted: '&?',
+
+      /**
+      * Callback to be supplied an error object upon an error in operation.
+      * The function is invoked with one argument that must be named "err".
+      */
+      onError: '&?'
+      },
+      template: plan_template
+      };
+      });
+
+
+      ;// CONCATENATED MODULE: ./awsComponents/customizeDocumentForm/customizeDocumentForm_controller.js
+      function customizeDocumentForm_controller_typeof(obj) { "@babel/helpers - typeof"; return customizeDocumentForm_controller_typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, customizeDocumentForm_controller_typeof(obj); }
+
+      function customizeDocumentController($scope, documentAjax) {
+      var ctrl = this;
+      ctrl.errs = [];
+      ctrl.model = {};
+      documentAjax.describeDocument(ctrl.documentSysId).then(function (response) {
+      if (response.success) {
+      ctrl.model.documentName = response.result.Document.Name;
+      ctrl.model.documentVersion = response.result.Document.DocumentVersion;
+      } else {
+      ctrl.recordError(response.result);
+      }
+      })["catch"](function (error) {
+      ctrl.recordError(error);
+      });
+      /*
+      * Capture the form so that scSubmissionError can mark required inputs as
+      * dirty when the form is submitted before everything is ready.
+      */
+
+      var form = undefined;
+
+      ctrl.setForm = function (f) {
+      form = f;
+      };
+
+      $scope.$on('aws-ssm:validationFailure', function () {
+      ctrl.dirtyForm();
+      });
+
+      ctrl.dirtyForm = function () {
+      if (form) {
+      angular.forEach(form.$error.required, function (field) {
+      field.$setDirty();
+      });
+      }
+      };
+
+      ctrl.onInputChanged = function () {
+      var m = ctrl.model; // Calculate IsValid and set it on the model
+
+      var allInputsValid = m.documentName && m.documentVersion && customizeDocumentForm_controller_typeof(m.params) === 'object' && Array.isArray(m.tags) && // Sanity check tag structure
+      m.tags.every(function (t) {
+      return t.Key && t.Value;
+      }) && form.$valid;
+      ctrl.onModelUpdate({
+      model: {
+      documentName: m.documentName || '',
+      documentVersion: m.documentVersion || '',
+      params: angular.toJson(m.params) || '',
+      tags: angular.toJson(m.tags) || '',
+      valid: allInputsValid ? 'Yes' : 'No'
+      }
+      });
+      };
+
+      ctrl.recordError = function (err) {
+      ctrl.errs.push(err);
+      ctrl.onError({
+      errs: ctrl.errs
+      });
+      };
+
+      ctrl.onParameterChange = function (params) {
+      ctrl.model.params = Object.values(params).reduce(function (o, param) {
+      if (param.Key && param.Value !== undefined && param.Value.length > 0) {
+      o[param.Key] = [param.Value];
+      }
+
+      return o;
+      }, {});
+      ctrl.onInputChanged();
+      };
+
+      ctrl.onTagsChange = function (tags) {
+      ctrl.model.tags = tags;
+      ctrl.onInputChanged();
+      };
+
+      $scope.$watch('ctrl.model', function () {
+      ctrl.onInputChanged();
+      }, true);
+      }
+      ;
+      ;// CONCATENATED MODULE: ./awsComponents/customizeDocumentForm/customizeDocumentForm_template.html
+      // Module
+      var customizeDocumentForm_template_code = "<div ng-cloak> <style scoped>.sc-error-message{padding:5px;font-size:large;font-weight:700}</style> <div class=\"row\"> <div class=\"col-sm-12\"> <div ng-if=\"ctrl.errs.length > 0\"> <div ng-repeat=\"err in ctrl.errs track by $index\" class=\"bg-danger sc-error-message\"> {{err.message ? err.message : err}} </div> </div> </div> </div> <form name=\"form\" class=\"form-horizontal aws-order-document\" ng-cloak> <div ng-init=\"ctrl.setForm(form);\"></div> <parameters document-sys-id=\"ctrl.documentSysId\" form=\"form\" on-param-change=\"ctrl.onParameterChange(params)\" on-error=\"ctrl.recordError(err)\" inputs-disabled=\"ctrl.inputsDisabled\"> </parameters> <tags form=\"form\" current-tags=\"ctrl.model.tags\" on-error=\"ctrl.recordError(err)\" inputs-disabled=\"ctrl.inputsDisabled\" tags-visible=\"true\" , selectable-tags-shown=\"false\"> </tags> </form> </div> ";
+      // Exports
+      /* harmony default export */ const customizeDocumentForm_template = (customizeDocumentForm_template_code);
+      ;// CONCATENATED MODULE: ./awsComponents/customizeDocumentForm/customizeDocumentForm.js
+      function customizeDocumentForm_defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+      function customizeDocumentForm_createClass(Constructor, protoProps, staticProps) { if (protoProps) customizeDocumentForm_defineProperties(Constructor.prototype, protoProps); if (staticProps) customizeDocumentForm_defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+      function customizeDocumentForm_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+
+
+      /**
+      * A directive to render the form with the inputs to capture the details of what product the user wants to order.
+      * This directive doesn't have any knowledge of any custom integration hooks on the page it is embedded in,
+      * such as hidden fields.
+      */
+
+      var CustomizeDocumentFormDirective = /*#__PURE__*/customizeDocumentForm_createClass(function CustomizeDocumentFormDirective() {
+      customizeDocumentForm_classCallCheck(this, CustomizeDocumentFormDirective);
+
+      return {
+      restrict: 'E',
+      scope: {},
+      controller: ['$scope', 'documentAjax', customizeDocumentController],
+      controllerAs: 'ctrl',
+      bindToController: {
+      /**
+      * The sys_id of the automation document catalog item
+      */
+      documentSysId: '=',
+
+      /**
+      A callback function which will be supplied the choices made on the form
+      each time one of its inputs changes. It must have signature fn(model) where
+      model will be populated with keys as follows:
+      {
+      documentName: '...',
+      documentVersion: '...',
+      params: [ {"Key": "...", "Value": "..."}, ... ]
+      tags: [ {"Key": "...", "Value": "..."}, ... ]
+      }
+      */
+      onModelUpdate: '&',
+
+      /**
+      A callback function which will be supplied any errors that the form detects
+      It must have signature fn(errs) where errs is a list of error strings.
+      */
+      onError: '&'
+      },
+      template: customizeDocumentForm_template
+      };
+      });
+
+
+      ;// CONCATENATED MODULE: ./awsComponents/documentsList/documentsList_controller.js
+      function DocumentsListController($scope, connectorAjax, documentAjax) {
+      var ctrl = this;
+      ctrl.documents = null;
+      connectorAjax.setUserToken(ctrl.userToken);
+      documentAjax.getDocuments({
+      opsitemSysId: ctrl.opsitemSysId
+      }).then(function (response) {
+      ctrl.documents = response.result;
+      })["catch"](function (err) {
+      ctrl.error = err;
+      ctrl.documents = undefined;
+      });
+      }
+      ;// CONCATENATED MODULE: ./awsComponents/documentsList/documentsList_template.html
+      // Module
+      var documentsList_template_code = "<div class=\"row\"> <div class=\"col-sm-12\"> <h3>Automation documents</h3> </div> <div class=\"col-sm-12\" ng-if=\"!ctrl.documents\"> <p ng-if=\"ctrl.documents === null\">Loading...</p> <p ng-if=\"ctrl.documents === undefined\">Failed to load automation documents: {{ctrl.error}}</p> </div> <div class=\"col-sm-12\" ng-if=\"ctrl.documents && ctrl.documents.length > 0\"> <div class=\"form-group\"> <label class=\"sr-only\" for=\"search-automation-documents\">Search for automation documents</label> <input type=\"text\" class=\"form-control\" id=\"search-automation-documents\" placeholder=\"Search automation documents\" ng-model=\"ctrl.search\"/> </div> <div class=\"panel-group\" id=\"documents\" role=\"tablist\" aria-multiselectable=\"true\"> <div class=\"panel panel-default\" ng-repeat=\"document in (ctrl.filteredDocuments = (ctrl.documents | filter:ctrl.search | orderBy:['-associated', 'name'])) track by document.sysId\"> <div class=\"panel-heading\" role=\"tab\" id=\"trigger-{{document.sysId}}\"> <h4 class=\"panel-title\"> <a role=\"button\" data-toggle=\"collapse\" data-parent=\"#documents\" href=\"#content-{{document.sysId}}\" aria-expanded=\"true\" aria-controls=\"content-{{document.sysId}}\"> {{document.name}}&nbsp; <span ng-if=\"document.associated\" class=\"label label-default\">Associated</span> </a> <a href=\"com.glideapp.servicecatalog_cat_item_view.do?sysparm_id={{document.sysId}}&opsitemSysId={{ctrl.opsitemSysId}}\" class=\"pull-right\">Order execution</a> </h4> </div> <div id=\"content-{{document.sysId}}\" class=\"panel-collapse collapse\" role=\"tabpanel\" aria-labelledby=\"trigger-{{document.sysId}}\"> <div class=\"panel-body\" ng-bind-html=\"document.description\"></div> </div> </div> </div> <div ng-if=\"ctrl.filteredDocuments.length === 0\"> There is no automation documents matching the search \"{{ctrl.search}}\" </div> </div> <div class=\"col-sm-12\" ng-if=\"ctrl.documents && ctrl.documents.length === 0\"> <p>There are no automation documents synchronised with ServiceNow for this AWS account and region. Please enable the \"AWS Systems Manager Automation\" integration in the connector settings.</p> </div> </div> ";
+      // Exports
+      /* harmony default export */ const documentsList_template = (documentsList_template_code);
+      ;// CONCATENATED MODULE: ./awsComponents/documentsList/documentsList.js
+      function documentsList_defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+      function documentsList_createClass(Constructor, protoProps, staticProps) { if (protoProps) documentsList_defineProperties(Constructor.prototype, protoProps); if (staticProps) documentsList_defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+      function documentsList_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+
+
+
+      var DocumentsList = /*#__PURE__*/documentsList_createClass(function DocumentsList() {
+      documentsList_classCallCheck(this, DocumentsList);
+
+      return {
+      scope: {},
+      controller: ['$scope', 'connectorAjax', 'documentAjax', DocumentsListController],
+      controllerAs: 'ctrl',
+      bindToController: {
+      /**
+      * The
+      */
+      userToken: '@?',
+
+      /**
+      * The sys_id of the OpsItem
+      */
+      opsitemSysId: '@?'
+      },
+      restrict: 'E',
+      template: documentsList_template
+      };
+      });
+
+
+      ;// CONCATENATED MODULE: ./awsComponents/customizeTemplateForm/customizeTemplateForm_controller.js
+      function customizeTemplateForm_controller_typeof(obj) { "@babel/helpers - typeof"; return customizeTemplateForm_controller_typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, customizeTemplateForm_controller_typeof(obj); }
+
+      function customizeTemplateController($scope, $q, documentAjax) {
+      var ctrl = this;
+      ctrl.errs = [];
+      ctrl.model = {};
+      ctrl.runbooks = [];
+      ctrl.loading = true;
+      documentAjax.describeChangeTemplate(ctrl.changeTemplateSysId).then(function (response) {
+      if (response.success) {
+      ctrl.model.documentName = response.result.name;
+      ctrl.model.documentVersion = response.result.version;
+      ctrl.runbooks = response.result.runbooks;
+      } else {
+      ctrl.recordError(response.result);
+      }
+      })["catch"](function (error) {
+      ctrl.recordError(error);
+      })["finally"](function () {
+      ctrl.loading = false;
+      });
+      /*
+      * Capture the form so that scSubmissionError can mark required inputs as
+      * dirty when the form is submitted before everything is ready.
+      */
+
+      var form = undefined;
+
+      ctrl.setForm = function (f) {
+      form = f;
+      };
+
+      $scope.$on('aws-ssm:validationFailure', function () {
+      ctrl.dirtyForm();
+      });
+
+      ctrl.dirtyForm = function () {
+      if (form) {
+      angular.forEach(form.$error.required, function (field) {
+      field.$setDirty();
+      });
+      }
+      };
+
+      ctrl.onInputChanged = function () {
+      var m = ctrl.model; // Calculate IsValid and set it on the model
+
+      var allInputsValid = m.documentName && m.documentVersion && Array.isArray(m.params) && m.params.length > 0 && // Sanity check params structure
+      m.params.every(function (p) {
+      return p.DocumentName && p.DocumentVersion && p.Parameters && customizeTemplateForm_controller_typeof(p.Parameters) === 'object';
+      }) && Array.isArray(m.tags) && // Sanity check tags structure
+      m.tags.every(function (t) {
+      return t.Key && t.Value;
+      }) && form.$valid;
+      ctrl.onModelUpdate({
+      model: {
+      documentName: m.documentName || '',
+      documentVersion: m.documentVersion || '',
+      params: angular.toJson(m.params) || '',
+      tags: angular.toJson(m.tags) || '',
+      valid: allInputsValid ? 'Yes' : 'No'
+      }
+      });
+      };
+
+      ctrl.recordError = function (err) {
+      ctrl.errs.push(err);
+      ctrl.onError({
+      errs: ctrl.errs
+      });
+      };
+
+      ctrl.onRunbookParamsChanged = function (params) {
+      ctrl.model.params = [{
+      DocumentName: ctrl.selectedRunbook.name,
+      DocumentVersion: ctrl.selectedRunbook.version,
+      Parameters: Object.values(params).reduce(function (o, param) {
+      if (param.Key && param.Value !== undefined && param.Value.length > 0) {
+      o[param.Key] = [param.Value];
+      }
+
+      return o;
+      }, {})
+      }];
+      ctrl.onInputChanged();
+      };
+
+      ctrl.onRunbookSelected = function (runbook) {
+      ctrl.selectedRunbook = runbook;
+      };
+
+      ctrl.onTagsChange = function (tags) {
+      ctrl.model.tags = tags;
+      ctrl.onInputChanged();
+      };
+
+      $scope.$watch('ctrl.model', function () {
+      ctrl.onInputChanged();
+      }, true);
+      $scope.$watch('ctrl.selectedRunbook', function () {
+      ctrl.model.params = [];
+      });
+      }
+      ;
+      ;// CONCATENATED MODULE: ./awsComponents/customizeTemplateForm/customizeTemplateForm_template.html
+      // Module
+      var customizeTemplateForm_template_code = "<div ng-cloak> <style scoped>.sc-error-message{padding:5px;font-size:large;font-weight:700}</style> <div class=\"row\"> <div class=\"col-sm-12\"> <div ng-if=\"ctrl.errs.length > 0\"> <div ng-repeat=\"err in ctrl.errs track by $index\" class=\"bg-danger sc-error-message\"> {{err.message ? err.message : err}} </div> </div> </div> </div> <form name=\"form\" class=\"form-horizontal aws-order-template\" ng-cloak> <div ng-init=\"ctrl.setForm(form);\"></div> <div class=\"row\"> <div class=\"col-sm-12\"> <h3>Runbook configuration <small class=\"icon-required text-danger\"></small></h3> <p ng-show=\"ctrl.loading\">Loading...</p> <p ng-show=\"!ctrl.loading && ctrl.runbooks.length === 0\"><strong>Unexpected error</strong>: this AWS Change Template does not have associated runbooks, which should not be possible. If you see this error, please report it to your AWS administrator.</p> <div ng-show=\"!ctrl.loading && ctrl.runbooks.length > 0\"> <p>Select the runbook that should be executed once the change request is approved:</p> <div class=\"radio\" ng-repeat=\"runbook in ctrl.runbooks track by $index\"> <label> <input type=\"radio\" name=\"selectedRunbook\" required ng-model=\"ctrl.selectedRunbook\" ng-change=\"ctrl.onRunbookSelected(runbook)\" ng-value=\"runbook\" ng-disabled=\"ctrl.inputsDisabled\"> {{runbook.name}} (Version {{runbook.version}}) </label> </div> <div ng-if=\"ctrl.selectedRunbook\"> <parameters runbook-name=\"ctrl.selectedRunbook.name\" runbook-version=\"ctrl.selectedRunbook.version\" change-template-sys-id=\"ctrl.changeTemplateSysId\" form=\"form\" on-param-change=\"ctrl.onRunbookParamsChanged(params)\" on-error=\"ctrl.recordError(err)\" inputs-disabled=\"ctrl.inputsDisabled\"> </parameters> </div> </div> </div> </div> <tags form=\"form\" current-tags=\"ctrl.model.tags\" on-error=\"ctrl.recordError(err)\" inputs-disabled=\"ctrl.inputsDisabled\" tags-visible=\"true\" selectable-tags-shown=\"false\"> </tags> </form> </div> ";
+      // Exports
+      /* harmony default export */ const customizeTemplateForm_template = (customizeTemplateForm_template_code);
+      ;// CONCATENATED MODULE: ./awsComponents/customizeTemplateForm/customizeTemplateForm.js
+      function customizeTemplateForm_defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+      function customizeTemplateForm_createClass(Constructor, protoProps, staticProps) { if (protoProps) customizeTemplateForm_defineProperties(Constructor.prototype, protoProps); if (staticProps) customizeTemplateForm_defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+      function customizeTemplateForm_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+
+
+      /**
+      * A directive to render the form with the inputs to capture the details of what product the user wants to order.
+      * This directive doesn't have any knowledge of any custom integration hooks on the page it is embedded in,
+      * such as hidden fields.
+      */
+
+      var CustomizeTemplateFormDirective = /*#__PURE__*/customizeTemplateForm_createClass(function CustomizeTemplateFormDirective() {
+      customizeTemplateForm_classCallCheck(this, CustomizeTemplateFormDirective);
+
+      return {
+      restrict: 'E',
+      scope: {},
+      controller: ['$scope', '$q', 'documentAjax', customizeTemplateController],
+      controllerAs: 'ctrl',
+      bindToController: {
+      /**
+      * The sys_id of the AWS Change Template (AWS document) catalog item
+      */
+      changeTemplateSysId: '=',
+
+      /**
+      A callback function which will be supplied the choices made on the form
+      each time one of its inputs changes. It must have signature fn(model) where
+      model will be populated with keys as follows:
+      {
+      documentName: '...',
+      documentVersion: '...',
+      params: [ {"Key": "...", "Value": "..."}, ... ]
+      tags: [ {"Key": "...", "Value": "..."}, ... ]
+      }
+      */
+      onModelUpdate: '&',
+
+      /**
+      A callback function which will be supplied any errors that the form detects
+      It must have signature fn(errs) where errs is a list of error strings.
+      */
+      onError: '&'
+      },
+      template: customizeTemplateForm_template
+      };
+      });
+
+
+      ;// CONCATENATED MODULE: ./awsComponents/awsComponents.js
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      external_angular_default().module('awsComponents', ['ui.bootstrap.tpls', 'ui.bootstrap.typeahead', 'ngTagsInput', 'ngSanitize']).provider('productAspect', productAspectProvider).provider('provisionedProduct', provisionedProductProvider).provider('documentAjax', documentAjaxProvider).provider('connectorAjax', connectorAjaxProvider).provider('requestService', requestServiceProvider).provider('account', accountProvider).provider('tagAjax', tagProvider).provider('ec2Ajax', ec2Provider).provider('route53Ajax', route53Provider).directive('customizeProductForm', function () {
+      return new CustomizeProductFormDirective();
+      }).directive('updateProductForm', function () {
+      return new UpdateProductFormDirective();
+      }).directive('launchPaths', function () {
+      return new LaunchPaths();
+      }).directive('locationGuard', function () {
+      return new LocationGuard();
+      }).directive('provisioningArtifacts', function () {
+      return new ProvisioningArtifacts();
+      }).directive('parameters', function () {
+      return new Parameters();
+      }).directive('selfServiceActions', function () {
+      return new SelfServiceActions();
+      }).directive('manageProduct', function () {
+      return new ManageProduct();
+      }).directive('tags', function () {
+      return new Tags();
+      }).directive('integer', function () {
+      return new Integer();
+      }).directive('stackSet', function () {
+      return new StackSet();
+      }).directive('plan', function () {
+      return new Plan();
+      }).directive('customizeDocumentForm', function () {
+      return new CustomizeDocumentFormDirective();
+      }).directive('documentsList', function () {
+      return new DocumentsList();
+      }).directive('customizeTemplateForm', function () {
+      return new CustomizeTemplateFormDirective();
+      });
+      /******/ })()
+      ;]]></script>
+        <script_name>awsComponents</script_name>
+        <sys_class_name>sys_ui_script</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-05-04 13:43:10</sys_created_on>
+        <sys_id>12112cbedb311300fd83f00fbf961968</sys_id>
+        <sys_mod_count>16</sys_mod_count>
+        <sys_name>x_126749_aws_sc.awsComponents</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_ui_script_12112cbedb311300fd83f00fbf961968</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2023-05-04 01:16:34</sys_updated_on>
+        <ui_type>0</ui_type>
+        <use_scoped_format>false</use_scoped_format>
+    </sys_ui_script>
+</record_update>

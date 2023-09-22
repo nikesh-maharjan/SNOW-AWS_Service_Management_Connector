@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ui_macro">
+    <sys_ui_macro action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <category>general</category>
+        <description>Displays provisioning parameters in a human-readable format.</description>
+        <media_type/>
+        <name>requested_item_provisioning_parameters</name>
+        <scoped_name>x_126749_aws_sc_requested_item_provisioning_parameters</scoped_name>
+        <sys_class_name>sys_ui_macro</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-04-14 10:48:31</sys_created_on>
+        <sys_id>ac930d052fa3201047d8b6a62799b699</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>requested_item_provisioning_parameters</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_ui_macro_ac930d052fa3201047d8b6a62799b699</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <xml><![CDATA[<?xml version="1.0" encoding="utf-8" ?>
+<j:jelly trim="false" xmlns:j="jelly:core" xmlns:g="glide" xmlns:j2="null" xmlns:g2="null">
+    <g:evaluate>
+        var params = JSON.parse(current.variables.ProvisioningParameters.getDecryptedValue() || []) || [];
+        var hasParams = params.length > 0;
+    </g:evaluate>
+
+    <j:if test="${JS:!hasParams}">
+        <em>None</em>
+    </j:if>
+
+    <j:if test="${JS:hasParams}">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Key</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <j:forEach items="${params}" var="p">
+                        <g:evaluate jelly="true">
+                            var key = jelly.p.Key;
+                            var value = jelly.p.Value;
+                            // Hide parameter value if it's a NoEcho parameter (will show every parameter value not having the NoEcho feature)
+                            var value = (jelly.p.IsNoEcho === undefined || !jelly.p.IsNoEcho) ? jelly.p.Value : "****";
+                        </g:evaluate>
+                        <tr>
+                            <th scope="row">${HTML:key}</th>
+                            <td>${HTML:value}</td>
+                        </tr>
+                    </j:forEach>
+                </tbody>
+            </table>
+        </div>
+    </j:if>
+</j:jelly>
+]]></xml>
+    </sys_ui_macro>
+</record_update>

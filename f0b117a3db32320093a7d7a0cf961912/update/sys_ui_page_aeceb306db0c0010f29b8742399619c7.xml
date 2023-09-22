@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ui_page">
+    <sys_ui_page action="INSERT_OR_UPDATE">
+        <category>general</category>
+        <client_script><![CDATA[function onOK() {
+	gsftSubmit(null, g_form.getFormElement(), 'Request Product Termination');	
+}
+
+function onCancel() {
+	GlideModalForm.prototype.get('x_126749_aws_sc_confirm_delete').destroy();
+}]]></client_script>
+        <description>Confirmatory dialog shown when terminating a product</description>
+        <direct>false</direct>
+        <endpoint>x_126749_aws_sc_confirm_delete.do</endpoint>
+        <html><![CDATA[<?xml version="1.0" encoding="utf-8" ?>
+<j:jelly trim="false" xmlns:j="jelly:core" xmlns:g="glide" xmlns:j2="null" xmlns:g2="null">
+<j:set var="jvar_pref" value="${HTML,JS:sysparm_message}"/>
+	 <div class="modal-body">
+	   <p>${jvar_pref}</p>
+   </div>
+   <footer class="modal-footer flex">
+	   <g:dialog_buttons_ok_cancel ok="return onOK();" cancel="return onCancel();"
+			ok_type="button" cancel_type="button"/>
+   </footer>
+</j:jelly>]]></html>
+        <name>confirm_delete</name>
+        <processing_script/>
+        <sys_class_name>sys_ui_page</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-09-24 10:40:23</sys_created_on>
+        <sys_id>aeceb306db0c0010f29b8742399619c7</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>confirm_delete</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_ui_page_aeceb306db0c0010f29b8742399619c7</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_ui_page>
+</record_update>

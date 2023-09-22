@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.HealthRepo</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>HealthRepo</name>
+        <script><![CDATA[var HealthRepo = /** @class */ (function () {
+    function HealthRepo() {
+        this.HEALTH_EVENT_TABLE = "x_126749_aws_sc_health_event";
+        this.HEALTH_RESOURCE_TABLE = "x_126749_aws_sc_health_resource";
+    }
+    HealthRepo.prototype.insertOrUpdateEvent = function (fields) {
+        var awsaccount = fields.awsaccount, awsregion = fields.awsregion, awsarn = fields.awsarn;
+        Util.assertExists(awsaccount, 'awsaccount');
+        Util.assertExists(awsregion, 'awsregion');
+        Util.assertExists(awsarn, 'awsarn');
+        return Util.insertOrUpdate(this.HEALTH_EVENT_TABLE, {
+            awsaccount: awsaccount,
+            awsregion: awsregion,
+            awsarn: awsarn,
+        }, fields);
+    };
+    HealthRepo.prototype.insertOrUpdateResource = function (fields) {
+        return Util.insertOrUpdate(this.HEALTH_RESOURCE_TABLE, fields);
+    };
+    HealthRepo.prototype.deleteUnrelatedResources = function (healthEvent, validResources) {
+        var currentEntities = new GlideRecord('x_126749_aws_sc_health_resource');
+        currentEntities.addQuery('awshealthevent', healthEvent.sys_id.toString());
+        currentEntities.query();
+        var deletedCount = 0;
+        var validEntityValues = validResources.map(function (effectedEntity) { return effectedEntity.entityValue; });
+        while (currentEntities.next()) {
+            if (validEntityValues.indexOf(currentEntities.getValue('awsresourceid')) === -1) {
+                currentEntities.deleteRecord();
+                deletedCount++;
+            }
+        }
+        return deletedCount;
+    };
+    return HealthRepo;
+}());
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2022-03-29 13:20:38</sys_created_on>
+        <sys_id>ac8dba5987228110ae94b8c6cebb355c</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>HealthRepo</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_ac8dba5987228110ae94b8c6cebb355c</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

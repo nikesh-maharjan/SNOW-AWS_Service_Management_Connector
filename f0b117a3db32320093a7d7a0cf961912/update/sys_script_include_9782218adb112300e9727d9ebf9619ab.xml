@@ -1,0 +1,952 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.WorkflowTasks</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>WorkflowTasks</name>
+        <script><![CDATA[/**
+ @Deployable({
+     table: 'sys_script_include',
+     column: 'script',
+     sysId: '9782218adb112300e9727d9ebf9619ab'
+ })
+ */
+var WorkflowTasks = (function () {
+    var workflowName = "AWS Service Catalog - Invoke Workflow Task";
+    var communicationPrefix = "[ServiceNow]";
+    function getServiceCatalog(region, product) {
+        return new AwsServiceCatalog(region, AwsCredentials.from(product).as(AwsCredentials.User.Sync));
+    }
+    function getConfig(region, account) {
+        return new AwsConfig(region, AwsCredentials.from(account).as(AwsCredentials.User.Sync));
+    }
+    function loadRecord(table, sysId) {
+        var recordGr = new GlideRecord(table);
+        return recordGr.get(sysId) ? recordGr : null;
+    }
+    function success() {
+        return { success: true };
+    }
+    var DeleteProduct = /** @class */ (function () {
+        function DeleteProduct(context, state) {
+            Util.assertExists(context.product, "Context missing property: product");
+            this.product = Util.assertExists(loadRecord('x_126749_aws_sc_product', context.product), "No such product: " + context.product);
+            this.productId = Util.assertExists(this.product.awsproductid.toString(), "Product missing awsproductid");
+            var region = Util.assertExists(this.product.awsregion.toString(), "Product missing awsregion");
+            this.sc = getServiceCatalog(region, this.product);
+            this.tagOptionsToDisassociate = state.tagOptionsToDisassociate;
+            this.portfoliosToDisassociate = state.portfoliosToDisassociate;
+            this.serviceActionsToDisassociate = state.serviceActionsToDisassociate;
+        }
+        DeleteProduct.prototype.getState = function () {
+            return {
+                tagOptionsToDisassociate: this.tagOptionsToDisassociate,
+                portfoliosToDisassociate: this.portfoliosToDisassociate,
+                serviceActionsToDisassociate: this.serviceActionsToDisassociate,
+            };
+        };
+        DeleteProduct.prototype._responseToResult = function (response) {
+            var obj = {
+                success: false,
+                canRetry: response.isRequestRetryable(),
+                message: response.deserialize().Message
+            };
+            if (obj.canRetry) {
+                obj.state = this.getState();
+            }
+            return obj;
+        };
+        DeleteProduct.prototype._processTagOptions = function () {
+            if (!Array.isArray(this.tagOptionsToDisassociate)) {
+                var descProd = this.sc.describeProductAsAdmin(this.productId);
+                if (descProd.haveError()) {
+                    return this._responseToResult(descProd);
+                }
+                this.tagOptionsToDisassociate = descProd.deserialize().TagOptions.map(function (to) {
+                    return to.Id;
+                });
+            }
+            for (var l = this.tagOptionsToDisassociate.length; l > 0; l--) {
+                var id = this.tagOptionsToDisassociate[l - 1];
+                var r = this.sc.disassociateTagOptionFromResource(this.productId, id);
+                if (r.haveError() && r.deserialize().__type !== 'ResourceNotFoundException') {
+                    return this._responseToResult(r);
+                }
+                this.tagOptionsToDisassociate.pop();
+            }
+            return success();
+        };
+        DeleteProduct.prototype._processPortfolios = function () {
+            if (!Array.isArray(this.portfoliosToDisassociate)) {
+                var productGr = new GlideRecord('x_126749_aws_sc_product');
+                productGr.addQuery('awsproductid', this.product.awsproductid.toString());
+                productGr.query();
+                this.portfoliosToDisassociate = [];
+                while (productGr.next()) {
+                    var portfolio = productGr.awsportfolio.getRefRecord();
+                    this.portfoliosToDisassociate.push({
+                        awsid: portfolio.awsid.toString(),
+                        sys_id: portfolio.sys_id.toString()
+                    });
+                }
+            }
+            for (var l = this.portfoliosToDisassociate.length; l > 0; l--) {
+                var portfolio = this.portfoliosToDisassociate[l - 1];
+                var id = portfolio.awsid;
+                var r = this.sc.disassociateProductFromPortfolio(id, this.productId);
+                if (r.haveError() && r.deserialize().__type !== 'ResourceNotFoundException') {
+                    return this._responseToResult(r);
+                }
+                this.portfoliosToDisassociate.pop();
+            }
+            return success();
+        };
+        DeleteProduct.prototype._processServiceActions = function () {
+            if (!Array.isArray(this.serviceActionsToDisassociate)) {
+                var productDescription = this.sc.describeProductAsAdmin(this.productId);
+                if (productDescription.haveError()) {
+                    return this._responseToResult(productDescription);
+                }
+                this.serviceActionsToDisassociate = productDescription.deserialize().ProvisioningArtifactSummaries.map(function (pa) {
+                    return {
+                        paId: pa.Id,
+                        saList: []
+                    };
+                });
+                for (var saIndex = this.serviceActionsToDisassociate.length - 1; saIndex >= 0; saIndex--) {
+                    var item = this.serviceActionsToDisassociate[saIndex];
+                    var serviceActionsForThisArtifact = this.sc.listServiceActionsForProvisioningArtifact(this.productId, item.paId).collectAll();
+                    if (!serviceActionsForThisArtifact.success) {
+                        return this._responseToResult(serviceActionsForThisArtifact);
+                    }
+                    item.saList = serviceActionsForThisArtifact.all.map(function (sa) {
+                        return sa.Id;
+                    });
+                }
+            }
+            for (var saItem = this.serviceActionsToDisassociate.length - 1; saItem >= 0; saItem--) {
+                var item = this.serviceActionsToDisassociate[saItem];
+                for (var index = item.saList.length - 1; index >= 0; index--) {
+                    var result = this.sc.disassociateServiceActionFromProvisioningArtifact(this.productId, item.paId, item.saList[index]);
+                    if (result.haveError() && result.deserialize()['__type'] !== 'ResourceNotFoundException') {
+                        return this._responseToResult(result);
+                    }
+                    item.saList.pop();
+                }
+                this.serviceActionsToDisassociate.pop();
+            }
+            return success();
+        };
+        DeleteProduct.prototype._deleteProduct = function () {
+            var response = this.sc.deleteProduct(this.productId);
+            if (response.haveError()) {
+                return this._responseToResult(response);
+            }
+            this.product.deleteRecord();
+            return { success: true, canRetry: false, message: "Deleted " + this.productId };
+        };
+        DeleteProduct.prototype.doDelete = function () {
+            var result = this._processTagOptions();
+            if (!result.success)
+                return result;
+            result = this._processPortfolios();
+            if (!result.success)
+                return result;
+            result = this._processServiceActions();
+            if (!result.success)
+                return result;
+            return this._deleteProduct();
+        };
+        return DeleteProduct;
+    }());
+    var PushResourceTypeToAwsConfig = /** @class */ (function () {
+        function PushResourceTypeToAwsConfig(context, state) {
+            Util.assertExists(context.ciSysId, 'Context missing property: ciSysId');
+            Util.assertExists(context.resourceTypeAccountSysId, 'Context missing property: resourceTypeAccountSysId');
+            Util.assertExists(context.schemaVersion, 'Context missing property: schemaVersion');
+            var resourceTypeAccount = Util.assertExists(loadRecord('x_126749_aws_sc_resource_type_account', context.resourceTypeAccountSysId), "No such resource type account for sys_id ".concat(context.resourceTypeAccountSysId));
+            this.ciGr = Util.assertExists(loadRecord(resourceTypeAccount.table.toString(), context.ciSysId), "No such configuration item for sys_id ".concat(context.ciSysId, " in table ").concat(resourceTypeAccount.table));
+            // TODO: Should we support multiple rule? I.e. having multiple table going to the same resource type on AWS Config?
+            var rules = ConfigSyncProvider.defaultRules()
+                .filter(function (rule) { return rule.snTable === resourceTypeAccount.table.toString(); })
+                .filter(function (rule) { return rule.syncType === ConfigSyncProvider.SYNC_DIR.TO_AWS_CONFIG; });
+            if (rules.length !== 1) {
+                throw new Error("Cannot determine exact rule to synchronize GlideRecord ".concat(context.ciSysId, " in table ").concat(resourceTypeAccount.table, " to AWS: ").concat(rules.length, " rule(s) matching, there must be only one."));
+            }
+            var account = resourceTypeAccount.awsaccount.getRefRecord();
+            this.syncContext = {
+                configApi: getConfig(resourceTypeAccount.awsregion.toString(), account),
+                configSyncRule: rules[0],
+                account: account,
+                region: resourceTypeAccount.awsregion.toString(),
+                connectorName: gs.getProperty(C.sysprop.discoverySourceName),
+                startTime: new GlideDateTime(),
+                schemaVersion: context.schemaVersion
+            };
+        }
+        PushResourceTypeToAwsConfig.prototype.execute = function () {
+            var response = this.syncContext.configSyncRule.syncFromSn(this.syncContext, this.ciGr);
+            return {
+                success: !response.haveError(),
+                canRetry: response.isRequestRetryable(),
+                message: response.getBody()
+            };
+        };
+        return PushResourceTypeToAwsConfig;
+    }());
+    var RegisterResourceType = /** @class */ (function () {
+        function RegisterResourceType(context, state) {
+            var _this = this;
+            Util.assertExists(context.resourceTypeAccountSysId, 'Context missing property: resourceTypeAccountSysId');
+            this.resourceTypeAccount = Util.assertExists(loadRecord('x_126749_aws_sc_resource_type_account', context.resourceTypeAccountSysId), "No such resource type account for sys_id ".concat(context.resourceTypeAccountSysId));
+            this.awsCloudFormation = new AwsCloudFormation(this.resourceTypeAccount.awsregion, AwsCredentials.from(this.resourceTypeAccount).as(AwsCredentials.User.Sync));
+            var rules = ConfigSyncProvider.defaultRules()
+                .filter(function (rule) { return rule.snTable === _this.resourceTypeAccount.table.toString(); })
+                .filter(function (rule) { return rule.syncType === ConfigSyncProvider.SYNC_DIR.TO_AWS_CONFIG; });
+            if (rules.length !== 1) {
+                throw new Error("Cannot determine exact rule to synchronize GlideRecord from table ".concat(this.resourceTypeAccount.table, " to AWS: ").concat(rules.length, " rule(s) matching, there must be only one."));
+            }
+            this.resourceType = rules[0].externalResourceType;
+            this.s3PackageName = "s3://".concat(gs.getProperty(C.sysprop.resourceProvidersBucket), "/").concat(this.resourceType.replace(/::/g, '-').toLocaleLowerCase(), ".zip");
+            this.registrationToken = state ? state.registrationToken : undefined;
+        }
+        RegisterResourceType.prototype.execute = function () {
+            if (this.registrationToken) {
+                return this.checkRegistration();
+            }
+            workflow.info("Starting registration of resource type \"".concat(this.resourceType, "\""));
+            var registerTypeResponse = this.awsCloudFormation.registerType(this.resourceType, this.s3PackageName);
+            if (registerTypeResponse.haveError()) {
+                return this.responseToErrorResult(registerTypeResponse);
+            }
+            this.registrationToken = registerTypeResponse.data().RegistrationToken;
+            return this.checkRegistration();
+        };
+        RegisterResourceType.prototype.checkRegistration = function () {
+            workflow.info("Checking type registration of resource type \"".concat(this.resourceType, "\" with token \"").concat(this.registrationToken, "\""));
+            var describeTypeRegistration = this.awsCloudFormation.describeTypeRegistration(this.registrationToken);
+            if (describeTypeRegistration.haveError()) {
+                return this.responseToErrorResult(describeTypeRegistration);
+            }
+            var body = describeTypeRegistration.data();
+            if (body.TypeVersionArn) {
+                var versionId = body.TypeVersionArn.split('/').pop();
+                Util.setValue(this.resourceTypeAccount, 'awsschemaversion', versionId);
+                this.resourceTypeAccount.setWorkflow(false);
+                var isUpdated = this.resourceTypeAccount.update();
+                if (!isUpdated) {
+                    workflow.error("Failed update resource type account with resource type version \"".concat(versionId, "\""));
+                }
+                else {
+                    workflow.info("Successfully stored resource type version ID \"".concat(versionId, "\" for resource type \"").concat(this.resourceType, "\""));
+                }
+            }
+            return {
+                success: body.ProgressStatus === "COMPLETE",
+                canRetry: body.ProgressStatus !== "FAILED",
+                message: body.Description,
+                state: {
+                    registrationToken: this.registrationToken
+                }
+            };
+        };
+        RegisterResourceType.prototype.responseToErrorResult = function (response) {
+            var body = response.deserialize();
+            var taskResult = {
+                success: false,
+                canRetry: response.isRequestRetryable() || body.ErrorResponse.Error.Code === 'ThrottlingException',
+                message: body.ErrorResponse.Error.Message
+            };
+            if (taskResult.canRetry) {
+                taskResult.state = {
+                    registrationToken: this.registrationToken
+                };
+            }
+            return taskResult;
+        };
+        return RegisterResourceType;
+    }());
+    var DeregisterResourceType = /** @class */ (function () {
+        function DeregisterResourceType(context, state) {
+            Util.assertExists(context.accountSysId, 'Context missing property: accountSysId');
+            Util.assertExists(context.region, 'Context missing property: region');
+            Util.assertExists(context.table, 'Context missing property: table');
+            Util.assertExists(context.schemaVersion, 'Context missing property: schemaVersion');
+            this.account = Util.assertExists(loadRecord('x_126749_aws_sc_account', context.accountSysId), "No such account for sys_id ".concat(context.accountSysId));
+            this.awsCloudFormation = new AwsCloudFormation(context.region, AwsCredentials.from(this.account).as(AwsCredentials.User.Sync));
+            var rules = ConfigSyncProvider.defaultRules()
+                .filter(function (rule) { return rule.snTable === context.table.toString(); })
+                .filter(function (rule) { return rule.syncType === ConfigSyncProvider.SYNC_DIR.TO_AWS_CONFIG; });
+            this.schemaVersion = context.schemaVersion;
+            if (rules.length !== 1) {
+                throw new Error("Cannot determine exact rule to synchronize GlideRecord from table ".concat(context.table, " to AWS: ").concat(rules.length, " rule(s) matching, there must be only one."));
+            }
+            this.resourceType = rules[0].externalResourceType;
+        }
+        DeregisterResourceType.prototype.execute = function () {
+            workflow.info("Starting deregistration of resource type \"".concat(this.resourceType, "\" with version ID \"").concat(this.schemaVersion, "\""));
+            var deregisterTypeResponse = this.awsCloudFormation.deregisterType(this.resourceType, this.schemaVersion);
+            var body = deregisterTypeResponse.deserialize();
+            return {
+                success: !deregisterTypeResponse.haveError(),
+                canRetry: deregisterTypeResponse.isRequestRetryable() || body.ErrorResponse ? body.ErrorResponse.Error.Code === 'ThrottlingException' : false,
+                message: deregisterTypeResponse.haveError() ? body.ErrorResponse.Error.Message : '',
+            };
+        };
+        return DeregisterResourceType;
+    }());
+    var PushFindingsToAws = /** @class */ (function () {
+        function PushFindingsToAws(context, state) {
+            Util.assertExists(context.awsfindingarn, 'Context missing property: awsfindingarn');
+            Util.assertExists(context.awsproductarn, 'Context missing property: awsproductarn');
+            Util.assertExists(context.accountSysId, 'Context missing property: accountSysId');
+            Util.assertExists(context.region, 'Context missing property: region');
+            this.awsfindingarn = context.awsfindingarn;
+            this.awsproductarn = context.awsproductarn;
+            this.awsseveritylabel = context.awsseveritylabel;
+            this.awsworkflowstatus = context.awsworkflowstatus;
+            this.account = Util.assertExists(loadRecord('x_126749_aws_sc_account', context.accountSysId), "No such account for sys_id: ".concat(context.accountSysId));
+            var region = context.region;
+            var credentials = AwsCredentials.from(this.account).as(AwsCredentials.User.Sync);
+            this.awsSecurityHub = new AwsSecurityHub(region, credentials);
+        }
+        PushFindingsToAws.prototype.execute = function () {
+            var service = this.awsSecurityHub;
+            var result = service.batchUpdateFindings(this.awsfindingarn, this.awsproductarn, this.awsseveritylabel, this.awsworkflowstatus);
+            return {
+                success: !result.haveError(),
+                canRetry: result.isRequestRetryable(),
+                message: result.getBody()
+            };
+        };
+        return PushFindingsToAws;
+    }());
+    var PushOpsItemsToAws = /** @class */ (function () {
+        function PushOpsItemsToAws(context, state) {
+            Util.assertExists(context.awsopsitemid, 'Context missing property: awsopsitemid');
+            Util.assertExists(context.accountSysId, 'Context missing property: accountSysId');
+            Util.assertExists(context.region, 'Context missing property: region');
+            this.awsopsitemid = context.awsopsitemid;
+            this.awspriority = context.awspriority;
+            this.awsseverity = context.awsseverity;
+            this.awsstatus = context.awsstatus;
+            this.awstitle = context.awstitle;
+            this.awsdescription = context.awsdescription;
+            this.account = Util.assertExists(loadRecord('x_126749_aws_sc_account', context.accountSysId), "No such account for sys_id: ".concat(context.accountSysId));
+            var region = context.region;
+            var credentials = AwsCredentials.from(this.account).as(AwsCredentials.User.Sync);
+            this.awsSystemsManager = new AwsSystemsManager(region, credentials);
+        }
+        PushOpsItemsToAws.prototype.execute = function () {
+            var service = this.awsSystemsManager;
+            var result = service.updateOpsItem({
+                OpsItemId: this.awsopsitemid,
+                Priority: this.awspriority,
+                Severity: this.awsseverity,
+                Status: this.awsstatus,
+                Title: this.awstitle,
+                Description: this.awsdescription,
+            });
+            return {
+                success: !result.haveError(),
+                canRetry: result.isRequestRetryable(),
+                message: result.getBody()
+            };
+        };
+        return PushOpsItemsToAws;
+    }());
+    var PushSupportCaseToAws = /** @class */ (function () {
+        function PushSupportCaseToAws(context, state) {
+            var account = Util.assertExists(loadRecord('x_126749_aws_sc_account', context.accountSysId), "No such account for sys_id: ".concat(context.accountSysId));
+            var credentials = AwsCredentials.from(account).as(AwsCredentials.User.Sync);
+            var supportCategory = Util.assertExists(loadRecord('x_126749_aws_sc_support_case_category', context.awscategory), "No such Support Case Category for sys_id: ".concat(context.awscategory));
+            var supportService = Util.assertExists(loadRecord('x_126749_aws_sc_support_case_service', context.awsservice), "No such Support Case Service for sys_id: ".concat(context.awsservice));
+            this.recordSysId = context.recordSysId;
+            this.awscategory = supportCategory.awscode.toString();
+            this.awsservice = supportService.awscode.toString();
+            this.awssubject = context.awssubject;
+            this.awsseverity = context.awsseverity;
+            this.awscommunicationbody = context.awscommunicationbody;
+            this.awscommunicationemails = context.awscommunicationemails;
+            this.awsSupport = new AwsSupport(account.sys_id.toString(), credentials);
+        }
+        PushSupportCaseToAws.prototype.execute = function () {
+            var service = this.awsSupport;
+            var result = service.createCase({
+                subject: this.awssubject,
+                serviceCode: this.awsservice,
+                severityCode: this.awsseverity,
+                categoryCode: this.awscategory,
+                communicationBody: this.awscommunicationbody,
+                language: "en",
+                ccEmailAddresses: this.awscommunicationemails
+            });
+            this.updateSupportCase(result, service, this.recordSysId);
+            return {
+                success: !result.haveError(),
+                canRetry: result.isRequestRetryable(),
+                message: result.getBody()
+            };
+        };
+        PushSupportCaseToAws.prototype.updateSupportCase = function (result, service, sysId) {
+            var supportCaseRepo = new SupportCaseRepo();
+            if (!result.haveError()) {
+                var caseIdentifier_1 = result.deserialize().caseId.toString();
+                //Get information from AWS to then update the related Incident
+                var paginatedResponse = service.describeCases({ "caseIdList": [caseIdentifier_1] });
+                if (!paginatedResponse.haveError()) {
+                    paginatedResponse.forEachPage(function (caseList) {
+                        if (caseList.length === 1) {
+                            supportCaseRepo.updateIncidentOnSupportCaseCreation(caseIdentifier_1, caseList[0].displayId, caseList[0].status, "AWS Support: Support Case synchronized with AWS", sysId);
+                        }
+                        else {
+                            //Add failure Work Notes in case of no case ID received (should never happened)
+                            supportCaseRepo.addWorkNoteToIncident("AWS Support: Error on getting Support Case Identifier values from AWS", sysId);
+                        }
+                    });
+                }
+                else {
+                    //Add failure Work Notes in case of API call error
+                    supportCaseRepo.addWorkNoteToIncident("AWS Support: Error on getting Support Case Identifier values from AWS", sysId);
+                }
+            }
+            else {
+                //Add failure Work Notes in case of API call error
+                supportCaseRepo.addWorkNoteToIncident("AWS Support: Error on synchronizing Support Case to AWS", sysId);
+            }
+        };
+        return PushSupportCaseToAws;
+    }());
+    var ResolveSupportCaseToAws = /** @class */ (function () {
+        function ResolveSupportCaseToAws(context, state) {
+            var account = Util.assertExists(loadRecord('x_126749_aws_sc_account', context.accountSysId), "No such account for sys_id: ".concat(context.accountSysId));
+            var credentials = AwsCredentials.from(account).as(AwsCredentials.User.Sync);
+            this.recordSysId = context.recordSysId;
+            this.awsCaseIdentifier = context.awsCaseIdentifier;
+            this.awsSupport = new AwsSupport(account.sys_id.toString(), credentials);
+        }
+        ResolveSupportCaseToAws.prototype.execute = function () {
+            var service = this.awsSupport;
+            var result = service.resolveCase({
+                caseId: this.awsCaseIdentifier
+            });
+            this.updateSupportCase(result, this.recordSysId);
+            return {
+                success: !result.haveError(),
+                canRetry: result.isRequestRetryable(),
+                message: result.getBody()
+            };
+        };
+        ResolveSupportCaseToAws.prototype.updateSupportCase = function (result, sysId) {
+            var supportCaseRepo = new SupportCaseRepo();
+            if (!result.haveError()) {
+                var awsStatus = result.deserialize().finalCaseStatus.toString();
+                supportCaseRepo.updateIncidentOnSupportCaseResolution("AWS Support: Support Case successfully resolved", awsStatus, sysId);
+            }
+            else {
+                supportCaseRepo.addWorkNoteToIncident("AWS Support: Error on resolving Support Case", sysId);
+            }
+        };
+        return ResolveSupportCaseToAws;
+    }());
+    var PushAttachmentsToAwsTask = /** @class */ (function () {
+        function PushAttachmentsToAwsTask(context, state) {
+            this.maxSizeBytes = 5 * 1024 * 1024; // 5 Mb
+            this.maxRetryUpload = 3;
+            this.maxRetryAttach = 3;
+            this.repo = new SupportCaseRepo();
+            this.recordSysId = context.recordSysId;
+            this.awsCaseIdentifier = context.awsCaseIdentifier;
+            this.attachmentSysId = context.attachmentSysId;
+            this.state = state;
+            if (!state.uploadTries) {
+                state.uploadTries = 0;
+            }
+            if (!state.attachTries) {
+                state.attachTries = 0;
+            }
+            var account = Util.assertExists(loadRecord('x_126749_aws_sc_account', context.accountSysId), "No such account for sys_id: ".concat(context.accountSysId));
+            var credentials = AwsCredentials.from(account).as(AwsCredentials.User.Sync);
+            this.awsSupport = new AwsSupport(account.sys_id.toString(), credentials);
+        }
+        PushAttachmentsToAwsTask.prototype.execute = function () {
+            var canRetry = true;
+            if (!this.state.stage) {
+                if (this.awsCaseIdentifier) { //Skipping initial phase when AWS Case Identifier is known
+                    this.state.stage = "Start";
+                }
+                else {
+                    this.state.stage = "Initial";
+                }
+            }
+            if (this.state.stage == "Initial") {
+                var isIntermediateTableModeEnabled_1 = gs.getProperty(C.sysprop.intermediateTableMode) === "true";
+                var supportCaseGr = new GlideRecord(isIntermediateTableModeEnabled_1 ? 'x_126749_aws_sc_smc_support_case' : 'incident');
+                supportCaseGr.get(this.recordSysId);
+                supportCaseGr.query();
+                if (supportCaseGr.next()) {
+                    if (supportCaseGr.x_126749_aws_sc_awscaseidentifier.nil()) { //Try again later
+                        canRetry = true;
+                    }
+                    else {
+                        this.awsCaseIdentifier = supportCaseGr.x_126749_aws_sc_awscaseidentifier.toString();
+                        this.state.stage = "Start";
+                    }
+                }
+            }
+            if (this.state.stage == "Start") {
+                var result = this.getAttachments(this.attachmentSysId);
+                if (result.success) {
+                    this.state.attachments = result.value;
+                    this.state.stage = "Fetched";
+                }
+                else {
+                    canRetry = result.canRetry;
+                }
+            }
+            if (this.state.stage == "Fetched") {
+                // attachmentSetId is undefined on first call. It is added
+                // to the state after the first call and that is used on
+                // subsequent calls to add attachments to the existing set.
+                var result = this.uploadAttachments(this.state.attachments, this.state.attachmentSetId, this.state.uploadTries);
+                canRetry = result.canRetry;
+                if (result.success) {
+                    this.state.attachmentSetId = result.value.attachmentSetId;
+                    this.state.stage = "Uploaded";
+                }
+                else if (result.error) {
+                    this.warn("Error uploading attachments on attempt #".concat(this.state.uploadTries));
+                    this.state.attachments = result.value.failedAttachments;
+                    ++this.state.uploadTries;
+                }
+            }
+            if (this.state.stage == "Uploaded") {
+                var result = this.addAttachmentsToCase(this.awsCaseIdentifier, this.state.attachmentSetId, this.state.attachTries);
+                if (result.success) {
+                    this.state.stage = "Attached";
+                    canRetry = false;
+                }
+                else if (result.error) {
+                    canRetry = result.canRetry;
+                    this.warn("Error adding attachments to AWS Support Case on attempt #".concat(this.state.attachTries));
+                    ++this.state.attachTries;
+                }
+            }
+            return {
+                success: this.state.stage == "Attached",
+                canRetry: canRetry,
+                state: this.state,
+            };
+        };
+        PushAttachmentsToAwsTask.prototype.getAttachments = function (attachmentSysId) {
+            var attachment = new GlideRecord('sys_attachment');
+            var canRetry = true;
+            attachment.addQuery('sys_id', attachmentSysId);
+            attachment.query();
+            var attachments = [];
+            while (attachment.next()) {
+                if (attachment.size_bytes <= this.maxSizeBytes) {
+                    var gsa = new GlideSysAttachment();
+                    attachments.push({
+                        fileName: attachment.file_name.toString(),
+                        data: gsa.getContentBase64(attachment)
+                    });
+                }
+                else {
+                    canRetry = false;
+                    var sizeMegabytes = attachment.size_bytes / (1024 * 1024);
+                    this.addWorkNote("Attachment not sent to AWS (over 5Mb): " +
+                        "".concat(sizeMegabytes, "Mb - ").concat(attachment.file_name));
+                }
+            }
+            return {
+                success: attachments.length > 0,
+                canRetry: canRetry,
+                value: attachments,
+            };
+        };
+        PushAttachmentsToAwsTask.prototype.uploadAttachments = function (attachments, attachmentSetId, uploadTries) {
+            var _this = this;
+            if (uploadTries === void 0) { uploadTries = 0; }
+            var result = {
+                success: true,
+                value: {
+                    attachmentSetId: attachmentSetId,
+                    failedAttachments: [],
+                }
+            };
+            if (uploadTries > this.maxRetryUpload) {
+                result.success = false;
+                result.canRetry = false;
+                result.error = "Exceeded maximum number of retries to upload attachments ";
+                this.addWorkNote(result.error + attachments.map(function (a) { return a.fileName; }).join(', '));
+                this.warn(result.error);
+            }
+            else {
+                attachments.forEach(function (attachment) {
+                    _this.uploadSingleAttachment(attachmentSetId, attachment, result);
+                });
+            }
+            return result;
+        };
+        PushAttachmentsToAwsTask.prototype.uploadSingleAttachment = function (attachmentSetId, attachment, result) {
+            var rawResponse = this.awsSupport.addAttachmentsToSet({
+                attachmentSetId: attachmentSetId,
+                attachments: [attachment]
+            });
+            if (rawResponse.haveError()) {
+                result.success = false;
+                result.canRetry = true;
+                result.value.failedAttachments.push(attachment);
+            }
+            else {
+                var response_1 = rawResponse.deserialize();
+                if (!result.value.attachmentSetId) {
+                    result.value.attachmentSetId = response_1.attachmentSetId;
+                }
+            }
+        };
+        PushAttachmentsToAwsTask.prototype.addAttachmentsToCase = function (caseId, attachmentSetId, attachTries) {
+            if (attachTries === void 0) { attachTries = 0; }
+            var result = {
+                success: true,
+            };
+            if (attachTries > this.maxRetryAttach) {
+                result.success = false;
+                result.canRetry = false;
+                result.error = "Exceeded maximum number of retries to add attachments to Support Case";
+                this.addWorkNote(result.error);
+                this.warn(result.error);
+            }
+            else {
+                var rawResponse = this.awsSupport.addCommunicationToCase({
+                    attachmentSetId: attachmentSetId,
+                    caseId: caseId,
+                    communicationBody: communicationPrefix
+                });
+                if (rawResponse.haveError()) {
+                    result.success = false;
+                    result.canRetry = true;
+                    result.error = rawResponse.getErrorMessage();
+                }
+            }
+            return result;
+        };
+        PushAttachmentsToAwsTask.prototype.addWorkNote = function (message) {
+            var sysId = this.recordSysId;
+            this.repo.addWorkNoteToIncident(message, sysId);
+        };
+        PushAttachmentsToAwsTask.prototype.warn = function (message) {
+            gs.warn("[AWS Support] [Push Attachments to AWS] " +
+                "[".concat(this.awsCaseIdentifier, "] ").concat(message));
+        };
+        return PushAttachmentsToAwsTask;
+    }());
+    var PushCommentToAwsTask = /** @class */ (function () {
+        function PushCommentToAwsTask(context, state) {
+            var account = Util.assertExists(loadRecord('x_126749_aws_sc_account', context.awsAccountSysId), "No such account for sys_id: ".concat(context.awsAccountSysId));
+            var credentials = AwsCredentials.from(account).as(AwsCredentials.User.Sync);
+            this.recordSysId = context.recordSysId;
+            this.awsCaseIdentifier = context.awsCaseIdentifier;
+            this.awsCommunicationBody = context.awsCommunicationBody;
+            this.awsSupport = new AwsSupport(account.sys_id.toString(), credentials);
+        }
+        PushCommentToAwsTask.prototype.execute = function () {
+            var canRetry = true;
+            var isSuccess = false;
+            if (!this.awsCaseIdentifier || this.awsCaseIdentifier === '') { //AWS Support Case not yet created on AWS
+                var isIntermediateTableModeEnabled_2 = gs.getProperty(C.sysprop.intermediateTableMode) === "true";
+                var supportCaseGr = new GlideRecord(isIntermediateTableModeEnabled_2 ? 'x_126749_aws_sc_smc_support_case' : 'incident');
+                supportCaseGr.get(this.recordSysId);
+                supportCaseGr.query();
+                if (supportCaseGr.next()) {
+                    if (supportCaseGr.x_126749_aws_sc_awscaseidentifier.nil()) { //Try again later
+                        canRetry = true;
+                    }
+                    else {
+                        this.awsCaseIdentifier = supportCaseGr.x_126749_aws_sc_awscaseidentifier.toString();
+                        var result = this.addCommunicationToCase(this.recordSysId, this.awsCaseIdentifier, this.awsCommunicationBody);
+                        canRetry = result.canRetry;
+                        isSuccess = result.isSuccess;
+                    }
+                }
+                else {
+                    gs.error("[AWS Support] Failed to push comment " +
+                        "from record ".concat(this.recordSysId, "\n") +
+                        "Reason: Could not find the GlideRecord linked to the comment");
+                }
+            }
+            else {
+                var result = this.addCommunicationToCase(this.recordSysId, this.awsCaseIdentifier, this.awsCommunicationBody);
+                canRetry = result.canRetry;
+                isSuccess = result.isSuccess;
+            }
+            return {
+                success: isSuccess,
+                canRetry: canRetry,
+                state: {
+                    stage: 'Retry'
+                }
+            };
+        };
+        PushCommentToAwsTask.prototype.addCommunicationToCase = function (recordSysId, awsCaseIdentifier, awsCommunicationBody) {
+            var canRetry = false;
+            var isSuccess = false;
+            //AWS Support Case created, pushing comment to AWS Support
+            try {
+                var response_2 = this.awsSupport.addCommunicationToCase({
+                    caseId: awsCaseIdentifier,
+                    communicationBody: awsCommunicationBody
+                });
+                if (response_2.haveError()) {
+                    var statusCode = response_2.getStatusCode();
+                    var message = response_2.deserialize().message;
+                    gs.error("[AWS Support] Failed to push comment " +
+                        "from record ".concat(recordSysId, "\n") +
+                        "Error: [".concat(statusCode, "] ").concat(message));
+                    if (response_2.isRequestRetryable()) {
+                        canRetry = true;
+                    }
+                }
+                else {
+                    isSuccess = true;
+                    gs.info("[AWS Support] Pushed comment from record ".concat(recordSysId, " to AWS Support"));
+                }
+            }
+            catch (e) {
+                gs.error("[AWS Support] Unexpected Error: AddCommunicationToCase " +
+                    "for record ".concat(recordSysId, "\nError: ").concat(e.message));
+            }
+            return { isSuccess: isSuccess, canRetry: canRetry };
+        };
+        return PushCommentToAwsTask;
+    }());
+    var SyncAutomationExecutionEvents = /** @class */ (function () {
+        function SyncAutomationExecutionEvents(context, state) {
+            var account = Util.assertExists(loadRecord('x_126749_aws_sc_account', context.accountSysId), "No such account for sys_id: ".concat(context.accountSysId));
+            var credentials = AwsCredentials.from(account).as(AwsCredentials.User.Sync);
+            this.awsCloudTrail = new AwsCloudTrail(context.region, credentials);
+            this.changeRequestId = context.changeRequestId;
+            this.changeRequestSysId = context.changeRequestSysId;
+            this.automationExecutionId = context.automationExecutionId;
+            this.eventDataStoreId = context.eventDataStoreId;
+            this.state = state;
+            if (!this.state.stage) {
+                this.state.stage = 'StartQuery';
+            }
+        }
+        SyncAutomationExecutionEvents.prototype.execute = function () {
+            gs.info("Attempting SyncAutomationExecutionEventsContext ".concat(this.state.stage, " at time: ").concat(new GlideDateTime(), " [State: ").concat(JSON.stringify(this.state), "]"));
+            var serviceEvents = new CloudtrailService.SyncChangeRequestEvents();
+            try {
+                switch (this.state.stage) {
+                    case "StartQuery":
+                        return serviceEvents.runStartQuery({
+                            changeRequestId: this.changeRequestId,
+                            automationExecutionId: this.automationExecutionId,
+                            awsCloudTrail: this.awsCloudTrail,
+                            state: this.state,
+                            eventDataStoreId: this.eventDataStoreId,
+                        });
+                    case "ResolveQuery":
+                        return serviceEvents.runResolveQuery({
+                            changeRequestId: this.changeRequestId,
+                            changeRequestSysId: this.changeRequestSysId,
+                            awsCloudTrail: this.awsCloudTrail,
+                            state: this.state,
+                            eventDataStoreId: this.eventDataStoreId,
+                        });
+                }
+            }
+            catch (e) {
+                gs.error("Unexpected error executing ".concat(this.state.stage, " [State: ").concat(JSON.stringify(this.state), "]"));
+                return { state: this.state, success: false, canRetry: false, message: "".concat(e.name, ": ").concat(e.message) };
+            }
+        };
+        return SyncAutomationExecutionEvents;
+    }());
+    function startWorkflow(fn, context, exponential_backoff_wait) {
+        if (exponential_backoff_wait === void 0) { exponential_backoff_wait = false; }
+        var handler = Util.getWorkflowHandler();
+        var w = handler.getWorkflowFromName(workflowName);
+        if (!w) {
+            gs.warn("No workflow named '" + workflowName + "'");
+            return null;
+        }
+        //If adding any parameter to that list, you need to also add that parameter to the Workflow Properties
+        return handler.startFlow(w, null, "insert", {
+            u_context: typeof context === "object" ? JSON.stringify(context) : context,
+            u_function: fn,
+            u_exponential_backoff_wait: exponential_backoff_wait
+        });
+    }
+    return {
+        WORKFLOW_NAME: workflowName,
+        deleteProduct: {
+            startWorkflow: function (product) {
+                return startWorkflow('deleteProduct', {
+                    product: product
+                });
+            },
+            run: function (context, state) {
+                return new DeleteProduct(context, state).doDelete();
+            }
+        },
+        pushResourceTypeToAwsConfig: {
+            startWorkflow: function (configurationItem, resourceTypeAccount) {
+                return startWorkflow('pushResourceTypeToAwsConfig', {
+                    ciSysId: configurationItem.sys_id.toString(),
+                    resourceTypeAccountSysId: resourceTypeAccount.sys_id.toString(),
+                    schemaVersion: resourceTypeAccount.awsschemaversion.toString()
+                });
+            },
+            run: function (context, state) {
+                return new PushResourceTypeToAwsConfig(context, state).execute();
+            }
+        },
+        registerResourceType: {
+            startWorkflow: function (resourceTypeAccount) {
+                return startWorkflow('registerResourceType', {
+                    resourceTypeAccountSysId: resourceTypeAccount.sys_id.toString()
+                });
+            },
+            run: function (context, state) {
+                return new RegisterResourceType(context, state).execute();
+            }
+        },
+        deregisterResourceType: {
+            startWorkflow: function (resourceTypeAccount) {
+                return startWorkflow('deregisterResourceType', {
+                    accountSysId: resourceTypeAccount.awsaccount.toString(),
+                    region: resourceTypeAccount.awsregion.toString(),
+                    table: resourceTypeAccount.table.toString(),
+                    schemaVersion: resourceTypeAccount.awsschemaversion.toString()
+                });
+            },
+            run: function (context, state) {
+                return new DeregisterResourceType(context, state).execute();
+            }
+        },
+        pushFindingsToAws: {
+            startWorkflow: function (finding) {
+                return startWorkflow('pushFindingsToAws', {
+                    accountSysId: finding.account.toString(),
+                    region: finding.awsregion.toString(),
+                    awsfindingarn: finding.awsfindingarn.toString(),
+                    awsproductarn: finding.awsproductarn.toString(),
+                    awsseveritylabel: finding.awsseveritylabel.toString(),
+                    awsworkflowstatus: finding.awsworkflowstatus.toString(),
+                });
+            },
+            run: function (context, state) {
+                return new PushFindingsToAws(context, state).execute();
+            }
+        },
+        pushOpsItemsToAws: {
+            startWorkflow: function (opsItem) {
+                return startWorkflow('pushOpsItemsToAws', {
+                    accountSysId: opsItem.awsaccount.toString(),
+                    region: opsItem.awsregion.toString(),
+                    awsopsitemid: opsItem.awsopsitemid.toString(),
+                    awsseverity: opsItem.awsseverity.toString(),
+                    awspriority: parseInt(opsItem.getValue('awspriority')),
+                    awsstatus: opsItem.awsstatus.toString(),
+                    awstitle: opsItem.awstitle.toString(),
+                    awsdescription: opsItem.awsdescription.toString(),
+                });
+            },
+            run: function (context, state) {
+                return new PushOpsItemsToAws(context, state).execute();
+            }
+        },
+        pushSupportCaseToAws: {
+            startWorkflow: function (recordSysId, accountSysId, awsCategory, awsService, awsSubject, awsSeverity, awsCommunicationBody, awsCommunicationEmails) {
+                return startWorkflow('pushSupportCaseToAws', {
+                    recordSysId: recordSysId,
+                    accountSysId: accountSysId,
+                    awscategory: awsCategory,
+                    awsservice: awsService,
+                    awssubject: awsSubject,
+                    awsseverity: awsSeverity,
+                    awscommunicationbody: awsCommunicationBody,
+                    awscommunicationemails: awsCommunicationEmails
+                });
+            },
+            run: function (context, state) {
+                return new PushSupportCaseToAws(context, state).execute();
+            }
+        },
+        resolveSupportCaseToAws: {
+            startWorkflow: function (recordSysId, accountSysId, awsCaseIdentifier) {
+                return startWorkflow('resolveSupportCaseToAws', {
+                    recordSysId: recordSysId.toString(),
+                    accountSysId: accountSysId.toString(),
+                    awsCaseIdentifier: awsCaseIdentifier.toString()
+                });
+            },
+            run: function (context, state) {
+                return new ResolveSupportCaseToAws(context, state).execute();
+            }
+        },
+        pushAttachmentsToAws: {
+            startWorkflow: function (recordSysId, awsCaseIdentifier, accountSysId, attachmentSysId) {
+                return startWorkflow('pushAttachmentsToAws', {
+                    recordSysId: recordSysId.toString(),
+                    awsCaseIdentifier: awsCaseIdentifier.toString(),
+                    accountSysId: accountSysId.toString(),
+                    attachmentSysId: attachmentSysId.toString()
+                });
+            },
+            run: function (context, state) {
+                return new PushAttachmentsToAwsTask(context, state).execute();
+            }
+        },
+        pushCommentToAws: {
+            startWorkflow: function (recordSysId, awsCaseIdentifier, accountSysId, awsCommunicationBody) {
+                return startWorkflow('pushCommentToAws', {
+                    recordSysId: recordSysId,
+                    awsCaseIdentifier: awsCaseIdentifier,
+                    awsAccountSysId: accountSysId,
+                    awsCommunicationBody: awsCommunicationBody
+                }, true);
+            },
+            run: function (context, state) {
+                return new PushCommentToAwsTask(context, state).execute();
+            }
+        },
+        syncAutomationExecutionEvents: {
+            startWorkflow: function (changeRequest, eventDataStoreId) {
+                var context = {
+                    changeRequestSysId: changeRequest.sys_id.toString(),
+                    changeRequestId: changeRequest.x_126749_aws_sc_awsrequestid.getRefRecord().awsopsitemid.toString(),
+                    automationExecutionId: changeRequest.x_126749_aws_sc_automationexecutionid.toString(),
+                    accountSysId: changeRequest.x_126749_aws_sc_awsaccount.toString(),
+                    region: changeRequest.x_126749_aws_sc_awsregion.toString(),
+                    eventDataStoreId: eventDataStoreId,
+                };
+                return startWorkflow('syncAutomationExecutionEvents', context, true);
+            },
+            run: function (context, state) {
+                return new SyncAutomationExecutionEvents(context, state).execute();
+            }
+        }
+    };
+}());
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-10-23 10:16:53</sys_created_on>
+        <sys_id>9782218adb112300e9727d9ebf9619ab</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>WorkflowTasks</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_9782218adb112300e9727d9ebf9619ab</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

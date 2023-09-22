@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_grid_canvas_pane">
+    <sys_grid_canvas_pane action="INSERT_OR_UPDATE">
+        <grid_canvas display_value="PA AWSServiceManagement - New Tab">a5d8083d1b052550b69acaa3604bcb3b</grid_canvas>
+        <height>4</height>
+        <portal_widget display_value="Created 2023-02-16 09:52:43">58fe10bd1b852550b69acaa3604bcb07</portal_widget>
+        <posx>5</posx>
+        <posy>0</posy>
+        <sys_class_name>sys_grid_canvas_pane</sys_class_name>
+        <sys_created_by>SMC.Specialists2</sys_created_by>
+        <sys_created_on>2023-02-16 17:52:43</sys_created_on>
+        <sys_id>5cfe54bd1b852550b69acaa3604bcb8c</sys_id>
+        <sys_mod_count>22</sys_mod_count>
+        <sys_name>a5d8083d1b052550b69acaa3604bcb3b</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_grid_canvas_pane_5cfe54bd1b852550b69acaa3604bcb8c</sys_update_name>
+        <sys_updated_by>SMC.Specialists2</sys_updated_by>
+        <sys_updated_on>2023-03-17 13:40:14</sys_updated_on>
+        <width>2</width>
+    </sys_grid_canvas_pane>
+</record_update>

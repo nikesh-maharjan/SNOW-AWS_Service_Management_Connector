@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="m2m_sp_dependency_css_include">
+    <m2m_sp_dependency_css_include action="INSERT_OR_UPDATE">
+        <order>100</order>
+        <sp_css_include display_value="ngTagInputStyle">7a98ca28db229010bd9fe4da4b9619a9</sp_css_include>
+        <sp_dependency display_value="ngTagsInput">961bed20dbee5010bd9fe4da4b961999</sp_dependency>
+        <sys_class_name>m2m_sp_dependency_css_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-08-07 13:06:29</sys_created_on>
+        <sys_id>c80a4668db229010bd9fe4da4b9619f4</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>ngTagInputStyle.ngTagsInput</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>m2m_sp_dependency_css_include_c80a4668db229010bd9fe4da4b9619f4</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </m2m_sp_dependency_css_include>
+</record_update>

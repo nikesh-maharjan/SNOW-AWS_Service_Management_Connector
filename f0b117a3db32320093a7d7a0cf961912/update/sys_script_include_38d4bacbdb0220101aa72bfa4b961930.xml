@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.StaleConfigItems</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>StaleConfigItems</name>
+        <script><![CDATA[var StaleConfigItems = /** @class */ (function () {
+    function StaleConfigItems() {
+    }
+    /**
+     * For each account number/region/aggregator combination:
+     * Retrieve all ci_items linked to most recent sync for comparison
+     * Retrieve all ci_items linked to other syncs (with optional time constraints)
+     * If items in other syncs are not in most recent consider them stale
+     *
+     *
+     */
+    StaleConfigItems.forAll = function (f, options) {
+        var createRelationship = gs.getProperty(C.sysprop.configDedupeDeleteRelationshipCreate) === 'true';
+		var usemtmStaleitems = gs.getProperty('x_126749_aws_sc.stalestatususemtm')==='true';
+        var correlationIdField = gs.getProperty(C.sysprop.configDedupeDeleteFieldCorrelationId);
+        if (!createRelationship || !correlationIdField) {
+            throw new Error('Missing values for correlationId field or create relationship for state sync not enabled');
+        }
+        var relTypeId = Util.getRelationTypeSysId('Defines resources for::Gets resources from');
+        var syncStatusTable = "x_126749_aws_sc_cmdb_ci_sync_status";
+        //now get the combinations of region, account number and aggregator
+        var config = new GlideAggregate(syncStatusTable);
+        config.setGroup(true);
+        config.groupBy('awsaccountnumber');
+        config.groupBy('awsregion');
+        config.groupBy('awsaggregatorname');
+        config.addNotNullQuery('awsaccountnumber');
+        config.query();
+        while (config.next()) {
+            var accountNumber = config.awsaccountnumber.toString();
+            var region = config.awsregion.toString();
+            var aggregatorName = !config.awsaggregatorname.nil() ? config.awsaggregatorname.toString() : null;
+            //get the time of the most recent sync for this account/region/aggregator
+            var mostRecentFullSyncTime = StaleConfigItems.getMostRecentFullSyncTime(accountNumber, region, aggregatorName);
+            gs.debug('Config: ' + accountNumber + '/' + region +
+                (aggregatorName ? '/' + aggregatorName : ''));
+            // get the sys_id for the config
+            // (can't come from config due to use of an aggregator)
+            //for each combination of account, region, aggregator look up current linked items and previous linked items
+            //first get a list of current items - join query linking syncStatus record for this account,region,aggregator and most recent full sync time
+            var mostRecentlySyncedItems = [];
+			var mtmtable = usemtmStaleitems ? 'x_126749_aws_sc_m2m_configuratio_sync_status' :'cmdb_rel_ci';
+            var ci_rel_new = new GlideRecord(mtmtable);
+            ci_rel_new.addJoinQuery('cmdb_ci', 'child', 'sys_id');
+			if(!usemtmStaleitems)
+			{ci_rel_new.addQuery('type', relTypeId);}
+            var ss_new = ci_rel_new.addJoinQuery(syncStatusTable, 'parent', 'sys_id');
+            ss_new.addCondition('awsaccountnumber', accountNumber);
+            ss_new.addCondition('awsregion', region);
+            ss_new.addCondition('awsaggregatorname', aggregatorName);
+            ss_new.addCondition('awssynctime', mostRecentFullSyncTime);
+            ci_rel_new.query();
+            while (ci_rel_new.next()) {
+                //add the items to our array
+                var childRecordNew = ci_rel_new.child.getRefRecord();
+                mostRecentlySyncedItems.push(childRecordNew[correlationIdField].toString());
+            }
+            //now find *all* ci items linked to this account/region/aggregator combo before the last full sync
+            var alreadyProcessed = [];
+            var ci_rel = new GlideRecord(mtmtable);
+			if(!usemtmStaleitems)
+				{
+            ci_rel.addQuery('type', relTypeId);
+				}
+            var ci = ci_rel.addJoinQuery('cmdb_ci', 'child', 'sys_id');
+            var ss = ci_rel.addJoinQuery(syncStatusTable, 'parent', 'sys_id');
+            ss.addCondition('awsaccountnumber', accountNumber);
+            ss.addCondition('awsregion', region);
+            ss.addCondition('awsaggregatorname', aggregatorName);
+            ss.addCondition('awssynctime', '!=', mostRecentFullSyncTime);
+            if (options && options.lowerTimeLimit) {
+                ss.addCondition('awssynctime', '>=', options.lowerTimeLimit);
+            }
+            if (options && options.upperTimeLimit) {
+                ss.addCondition('awssynctime ', '<=', options.upperTimeLimit);
+            }
+            if (options && options.excludeStatus) {
+                ci.addCondition('install_status', 'NOT IN', options.excludeStatus.join(','));
+            }
+            ci_rel.orderByDesc('parent.awssynctime');
+            ci_rel.query();
+            //we can't specify previous sync time because the script would miss items deleted more than one sync back
+            //this would be fine for setting the install_status immediately after a sync but would be of little use as a standalone script
+            while (ci_rel.next()) {
+                var parentRecord = ci_rel.parent.getRefRecord();
+                var childRecord = ci_rel.child.getRefRecord();
+                var correlationId = childRecord[correlationIdField].toString();
+                if (mostRecentlySyncedItems.indexOf(correlationId) === -1 && alreadyProcessed.indexOf(correlationId) === -1) {
+                    alreadyProcessed.push(correlationId);
+                    var item = {
+                        ci: childRecord,
+                        accountNumber: parentRecord.awsaccountnumber.toString(),
+                        region: parentRecord.awsregion.toString(),
+                        aggregatorName: parentRecord.awsaggregatorname.toString(),
+                        lastSynced: parentRecord.awssynctime
+                    };
+                    f.apply(null, [item]);
+                }
+            }
+        }
+    };
+    StaleConfigItems.getMostRecentSyncTime = function (accountNumber, region, aggregatorName, isFullSync) {
+        if (isFullSync === void 0) { isFullSync = false; }
+        var thisSync = new GlideRecord("x_126749_aws_sc_cmdb_ci_sync_status");
+        thisSync.addQuery('awsaccountnumber', accountNumber);
+        thisSync.addQuery('awsregion', region);
+        if (aggregatorName) {
+            thisSync.addQuery('awsaggregatorname', aggregatorName);
+        }
+        else {
+            thisSync.addNullQuery('awsaggregatorname');
+        }
+        if (isFullSync) {
+            thisSync.addQuery('is_full_sync', 'true');
+        }
+        thisSync.orderByDesc('awssynctime');
+        thisSync.setLimit(1);
+        thisSync.query();
+        if (thisSync.next()) {
+            return thisSync.awssynctime;
+        }
+        return undefined;
+    };
+    StaleConfigItems.getMostRecentFullSyncTime = function (accountNumber, region, aggregatorName) {
+        return StaleConfigItems.getMostRecentSyncTime(accountNumber, region, aggregatorName, true);
+    };
+    StaleConfigItems.list = function (item) {
+        gs.info('account/region: ' + item.accountNumber + '/' + item.region
+            + (item.parent.aggregatorName ? ' agg: ' + item.parent.aggregatorName : '')
+            + ' ci: ' + item.child.name + ' - ' + item.ci.child.getDisplayValue('install_status')
+            + ' last seen: ' + item.child);
+    };
+    return StaleConfigItems;
+}());
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-02-05 10:19:04</sys_created_on>
+        <sys_id>38d4bacbdb0220101aa72bfa4b961930</sys_id>
+        <sys_mod_count>68</sys_mod_count>
+        <sys_name>StaleConfigItems</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_38d4bacbdb0220101aa72bfa4b961930</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-07-05 22:28:48</sys_updated_on>
+    </sys_script_include>
+</record_update>

@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category/>
+        <client_script><![CDATA[function provisionedProductsClient(spUtil, $scope) {
+    var c = this;
+
+    c.collapsible = {
+        provisioned: true,
+        terminated: false
+    };
+
+    spUtil.recordWatch($scope, "x_126749_aws_sc_cmdb_ci_pp", "owned_by.sys_id=" + c.data.sys_id, function(name, data) {
+        spUtil.update($scope);
+    });
+}
+]]></client_script>
+        <controller_as>c</controller_as>
+        <css>.result-container {
+    margin-top: 10px;
+}
+
+.provisioned-product {
+    background-color: #f5f5f5;
+    padding: 10px;
+@include border-top-radius($panel-border-radius);
+@include border-bottom-radius($panel-border-radius);
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.floatright {
+    float: right;
+}
+
+.panel-heading .panel-title {
+    display: inline;
+}
+
+.invisible {
+    display: none;
+}
+
+.item-title {
+    margin-top: 10px;
+}
+
+.item-details {
+    margin-top: 10px;
+}
+
+.item-update {
+    border-left: 1px solid #ccc;
+    margin-left: 5px;
+    padding-left: 8px;
+}
+</css>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description>Products provisioned through AWS Service Catalog</description>
+        <docs/>
+        <field_list/>
+        <has_preview>true</has_preview>
+        <id>aws-sc-pp-list</id>
+        <internal>false</internal>
+        <link/>
+        <name>My AWS Products</name>
+        <option_schema/>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[(function() {
+
+    data.products = [];
+
+    var userID = gs.getUserID();
+    data.userID = userID;
+
+    var pp = new GlideRecordSecure('x_126749_aws_sc_cmdb_ci_pp');
+    pp.addQuery('owned_by', userID);
+    pp.orderBy('awsname');
+    pp.query();
+
+    while (pp.next()) {
+        var product = {
+            sys_id: pp.sys_id.toString(),
+            arn: pp.awsarn.toString(),
+            lastRecordId: pp.awslastrecordid.toString(),
+            name: pp.awsname.toString(),
+            productStatus: pp.awsproductstatus.getChoiceValue(),
+            region: pp.awsregion.toString(),
+            status: pp.awsstatus.toString(),
+            statusMessage: pp.awsstatusmessage.toString(),
+            syncStatus: pp.awssyncstatus.toString()
+        };
+
+        var createdTime = !pp.awscreatedtime.nil() ? new GlideDateTime(pp.awscreatedtime) : null;
+        if (createdTime) {
+            product.createdTime = {
+                value: createdTime ? createdTime.getValue() : null,
+                displayValue: createdTime ? createdTime.getDisplayValue() : null,
+                numericValue: createdTime ? createdTime.getNumericValue() : null,
+                tzOffset: createdTime ? createdTime.getTZOffset() : null
+            };
+        }
+        
+        data.products.push(product);
+    }
+
+})();
+]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-05-17 13:57:42</sys_created_on>
+        <sys_id>182b97b60f8213003ab248dce1050e40</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>My AWS Products</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sp_widget_182b97b60f8213003ab248dce1050e40</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <template><![CDATA[<!--
+    My AWS Products
+-->
+<div class="panel panel-{{::c.options.color}} b">
+
+    <div class="panel-heading">
+        <h4 class="panel-title">My AWS Products</h4>
+        <span class="clickable floatright glyphicon glyphicon-resize-full"
+              ng-class="{'invisible': c.collapsible.provisioned}"
+              ng-click="c.collapsible.provisioned = !c.collapsible.provisioned"
+              data-toggle="collapse" data-target="#provisioned"></span>
+        <span class="clickable floatright glyphicon glyphicon-resize-small"
+              ng-class="{'invisible': !c.collapsible.provisioned}"
+              ng-click="c.collapsible.provisioned = !c.collapsible.provisioned"
+              data-toggle="collapse" data-target="#provisioned"></span>
+    </div>
+
+    <div id="provisioned" class="collapse in list-group result-container hide-x-overflow" style="overflow-y: auto;">
+        <a ng-if="c.data.products.length > 0"
+           ng-repeat="item in c.data.products | filter:{'productStatus': '!Terminated'} as provisionedProducts track by item.sys_id"
+           ng-href="/sp?id=aws_sc_pp_details&sys_id={{ item.sys_id }}" ng-click="c.select(item.sys_id)"
+           href="javascript:void(0)" class="list-group-item">
+            <h2 class="text-primary item-title">{{ item.name }}</h2>
+            <p class="text-muted item-details">
+                <i class="glyphicon glyphicon-flag"></i>
+                <span>{{ ::item.productStatus }}</span>
+                <em class="item-update" ng-if="item.createdTime" uib-tooltip="{{ item.createdTime.displayValue }}" tooltip-placement="top">
+                    Created
+                    <sn-time-ago timestamp="item.createdTime.value"></sn-time-ago>
+                </em>
+            </p>
+        </a>
+
+        <div ng-if="provisionedProducts.length === 0" class="list-group-item">
+            ${No records found}
+        </div>
+    </div>
+
+</div>
+
+<div class="panel panel-{{::c.options.color}} b">
+
+    <div class="panel-heading">
+        <h4 class="panel-title">Terminated Products</h4>
+        <span class="clickable floatright glyphicon glyphicon-resize-full"
+              ng-class="{'invisible': c.collapsible.terminated}"
+              ng-click="c.collapsible.terminated = !c.collapsible.terminated"
+              data-toggle="collapse" data-target="#terminated"></span>
+        <span class="clickable floatright glyphicon glyphicon-resize-small"
+              ng-class="{'invisible': !c.collapsible.terminated}"
+              ng-click="c.collapsible.terminated = !c.collapsible.terminated"
+              data-toggle="collapse" data-target="#terminated"></span>
+    </div>
+
+    <div id="terminated" class="collapse list-group result-container hide-x-overflow" style="overflow-y: auto;">
+        <a ng-if="c.data.products.length > 0"
+           ng-repeat="item in c.data.products | filter:{'productStatus': 'Terminated'} as terminatedProducts track by item.sys_id"
+           ng-href="/sp?id=aws_sc_pp_details&sys_id={{ item.sys_id }}" ng-click="c.select(item.sys_id)"
+           href="javascript:void(0)" class="list-group-item">
+            <h2 class="text-primary item-title">{{ item.name }}</h2>
+            <p class="text-muted item-details">
+                <i class="glyphicon glyphicon-flag"></i>
+                <span>{{ ::item.productStatus }}</span>
+                <em class="item-update" ng-if="item.createdTime" uib-tooltip="{{ item.createdTime.displayValue }}" tooltip-placement="top">
+                    Created
+                    <sn-time-ago timestamp="item.createdTime.value"></sn-time-ago>
+                </em>
+            </p>
+        </a>
+
+        <div ng-if="terminatedProducts.length === 0" class="list-group-item">
+            ${No records found}
+        </div>
+    </div>
+
+</div>
+]]></template>
+    </sp_widget>
+</record_update>

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.AbstractAwsAjaxProcessor</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>AbstractAwsAjaxProcessor</name>
+        <script><![CDATA[/**
+ * Functions for AJAX Processors.
+ */
+var AbstractAwsAjaxProcessor = /** @class */ (function (_super) {
+    Polyfill.__extends(AbstractAwsAjaxProcessor, _super);
+    function AbstractAwsAjaxProcessor() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    AbstractAwsAjaxProcessor.prototype._applyWith = function (suppliers, callback) {
+        var result;
+        try {
+            var args = [];
+            for (var i = 0, l = suppliers.length; i < l; i++) {
+                var v = suppliers[i].get(this);
+                if (v instanceof Error) {
+                    return this._errorResponse(v.message);
+                }
+                else {
+                    args.push(v);
+                }
+            }
+            result = callback.apply(this, args);
+        }
+        catch (e) {
+            var msg = (e.message ? e.message : e.toString());
+            gs.warn("Unhandled error calling " + callback.name + ": " + msg);
+            return this._errorResponse("Unhandled error: " + msg);
+        }
+        if (typeof result === 'string') {
+            return result;
+        }
+        else if (!result) {
+            result = 'ok';
+        }
+        return this._response(JSON.stringify(result));
+    };
+    AbstractAwsAjaxProcessor.prototype._getProduct = function (id) {
+        var productGr = new GlideRecord('x_126749_aws_sc_product');
+        return productGr.get(id) ? productGr : null;
+    };
+    AbstractAwsAjaxProcessor.prototype._getProductFromProvisioned = function (ppGR) {
+        var event = new GlideRecord('x_126749_aws_sc_pp_event');
+        event.addQuery('awsproduct', ppGR.sys_id);
+        event.setLimit(1);
+        event.query();
+        if (!event.next()) {
+            return null;
+        }
+        var product = new GlideRecord('x_126749_aws_sc_product');
+        product.addQuery('awsregion', ppGR.awsregion.toString());
+        product.addQuery('awsproductid', event.awsproductid.toString());
+        product.query();
+        if (!product.next()) {
+            return null;
+        }
+        return product;
+    };
+    AbstractAwsAjaxProcessor.prototype._getSecurityTokenService = function (region, credential) {
+        return new AwsSecurityTokenService(region, credential);
+    };
+    AbstractAwsAjaxProcessor.prototype._getServiceCatalog = function (region, credential) {
+        return new AwsServiceCatalog(region, credential);
+    };
+    AbstractAwsAjaxProcessor.prototype._getCloudFormation = function (region, credential) {
+        return new AwsCloudFormation(region, credential);
+    };
+    AbstractAwsAjaxProcessor.prototype._getEc2 = function (region, credential) {
+        return new AwsEc2(region, credential);
+    };
+    AbstractAwsAjaxProcessor.prototype._getRoute53 = function (credential) {
+        return new AwsRoute53(credential);
+    };
+    AbstractAwsAjaxProcessor.prototype._getBudgets = function (region, credential) {
+        return new AwsBudgets(region, credential);
+    };
+    AbstractAwsAjaxProcessor.prototype._isEmpty = function (param) {
+        return param.trim() === "";
+    };
+    AbstractAwsAjaxProcessor.prototype._isMissing = function (param) {
+        return param === undefined || param === null;
+    };
+    AbstractAwsAjaxProcessor.prototype._isMissingOrEmpty = function (param) {
+        return this._isMissing(param) || this._isEmpty(param);
+    };
+    AbstractAwsAjaxProcessor.prototype._missingParameter = function (param) {
+        return this._errorResponse('Missing parameter: ' + param);
+    };
+    AbstractAwsAjaxProcessor.prototype._errorResponse = function (msg, result) {
+        var obj = '{"success": false, "message": ' + JSON.stringify(msg);
+        if (result) {
+            if (typeof result === 'object') {
+                result = JSON.stringify(result);
+            }
+            obj += ', "result": ' + result;
+        }
+        obj += '}';
+        return obj;
+    };
+    AbstractAwsAjaxProcessor.prototype._response = function (body) {
+        if (typeof body === 'object') {
+            body = JSON.stringify(body);
+        }
+        return '{"success": true, "result": ' + body + '}';
+    };
+    return AbstractAwsAjaxProcessor;
+}(global.AbstractAjaxProcessor));
+AbstractAwsAjaxProcessor.prototype.type = 'AbstractAwsAjaxProcessor';
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-07-26 16:13:51</sys_created_on>
+        <sys_id>db8f94a54fe31300248489dba310c750</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AbstractAwsAjaxProcessor</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_db8f94a54fe31300248489dba310c750</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

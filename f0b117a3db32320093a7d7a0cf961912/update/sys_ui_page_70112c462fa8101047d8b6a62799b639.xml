@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ui_page">
+    <sys_ui_page action="INSERT_OR_UPDATE">
+        <category>general</category>
+        <client_script/>
+        <description>A page to gather necessary information to order an AWS Systems Manager Automation Document</description>
+        <direct>false</direct>
+        <endpoint>x_126749_aws_sc_order_document.do</endpoint>
+        <html><![CDATA[<?xml version="1.0" encoding="utf-8" ?>
+<!-- TODO: not currently supported by the CLI. @Deployable({table: 'sys_ui_page', column: 'html', sysId: '70112c462fa8101047d8b6a62799b639'}) -->
+<j:jelly trim="false" xmlns:j="jelly:core" xmlns:g="glide" xmlns:j2="null" xmlns:g2="null">
+    <g:requires name="angular_includes_1.5.11.jsx"/>
+    <g:requires name="x_126749_aws_sc.angularBootstrap.jsdbx"/>
+    <g:requires name="x_126749_aws_sc.ngTagsInput.jsdbx"/>
+    <g:requires name="x_126749_aws_sc.awsComponents.jsdbx"/>
+    <g:requires name="x_126749_aws_sc.documentCatalog.jsdbx"/>
+    <head>
+        <title>Execute automation document from AWS System Manager</title>
+    </head>
+    <body ng-app="documentCatalog">
+
+    <g:evaluate object="true">
+        // Get session token. Required so we can use $http in Service Portal. See
+        // https://community.servicenow.com/community?id=community_blog&amp;sys_id=bebc6e25dbd0dbc01dcaf3231f961928
+        // Note ServiceNow documentation says that GlideSystem's getSessionToken()
+        // method "is no longer available. Instead, use gs.getSession().getSessionToken()."
+        // Experimentally on Istanbul this is not true on this page, only in server scripts.
+        var session = gs.getSession();
+        var token;
+        var token = session.getSessionToken();
+        if (!token) {
+            try {
+                token = gs.getSessionToken();
+            } catch (err) {
+                gs.debug('Fallback to GlideSession.getSessionToken failed');
+            }
+        }
+
+        var opsitemId;
+        var opsitemSysId = RP.getParameterValue('opsitemSysId');
+        var opsitemGr = new GlideRecordSecure('x_126749_aws_sc_opsitem');
+        if (opsitemGr.get(opsitemSysId) ${AND} opsitemGr.isValidRecord()) {
+            opsitemId = opsitemGr.awsopsitemid.toString();
+        }
+    </g:evaluate>
+
+    <main>
+        <location-guard if-location-matches="'com\.glideapp\.servicecatalog_cat_item(_guide)?_view\.do'">
+            <document-catalog-ui user-token="$[token]" opsitem-id="$[opsitemId]"></document-catalog-ui>
+        </location-guard>
+    </main>
+    <footer></footer>
+    </body>
+</j:jelly>
+]]></html>
+        <name>order_document</name>
+        <processing_script/>
+        <sys_class_name>sys_ui_page</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-05-04 11:13:52</sys_created_on>
+        <sys_id>70112c462fa8101047d8b6a62799b639</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>order_document</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_ui_page_70112c462fa8101047d8b6a62799b639</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_ui_page>
+</record_update>

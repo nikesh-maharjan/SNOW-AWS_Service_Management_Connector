@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.PortfolioRepo</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>PortfolioRepo</name>
+        <script><![CDATA[var PortfolioRepo = /** @class */ (function () {
+    function PortfolioRepo(region, serviceCatalog) {
+        this.region = Util.assertExists(region, "region");
+        this.serviceCatalog = Util.assertExists(serviceCatalog, "serviceCatalog");
+    }
+    PortfolioRepo.prototype.get = function (portFolioId, accountSysId) {
+        var portfolioGr = new GlideRecord('x_126749_aws_sc_portfolio');
+        portfolioGr.addQuery('awsid', "=", portFolioId);
+        portfolioGr.addQuery('awsaccount', "=", accountSysId);
+        portfolioGr.addQuery('awsregion', "=", this.region);
+        portfolioGr.setLimit(1);
+        portfolioGr.query();
+        if (portfolioGr.next()) {
+            return portfolioGr;
+        }
+        return null;
+    };
+    PortfolioRepo.prototype.insertOrUpdate = function (account, portfolioDetail, type, budgetDetail) {
+        var message = "portfolio ".concat(portfolioDetail.DisplayName, " (").concat(portfolioDetail.Id, ") in account ").concat(account.awsname);
+        var glideRecord = this.get(portfolioDetail.Id, account.sys_id.toString());
+        if (glideRecord) {
+            message = "Updating " + message;
+            this._updatePortfolio(glideRecord, account, portfolioDetail, type, budgetDetail);
+        }
+        else {
+            message = "Inserting " + message;
+            glideRecord = this._insertPortfolio(account, portfolioDetail, type, budgetDetail);
+        }
+        gs.debug("[SYNC] [AWS ServiceCatalog] ".concat(message));
+        return glideRecord;
+    };
+    PortfolioRepo.prototype._insertPortfolio = function (account, portfolioDetail, type, budgetDetail) {
+        var portfolioGr = new GlideRecord('x_126749_aws_sc_portfolio');
+        portfolioGr.initialize();
+        Util.setValue(portfolioGr, 'awsid', portfolioDetail.Id);
+        Util.setValue(portfolioGr, 'awsregion', this.region);
+        this._setPortfolioProperties(portfolioGr, account, portfolioDetail, type);
+        this._setBudgetProperties(portfolioGr, budgetDetail);
+        portfolioGr.insert();
+        return portfolioGr;
+    };
+    PortfolioRepo.prototype._updatePortfolio = function (existingGlideRecord, account, portfolioDetail, type, budgetDetail) {
+        this._setPortfolioProperties(existingGlideRecord, account, portfolioDetail, type);
+        this._setBudgetProperties(existingGlideRecord, budgetDetail);
+        existingGlideRecord.update();
+    };
+    PortfolioRepo.prototype.processLastUpdatedBefore = function (glideDateTime) {
+        this._deletePortfoliosOlderThan(glideDateTime);
+    };
+    PortfolioRepo.prototype._deletePortfoliosOlderThan = function (glideDateTime) {
+        gs.debug("[SYNC] [AWS ServiceCatalog] Deleting any portfolios older than ".concat(glideDateTime));
+        var portfolioGR = new GlideRecord('x_126749_aws_sc_portfolio');
+        var categorySysIdsToDelete = [];
+        portfolioGR.addQuery('sys_updated_on', '<', glideDateTime);
+        portfolioGR.query();
+        while (portfolioGR.next()) {
+            if (!portfolioGR.sc_category.nil()) {
+                categorySysIdsToDelete.push(portfolioGR.sc_category.toString());
+            }
+            // budget information is stored in Currency type fields
+            // GlideRecord#deleteMultiple() cannot be used with these fields
+            // https://docs.servicenow.com/bundle/madrid-platform-administration/page/administer/currency/concept/currency-values-scripts.html
+            portfolioGR.deleteRecord();
+        }
+        gs.debug("[SYNC] [AWS ServiceCatalog] Service Catalog Categories to delete: ".concat(categorySysIdsToDelete.join(',')));
+        categorySysIdsToDelete.forEach(function (categorySysIdToDelete) {
+            var catCategory = new sn_sc.CatCategory(categorySysIdToDelete);
+            catCategory.deleteRecord();
+        });
+    };
+    PortfolioRepo.prototype.saveCategoryForPortfolio = function (portfolio) {
+        var parentCategory = ProductRepo.getProductCategory();
+        if (!parentCategory) {
+            return null;
+        }
+        var attrs = {};
+        var account = portfolio.awsaccount.getRefRecord();
+        if (account.isValidRecord()) {
+            attrs.description = "In account ".concat(account.awsname, " (").concat(portfolio.awsregion, " region)");
+        }
+        var catProdCategory;
+        // check whether to create a hierarchical categorization in SN Service Portal based on the property value selected
+        if (gs.getProperty(C.sysprop.portalView) == 'Account/Region/Portfolio') {
+            var accountCategory = this.checkCreateCategoryexists(account.awsname, parentCategory.sys_id.toString(), parentCategory);
+            var regionCategory = this.checkCreateCategoryexists(portfolio.awsregion, accountCategory, parentCategory);
+            catProdCategory = this.checkCreateCategoryexists(portfolio.awsdisplayname, regionCategory, parentCategory);
+        }
+        else {
+            catProdCategory = this.checkCreateCategoryexists(portfolio.awsdisplayname, parentCategory.sys_id.toString(), parentCategory);
+        }
+        // Copy the parent category's icon to the new category.
+        var gsa = new GlideSysAttachment();
+        gsa.copy('sc_category', parentCategory.sys_id, 'sc_category', catProdCategory);
+        portfolio.sc_category = catProdCategory;
+        portfolio.update();
+        return catProdCategory;
+    };
+    PortfolioRepo.prototype.checkCreateCategoryexists = function (title, parent, parentCategory) {
+        var category = new GlideRecord('sc_category');
+        category.addQuery('title', title);
+        if (parent) {
+            category.addQuery('parent', parent);
+        }
+        category.query();
+        if (category.next()) {
+            return category.sys_id;
+        }
+        else {
+            var attrs = {
+                'title': title,
+                'parent': parent,
+                'sc_catalog': parentCategory.getValue('sc_catalog')
+            };
+            var catCategory = new sn_sc.CatCategory();
+            catCategory.setAttributes(attrs);
+            return catCategory.create();
+        }
+    };
+    PortfolioRepo.prototype._setPortfolioProperties = function (portfolioGr, account, portfolioDetail, type) {
+        Util.setValue(portfolioGr, 'awsarn', portfolioDetail.ARN);
+        Util.setValue(portfolioGr, 'awscreatedtime', Util.toGlideDateTime(portfolioDetail.CreatedTime));
+        Util.setValue(portfolioGr, 'awsdescription', portfolioDetail.Description);
+        Util.setValue(portfolioGr, 'awsdisplayname', portfolioDetail.DisplayName);
+        Util.setValue(portfolioGr, 'awsprovidername', portfolioDetail.ProviderName);
+        Util.setValue(portfolioGr, 'awstype', type);
+        Util.setValue(portfolioGr, 'awsaccount', account.sys_id.toString());
+        // ensure the record is always marked as updated, as 'setForceUpdate' is not available to scoped apps
+        Util.setValue(portfolioGr, 'awslastsynctime', new GlideDateTime());
+    };
+    PortfolioRepo.prototype._setBudgetProperties = function (portfolioGr, budgetDetail) {
+        Util.setBudgetOnGlideRecord(portfolioGr, budgetDetail);
+    };
+    return PortfolioRepo;
+}());
+PortfolioRepo.prototype.type = "PortfolioRepo";
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2017-09-12 08:19:24</sys_created_on>
+        <sys_id>7df29e57db010300cb04d421cf9619b8</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>PortfolioRepo</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_7df29e57db010300cb04d421cf9619b8</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

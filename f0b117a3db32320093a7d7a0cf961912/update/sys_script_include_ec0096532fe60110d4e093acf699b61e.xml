@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.AwsSystemsManagerIncidentManager</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>AwsSystemsManagerIncidentManager</name>
+        <script><![CDATA[var AwsSystemsManagerIncidentManager = /** @class */ (function (_super) {
+    Polyfill.__extends(AwsSystemsManagerIncidentManager, _super);
+    function AwsSystemsManagerIncidentManager(region, credential) {
+        var _this = this;
+        Util.assertExists(region, 'AwsSystemsManagerIncidentManager requires a region');
+        _this = _super.call(this, 'ssm-incidents', region, credential, true) || this;
+        return _this;
+    }
+    AwsSystemsManagerIncidentManager.prototype.headers = function () {
+        return {
+            'Content-Type': 'application/json',
+        };
+    };
+    /**
+     * Lists all incident records in your account. Use this command to retrieve the Amazon Resource Name (ARN) of the incident record you want to update.
+     *
+     * @see https://docs.aws.amazon.com/incident-manager/latest/APIReference/API_ListIncidentRecords.html
+     * @param request
+     */
+    AwsSystemsManagerIncidentManager.prototype.listIncidentRecords = function (request) {
+        var _this = this;
+        var action = "ListIncidentRecords";
+        var focus = "incidentRecordSummaries";
+        var pageToken = "nextToken";
+        var headers = this.headers();
+        var path = '/listIncidentRecords';
+        var call = function (payload) {
+            return _this._post(action, payload, headers, undefined, path);
+        };
+        var pageFn = function (token) {
+            var pagedRequest = Object.extend({}, request);
+            pagedRequest[pageToken] = token;
+            return Response.paginated(call(request), focus, pageFn, pageToken);
+        };
+        return Response.paginated(call(request), focus, pageFn, pageToken);
+    };
+    /**
+     * Returns the details for the specified incident record.
+     *
+     * @see https://docs.aws.amazon.com/incident-manager/latest/APIReference/API_GetIncidentRecord.html
+     * @param request
+     */
+    AwsSystemsManagerIncidentManager.prototype.getIncidentRecord = function (request) {
+        var path = '/getIncidentRecord';
+        return Response.of(this._get(path, undefined, undefined, { arn: request.arn }));
+    };
+    /**
+     * Lists timeline events for the specified incident record.
+     *
+     * @see https://docs.aws.amazon.com/incident-manager/latest/APIReference/API_ListTimelineEvents.html
+     * @param request
+     */
+    AwsSystemsManagerIncidentManager.prototype.listTimelineEvents = function (request) {
+        var _this = this;
+        var action = "ListTimelineEvents";
+        var focus = 'eventSummaries';
+        var pageToken = 'nextToken';
+        var headers = this.headers();
+        var path = '/listTimelineEvents';
+        var call = function (payload) {
+            return _this._post(action, payload, headers, undefined, path);
+        };
+        var pageFn = function (token) {
+            var pagesRequest = Object.extend({}, request);
+            pagesRequest[pageToken] = token;
+            return Response.paginated(call(request), focus, pageFn, pageToken);
+        };
+        return Response.paginated(call(request), focus, pageFn, pageToken);
+    };
+    /**
+     * Retrieves a timeline event based on its ID and incident record.
+     *
+     * @see https://docs.aws.amazon.com/incident-manager/latest/APIReference/API_GetTimelineEvent.html
+     * @param request
+     */
+    AwsSystemsManagerIncidentManager.prototype.getTimelineEvent = function (request) {
+        var path = '/getTimelineEvent';
+        return Response.of(this._get(path, undefined, undefined, request));
+    };
+    /**
+     * Add or remove related items from the related items tab of an incident record.
+     *
+     * @see https://docs.aws.amazon.com/incident-manager/latest/APIReference/API_UpdateRelatedItems.html
+     * @param request
+     */
+    AwsSystemsManagerIncidentManager.prototype.updateRelatedItems = function (request) {
+        var action = "UpdateRelatedItems";
+        var path = '/updateRelatedItems';
+        var headers = this.headers();
+        return Response.of(this._post(action, request, headers, undefined, path));
+    };
+    /**
+     * Lists all incident records in your account. Use this command to retrieve the Amazon Resource Name (ARN) of the incident record you want to update.
+     *
+     * @see https://docs.aws.amazon.com/incident-manager/latest/APIReference/API_UpdateIncidentRecord.html
+     * @param request
+     */
+    AwsSystemsManagerIncidentManager.prototype.updateIncidentRecord = function (request) {
+        var action = "UpdateIncidentRecord";
+        var path = '/updateIncidentRecord';
+        var headers = this.headers();
+        return Response.of(this._post(action, request, headers, undefined, path));
+    };
+    return AwsSystemsManagerIncidentManager;
+}(AwsService));
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2022-04-04 15:09:46</sys_created_on>
+        <sys_id>ec0096532fe60110d4e093acf699b61e</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AwsSystemsManagerIncidentManager</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_ec0096532fe60110d4e093acf699b61e</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

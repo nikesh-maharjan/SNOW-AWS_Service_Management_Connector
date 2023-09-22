@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.AwsCloudFormation</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>AwsCloudFormation</name>
+        <script><![CDATA[/**
+ * @class AwsCloudFormation
+ * @classdesc Make HTTP requests to AWS CloudFormation.
+ * This class, and the objects its functions return, should be considered beta and subject to change without notice.
+ * @param region {String} An AWS region, e.g. "us-west-1"
+ * @param credential {Object} AWS account credentials.
+ * @param credential.identity {String} An AWS access key.
+ * @param credential.secret {String} An AWS secret access key.
+ * @param credential.session {String=} Required if using temporary credentials.
+ * @param apiVersion {String=} Optional version of CloudFormation API. Defaults to "2010-05-15".
+ *
+ * @beta
+ */
+var AwsCloudFormation = /** @class */ (function (_super) {
+    Polyfill.__extends(AwsCloudFormation, _super);
+    function AwsCloudFormation(region, credential, apiVersion) {
+        var _this = _super.call(this, "cloudformation", region, credential, false) || this;
+        Util.assertExists(region, "region");
+        _this.apiVersion = apiVersion || "2010-05-15";
+        return _this;
+    }
+    /**
+     * Deregister a resource type for CloudFormation.
+     * @see https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_DeregisterType.html
+     * @param typeName string The name of the resource type to deregister, e.g. ServiceNow::CMDB::Service
+     * @param schemaVersion string The version of the resource type to deregister
+     * @memberof! AwsCloudFormation#
+     * @alias deregisterType
+     */
+    AwsCloudFormation.prototype.deregisterType = function (typeName, schemaVersion) {
+        Util.assertExists(typeName, "typeName");
+        Util.assertExists(schemaVersion, "schemaVersion");
+        var action = "DeregisterType";
+        var payload = Util.formEncode({
+            "Action": action,
+            "Type": "RESOURCE",
+            "TypeName": typeName,
+            "VersionId": schemaVersion
+        });
+        return Response.of(this._post(action, payload, {
+            "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+        }));
+    };
+    /**
+     * Returns the state of a specified type registration.
+     * @see https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_DescribeTypeRegistration.html
+     * @param [registrationToken] string The registration token ID.
+     * @returns {WrappedResponse}
+     * @memberof! AwsCloudFormation#
+     * @alias describeTypeRegistration
+     */
+    AwsCloudFormation.prototype.describeTypeRegistration = function (registrationToken) {
+        Util.assertExists(registrationToken, "registrationToken");
+        var action = "DescribeTypeRegistration";
+        var payload = Util.formEncode({
+            "Action": action,
+            "RegistrationToken": registrationToken
+        });
+        return Response.of(this._post(action, payload, {
+            "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+        }), 'DescribeTypeRegistrationResponse.DescribeTypeRegistrationResult');
+    };
+    /**
+     * Returns the description for the specified stack.
+     * @see https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_DescribeStacks.html
+     * @param [stackName] string The name or the unique stack ID that is associated with the stack.
+     * @returns {WrappedResponse}
+     * @memberof! AwsCloudFormation#
+     * @alias describeStacks
+     */
+    AwsCloudFormation.prototype.describeStacks = function (stackName) {
+        Util.assertExists(stackName, "stackName");
+        var action = "DescribeStacks";
+        var payload = Util.formEncode({
+            "Action": action,
+            "StackName": stackName,
+            "Version": this.apiVersion
+        });
+        return Response.of(this._post(action, payload, {
+            "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+        }));
+    };
+    /**
+     * Returns the description for the specified stack set.
+     * @see https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_DescribeStackSet.html
+     * @param [stackSetName] string The name or the unique stack set ID that is associated with the stack set.
+     * @returns {WrappedResponse}
+     * @memberof! AwsCloudFormation#
+     * @alias describeStackSet
+     */
+    AwsCloudFormation.prototype.describeStackSet = function (stackSetName) {
+        Util.assertExists(stackSetName, "stackSetName");
+        var action = "DescribeStackSet";
+        var payload = Util.formEncode({
+            "Action": action,
+            "StackSetName": stackSetName,
+            "Version": this.apiVersion
+        });
+        return Response.of(this._post(action, payload, {
+            "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+        }));
+    };
+    /**
+     * Register a new resource type for CloudFormation.
+     * @see https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_RegisterType.html
+     * @param typeName string The name of the resource type to register, e.g. ServiceNow::CMDB::Service
+     * @param s3PackageName string the s3 location of the resource provider ZIP file, e.g. s3://cmdb-resource-providers/servicenow-cmdb-service.zip
+     * @memberof! AwsCloudFormation#
+     * @alias registerType
+     */
+    AwsCloudFormation.prototype.registerType = function (typeName, s3PackageName) {
+        Util.assertExists(typeName, "typeName");
+        Util.assertExists(s3PackageName, "s3PackageName");
+        var action = "RegisterType";
+        var payload = Util.formEncode({
+            "Action": action,
+            "Type": "RESOURCE",
+            "TypeName": typeName,
+            "SchemaHandlerPackage": s3PackageName
+        });
+        return Response.of(this._post(action, payload, {
+            "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+        }), 'RegisterTypeResponse.RegisterTypeResult');
+    };
+    return AwsCloudFormation;
+}(AwsService));
+AwsCloudFormation.prototype.type = 'AwsCloudFormation';
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-07-26 16:18:23</sys_created_on>
+        <sys_id>93902c654fe31300248489dba310c710</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AwsCloudFormation</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_93902c654fe31300248489dba310c710</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

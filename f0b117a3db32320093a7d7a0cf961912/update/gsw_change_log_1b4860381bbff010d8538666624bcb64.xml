@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="gsw_change_log">
+    <gsw_change_log action="INSERT_OR_UPDATE">
+        <change_date>2021-11-10 20:18:53</change_date>
+        <changed_by display_value="Joe Thomas">9e7e21991b0e7410d8538666624bcbb9</changed_by>
+        <content display_value="AWS Service Management Connector">c09fcac2dbd130100f00b298f496196f</content>
+        <related_change_log_entry/>
+        <related_task_entry/>
+        <sys_class_name>gsw_change_log</sys_class_name>
+        <sys_created_by>mjoethom</sys_created_by>
+        <sys_created_on>2021-11-10 20:18:53</sys_created_on>
+        <sys_id>1b4860381bbff010d8538666624bcb64</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>2021-11-10 20:18:53</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>gsw_change_log_1b4860381bbff010d8538666624bcb64</sys_update_name>
+        <sys_updated_by>mjoethom</sys_updated_by>
+        <sys_updated_on>2021-11-10 20:18:53</sys_updated_on>
+        <type>1</type>
+    </gsw_change_log>
+</record_update>

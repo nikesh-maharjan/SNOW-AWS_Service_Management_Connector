@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.AwsSmc</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>AwsSmc</name>
+        <script><![CDATA[/**
+ * Create an instance of the AWS SMC public API.
+ * @classdesc `AwsSmc` is the Connector's public API to AWS Service integrations.
+ * @class AwsSmc
+ */
+var AwsSmc = /** @class */ (function () {
+    function AwsSmc(user) {
+        this.user = user;
+    }
+    AwsSmc.asSyncUser = function () {
+        return new AwsSmc(AwsCredentials.User.Sync);
+    };
+    AwsSmc.asEndUser = function () {
+        return new AwsSmc(AwsCredentials.User.End);
+    };
+    /**
+     *
+     * @param region {String} The AWS region to target.
+     * @param account {GlideRecord} A GlideRecord instance for a record in x_126749_aws_sc_account.
+     *
+     * @return {AwsServiceCatalog} An object proxying the public functions on an instance of AwsServiceCatalog.
+     *
+     * @throws Error If account does not have the required properties.
+     * @memberof! AwsSmc#
+     * @alias getServiceCatalog
+     */
+    AwsSmc.prototype.getServiceCatalog = function (region, account) {
+        this.validateAccount(account);
+        return new AwsServiceCatalog(region, AwsCredentials.from(account).as(this.user));
+    };
+    /**
+     *
+     * @param region {String} The AWS region to target.
+     * @param account {GlideRecord} A GlideRecord instance for a record in x_126749_aws_sc_account.
+     *
+     * @return {AwsConfig} An object proxying the public functions on an instance of AwsConfig.
+     *
+     * @throws Error If account does not have the required properties.
+     * @memberof! AwsSmc#
+     * @alias getConfig
+     */
+    AwsSmc.prototype.getConfig = function (region, account) {
+        this.validateAccount(account);
+        return new AwsConfig(region, AwsCredentials.from(account).as(this.user));
+    };
+    /**
+     *
+     * @param region {String} The AWS region to target.
+     * @param account {GlideRecord} A GlideRecord instance for a record in x_126749_aws_sc_account.
+     *
+     * @return {AwsSystemsManager} An object proxying the public functions on an instance of AwsSystemsManager.
+     *
+     * @throws Error If account does not have the required properties.
+     * @memberof! AwsSmc#
+     * @alias getSystemsManager
+     */
+    AwsSmc.prototype.getSystemsManager = function (region, account) {
+        this.validateAccount(account);
+        return new AwsSystemsManager(region, AwsCredentials.from(account).as(this.user));
+    };
+    /**
+     *
+     * @param region {String} The AWS region to target.
+     * @param account {GlideRecord} A GlideRecord instance for a record in x_126749_aws_sc_account.
+     *
+     * @return {AwsSecurityHub} An object proxying the public functions on an instance of AwsSecurityHub.
+     *
+     * @throws Error If account does not have the required properties.
+     * @memberof! AwsSmc#
+     * @alias getSecurityHub
+     */
+    AwsSmc.prototype.getSecurityHub = function (region, account) {
+        this.validateAccount(account);
+        return new AwsSecurityHub(region, AwsCredentials.from(account).as(this.user));
+    };
+    /**
+     *
+     * @param account {GlideRecord} A GlideRecord instance for a record in x_126749_aws_sc_account.
+     *
+     * @return {AwsSupport} An object proxying the public functions on an instance of AwsSupport.
+     *
+     * @throws Error If account does not have the required properties.
+     * @memberof! AwsSmc#
+     * @alias getSupport
+     */
+    AwsSmc.prototype.getSupport = function (account) {
+        this.validateAccount(account);
+        var credentials = AwsCredentials.from(account).as(this.user);
+        return new AwsSupport(account.sys_id.toString(), credentials);
+    };
+    /**
+     *
+     * @param region {String} The AWS region to target.
+     * @param account {GlideRecord} A GlideRecord instance for a record in x_126749_aws_sc_account.
+     *
+     * @return {AwsSecurityHub} An object proxying the public functions on an instance of AwsSecurityHub.
+     *
+     * @throws Error If account does not have the required properties.
+     * @memberof! AwsSmc#
+     * @alias getSecurityHub
+     */
+    AwsSmc.prototype.getStaleConfigItems = function () {
+        return StaleConfigItems;
+    };
+    AwsSmc.prototype.validateAccount = function (account) {
+        if (!account || account.getTableName() !== 'x_126749_aws_sc_account' || !account.isValidRecord()) {
+            throw new Error('Illegal argument: account must be an instance of "x_126749_aws_sc_account"');
+        }
+    };
+    AwsSmc.prototype.resolveAwsSupportCaseToAws = function (recordSysId, accountSysId, awsCaseIdentifier) {
+        try {
+            var workflow_1 = WorkflowTasks.resolveSupportCaseToAws.startWorkflow(recordSysId, accountSysId, awsCaseIdentifier);
+            gs.info("[SYNC] [AWS Support] Successfully requested resolution of ServiceNow SMC Support Case \"".concat(recordSysId, "\" to AWS Support. See workflow context ").concat(workflow_1.sys_id, " for the execution details"));
+        }
+        catch (ex) {
+            gs.warn("[SYNC] [AWS Support] Error requesting resolution of ServiceNow SMC Support Case \"".concat(recordSysId, "\" to AWS Support: ").concat(Util.errorMessageFormat(ex.message)));
+            throw ex;
+        }
+    };
+    return AwsSmc;
+}());
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-03-08 19:06:23</sys_created_on>
+        <sys_id>1f7880ec4f381300f54a8fe18110c789</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AwsSmc</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_1f7880ec4f381300f54a8fe18110c789</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

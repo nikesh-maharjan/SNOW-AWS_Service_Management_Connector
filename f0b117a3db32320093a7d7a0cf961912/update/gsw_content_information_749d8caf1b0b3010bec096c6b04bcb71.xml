@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="gsw_content_information">
+    <gsw_content_information action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <article><![CDATA[<div>
+<p><strong>To view OpsItems from AWS Systems Manager - OpsCenter</strong></p>
+<ol style="list-style-position: inside;"><li>To view AWS OpsItem, you must have the role <code>x_126749_aws_sc.opscenter_manager</code> with the Connector scope app.</li><li>Log in to your ServiceNow instance as a user (for example, System Administrator) in the fulfiller view (Standard user interface view).</li><li>In the navigator, enter <code>AWS Service Management</code>.</li><li>Choose <strong>AWS Systems Manager - OpsCenter</strong>.</li><li>Choose <strong>OpsItems</strong> to show a list of all synced Findings.</li><li>Choose an OpsItems to open the record. The Incident and Problem fields show the Incident for the OpsItems, if these exist.</li><li>Choose the ⓘ icon to the right of the field to preview the Incident.</li><li>Choose <strong>Open Record</strong> on the preview form to open the Incident. If the Connector configuration does not to automatically create a ServiceNow Incident when a new Finding syncs, you can create one manually. To do so, choose the link at the bottom of the form.</li></ol>
+</div>
+<div>
+<p><strong>To execute an AWS Systems Manager – Automation Document from an AWS OpsItems associated to a ServiceNow Incident</strong></p>
+<p>One of the following conditions must be true to view or execute automation documents (runbooks):</p>
+<div>
+<ul style="list-style-position: inside;"><li>The user has the role Account Manager or Automation Manager.</li><li>The user is assigned to a linked incident.</li><li>The system parameter <em>Assignment Group (SYS_ID) for created incidents</em> is set to a valid group, a linked incident whose Assignment group is set to that group, and the user is a member of that group.</li></ul>
+</div>
+<div> </div>
+<ol style="list-style-position: inside;"><li>Log in to your ServiceNow instance as a user (for example, System Administrator) in the fulfiller view (standard user interface view).</li><li>In the navigator, enter <code>AWS Service Management</code>. Then choose <strong>AWS Systems Manager - OpsCenter</strong>.</li><li>Choose OpsItems to show a list of all synced Findings. Then choose <strong>Execute Automation Document</strong>.</li><li>Choose your Automation Document. (You can configure an OpsItem with Automation Documents and mark it as <em>Associated</em>.)</li><li>Choose <strong>Order Execution</strong> next to the Automation Document you want to execute. You’ll see the ServiceNow catalog item associated with the Automation Document.</li><li>Enter the necessary AWS parameters and choose <strong>Order Now</strong>.</li><li>In OpsItems in the scoped app, choose the OpsItem in the Automation Document where you executed it.</li><li>In <strong>OpsItem Automation Executions</strong>, review the success or failure status.</li><li>Follow your organization&#39;s incident management procedures to determine related incident resolution actions.</li></ol>
+</div>
+<p><strong>Fields mapped from OpsCenter OpsItem records to ServiceNow Incident records</strong></p>
+<p>This table shows how AWS OpsItems map to ServiceNow incidents.</p>
+<div>
+<div>
+<table id="w879aac31b7c45c11c11"><tbody><tr><td style="width: 105px;"><strong>AWS Ops Center</strong></td><td style="width: 132px;"><strong>ServiceNow Incident</strong></td></tr><tr><td style="width: 105px;">Title</td><td style="width: 132px;">short_description</td></tr><tr><td style="width: 105px;">Description</td><td style="width: 132px;">description</td></tr><tr><td style="width: 105px;">CreatedTime</td><td style="width: 132px;">opened_at</td></tr><tr><td style="width: 105px;">Status</td><td style="width: 132px;">incident_state</td></tr><tr><td style="width: 105px;">Severity</td><td style="width: 132px;">impact/urgency</td></tr><tr><td style="width: 105px;">Priority</td><td style="width: 132px;">priority</td></tr><tr><td style="width: 105px;">CreatedBy</td><td style="width: 132px;">Not synced</td></tr><tr><td style="width: 105px;">LastModifiedTime</td><td style="width: 132px;">Not synced</td></tr><tr><td style="width: 105px;">LastModifiedBy</td><td style="width: 132px;">Not synced</td></tr><tr><td style="width: 105px;">Source</td><td style="width: 132px;">Not synced</td></tr><tr><td style="width: 105px;">OpsItemId</td><td style="width: 132px;">Not synced</td></tr><tr><td style="width: 105px;">OperationalData</td><td style="width: 132px;">Not synced</td></tr><tr><td style="width: 105px;">Category</td><td style="width: 132px;">Software</td></tr></tbody></table>
+</div>
+</div>
+<p><strong>Incident Status</strong> is an integer in ServiceNow. We map OpsItem status values to values.</p>
+<div>
+<div>
+<table id="w879aac31b7c45c11c15"><tbody><tr><td><strong>ServiceNow Incident Status</strong></td><td><strong>OpsCenter Status</strong></td></tr><tr><td>New (primary)</td><td>Open</td></tr><tr><td>On Hold</td><td>Open</td></tr><tr><td>In Progress</td><td>In Progress</td></tr><tr><td>Resolved (primary)</td><td>Resolved</td></tr><tr><td>Closed</td><td>Resolved</td></tr><tr><td>Cancelled</td><td>Resolved</td></tr></tbody></table>
+</div>
+</div>
+<p>In this type of subjective mapping, we only change the target value if it is incompatible. An example of subjective mapping would be if <em>New</em> and <em>On Hold</em> in ServiceNow both map to <em>Open</em> in AWS. An example of an incompatible target would be if the incident is <em>On Hold</em>, while we&#39;re synchronizing from AWS an OpsItem that is <em>Open</em>, and we don&#39;t change <em>On Hold</em>.</p>
+<p><strong>Priority</strong> - In Incident, you can’t set the Priority field directly. The values of the <strong>Impact</strong> and <strong>Urgency</strong> fields calculate the <strong>Priority</strong> field. When synchronizing from AWS, we set by default the fields shown in the table below:</p>
+<div>
+<div>
+<table id="w879aac31b7c45c11c21"><thead><tr><th>OpsItem Priority</th><th colspan="3">ServiceNow Incident</th></tr></thead><tbody><tr><td> </td><td><strong>Impact</strong></td><td><strong>Urgency</strong></td><td><strong>Priority (Calculated)</strong></td></tr><tr><td>1</td><td>High</td><td>High</td><td>Critical (1)</td></tr><tr><td>2</td><td>Medium</td><td>High</td><td>High (2)</td></tr><tr><td>3</td><td>Medium</td><td>Medium</td><td>Moderate (3)</td></tr><tr><td>4</td><td>Low</td><td>Medium</td><td>Low (4)</td></tr><tr><td>5</td><td>Low</td><td>Low</td><td>Planning (5)</td></tr></tbody></table>
+</div>
+</div>
+<p>You can find these mappings in a ServiceNow table <em>Priority Data Lookup</em>. While we can use this table to find the required values of <strong>Impact</strong> and <strong>Urgency</strong>, note that you can customize the mappings and also define new priority values. Additionally, you might want a specific priority in AWS to map to an entirely different priority in an Incident or Problem.</p>]]></article>
+        <best_practice_acceptable>false</best_practice_acceptable>
+        <dependent_on_contents/>
+        <dependent_on_plugins/>
+        <dependent_on_plugins_ids/>
+        <description/>
+        <embedded_help_qualifier/>
+        <end_point/>
+        <end_point_open_mode/>
+        <end_point_type/>
+        <field/>
+        <filter/>
+        <filter_result/>
+        <implicit_dependent_on/>
+        <implicit_plugin_dependencies/>
+        <is_dynamic>false</is_dynamic>
+        <more_info_available>false</more_info_available>
+        <more_info_html/>
+        <order>400</order>
+        <parent display_value="Validate configurations">3ca44ca71b0b3010bec096c6b04bcbb3</parent>
+        <parents>3ca44ca71b0b3010bec096c6b04bcbb3,c09fcac2dbd130100f00b298f496196f</parents>
+        <plugin_id/>
+        <property_name/>
+        <property_value/>
+        <quick_startable>false</quick_startable>
+        <root_parent display_value="AWS Service Management Connector">c09fcac2dbd130100f00b298f496196f</root_parent>
+        <skippable>true</skippable>
+        <supports_child_content>false</supports_child_content>
+        <sys_class_name>gsw_content_information</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-10-13 00:38:20</sys_created_on>
+        <sys_id>749d8caf1b0b3010bec096c6b04bcb71</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AWS Systems Manager OpsCenter integration features</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>gsw_content_information_749d8caf1b0b3010bec096c6b04bcb71</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <table/>
+        <title>AWS Systems Manager OpsCenter integration features</title>
+        <weight>1</weight>
+    </gsw_content_information>
+    <sys_translated_text action="delete_multiple" query="documentkey=749d8caf1b0b3010bec096c6b04bcb71"/>
+    <sys_attachment action="INSERT_OR_UPDATE">
+        <average_image_color/>
+        <chunk_size_bytes>700000</chunk_size_bytes>
+        <compressed>true</compressed>
+        <content_type>image/png</content_type>
+        <file_name>Pasted image.png</file_name>
+        <hash>caaef9881a27b3111a07ebbd3adcd3d2fd370599f56dad227488dd3befca168d</hash>
+        <image_height/>
+        <image_width/>
+        <size_bytes>6363</size_bytes>
+        <size_compressed>5995</size_compressed>
+        <state>available</state>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-02 13:11:23</sys_created_on>
+        <sys_id>8bb9390a1b233010bec096c6b04bcbe1</sys_id>
+        <sys_mod_count>1</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-03-28 14:57:39</sys_updated_on>
+        <table_name>gsw_content_information</table_name>
+        <table_sys_id>749d8caf1b0b3010bec096c6b04bcb71</table_sys_id>
+    </sys_attachment>
+    <sys_attachment_doc action="INSERT_OR_UPDATE">
+        <data>H4sIAAAAAAAAAA==</data>
+        <length>16</length>
+        <position>0</position>
+        <sys_attachment display_value="Pasted image.png" sys_id="8bb9390a1b233010bec096c6b04bcbe1">8bb9390a1b233010bec096c6b04bcbe1</sys_attachment>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-02 13:11:23</sys_created_on>
+        <sys_id>cbb9390a1b233010bec096c6b04bcbe1</sys_id>
+    </sys_attachment_doc>
+    <sys_attachment_doc action="INSERT_OR_UPDATE">
+        <data>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</data>
+        <length>7980</length>
+        <position>1</position>
+        <sys_attachment display_value="Pasted image.png" sys_id="8bb9390a1b233010bec096c6b04bcbe1">8bb9390a1b233010bec096c6b04bcbe1</sys_attachment>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-02 13:11:23</sys_created_on>
+        <sys_id>4fb9390a1b233010bec096c6b04bcbe1</sys_id>
+    </sys_attachment_doc>
+</record_update>

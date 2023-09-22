@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="gsw_content_group">
+    <gsw_content_group action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <checksum>/tKttqVs8C/GI2IyJz8XrVoI6uQ=</checksum>
+        <child_can_have_roles>false</child_can_have_roles>
+        <children_layout>1</children_layout>
+        <dependent_on_contents/>
+        <dependent_on_plugins/>
+        <dependent_on_plugins_ids/>
+        <description><![CDATA[<p>The Connector Validation section includes details on how to configure AWS accounts to synchronize in the connector, validate the connectivity and configurations. </p>
+<p><em>Note: These steps can be repeated as you opt in new AWS accounts into the connector</em></p>]]></description>
+        <display_child_max_num/>
+        <done_status_text/>
+        <hide_getting_started>false</hide_getting_started>
+        <icon>ac044bab1b837010bec096c6b04bcbc1</icon>
+        <implicit_dependent_on/>
+        <implicit_plugin_dependencies/>
+        <is_root_content>false</is_root_content>
+        <order>300</order>
+        <parent display_value="AWS Service Management Connector">c09fcac2dbd130100f00b298f496196f</parent>
+        <parents>c09fcac2dbd130100f00b298f496196f</parents>
+        <progress_text/>
+        <roles/>
+        <root_intro_frame_link/>
+        <root_parent display_value="AWS Service Management Connector">c09fcac2dbd130100f00b298f496196f</root_parent>
+        <skippable>true</skippable>
+        <supports_child_content>true</supports_child_content>
+        <sys_class_name>gsw_content_group</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-10-13 00:56:17</sys_created_on>
+        <sys_id>f7a1d0e31b4b3010bec096c6b04bcbb5</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AWS Account configuration and validation</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>gsw_content_group_f7a1d0e31b4b3010bec096c6b04bcbb5</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <title>AWS Account configuration and validation</title>
+        <weight>1</weight>
+    </gsw_content_group>
+    <sys_translated_text action="delete_multiple" query="documentkey=f7a1d0e31b4b3010bec096c6b04bcbb5"/>
+    <sys_attachment action="INSERT_OR_UPDATE">
+        <average_image_color>#bd1759</average_image_color>
+        <chunk_size_bytes>700000</chunk_size_bytes>
+        <compressed>true</compressed>
+        <content_type>image/png</content_type>
+        <file_name>icon</file_name>
+        <hash>23731ff631c5d7b868d2ae1166e4636fd5df57fa6a25e419680d8025b480f4dd</hash>
+        <image_height>77</image_height>
+        <image_width>77</image_width>
+        <size_bytes>2384</size_bytes>
+        <size_compressed>2394</size_compressed>
+        <state>available</state>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-10-13 13:55:24</sys_created_on>
+        <sys_id>ac044bab1b837010bec096c6b04bcbc1</sys_id>
+        <sys_mod_count>3</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-10-13 13:55:24</sys_updated_on>
+        <table_name>ZZ_YYgsw_content_group</table_name>
+        <table_sys_id>f7a1d0e31b4b3010bec096c6b04bcbb5</table_sys_id>
+    </sys_attachment>
+    <sys_attachment_doc action="INSERT_OR_UPDATE">
+        <data>H4sIAAAAAAAAAA==</data>
+        <length>16</length>
+        <position>0</position>
+        <sys_attachment display_value="icon" sys_id="ac044bab1b837010bec096c6b04bcbc1">ac044bab1b837010bec096c6b04bcbc1</sys_attachment>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-10-13 13:55:24</sys_created_on>
+        <sys_id>ec044bab1b837010bec096c6b04bcbc1</sys_id>
+    </sys_attachment_doc>
+    <sys_attachment_doc action="INSERT_OR_UPDATE">
+        <data>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</data>
+        <length>3180</length>
+        <position>1</position>
+        <sys_attachment display_value="icon" sys_id="ac044bab1b837010bec096c6b04bcbc1">ac044bab1b837010bec096c6b04bcbc1</sys_attachment>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-10-13 13:55:24</sys_created_on>
+        <sys_id>60044bab1b837010bec096c6b04bcbc2</sys_id>
+    </sys_attachment_doc>
+</record_update>

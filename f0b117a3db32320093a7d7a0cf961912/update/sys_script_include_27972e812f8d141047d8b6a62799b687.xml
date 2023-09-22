@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.TagAjax</api_name>
+        <caller_access/>
+        <client_callable>true</client_callable>
+        <description/>
+        <name>TagAjax</name>
+        <script><![CDATA[var TagAjax = /** @class */ (function (_super) {
+    Polyfill.__extends(TagAjax, _super);
+    function TagAjax() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.tagParameter = AjaxParameterSupplier.required('sysparm_tagSysId')
+            .gr('x_126749_aws_sc_tags')
+            .notNil('awskey')
+            .then(function (tag) {
+            if (!tag.awsselectable) {
+                return new Error("Tag " + tag.awskey + " is not selectable by end user");
+            }
+            if (tag.awstable.nil() || tag.awsfield.nil()) {
+                return new Error("Tag " + tag.awskey + " is not correctly configured. Cannot load values");
+            }
+            return tag;
+        });
+        _this.searchParameter = AjaxParameterSupplier.optional('sysparm_search');
+        _this.productIdParameter = AjaxParameterSupplier.optional('sysparm_product_id');
+        return _this;
+    }
+    TagAjax.prototype.getSelectableTags = function () {
+        var _this = this;
+        return this._applyWith([this.productIdParameter], function (productId) {
+            var catalogProduct = _this.getCatalogProduct(productId);
+            var portfolio = catalogProduct != null ? catalogProduct.awsportfolio : null;
+            var tags = [];
+            var tagsGr = new GlideRecord('x_126749_aws_sc_tags');
+            tagsGr.addNullQuery('awsportfolio').addOrCondition('awsportfolio', '=', portfolio != null ? portfolio.sys_id.toString() : null);
+            tagsGr.addQuery('awsselectable', 'true');
+            tagsGr.query();
+            while (tagsGr.next()) {
+                tags.push({
+                    key: tagsGr.awskey.toString(),
+                    sysId: tagsGr.sys_id.toString()
+                });
+            }
+            return _this._response(tags);
+        });
+    };
+    TagAjax.prototype.getSelectableTagValues = function () {
+        var _this = this;
+        return this._applyWith([this.tagParameter, this.searchParameter], function (tag, search) {
+            var values = [];
+            var tableGr = new GlideRecord(tag.awstable.toString());
+            tableGr.addEncodedQuery(tag.awstablefilter);
+            if (search && search.length > 0) {
+                tableGr.addQuery(tag.awsfield.toString(), 'STARTSWITH', search);
+            }
+            tableGr.query();
+            var _loop_1 = function () {
+                var value = tableGr.getValue(tag.awsfield.toString());
+                if (value && !values.some(function (v) { return v === value; })) {
+                    values.push(value);
+                }
+            };
+            while (tableGr.next()) {
+                _loop_1();
+            }
+            return _this._response(JSON.stringify(values));
+        });
+    };
+    TagAjax.prototype.getCatalogProduct = function (productId) {
+        var pgr = new GlideRecord('x_126749_aws_sc_product');
+        if (pgr.get(productId)) {
+            return pgr;
+        }
+        return null;
+    };
+    return TagAjax;
+}(AbstractAwsAjaxProcessor));
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-05-26 14:58:52</sys_created_on>
+        <sys_id>27972e812f8d141047d8b6a62799b687</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>TagAjax</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_27972e812f8d141047d8b6a62799b687</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

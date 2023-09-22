@@ -1,0 +1,572 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.OpsCenterSyncProvider</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>OpsCenterSyncProvider</name>
+        <script><![CDATA[var OpsCenterSyncProvider = /** @class */ (function (_super) {
+    Polyfill.__extends(OpsCenterSyncProvider, _super);
+    function OpsCenterSyncProvider(syncTypes) {
+        if (syncTypes === void 0) { syncTypes = [
+            OpsCenterSyncProvider.SyncType.ChangeRequests,
+            OpsCenterSyncProvider.SyncType.Issues,
+            OpsCenterSyncProvider.SyncType.ActionItems
+        ]; }
+        var _this = _super.call(this) || this;
+        _this.opsItemChangeRequestType = '/aws/changerequest';
+        _this.opsItemIssueType = '/aws/issue';
+        _this.opsItemActionItemType = '/aws/actionitem';
+        _this.resolvedStatus = "Resolved";
+        // OpsItem Statuses that equate to Closed for a ServiceNow Change Request
+        // this list matches those filtered for in opsitem-changerequest-status-update.ts
+        _this.closedOpsItemStatuses = [
+            "Resolved",
+            "TimedOut",
+            "Failed",
+            "CompletedWithSuccess",
+            "CompletedWithFailure",
+            "Rejected",
+            "Closed",
+        ];
+        _this.cancelledOpsItemStatuses = [
+            "Cancelled"
+        ];
+        _this.providerName = 'AWS Systems Manager OpsCenter';
+        _this.timeout = 120;
+        _this.syncTypes = syncTypes;
+        return _this;
+    }
+    OpsCenterSyncProvider.prototype.filterAccountSync = function (accountSync) {
+        _super.prototype.filterAccountSync.call(this, accountSync);
+        var requiresOpsCenter = this.isSyncTypeOpsItemIssues() || this.isSyncTypeOpsItemActionItems();
+        var requiresChangeManager = this.isSyncTypeOpsItemChangeRequests();
+        if (requiresOpsCenter && requiresChangeManager) {
+            // if BOTH flags are set then filter to accounts with EITHER feature enabled
+            accountSync.addQuery('awsaccount.awsenableopscenter', 'true')
+                .addOrCondition('awsaccount.awsenablechangemanager', 'true');
+        }
+        else {
+            // only filter to accounts with the required feature enabled
+            if (requiresOpsCenter) {
+                accountSync.addQuery('awsaccount.awsenableopscenter', 'true');
+            }
+            else if (requiresChangeManager) {
+                accountSync.addQuery('awsaccount.awsenablechangemanager', 'true');
+            }
+            else {
+                // should never end up here are we always have at least one of the
+                // SyncTypes selected, so at least one of the features should be
+                // required to select a filter.
+                throw Error("Configuration error - no account filter selected");
+            }
+        }
+    };
+    OpsCenterSyncProvider.prototype.isSyncTypeOpsItemIssues = function () {
+        return this.syncTypes.indexOf(OpsCenterSyncProvider.SyncType.Issues) > -1;
+    };
+    OpsCenterSyncProvider.prototype.isSyncTypeOpsItemActionItems = function () {
+        return this.syncTypes.indexOf(OpsCenterSyncProvider.SyncType.ActionItems) > -1;
+    };
+    OpsCenterSyncProvider.prototype.isSyncTypeOpsItemChangeRequests = function () {
+        return this.syncTypes.indexOf(OpsCenterSyncProvider.SyncType.ChangeRequests) > -1;
+    };
+    OpsCenterSyncProvider.prototype.fromAwsWith = function (account, region) {
+        var _this = this;
+        var syncResults = {
+            success: true,
+            seconds: 0,
+            requests: 0
+        };
+        var timer = Util.startTimer();
+        var credentials = AwsCredentials.from(account).as(AwsCredentials.User.Sync);
+        var awsSystemsManager = this.getSystemsManager(region, credentials);
+        var lastSyncTime = this.newestCreatedTime(account, region);
+        var excludeResolved = this.noIssueTypeOpsItems(account, region);
+        var statusesToSync = [
+            "Open",
+            "InProgress"
+        ];
+        //Sync Resolved OpsItems if there are existing opsItems for the given account/region
+        if (!excludeResolved) {
+            statusesToSync.push(this.resolvedStatus);
+        }
+        var types = [];
+        account.awsenableopscenter && this.isSyncTypeOpsItemIssues() && types.push(this.opsItemIssueType);
+        account.awsenableopscenter && this.isSyncTypeOpsItemActionItems() && types.push(this.opsItemActionItemType);
+        account.awsenablechangemanager && this.isSyncTypeOpsItemChangeRequests() && types.push(this.opsItemChangeRequestType);
+        if (types.length == 0) {
+            gs.debug("[SYNC] [".concat(this.providerName, "] Not Synchronizing OpsItems in \"").concat(account.awsname, "\""));
+            return;
+        }
+        try {
+            var result = {
+                success: true,
+                message: '',
+                requests: 1
+            };
+            var opsItemSummaries_1 = [];
+            // Sync of Issue type OpsItems (standard OpsItems)
+            if (types.indexOf(this.opsItemIssueType) > -1) {
+                var issueTypeOpsItems = this.getIssues(awsSystemsManager, lastSyncTime, statusesToSync);
+                issueTypeOpsItems.all.forEach(function (issueOpsItem) { return opsItemSummaries_1.push(issueOpsItem); });
+                result.requests += issueTypeOpsItems.requests;
+                if (!issueTypeOpsItems.success) {
+                    result.message = "[OpsItems] " + issueTypeOpsItems.message;
+                    result.success = issueTypeOpsItems.success;
+                }
+            }
+            //Sync of ActionItem type OpsItems
+            if (types.indexOf(this.opsItemActionItemType) > -1) {
+                var ActionItemTypeOpsItems = this.getActionItems(awsSystemsManager, lastSyncTime, statusesToSync);
+                ActionItemTypeOpsItems.all.forEach(function (actionItemOpsItem) { return opsItemSummaries_1.push(actionItemOpsItem); });
+                result.requests += ActionItemTypeOpsItems.requests;
+                if (!ActionItemTypeOpsItems.success) {
+                    result.message = "[OpsItems] " + ActionItemTypeOpsItems.message;
+                    result.success = ActionItemTypeOpsItems.success;
+                }
+            }
+            // Sync of Change Requests type OpsItems
+            // initial request must succeed so we don't inadvertently mask it's error
+            if (result.success && types.indexOf(this.opsItemChangeRequestType) > -1) {
+                var changeRequestTypeOpsItems = this.getChangeRequests(awsSystemsManager, lastSyncTime);
+                changeRequestTypeOpsItems.all.forEach(function (changeRequestTypeOpsItem) { return opsItemSummaries_1.push(changeRequestTypeOpsItem); });
+                result.requests += changeRequestTypeOpsItems.requests;
+                if (!changeRequestTypeOpsItems.success) {
+                    result.message = "[Change Requests] " + changeRequestTypeOpsItems.message;
+                    result.success = changeRequestTypeOpsItems.success;
+                }
+            }
+            if (!result.success) {
+                throw new Error("Error loading OpsItems in ".concat(account.awsname, " : ").concat(result.message));
+            }
+            var repo_1 = this.getOpsItemRepo();
+            opsItemSummaries_1.forEach(function (ois) {
+                var opsItem = JSON.parse(awsSystemsManager.getOpsItem(ois.OpsItemId).getBody()).OpsItem;
+                var incidentSysId = _this.getIncidentReferenceFromRelatedItems(opsItem, account, awsSystemsManager);
+                var updatedRecord = repo_1.createOrUpdate(opsItem, account, region, incidentSysId);
+                _this.syncRelatedAutomationDocuments(opsItem, updatedRecord, account, region);
+                _this.syncRelatedResources(opsItem, updatedRecord);
+                _this.updateAutomationExecutions(opsItem, updatedRecord);
+            });
+            this.syncAllAutomationExecutions(awsSystemsManager, region);
+        }
+        catch (ex) {
+            syncResults.success = false;
+            syncResults.error = ex.message;
+        }
+        finally {
+            syncResults.seconds = timer.elapsed();
+            syncResults.requests = awsSystemsManager.getRequestCount();
+        }
+        return syncResults;
+    };
+    OpsCenterSyncProvider.prototype.fromSn = function () {
+        var results = {
+            seconds: 0,
+            success: true,
+            requests: 0
+        };
+        return results;
+    };
+    /**
+     * Sync update from ServiceNow to AWS
+     */
+    OpsCenterSyncProvider.prototype.updateAws = function (opsItem) {
+        if (!opsItem.awsaccount.awsenableopscenter
+            && !opsItem.awsaccount.awsenablechangemanager) {
+            gs.warn("[SYNC] [".concat(this.providerName, "] Skipping synchronization of opsItem ").concat(opsItem.sys_id, ": the feature is disabled for account ").concat(opsItem.awsaccount.awsname, " in region ").concat(opsItem.awsregion));
+        }
+        else if (this.isUpdatedSinceSyncFromAws(opsItem)) {
+            try {
+                var workflow_1 = WorkflowTasks.pushOpsItemsToAws.startWorkflow(opsItem);
+                gs.info("[SYNC] [".concat(this.providerName, "] Successfully pushed updated opsItem \"").concat(opsItem.sys_id, "\" to AWS OpsCenter, for account \"").concat(opsItem.awsaccount.awsname, "\" in region \"").concat(opsItem.awsregion, "\". See workflow context ").concat(workflow_1.sys_id, " for the execution details"));
+            }
+            catch (ex) {
+                gs.warn("[SYNC] [".concat(this.providerName, "] Error requesting push of OpsItem \"").concat(opsItem.sys_id, "\" to AWS SecurityHub, for account \"").concat(opsItem.awsaccount.awsname, "\" in region \"").concat(opsItem.awsregion, "\": ").concat(ex.message));
+            }
+        }
+    };
+    OpsCenterSyncProvider.prototype.validate = function () {
+        return true;
+    };
+    OpsCenterSyncProvider.prototype.updateChangeRequestStatus = function (opsItem) {
+        var changeRequest = new GlideRecord('change_request');
+        changeRequest.addQuery(C.prefix + "_awsrequestid", opsItem.sys_id.toString());
+        changeRequest.query();
+        if (changeRequest.next()) {
+            if (opsItem.awsstatus.toString() !== changeRequest.x_126749_aws_sc_awsstatus.toString()) {
+                var from = changeRequest.x_126749_aws_sc_awsstatus.toString();
+                var to = opsItem.awsstatus.toString();
+                var comment = "Change Request Status changed in AWS from ".concat(from, " to ").concat(to);
+                Util.setValue(changeRequest, 'comments_and_work_notes', comment);
+            }
+            Util.setValue(changeRequest, C.prefix + "_awsstatus", opsItem.awsstatus.toString());
+            if (this.closedOpsItemStatuses.indexOf(opsItem.awsstatus.toString()) > -1) {
+                var closed = Util.getChoiceValueFromLabel('change_request', 'state', 'Closed');
+                var closeCode = Util.getChoiceValueFromLabel('change_request', 'close_code', opsItem.awsstatus.toString() === 'CompletedWithSuccess' ? 'Successful' : 'Unsuccessful');
+                var closeNotes = "The AWS Change Request was completed with Status as ".concat(opsItem.awsstatus);
+                Util.setValue(changeRequest, 'state', closed);
+                Util.setValue(changeRequest, 'close_code', closeCode);
+                Util.setValue(changeRequest, 'close_notes', closeNotes);
+            }
+            else if (this.cancelledOpsItemStatuses.indexOf(opsItem.awsstatus.toString()) > -1) {
+                var cancelled = Util.getChoiceValueFromLabel('change_request', 'state', 'Cancelled');
+                Util.setValue(changeRequest, 'state', cancelled);
+            }
+            changeRequest.update();
+        }
+    };
+    //Verify if the OpsItem is already in a Closed or Cancelled state. Sync the ServiceNow Change Request status if that's the case
+    OpsCenterSyncProvider.prototype.updateChangeRequestStatusFromOpsItem = function (changeTask) {
+        var changeRequest = changeTask.change_request.getRefRecord();
+        if (changeRequest.isValidRecord()) {
+            var opsItem = changeRequest.x_126749_aws_sc_awsrequestid.nil() ? null
+                : changeRequest.x_126749_aws_sc_awsrequestid.getRefRecord();
+            if (opsItem !== null) {
+                if (this.closedOpsItemStatuses.indexOf(opsItem.awsstatus.toString()) > -1
+                    || this.cancelledOpsItemStatuses.indexOf(opsItem.awsstatus.toString()) > -1) {
+                    //Sync Change Request status with the OpsItem status
+                    this.updateChangeRequestStatus(opsItem);
+                }
+            }
+        }
+    };
+    // Update the State of the OpsItem and push the change to the AWS OpsItem
+    OpsCenterSyncProvider.prototype.updateOpsItemStatusFromChangeRequest = function (changeRequest) {
+        // changerequest state has changed and has an opsitem
+        var opsItem = changeRequest.x_126749_aws_sc_awsrequestid.nil() ? null
+            : changeRequest.x_126749_aws_sc_awsrequestid.getRefRecord();
+        if (opsItem !== null) {
+            //Do not update the OpsItem status if it is already Finished
+            var originalStatus = opsItem.getValue('awsstatus');
+            if (this.closedOpsItemStatuses.indexOf(originalStatus) === -1
+                && this.cancelledOpsItemStatuses.indexOf(originalStatus) === -1) {
+                var opsItemStatus = this.mapChangeRequestStatusToOpsItemStatus(changeRequest);
+                if (originalStatus != opsItemStatus) {
+                    Util.setValue(opsItem, 'awsstatus', opsItemStatus);
+                    opsItem.setWorkflow(false); // to prevent br from updating changeRequest
+                    opsItem.update();
+                    this.pushStatusChangeToAWS(opsItem, changeRequest);
+                }
+            }
+        }
+        return opsItem;
+    };
+    OpsCenterSyncProvider.prototype.pushStatusChangeToAWS = function (opsItem, changeRequest) {
+        if (!opsItem.awsregion) {
+            return; // avoid attempting to get systemManager instance with invalid opsItem
+        }
+        var credentials = AwsCredentials.from(opsItem.awsaccount.getRefRecord()).as(AwsCredentials.User.Sync);
+        var systemsManager = this.getSystemsManager(opsItem.awsregion, credentials);
+        var response = systemsManager.updateOpsItem({
+            OpsItemId: opsItem.awsopsitemid.toString(),
+            Status: opsItem.awsstatus.toString()
+        });
+        if (response.haveError()) {
+            Util.setValue(changeRequest, 'comments_and_work_notes', "Error setting status of AWS OpsItem ".concat(opsItem.awsopsitemid, " ") +
+                "for ".concat(changeRequest.description, " (").concat(changeRequest.sys_id, ")") +
+                ": (".concat(response.getStatusCode(), ") ").concat(response.getErrorMessage()));
+            changeRequest.update();
+        }
+    };
+    OpsCenterSyncProvider.prototype.syncRelatedAutomationDocuments = function (opsItem, updatedRecord, account, region) {
+        var relatedAutomationDocuments = JSON.parse((opsItem.OperationalData['/aws/automations'] || {}).Value || "[]")
+            .filter(function (ad) { return ad.automationType === "AWS::SSM::Automation"; })
+            .map(function (ad) { return ad.automationId; });
+        var updatedRecordIds = [];
+        relatedAutomationDocuments.forEach(function (ad) {
+            var definitional = {
+                awsopsitem: updatedRecord.sys_id.toString(),
+                awsrunbook: ad
+            };
+            var additional = {};
+            var automationDoc = new GlideRecord('x_126749_aws_sc_document');
+            automationDoc.addQuery('name', ad);
+            automationDoc.addQuery('awsaccount', account.sys_id.toString());
+            automationDoc.addQuery('awsregion', region);
+            automationDoc.query();
+            if (automationDoc.next()) {
+                additional.configuration_item = automationDoc.sys_id.toString();
+            }
+            var updatedRecordId = Util.insertOrUpdate('x_126749_aws_sc_opsitem_ad', definitional, additional).sys_id.toString();
+            updatedRecordIds.push(updatedRecordId);
+        });
+        var opsItemAutomationDocumentGr = new GlideRecord('x_126749_aws_sc_opsitem_ad');
+        opsItemAutomationDocumentGr.addQuery('awsopsitem', updatedRecord.sys_id.toString());
+        opsItemAutomationDocumentGr.addQuery('sys_id', 'NOT IN', updatedRecordIds.join(','));
+        opsItemAutomationDocumentGr.query();
+        while (opsItemAutomationDocumentGr.next()) {
+            opsItemAutomationDocumentGr.deleteRecord();
+        }
+    };
+    OpsCenterSyncProvider.prototype.syncRelatedResources = function (opsItem, updatedRecord) {
+        var relatedResources = JSON.parse((opsItem.OperationalData['/aws/resources'] || {}).Value || "[]")
+            .map(function (rr) { return rr.arn; });
+        var updatedRecordIds = [];
+        relatedResources.forEach(function (resource) {
+            var definitional = {
+                awsopsitem: updatedRecord.sys_id.toString(),
+                awsarn: resource
+            };
+            var updatedRecordId = Util.insertOrUpdate('x_126749_aws_sc_opsitem_resource', definitional).sys_id.toString();
+            updatedRecordIds.push(updatedRecordId);
+        });
+        var opsItemResourceGr = new GlideRecord('x_126749_aws_sc_opsitem_resource');
+        opsItemResourceGr.addQuery('awsopsitem', updatedRecord.sys_id.toString());
+        opsItemResourceGr.addQuery('sys_id', 'NOT IN', updatedRecordIds.join(','));
+        opsItemResourceGr.query();
+        while (opsItemResourceGr.next()) {
+            opsItemResourceGr.deleteRecord();
+        }
+    };
+    OpsCenterSyncProvider.prototype.updateAutomationExecutions = function (opsItem, updatedRecord) {
+        //at this point add only minimal data
+        var automationExecutions = JSON.parse((opsItem.OperationalData['/aws/automations'] || {}).Value || "[]");
+        automationExecutions.forEach(function (ae) {
+            //one automation may have several executions
+            var executions = ae.executions;
+            executions.forEach(function (ex) {
+                var definitional = {
+                    awsopsitem: updatedRecord.sys_id.toString(),
+                    awsdocumentname: ae.automationId,
+                    awsautomationexecutionid: ex.executionId
+                };
+                Util.insertOrUpdate('x_126749_aws_sc_opsitem_ae', definitional);
+            });
+        });
+    };
+    OpsCenterSyncProvider.prototype.syncAllAutomationExecutions = function (awsSystemsManager, region) {
+        //statuses where we can be sure there will be no further updates
+        var completedStatuses = ['Success', 'TimedOut', 'Cancelled', 'Failed', 'CompletedWithSuccess', 'CompletedWithFailure'];
+        var syncErrors = false;
+        var auto = new GlideRecord('x_126749_aws_sc_opsitem_ae');
+        auto.addQuery('awsopsitem.awsregion', region);
+        auto.addNullQuery('awsautomationexecutionstatus').addOrCondition('awsautomationexecutionstatus', 'NOT IN', completedStatuses.join(','));
+        auto.query();
+        while (auto.next()) {
+            //retrieve data for the executionId
+            var opsItem = auto.awsopsitem;
+            var executionId = auto.awsautomationexecutionid.toString();
+            var response_1 = awsSystemsManager.getAutomationExecution(executionId);
+            if (!response_1.haveError()) {
+                var data = response_1.deserialize();
+                var automationExecution = data.AutomationExecution;
+                var stepExecutions = automationExecution.StepExecutions;
+                var inProgressStep = stepExecutions.filter(function (se) { return se.StepStatus === 'InProgress'; });
+                var definitional = {
+                    awsopsitem: opsItem,
+                    awsdocumentname: automationExecution.DocumentName,
+                    awsautomationexecutionid: automationExecution.AutomationExecutionId
+                };
+                var additional = {
+                    awsautomationexecutionstatus: automationExecution.AutomationExecutionStatus,
+                    awsexecutionstarttime: Util.toGlideDateTime(automationExecution.ExecutionStartTime),
+                    awsexecutionendtime: Util.toGlideDateTime(automationExecution.ExecutionEndTime),
+                    awsdocumentversion: automationExecution.DocumentVersion,
+                    awsexecutedby: automationExecution.ExecutedBy,
+                    awsmode: automationExecution.Mode,
+                    awsfailuremessage: automationExecution.FailureMessage,
+                    awsprogresscountercancelledsteps: stepExecutions.filter(function (se) { return se.StepStatus === 'Cancelled'; }).length,
+                    awsprogresscounterfailedsteps: stepExecutions.filter(function (se) { return se.StepStatus === 'Failed'; }).length,
+                    awsprogresscountersuccesssteps: stepExecutions.filter(function (se) { return se.StepStatus === 'Success'; }).length,
+                    awsprogresscountertimedoutsteps: stepExecutions.filter(function (se) { return se.StepStatus === 'TimedOut'; }),
+                    awsprogresscountertotalsteps: stepExecutions.length,
+                    awsmaxconcurrency: automationExecution.MaxConcurrency,
+                    awsmaxerrors: automationExecution.MaxErrors,
+                    awsparentautomationexecutionid: automationExecution.ParentAutomationExecutionId,
+                    awscurrentaction: inProgressStep.length > 0 ? inProgressStep[0].StepName : '',
+                    awstarget: automationExecution.Target,
+                    awstargetparametername: automationExecution.TargetParameterName,
+                };
+                Util.insertOrUpdate('x_126749_aws_sc_opsitem_ae', definitional, additional);
+            }
+            else {
+                gs.error("[SYNC] [".concat(this.providerName, "] Error synchronizing automation execution \"").concat(executionId, "\": ").concat(response_1.getBody()));
+                syncErrors = true;
+            }
+        }
+        if (syncErrors) {
+            throw new Error('One of more automation executions failed to synchronize. Please check the debug, warning and error logs for more information');
+        }
+    };
+    /**
+     * Returns true if there are no existing opsItems for the given account/region
+     * @Param account: serviceNow.Account
+     * @Param region: string
+     */
+    OpsCenterSyncProvider.prototype.noIssueTypeOpsItems = function (account, region) {
+        //query the OpsItem table for this account and region and return true if there are no records
+        var opsItemGr = new GlideRecord('x_126749_aws_sc_opsitem');
+        opsItemGr.addQuery('awsaccount', account.sys_id.toString());
+        opsItemGr.addQuery('awstype', this.opsItemIssueType);
+        opsItemGr.addQuery('awsregion', region);
+        opsItemGr.query();
+        return !opsItemGr.hasNext();
+    };
+    /**
+     * Returns the max of last modified time of existing opsItems for the given account/region
+     * Returns the time integration with opscenter was enabled if there are no opsItems
+     * @Param account: serviceNow.Account
+     * @Param region: string
+     */
+    OpsCenterSyncProvider.prototype.newestCreatedTime = function (account, region) {
+        var result = account.getValue('awsopscenterenabledtime');
+        var ga = new GlideAggregate('x_126749_aws_sc_opsitem');
+        ga.setGroup(false);
+        ga.addNotNullQuery('awslastmodifiedtime');
+        ga.addAggregate('MAX', 'awslastmodifiedtime');
+        ga.query();
+        if (ga.next() && ga.getAggregate('MAX', 'awslastmodifiedtime')) {
+            result = ga.getAggregate('MAX', 'awslastmodifiedtime');
+        }
+        if (!result || result.length === 0) {
+            gs.error('Error retrieving newest created time. Using default');
+            var now = new GlideDateTime();
+            now.subtract(31 * 60 * 1000);
+            result = now.toString();
+        }
+        return result.replace(' ', 'T');
+    };
+    OpsCenterSyncProvider.prototype.isUpdatedSinceSyncFromAws = function (opsItem) {
+        return opsItem.sys_updated_on > opsItem.awslastsyncfromaws;
+    };
+    OpsCenterSyncProvider.prototype.getSystemsManager = function (region, credentials) {
+        var awsSystemsManager = new AwsSystemsManager(region, credentials);
+        awsSystemsManager.setExponentialBackoff(this.timeout);
+        return awsSystemsManager;
+    };
+    OpsCenterSyncProvider.prototype.getOpsItemRepo = function () {
+        return new OpsItemRepo();
+    };
+    OpsCenterSyncProvider.prototype.getIssues = function (awsSystemsManager, lastSyncTime, statusesToSync) {
+        return awsSystemsManager.describeOpsItems({
+            "MaxResults": 50,
+            "OpsItemFilters": [
+                {
+                    "Key": "LastModifiedTime",
+                    "Operator": "GreaterThan",
+                    "Values": [lastSyncTime]
+                },
+                {
+                    "Key": "OpsItemType",
+                    "Operator": "Equal",
+                    "Values": [this.opsItemIssueType],
+                },
+                {
+                    "Key": "Status",
+                    "Operator": "Equal",
+                    "Values": statusesToSync
+                }
+            ]
+        }).collectAll();
+    };
+    OpsCenterSyncProvider.prototype.getActionItems = function (awsSystemsManager, lastSyncTime, statusesToSync) {
+        return awsSystemsManager.describeOpsItems({
+            "MaxResults": 50,
+            "OpsItemFilters": [
+                {
+                    "Key": "LastModifiedTime",
+                    "Operator": "GreaterThan",
+                    "Values": [lastSyncTime]
+                },
+                {
+                    "Key": "OpsItemType",
+                    "Operator": "Equal",
+                    "Values": [this.opsItemActionItemType],
+                },
+                {
+                    "Key": "Status",
+                    "Operator": "Equal",
+                    "Values": statusesToSync
+                }
+            ]
+        }).collectAll();
+    };
+    OpsCenterSyncProvider.prototype.getChangeRequests = function (awsSystemsManager, lastSyncTime) {
+        return awsSystemsManager.describeOpsItems({
+            "MaxResults": 50,
+            "OpsItemFilters": [
+                {
+                    "Key": "LastModifiedTime",
+                    "Operator": "GreaterThan",
+                    "Values": [lastSyncTime]
+                },
+                {
+                    "Key": "OpsItemType",
+                    "Operator": "Equal",
+                    "Values": [this.opsItemChangeRequestType],
+                }
+            ]
+        }).collectAll();
+    };
+    OpsCenterSyncProvider.prototype.mapChangeRequestStatusToOpsItemStatus = function (changeRequest) {
+        var state = Util.getChoiceLabelFromValue('change_request', 'state', changeRequest.state.toString());
+        switch (state) {
+            case "New":
+                return "Open";
+            case "Assess":
+                return "PendingApproval";
+            case "Authorize":
+                return "Approved";
+            case "Scheduled":
+                return "Scheduled";
+            case "Implement":
+            case "Review":
+                return "InProgress";
+            case "Closed":
+                return "Closed";
+            case "Canceled":
+                return "Cancelled";
+            default:
+                return null;
+        }
+    };
+    /**
+     * If the OpsItem is created from AWS SMIM, try to get the URI of the Incident
+     * that created it by fetching the Incident Record in the list of Related Items.
+     * If the found URI can be match with a record on ServiceNow: returns the record sys_id
+     */
+    OpsCenterSyncProvider.prototype.getIncidentReferenceFromRelatedItems = function (opsItem, account, awsSystemsManager) {
+        if (account.awsenableincidentmanager && opsItem.Source === 'ssm-incidents') {
+            var ssmIncidentRelatedItems_1 = [];
+            awsSystemsManager.listOpsItemRelatedItems(opsItem.OpsItemId).forEachPage(function (relatedItems) {
+                relatedItems.filter(function (relatedItem) { return relatedItem.ResourceType === 'AWS::SSMIncidents::IncidentRecord'; })
+                    .forEach(function (relatedItem) { return ssmIncidentRelatedItems_1.push(relatedItem); });
+            });
+            if (ssmIncidentRelatedItems_1.length > 0 && ssmIncidentRelatedItems_1[0].ResourceUri) {
+                var incident = new IncidentRepo().findByAwsIncidentArn(ssmIncidentRelatedItems_1[0].ResourceUri);
+                if (incident) {
+                    return incident.sys_id.toString();
+                }
+            }
+        }
+        return undefined;
+    };
+    return OpsCenterSyncProvider;
+}(AbstractSyncProvider));
+(function (OpsCenterSyncProvider) {
+    var SyncType;
+    (function (SyncType) {
+        SyncType[SyncType["Issues"] = 0] = "Issues";
+        SyncType[SyncType["ChangeRequests"] = 1] = "ChangeRequests";
+        SyncType[SyncType["ActionItems"] = 2] = "ActionItems";
+    })(SyncType = OpsCenterSyncProvider.SyncType || (OpsCenterSyncProvider.SyncType = {}));
+})(OpsCenterSyncProvider || (OpsCenterSyncProvider = {}));
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-01-12 12:24:04</sys_created_on>
+        <sys_id>91ea2f17dbed201079bd2fb7489619eb</sys_id>
+        <sys_mod_count>1</sys_mod_count>
+        <sys_name>OpsCenterSyncProvider</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_91ea2f17dbed201079bd2fb7489619eb</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2023-02-14 17:43:57</sys_updated_on>
+    </sys_script_include>
+</record_update>

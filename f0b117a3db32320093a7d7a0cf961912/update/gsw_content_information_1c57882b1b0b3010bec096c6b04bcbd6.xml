@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="gsw_content_information">
+    <gsw_content_information action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <article><![CDATA[<p>To see AWS Config details, configure the service settings to record data for the resource types of interest. For more information, see <a href="https://docs.aws.amazon.com/config/latest/developerguide/gs-console.html" rel="nofollow">Setting Up AWS Config with the Console</a>.</p>
+<div>
+<p><strong>To view configuration item details from AWS Config in the ServiceNow CMDB</strong></p>
+<ol style="list-style-position: inside;"><li>Log in to your ServiceNow instance as a user (for example, System Administrator) in the fulfiller view (Standard user interface view).</li><li>In the navigator, enter <code>AWS Service Management</code>.</li><li>Choose <strong>AWS Config</strong>.</li></ol>
+</div>
+<p>Select and view relationships for available AWS resources. This table illustrates the available AWS resources, ServiceNow CMDB label, and table name.</p>
+<div>
+<div>
+<table id="w879aac31b7c45b7b9" style="height: 307px;"><tbody><tr style="height: 13px;"><td style="width: 205.516px; height: 13px;"><strong>AWS Resources(AWS Config)</strong></td><td style="width: 266.594px; height: 13px;"><strong>ServiceNow CMDB/Scoped App Table Label</strong></td><td style="width: 336.656px; height: 13px;"><strong>ServiceNow CMDB/Scoped App Table Name</strong></td></tr><tr style="height: 14px;"><td style="height: 14px; width: 205.516px;">Accounts</td><td style="height: 14px; width: 266.594px;">CMDB CI Cloud Service Accounts</td><td style="height: 14px; width: 336.656px;"><code>cmdb_ci_cloud_service_account</code></td></tr><tr style="height: 14px;"><td style="height: 14px; width: 205.516px;">VPCs</td><td style="height: 14px; width: 266.594px;">Cloud Networks</td><td style="height: 14px; width: 336.656px;"><code>cmdb_ci_network</code></td></tr><tr style="height: 14px;"><td style="height: 14px; width: 205.516px;">Availability Zones</td><td style="height: 14px; width: 266.594px;">Availability Zone</td><td style="height: 14px; width: 336.656px;"><code>cmdb_ci_availability_zone</code></td></tr><tr style="height: 14px;"><td style="height: 14px; width: 205.516px;">EC2 Instances</td><td style="height: 14px; width: 266.594px;">Virtual Machine Instance</td><td style="height: 14px; width: 336.656px;"><code>cmdb_ci_vm_instance</code></td></tr><tr style="height: 14px;"><td style="height: 14px; width: 205.516px;">EBS Volumes</td><td style="height: 14px; width: 266.594px;">Storage Volume</td><td style="height: 14px; width: 336.656px;"><code>cmdb_ci_storage_volume</code></td></tr><tr style="height: 14px;"><td style="height: 14px; width: 205.516px;">Security Groups</td><td style="height: 14px; width: 266.594px;">Compute Security Group</td><td style="height: 14px; width: 336.656px;"><code>cmdb_ci_compute_security_group</code></td></tr><tr style="height: 14px;"><td style="height: 14px; width: 205.516px;">Auto Scaling Group</td><td style="height: 14px; width: 266.594px;">Auto Scaling Groups</td><td style="height: 14px; width: 336.656px;"><code>x_126749_aws_sc_cmdb_ci_autoscaling_group</code></td></tr><tr style="height: 14px;"><td style="height: 14px; width: 205.516px;">Network Interfaces</td><td style="height: 14px; width: 266.594px;">Cloud Mgmt Network Interface</td><td style="height: 14px; width: 336.656px;"><code>cmdb_ci_nic</code></td></tr><tr style="height: 14px;"><td style="height: 14px; width: 205.516px;">RDS Instances</td><td style="height: 14px; width: 266.594px;">Cloud DataBase</td><td style="height: 14px; width: 336.656px;"><code>cmdb_ci_cloud_database</code></td></tr><tr style="height: 14px;"><td style="height: 14px; width: 205.516px;">Subnets</td><td style="height: 14px; width: 266.594px;">Cloud Subnet</td><td style="height: 14px; width: 336.656px;"><code>cmdb_ci_cloud_subnet</code></td></tr><tr style="height: 14px;"><td style="height: 14px; width: 205.516px;">Load Balancers (V2)</td><td style="height: 14px; width: 266.594px;">Cloud Load Balancer</td><td style="height: 14px; width: 336.656px;"><code>cmdb_ci_cloud_load_balancer</code></td></tr><tr style="height: 14px;"><td style="height: 14px; width: 205.516px;">S3 Buckets</td><td style="height: 14px; width: 266.594px;">Cloud Object Storages</td><td style="height: 14px; width: 336.656px;"><code>cmdb_ci_cloud_object_storage</code></td></tr><tr style="height: 14px;"><td style="height: 14px; width: 205.516px;">CloudFormation Stacks</td><td style="height: 14px; width: 266.594px;">CloudFormation Stack</td><td style="height: 14px; width: 336.656px;"><code>x_126749_aws_sc_cmdb_ci_cloudformation_stack</code></td></tr><tr style="height: 14px;"><td style="height: 14px; width: 205.516px;">CloudFormation Provisioned Products</td><td style="height: 14px; width: 266.594px;">CloudFormation Provisioned Product</td><td style="height: 14px; width: 336.656px;"><code>x_126749_aws_sc_cmdb_ci_config_pp</code></td></tr><tr style="height: 14px;"><td style="height: 14px; width: 205.516px;">Tags</td><td style="height: 14px; width: 266.594px;">Key Value</td><td style="height: 14px; width: 336.656px;"><code>cmdb_key_value</code></td></tr><tr style="height: 14px;"><td style="height: 14px; width: 205.516px;">Lambdas</td><td style="height: 14px; width: 266.594px;">Cloud Function</td><td style="height: 14px; width: 336.656px;"><code>cmdb_ci_cloud_function</code></td></tr><tr style="height: 14px;"><td style="height: 14px; width: 205.516px;">Dynamo DB</td><td style="height: 14px; width: 266.594px;">DynamoDB Table</td><td style="height: 14px; width: 336.656px;"><code>cmdb_ci_dynamodb_table</code></td></tr><tr style="height: 14px;"><td style="height: 14px; width: 205.516px;">OS images</td><td style="height: 14px; width: 266.594px;">Images</td><td style="height: 14px; width: 336.656px;"><code>cmdb_ci_os_template</code></td></tr><tr style="height: 14px;"><td style="height: 14px; width: 205.516px;">AppRegistry Applications</td><td style="height: 14px; width: 266.594px;">AppRegistry Application</td><td style="height: 14px; width: 336.656px;"><code>x_126749_aws_sc_cmdb_ci_appregistry_application</code></td></tr><tr style="height: 14px;"><td style="height: 14px; width: 205.516px;">AppRegistry Attribute Groups</td><td style="height: 14px; width: 266.594px;">AppRegistry Attribute Group</td><td style="height: 14px; width: 336.656px;"><code>x_126749_aws_sc_cmdb_ci_appregistry_attribute_group</code></td></tr><tr style="height: 14px;"><td style="height: 14px; width: 205.516px;">AppRegistry Resources</td><td style="height: 14px; width: 266.594px;">AppRegistryResource</td><td style="height: 14px; width: 336.656px;"><code>x_126749_aws_sc_cmdb_ci_appregistry_resource</code></td></tr></tbody></table>
+</div>
+</div>]]></article>
+        <best_practice_acceptable>false</best_practice_acceptable>
+        <dependent_on_contents/>
+        <dependent_on_plugins/>
+        <dependent_on_plugins_ids/>
+        <description/>
+        <embedded_help_qualifier/>
+        <end_point/>
+        <end_point_open_mode/>
+        <end_point_type/>
+        <field/>
+        <filter/>
+        <filter_result/>
+        <implicit_dependent_on/>
+        <implicit_plugin_dependencies/>
+        <is_dynamic>false</is_dynamic>
+        <more_info_available>false</more_info_available>
+        <more_info_html/>
+        <order>200</order>
+        <parent display_value="Validate configurations">3ca44ca71b0b3010bec096c6b04bcbb3</parent>
+        <parents>3ca44ca71b0b3010bec096c6b04bcbb3,c09fcac2dbd130100f00b298f496196f</parents>
+        <plugin_id/>
+        <property_name/>
+        <property_value/>
+        <quick_startable>false</quick_startable>
+        <root_parent display_value="AWS Service Management Connector">c09fcac2dbd130100f00b298f496196f</root_parent>
+        <skippable>true</skippable>
+        <supports_child_content>false</supports_child_content>
+        <sys_class_name>gsw_content_information</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-10-13 00:10:59</sys_created_on>
+        <sys_id>1c57882b1b0b3010bec096c6b04bcbd6</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AWS Config integration features</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>gsw_content_information_1c57882b1b0b3010bec096c6b04bcbd6</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <table/>
+        <title>AWS Config integration features</title>
+        <weight>1</weight>
+    </gsw_content_information>
+    <sys_translated_text action="delete_multiple" query="documentkey=1c57882b1b0b3010bec096c6b04bcbd6"/>
+</record_update>

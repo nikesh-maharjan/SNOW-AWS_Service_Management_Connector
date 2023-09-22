@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.CloudtrailEventRepo</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>CloudtrailEventRepo</name>
+        <script><![CDATA[var CloudtrailEventRepo = /** @class */ (function () {
+    function CloudtrailEventRepo() {
+    }
+    // finds the latest event already synced for the current change request, or null if none
+    CloudtrailEventRepo.prototype.findLatestEventTime = function (changeRequestId) {
+        var events = new GlideAggregate('x_126749_aws_sc_change_request_cloudtrail_event');
+        events.addAggregate('MAX', 'awseventtime');
+        events.addQuery('awschangerequest', changeRequestId);
+        events.query();
+        if (events.next()) {
+            return events.getAggregate('MAX', 'awseventtime');
+        }
+        return null;
+    };
+    CloudtrailEventRepo.prototype.insertEvent = function (changeRequestSysId, row) {
+        var fields = {
+            awschangerequest: changeRequestSysId,
+            awseventid: row['eventID'],
+            awseventname: row['eventName'],
+            awseventsource: row['eventSource'],
+            awseventtime: row['eventTime'],
+            awseventtype: row['eventType'],
+            awseventversion: row['eventVersion'],
+            awsreadonly: row['readOnly'],
+            awsrecipientaccountid: row['recipientAccountId'],
+            awsregion: row['awsRegion'],
+            awsrequestid: row['requestID'],
+            awsrequestparameters: row['requestParameters'],
+            awsresponseelement: row['responseElements'],
+            awssourceipaddress: row['sourceIPAddress'],
+            awsuseragent: row['userAgent'],
+            awsuseridentity: row['userIdentity'],
+            awsusername: row['username'],
+        };
+        var key = {
+            awschangerequest: fields.awschangerequest,
+            awseventid: fields.awseventid,
+        };
+        return Util.insertOrUpdate('x_126749_aws_sc_change_request_cloudtrail_event', key, fields);
+    };
+    CloudtrailEventRepo.prototype.insertResources = function (resources, event) {
+        resources.forEach(function (resource) {
+            var definitionalFields = {
+                awscloudtrailevent: event.sys_id.toString(),
+                awsresourcetype: resource.type,
+                awsresourcename: resource.arn,
+            };
+            // all fields form the identity of a record, so fields is also used as the key
+            Util.insertOrUpdate('x_126749_aws_sc_change_request_cloudtrail_event_resource', definitionalFields);
+        });
+    };
+    return CloudtrailEventRepo;
+}());
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2022-05-12 09:33:26</sys_created_on>
+        <sys_id>a56f6c672f130110a082e83df699b678</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>CloudtrailEventRepo</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_a56f6c672f130110a082e83df699b678</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

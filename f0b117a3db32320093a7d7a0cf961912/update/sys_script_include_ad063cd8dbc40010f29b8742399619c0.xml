@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.AwsBudgets</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>Methods to retrieve data from AWS Budgets service</description>
+        <name>AwsBudgets</name>
+        <script><![CDATA[/**
+ * @class AwsBudgets
+ * @classdesc Make HTTP requests to AWS Budgets.
+ * @param credential {Object} AWS account credentials.
+ * @param credential.identity {String} An AWS access key.
+ * @param credential.secret {String} An AWS secret access key.
+ * @param credential.session {String=} Required if using temporary credentials.
+ */
+var AwsBudgets = /** @class */ (function (_super) {
+    Polyfill.__extends(AwsBudgets, _super);
+    function AwsBudgets(region, credential, apiVersion) {
+        var _this = _super.call(this, "budgets", null, credential, false) || this;
+        _this.apiVersion = apiVersion || "2010-05-15";
+        _this.isSupported = [
+            "us-gov-west-1", "us-gov-west-1:fips",
+            "us-gov-east-1", "us-gov-east-1:fips"
+        ].indexOf(region) === -1;
+        return _this;
+    }
+    AwsBudgets.prototype.headers = function (action) {
+        // Request this.headers required by AWS Budgets are not publicly documented.
+        // The headers sent by the cli are as shown below.
+        return {
+            "Content-Type": "application/x-amz-json-1.1",
+            "X-Amz-Target": "AWSBudgetServiceGateway." + action
+        };
+    };
+    /**
+     * Return details of the specified budget
+     * @see https://docs.aws.amazon.com/cli/latest/reference/budgets/describe-budget.html
+     * @param accountId {String} the aws account or role making the call
+     * @param budgetName {String} the name of the budget
+     * @returns {WrappedResponse}
+     * @memberof! AwsBudgets#
+     * @alias describeBudget
+     */
+    AwsBudgets.prototype.describeBudget = function (accountId, budgetName) {
+        this._assertIsSupported();
+        Util.assertExists(accountId, "accountId");
+        Util.assertExists(budgetName, "budgetName");
+        var action = "DescribeBudget";
+        var payload = JSON.stringify({
+            "Action": action,
+            "AccountId": accountId,
+            "BudgetName": budgetName,
+            "Version": this.apiVersion
+        });
+        return Response.of(this._post(action, payload, this.headers("DescribeBudget")));
+    };
+    AwsBudgets.prototype._assertIsSupported = function () {
+        if (!this.isSupported) {
+            var error = new Error("Budget service not available in " + this.region);
+            error.name = "NotSupportedError";
+            throw error;
+        }
+    };
+    return AwsBudgets;
+}(AwsService));
+AwsBudgets.prototype.type = 'AwsBudgets';
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-09-18 09:33:47</sys_created_on>
+        <sys_id>ad063cd8dbc40010f29b8742399619c0</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AwsBudgets</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_ad063cd8dbc40010f29b8742399619c0</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_ui_action">
+    <sys_ui_action action="INSERT_OR_UPDATE">
+        <action_name>Execute Provisioned Product Plan</action_name>
+        <active>true</active>
+        <client>true</client>
+        <client_script_v2/>
+        <comments>Execute the plan for this provisioned product. If the product's status is "Plan in Progress" then this is done by ordering the relevant catalogue item. Otherwise, the action is handled by a change request.&#13;
+&#13;
+In versions before Madrid, the Request that is created by CartJS will also include any other products the user has in their cart when they use this UI action.</comments>
+        <condition>(function () {var pp = new ProvisionedProduct(current); return pp.hasPlan() &amp;&amp; pp.getPlan().getStatus() === 'CREATE_SUCCESS';}());</condition>
+        <form_action>true</form_action>
+        <form_button>false</form_button>
+        <form_button_v2>false</form_button_v2>
+        <form_context_menu>false</form_context_menu>
+        <form_link>true</form_link>
+        <form_menu_button_v2>false</form_menu_button_v2>
+        <form_style/>
+        <format_for_configurable_workspace>false</format_for_configurable_workspace>
+        <hint>Execute the plan for this provisioned product. If the product's status is "Plan in Progress" then this is done by ordering the relevant catalogue item. Otherwise, the action is handled by a change request.</hint>
+        <isolate_script>false</isolate_script>
+        <list_action>false</list_action>
+        <list_banner_button>false</list_banner_button>
+        <list_button>false</list_button>
+        <list_choice>false</list_choice>
+        <list_context_menu>false</list_context_menu>
+        <list_link>false</list_link>
+        <list_save_with_form_button>false</list_save_with_form_button>
+        <list_style/>
+        <messages/>
+        <name>Execute Plan</name>
+        <onclick>executePlan()</onclick>
+        <order>100</order>
+        <script><![CDATA[/**
+ * Execute a plan on a provisioned product.
+ */
+// UI Action condition:
+// (function () {var pp = new ProvisionedProduct(current); return pp.hasPlan() && pp.getPlan().getStatus() === 'CREATE_SUCCESS';}());
+// table: AWS Service Catalog Product (x_126749_aws_sc_cmdb_ci_pp)
+// @Deployable({table: 'sys_ui_action', column: 'script', sysId: '453053a74f1033001a959acf9310c732'})
+function executePlan() {
+    var provisionedProduct = g_form.getValue('sys_uniqueValue');
+    var ajax = new GlideAjax('x_126749_aws_sc.ProvisionedProductAjax');
+    ajax.addParam('sysparm_name', 'executePlan');
+    ajax.addParam('sysparm_provisionedProductSysId', provisionedProduct);
+    ajax.getXML(function (response) {
+        if (!response.responseXML || !response.responseXML.documentElement.getAttribute("answer")) {
+            g_form.addErrorMessage("Unexpected response from the server");
+        }
+        var xmlResponseAnswer = response.responseXML.documentElement.getAttribute("answer");
+        var answer = JSON.parse(xmlResponseAnswer);
+        if (answer.success) {
+            g_form.addInfoMessage('Plan is executing ...');
+        }
+        else {
+            g_form.addErrorMessage(answer.message);
+        }
+    });
+}
+]]></script>
+        <show_insert>false</show_insert>
+        <show_multiple_update>false</show_multiple_update>
+        <show_query>false</show_query>
+        <show_update>true</show_update>
+        <sys_class_name>sys_ui_action</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-26 13:22:00</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>453053a74f1033001a959acf9310c732</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Execute Plan</sys_name>
+        <sys_overrides/>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_ui_action_453053a74f1033001a959acf9310c732</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <table>x_126749_aws_sc_cmdb_ci_pp</table>
+        <ui11_compatible>true</ui11_compatible>
+        <ui16_compatible>false</ui16_compatible>
+    </sys_ui_action>
+</record_update>

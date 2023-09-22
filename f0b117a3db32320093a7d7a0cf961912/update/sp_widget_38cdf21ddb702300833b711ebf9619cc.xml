@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category/>
+        <client_script><![CDATA[function executeSelfServiceActionUi($scope, $timeout, $rootScope, $location, spUtil, provisionedProduct, connectorAjax) {
+
+    /* widget controller */
+    var c = this;
+    c.errors = [];
+    c.executing = false;
+    c.model = {
+        provisionedProductSysId: c.data.sys_id,
+        action: undefined
+    };
+
+    c.data.warnings.forEach(function (e) {
+        spUtil.addErrorMessage(e);
+    });
+
+    if (!c.model.provisionedProductSysId) {
+        spUtil.addErrorMessage('Could not determine provisioned product ID');
+    }
+
+    c.setUserToken = function () {
+        connectorAjax.setUserToken(c.data.sessionToken);
+        c.tokenIsSet = true;
+    };
+
+    c.addError = function (error) {
+        c.errors.push(error);
+    };
+
+    c.resetErrors = function () {
+        c.errors.length = 0;
+    };
+
+    c.submitForm = function () {
+        c.resetErrors();
+        c.executing = true;
+
+        provisionedProduct.executeSelfServiceAction(c.model.provisionedProductSysId, c.model.action.Id, c.model.action.Name, c.model.action.Description).then(function (response) {
+            spUtil.addInfoMessage('Self-service action requested');
+            var productPage = 'id=aws_sc_pp_details&sys_id=' + c.model.provisionedProductSysId;
+            $location.search(productPage);
+            $scope.$applyAsync(function () {
+                c.executing = false;
+            });
+        }, function (error) {
+            $scope.$applyAsync(function () {
+                c.addError(error);
+                c.executing = false;
+            });
+        });
+    };
+
+    $scope.$watch('c.data.sessionToken', c.setUserToken);
+
+    $timeout(function() {
+        $rootScope.$broadcast('sp.update.breadcrumbs', c.data.breadcrumbs);
+    });
+
+}
+]]></client_script>
+        <controller_as>c</controller_as>
+        <css>.form-group {
+    margin-bottom: 10px;
+}
+
+.bs-callout {
+    margin: 10px 0 !important;
+    padding: 20px !important;
+    border-left-style: solid;
+    border-left-width: 10px;
+}
+
+.bs-callout-error {
+    background-color: #fdf7f7;
+    border-color: #d9534f;
+}
+
+.bs-callout-ok {
+    background-color: #f4f8fa;
+    border-color: #5bc0de;
+}
+
+.label.event {
+    float: right;
+}
+
+.panel-body &gt; div {
+    margin-bottom: 15px;
+}
+
+fa {
+    margin-right: 10px;
+}
+
+.intro {
+    padding: 20px !important
+}
+
+.arn {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.glyphicon-exclamation-sign {
+    color: #d9534f;
+}
+
+.timeline-heading a {
+    cursor: pointer;
+}
+</css>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>true</has_preview>
+        <id>aws-sc-action</id>
+        <internal>false</internal>
+        <link/>
+        <name>AWS SC Self-Service Action Form</name>
+        <option_schema/>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[(function () {
+
+    data.warnings = [];
+
+    function initialize() {
+        data.sessionToken = gs.getSession().getSessionToken();
+        if (input) {
+            data.sys_id = input.sys_id;
+        } else {
+            data.sys_id = $sp.getParameter("sys_id");
+        }
+
+        try {
+            var pp = new GlideRecord('x_126749_aws_sc_cmdb_ci_pp');
+            pp.addQuery('sys_id', data.sys_id);
+            pp.addQuery('owned_by', gs.getUserID());
+            pp.query();
+            if (pp.next()) {
+                data.productDetails = true;
+            }
+
+            var listPage, detailPage;
+            var page = new GlideRecord('sp_page');
+            if (page.get('id', 'aws_sc_pp')) {
+                listPage = page.title.toString();
+            }
+            if (page.get('id', 'aws_sc_pp_details')) {
+                detailPage = page.title.toString();
+            }
+            if (listPage && detailPage) {
+                var name = data.productDetails ? pp.awsname.toString() : data.sys_id;
+                data.breadcrumbs = [
+                    {label: listPage, url: '?id=aws_sc_pp'},
+                    {label: name, url: '?id=aws_sc_pp_details&sys_id=' + data.sys_id},
+                    {label: "Self-Service Action", url: '#'}
+                ];
+            }
+        } catch (err) {
+            gs.info('Caught exception in retrieving provisioned product details for ' +
+                data.sys_id + (err.message ? err.message : err));
+            data.warnings.push('Product not found');
+        }
+
+    }
+
+    initialize();
+})();
+]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-09-26 12:24:44</sys_created_on>
+        <sys_id>38cdf21ddb702300833b711ebf9619cc</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AWS SC Self-Service Action Form</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sp_widget_38cdf21ddb702300833b711ebf9619cc</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <template><![CDATA[<div ng-if="!data.productDetails" class="panel panel-{{::c.options.color}} intro b">
+    No product information available
+</div>
+<div ng-if="data.productDetails" class="panel panel-{{::c.options.color}} intro b">
+    <div ng-repeat="error in c.errors track by $index" class="bg-danger sc-error-message">
+        {{error.message ? error.message : error}}
+    </div>
+
+    <form name="actionForm" class="form-horizontal" ng-submit="c.submitForm()" novalidate ng-cloak>
+        <div>
+            <self-service-actions
+                provisioned-product-sys-id="c.model.provisionedProductSysId"
+                form="actionForm"
+                action="c.model.action"
+                on-error="c.addError(error)"
+                reset-errors="c.resetErrors()"
+                inputs-disabled="c.executing">
+            </self-service-actions>
+
+            <button type="submit" tabindex="0" class="btn btn-primary ng-binding"
+                    ng-disabled="!c.model.action || c.executing || actionForm.$invalid"
+                    ng-click="c.clickSubmit($event)">
+                {{c.executing ? 'Executing ...' : 'Execute'}}
+            </button>
+        </div>
+    </form>
+</div>
+]]></template>
+    </sp_widget>
+</record_update>

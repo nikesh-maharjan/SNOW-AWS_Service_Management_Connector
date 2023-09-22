@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.AWSWorkspaceResourceType</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>AWSWorkspaceResourceType</name>
+        <script><![CDATA[var AWSWorkspaceResourceType = /** @class */ (function(_super) {
+    Polyfill.__extends(AWSWorkspaceResourceType, _super);
+
+    function AWSWorkspaceResourceType() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    AWSWorkspaceResourceType.prototype.rules = function() {
+        return [{
+            order: 55,
+            syncType: NonConfigSyncProvider.SYNC_DIR.FROM_AWS_CONFIG,
+            externalResourceType: 'AWS::WorkSpaces::Workspace',
+            externalResourceId: 'resourceId',
+            snTable: 'cmdb_ci_virtual_desktop',
+            syncFromAws: this.syncFromAws,
+        }];
+    };
+    AWSWorkspaceResourceType.prototype.fields = function() {
+        var _this = this;
+        return [{
+            mode: NonConfigSyncProvider.FieldMode.FromAws,
+            snField: 'name',
+            transformFromAws: function(object, context) {
+                return (context && context.resourceIdAsName) || !object.item.resourceName ?
+                    object.item.resourceId : object.item.workspace ? object.item.workspace.ComputerName : object.item.resourceId;
+            }
+        }, {
+            mode: NonConfigSyncProvider.FieldMode.FromAws,
+            snField: 'ip_address',
+            transformFromAws: function(object, context) {
+                return (object.item.workspace && object.item.workspace.IpAddress) ?
+                    object.item.workspace.IpAddress : '';
+            }
+        }, {
+            mode: ConfigSyncProvider.FieldMode.FromAws,
+            snField: 'state',
+            transformFromAws: function(object) {
+                return _this.getState(object);
+            }
+        }];
+    };
+
+    AWSWorkspaceResourceType.prototype.getState = function(config) {
+        if (!config.item.workspace) {
+            return 'terminated';
+        }
+        switch (config.item.workspace.State) {
+            case 'AVAILABLE':
+                return 'available';
+            case 'STOPPED':
+                return 'stopped';
+            case 'MAINTENANCE':
+                return 'maintenance';
+            case 'SUSPENDED':
+                return 'suspended';
+            case 'RESTORING':
+                return 'restoring';
+            case 'TERMINATED':
+                return 'terminated';
+            case 'PENDING':
+                return 'pending';
+            default:
+                return 'retired';
+        }
+    };
+
+    AWSWorkspaceResourceType.prototype.getSubnetSysId = function(config,context) {
+        var subnetGr = new GlideRecord('cmdb_ci_cloud_subnet');
+        subnetGr.addQuery('object_id', config.item.workspace.SubnetId);
+        subnetGr.query();
+        if (subnetGr.next()) {
+            return subnetGr.sys_id;
+        } else {
+            subnetGr.initialize();
+            Util.setValue(subnetGr, 'object_id', config.item.workspace.SubnetId);
+            Util.setValue(subnetGr, 'name', config.item.workspace.SubnetId);
+            Util.setValue(subnetGr, 'discovery_source', context.connectorName);
+            Util.setValue(subnetGr, 'first_discovered', new GlideDateTime());
+            return subnetGr.insert();
+        }
+    };
+
+    AWSWorkspaceResourceType.prototype.relationships = function() {
+        return [{
+            relationship: NonConfigSyncProvider.RelationshipType.HostedOn,
+            externalResourceType: 'AWS::Region',
+            snTable: 'cmdb_ci_aws_datacenter',
+            documentationOnly: true,
+        }, {
+            resourceType: new SubnetResourceType(),
+            relationship: NonConfigSyncProvider.RelationshipType.Contains,
+            reverse: true
+        }];
+    };
+    AWSWorkspaceResourceType.prototype.syncFromAwsAddRelationships = function(context, config, resourceSysId) {
+        // Process relationships to AWS regions
+        this.addHostedOnRegionRelationship(context, config, resourceSysId);
+        if (config.item.workspace) {
+            var subnetSysId = this.getSubnetSysId(config);
+            var ContainsSysId = this.getRelationTypeSysId(NonConfigSyncProvider.RelationshipType.Contains);
+            this.updateRelationship(subnetSysId, resourceSysId, ContainsSysId);
+        }
+
+    };
+    // the payload from AWS Config for API gateway has a tag attribute within configuration all the time, which has the incorrect details.
+    //tags that we want to process for API gateway is available within _config.item, hence setting as below
+    AWSWorkspaceResourceType.prototype.getResourceTags = function(_config) {
+        return _config.data.Tags || [];
+    };
+    return AWSWorkspaceResourceType;
+}(AbstractResourceType));]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2023-03-01 20:11:54</sys_created_on>
+        <sys_id>357b33b597912110c830fbc71153afe2</sys_id>
+        <sys_mod_count>22</sys_mod_count>
+        <sys_name>AWSWorkspaceResourceType</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_357b33b597912110c830fbc71153afe2</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2023-03-06 05:20:43</sys_updated_on>
+    </sys_script_include>
+</record_update>

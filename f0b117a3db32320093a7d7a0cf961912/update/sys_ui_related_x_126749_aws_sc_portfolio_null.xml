@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update>
+    <sys_ui_related sys_domain="global" table="x_126749_aws_sc_portfolio" version="2" view="">
+        <sys_ui_related_list_entry action="INSERT_OR_UPDATE">
+            <filter/>
+            <list_id display_value="Portfolio - Default view" name="x_126749_aws_sc_portfolio" related_list="NULL" sys_domain="global" view="Default view">b16f32611bc8901039ed877ddc4bcbd8</list_id>
+            <order_by/>
+            <position>0</position>
+            <related_list>REL:9e8b85b7db054300a5d3ddd0cf96191e</related_list>
+            <sys_class_name>sys_ui_related_list_entry</sys_class_name>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2020-04-27 10:30:13</sys_created_on>
+            <sys_id>a814183b2f58541047d8b6a62799b69e</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2020-04-27 10:30:13</sys_updated_on>
+        </sys_ui_related_list_entry>
+        <sys_ui_related_list_entry action="INSERT_OR_UPDATE">
+            <filter/>
+            <list_id display_value="Portfolio - Default view" name="x_126749_aws_sc_portfolio" related_list="NULL" sys_domain="global" view="Default view">b16f32611bc8901039ed877ddc4bcbd8</list_id>
+            <order_by/>
+            <position>1</position>
+            <related_list>REL:8b1be8731b33041039ed877ddc4bcb35</related_list>
+            <sys_class_name>sys_ui_related_list_entry</sys_class_name>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2020-04-27 10:30:13</sys_created_on>
+            <sys_id>2014183b2f58541047d8b6a62799b69f</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2020-04-27 10:30:13</sys_updated_on>
+        </sys_ui_related_list_entry>
+        <sys_ui_related_list_entry action="INSERT_OR_UPDATE">
+            <filter/>
+            <list_id display_value="Portfolio - Default view" name="x_126749_aws_sc_portfolio" related_list="NULL" sys_domain="global" view="Default view">b16f32611bc8901039ed877ddc4bcbd8</list_id>
+            <order_by/>
+            <position>2</position>
+            <related_list>REL:069cb3672f18541047d8b6a62799b6bd</related_list>
+            <sys_class_name>sys_ui_related_list_entry</sys_class_name>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2020-04-27 10:30:13</sys_created_on>
+            <sys_id>a414183b2f58541047d8b6a62799b69f</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2020-04-27 10:30:13</sys_updated_on>
+        </sys_ui_related_list_entry>
+        <sys_ui_related_list action="INSERT_OR_UPDATE">
+            <calculated_name>Portfolio - Default view</calculated_name>
+            <filter/>
+            <name>x_126749_aws_sc_portfolio</name>
+            <order_by/>
+            <position/>
+            <related_list/>
+            <sys_class_name>sys_ui_related_list</sys_class_name>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2020-04-27 10:30:13</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>b16f32611bc8901039ed877ddc4bcbd8</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_name>Portfolio - Default view</sys_name>
+            <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+            <sys_policy/>
+            <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+            <sys_update_name>sys_ui_related_x_126749_aws_sc_portfolio_null</sys_update_name>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+            <sys_user/>
+            <view display_value="Default view" name="NULL">Default view</view>
+            <view_name/>
+        </sys_ui_related_list>
+    </sys_ui_related>
+</record_update>

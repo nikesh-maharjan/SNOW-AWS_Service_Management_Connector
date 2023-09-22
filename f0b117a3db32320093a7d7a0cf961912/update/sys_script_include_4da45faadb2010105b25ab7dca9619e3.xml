@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.AwsSystemsManager</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>AwsSystemsManager</name>
+        <script><![CDATA[var AwsSystemsManager = /** @class */ (function (_super) {
+    Polyfill.__extends(AwsSystemsManager, _super);
+    function AwsSystemsManager(region, credential) {
+        Util.assertExists(region, 'AwsSystemManager requires a region');
+        return _super.call(this, 'ssm', region, credential, true) || this;
+    }
+    AwsSystemsManager.prototype.headers = function (action) {
+        return {
+            'Content-Type': 'application/x-amz-json-1.1',
+            'X-Amz-Target': 'AmazonSSM.' + action
+        };
+    };
+    /**
+     * Returns all Systems Manager (SSM) documents in the current AWS account and AWS Region. You can limit the results of this request by using a filter.
+     *
+     * @see https://docs.aws.amazon.com/systems-manager/latest/APIReference/API_ListDocuments.html
+     * @param opts The request parameters payload to use.
+     */
+    AwsSystemsManager.prototype.listDocuments = function (opts) {
+        var action = 'ListDocuments';
+        var payload = opts || {};
+        var headers = this.headers(action);
+        var focus = 'DocumentIdentifiers';
+        var pageToken = 'NextToken';
+        return this._paginatedApi(action, payload, headers, focus, pageToken);
+    };
+    /**
+     * Describes the specified AWS Systems Manager document (SSM document).
+     *
+     * @see https://docs.aws.amazon.com/systems-manager/latest/APIReference/API_DescribeDocument.html
+     * @param documentName The name of a document.
+     * @param documentVersion The version of a document.
+     * @param documentVersionName The version name of a document.
+     */
+    AwsSystemsManager.prototype.describeDocument = function (documentName, documentVersion, documentVersionName) {
+        Util.assertExists(documentName, 'name');
+        var action = 'DescribeDocument';
+        var payload = { 'Name': documentName };
+        if (documentVersion) {
+            payload.DocumentVersion = documentVersion;
+        }
+        if (documentVersionName) {
+            payload.VersionName = documentVersionName;
+        }
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    /**
+     * Gets the contents of the specified AWS Systems Manager document (SSM document).
+     *
+     * @see https://docs.aws.amazon.com/systems-manager/latest/APIReference/API_GetDocument.html
+     * @param documentName The name of a document.
+     * @param documentVersion The version of a document.
+     * @param documentVersionName The version name of a document.
+     */
+    AwsSystemsManager.prototype.getDocument = function (documentName, documentVersion, documentVersionName) {
+        Util.assertExists(documentName, 'name');
+        var action = 'GetDocument';
+        var payload = {
+            Name: documentName
+        };
+        if (documentVersion) {
+            payload.DocumentVersion = documentVersion;
+        }
+        if (documentVersionName) {
+            payload.VersionName = documentVersionName;
+        }
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    /**
+     * Get detailed information about a particular Automation execution.
+     *
+     * @see https://docs.aws.amazon.com/systems-manager/latest/APIReference/API_GetAutomationExecution.html
+     * @param automationExecutionId The unique identifier for an existing automation execution to examine.
+     */
+    AwsSystemsManager.prototype.getAutomationExecution = function (automationExecutionId) {
+        Util.assertExists(automationExecutionId, 'automationExecutionId');
+        var action = 'GetAutomationExecution';
+        var payload = { 'AutomationExecutionId': automationExecutionId };
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    /**
+     * Initiates execution of an Automation runbook.
+     *
+     * @see https://docs.aws.amazon.com/systems-manager/latest/APIReference/API_StartAutomationExecution.html
+     * @param name The name of the SSM document to run.
+     * @param version The version of the SSM document to run.
+     * @param parameters A key-value map of execution parameters
+     * @param tags Optional metadata that you assign to a resource.
+     */
+    AwsSystemsManager.prototype.startAutomationExecution = function (name, version, parameters, tags) {
+        var action = 'StartAutomationExecution';
+        var payload = {
+            DocumentName: name
+        };
+        if (version) {
+            payload.DocumentVersion = version;
+        }
+        if (parameters) {
+            payload.Parameters = parameters;
+        }
+        if (tags) {
+            payload.Tags = tags;
+        }
+        return Response.of(this._post(action, payload, this.headers(action)));
+    };
+    /**
+     * Query a set of OpsItems.
+     *
+     * @see https://docs.aws.amazon.com/systems-manager/latest/APIReference/API_DescribeOpsItems.html
+     * @param opts The request parameters payload to use.
+     */
+    AwsSystemsManager.prototype.describeOpsItems = function (opts) {
+        var action = "DescribeOpsItems";
+        var headers = this.headers(action);
+        var payload = opts || {
+            MaxResults: 50,
+            OpsItemFilters: [
+                {
+                    Key: "Status",
+                    Operator: "Equals",
+                    Values: ["Open", "InProgress"]
+                }
+            ]
+        };
+        var focus = "OpsItemSummaries";
+        var pageToken = "NextToken";
+        return this._paginatedApi(action, payload, headers, focus, pageToken);
+    };
+    /**
+     * Get information about an OpsItem by using the ID.
+     *
+     * @see https://docs.aws.amazon.com/systems-manager/latest/APIReference/API_GetOpsItem.html
+     * @param opsItemId The ID of the OpsItem that you want to get.
+     */
+    AwsSystemsManager.prototype.getOpsItem = function (opsItemId) {
+        var action = "GetOpsItem";
+        var headers = this.headers(action);
+        var focus = 'OpsItem';
+        var payload = {
+            OpsItemId: opsItemId
+        };
+        return Response.of(this._post(action, payload, headers), focus);
+    };
+    /**
+     * Edit or change an OpsItem.
+     *
+     * @see https://docs.aws.amazon.com/systems-manager/latest/APIReference/API_UpdateOpsItem.html
+     * @param payload The request parameters payload to use.
+     */
+    AwsSystemsManager.prototype.updateOpsItem = function (payload) {
+        var action = "UpdateOpsItem";
+        var headers = this.headers(action);
+        return Response.of(this._post(action, payload, headers));
+    };
+    /**
+     * Creates a change request for Change Manager.
+     *
+     * @see https://docs.aws.amazon.com/systems-manager/latest/APIReference/API_StartChangeRequestExecution.html
+     * @param payload The request parameters payload to use.
+     */
+    AwsSystemsManager.prototype.startChangeRequestExecution = function (payload) {
+        var action = "StartChangeRequestExecution";
+        var headers = this.headers(action);
+        return Response.of(this._post(action, payload, headers));
+    };
+    AwsSystemsManager.prototype.listOpsItemRelatedItems = function (opsItemId) {
+        var action = "ListOpsItemRelatedItems";
+        var focus = "Summaries";
+        var pageToken = "NextToken";
+        var headers = this.headers(action);
+        var payload = {
+            MaxResults: 50,
+            OpsItemId: opsItemId,
+        };
+        return this._paginatedApi(action, payload, headers, focus, pageToken);
+    };
+    return AwsSystemsManager;
+}(AwsService));
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-05-06 13:35:06</sys_created_on>
+        <sys_id>4da45faadb2010105b25ab7dca9619e3</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AwsSystemsManager</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_4da45faadb2010105b25ab7dca9619e3</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

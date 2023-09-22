@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.AwsEc2</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>AwsEc2</name>
+        <script><![CDATA[/**
+ * @class AwsEC2
+ * @classdesc Make HTTP requests to AWS EC2.
+ * @param region {String} An AWS region, e.g. "us-west-1"
+ * @param credential {Object} AWS account credentials.
+ * @param credential.identity {String} An AWS access key.
+ * @param credential.secret {String} An AWS secret access key.
+ * @param credential.session {String=} Required if using temporary credentials.
+ */
+var AwsEc2 = /** @class */ (function (_super) {
+    Polyfill.__extends(AwsEc2, _super);
+    function AwsEc2(region, credential) {
+        var _this = _super.call(this, "ec2", region, credential, true) || this;
+        Util.assertExists(region, "region");
+        return _this;
+    }
+    AwsEc2.prototype.headers = function (isAwsParameterLookup) {
+        // Request this.headers required by AWS EC2 are not publicly documented.
+        // Using debug on the cli suggests that only Content-Type is required.
+        var headers = {
+            'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
+        };
+        if (isAwsParameterLookup === true) {
+            headers['X-Aws-Parameter-Lookup'] = true;
+        }
+        return headers;
+    };
+    /**
+     * Return all Availability Zones.
+     * @see https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeAvailabilityZones.html#API_DescribeAvailabilityZones_ResponseElements
+     * @returns {WrappedResponse}
+     * @memberof! AwsEC2#
+     */
+    AwsEc2.prototype.describeAvailabilityZones = function (filters, isAwsParameterLookup) {
+        var action = "DescribeAvailabilityZones";
+        var payloadObj = {
+            'Action': action,
+            'Version': '2016-11-15'
+        };
+        if (filters) {
+            payloadObj = this.addFilters(payloadObj, filters);
+        }
+        var payload = Util.formEncode(payloadObj);
+        return Response.of(this._post(action, payload, this.headers(isAwsParameterLookup)));
+    };
+    /**
+     * Return all Vpcs.
+     * @see #https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVpcs.html
+     * @returns {WrappedResponse}
+     * @memberof! AwsEC2#
+     */
+    AwsEc2.prototype.describeVpcs = function (filters, isAwsParameterLookup) {
+        var action = "DescribeVpcs";
+        var payloadObj = {
+            'Action': action,
+            'Version': '2016-11-15'
+        };
+        if (filters) {
+            payloadObj = this.addFilters(payloadObj, filters);
+        }
+        var payload = Util.formEncode(payloadObj);
+        return Response.of(this._post(action, payload, this.headers(isAwsParameterLookup)));
+    };
+    /**
+     * Return all Ec2 Instances.
+     * @see #https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeInstances.html
+     * @returns {WrappedResponse}
+     * @memberof! AwsEC2#
+     */
+    AwsEc2.prototype.describeInstances = function (filters, isAwsParameterLookup) {
+        var action = "DescribeInstances";
+        var payloadObj = {
+            'Action': action,
+            'Version': '2016-11-15'
+        };
+        if (filters) {
+            payloadObj = this.addFilters(payloadObj, filters);
+        }
+        var payload = Util.formEncode(payloadObj);
+        return Response.of(this._post(action, payload, this.headers(isAwsParameterLookup)));
+    };
+    /**
+     * Return all KeyPairs, matching any filters.
+     * @see https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeKeyPairs.html
+     * @returns {WrappedResponse}
+     * @memberof! AwsEC2#
+     */
+    AwsEc2.prototype.describeKeyPairs = function (filters, isAwsParameterLookup) {
+        var action = "DescribeKeyPairs";
+        var payloadObj = {
+            'Action': action,
+            'Version': '2016-11-15'
+        };
+        if (filters) {
+            payloadObj = this.addFilters(payloadObj, filters);
+        }
+        var payload = Util.formEncode(payloadObj);
+        return Response.of(this._post(action, payload, this.headers(isAwsParameterLookup)));
+    };
+    /**
+     * Return all Security Groups, matching any filters.
+     * @see https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeSecurityGroups.html
+     * @returns {WrappedResponse}
+     * @memberof! AwsEC2#
+     */
+    AwsEc2.prototype.describeSecurityGroups = function (filters, isAwsParameterLookup) {
+        var action = "DescribeSecurityGroups";
+        var payloadObj = {
+            'Action': action,
+            'Version': '2016-11-15'
+        };
+        if (filters) {
+            payloadObj = this.addFilters(payloadObj, filters);
+        }
+        var payload = Util.formEncode(payloadObj);
+        return Response.of(this._post(action, payload, this.headers(isAwsParameterLookup)));
+    };
+    AwsEc2.prototype.describeSubnets = function (filters, isAwsParameterLookup) {
+        var action = "DescribeSubnets";
+        var payloadObj = {
+            'Action': action,
+            'Version': '2016-11-15'
+        };
+        if (filters) {
+            payloadObj = this.addFilters(payloadObj, filters);
+        }
+        var payload = Util.formEncode(payloadObj);
+        return Response.of(this._post(action, payload, this.headers(isAwsParameterLookup)));
+    };
+    /**
+     * Return all Ec2 Volumes
+     * @see #https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVolumes.html
+     * @returns {WrappedResponse}
+     * @memberof! AwsEC2#
+     */
+    AwsEc2.prototype.describeVolumes = function (filters, isAwsParameterLookup) {
+        var action = "DescribeVolumes";
+        var payloadObj = {
+            'Action': action,
+            'Version': '2016-11-15'
+        };
+        if (filters) {
+            payloadObj = this.addFilters(payloadObj, filters);
+        }
+        var payload = Util.formEncode(payloadObj);
+        return Response.of(this._post(action, payload, this.headers(isAwsParameterLookup)));
+    };
+    AwsEc2.prototype.addFilters = function (payload, filters) {
+        //return a new object with the filters formatted correctly
+        filters.forEach(function (filter, nIndex) {
+            payload = Util.mergeInto(payload, "Filter." + (nIndex + 1) + ".Name", filter.Name);
+            filter.Values.forEach(function (value, vIndex) {
+                payload = Util.mergeInto(payload, "Filter." + (nIndex + 1) + ".Value." + (vIndex + 1), value);
+            });
+        });
+        return payload;
+    };
+    return AwsEc2;
+}(AwsService));
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-07-13 11:54:11</sys_created_on>
+        <sys_id>6b99cd6cdb061010bd9fe4da4b9619df</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AwsEc2</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_6b99cd6cdb061010bd9fe4da4b9619df</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

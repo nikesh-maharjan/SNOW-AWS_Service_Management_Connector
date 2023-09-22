@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.SyncEventRecord</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>SyncEventRecord</name>
+        <script><![CDATA[/**
+ * Functions to synchronise the status of events on provisioned products.
+ * @namespace
+ */
+var SyncEventRecord = (function () {
+    /**
+     * Values correspond to the values of the awssyncstatus column choices.
+     * @memberof SyncEventRecord
+     */
+    var syncStatus = {
+        ok: 1,
+        error: 2,
+        authFailure: 3
+    };
+    /**
+     * Inserts or updates each record output.
+     */
+    function storeOutputs(outputs, event) {
+        // ServiceNow's scope is incorrect if you use forEach and the records aren't inserted.
+        // (Last confirmed in Istanbul.)
+        for (var i = 0, l = outputs.length; i < l; i++) {
+            var elem = outputs[i];
+            // According to the documentation for a record output neither
+            // key, nor value, nor description are required.
+            if (elem.OutputKey) {
+                var gro = new GlideRecord('x_126749_aws_sc_ppo');
+                gro.addQuery('awsppevent', event.sys_id.toString());
+                gro.addQuery('awskey', elem.OutputKey);
+                gro.query();
+                if (gro.next()) {
+                    Util.setValue(gro, 'awsvalue', elem.OutputValue);
+                    Util.setValue(gro, 'awsdescription', elem.Description);
+                    gro.update();
+                }
+                else {
+                    gro.initialize();
+                    Util.setValue(gro, 'awsppevent', event.sys_id.toString());
+                    Util.setValue(gro, 'awskey', elem.OutputKey);
+                    Util.setValue(gro, 'awsvalue', elem.OutputValue);
+                    Util.setValue(gro, 'awsdescription', elem.Description);
+                    gro.insert();
+                }
+            }
+        }
+    }
+    /**
+     * Inserts new record errors.
+     */
+    function storeErrors(errors, event) {
+        // ServiceNow's scope is incorrect if you use forEach and the records aren't inserted.
+        // (Last confirmed in Istanbul.)
+        for (var i = 0, l = errors.length; i < l; i++) {
+            var error = errors[i];
+            if (error.Description && error.Description.length > SyncEventRecord.maxRecordErrorDescriptionLength) {
+                error.Description = error.Description.substr(0, SyncEventRecord.maxRecordErrorDescriptionLength);
+            }
+            var gre = new GlideRecord('x_126749_aws_sc_pp_event_error');
+            gre.addQuery('awsppevent', event.sys_id.toString());
+            gre.addQuery('awsdescription', error.Description);
+            gre.addQuery('awscode', error.Code);
+            gre.query();
+            if (!gre.hasNext()) {
+                gre.initialize();
+                Util.setValue(gre, 'awsppevent', event.sys_id.toString());
+                Util.setValue(gre, 'awscode', error.Code);
+                Util.setValue(gre, 'awsdescription', error.Description);
+                gre.insert();
+            }
+        }
+    }
+    /**
+     * Does a DescribeRecord on the event record and updates ppEventGR with the response values.
+     * Sets the value of `awssyncstatus` to indicate whether the operation was successful.
+     * The function does <i>not</i> <code>update</code> the GlideRecord, meaning that it can be
+     * called from workflows that have a provisioned product as their <code>current</code> value.
+     *
+     * @param ppEventGR {GlideRecord} GlideRecord for the provisioned product to update.
+     * @param [serviceCatalog] {AwsServiceCatalog}
+     *      Object that should make requests to AWS Service Catalog. If not provided the
+     *      function use <code>ProvisionedProduct</code> to obtain a credential.
+     * @throws Error if <code>awsidentity</code> is not set on the product.
+     * @throws Error if <code>serviceCatalog</code> is unset and credentials cannot be determined.
+     * @throws Error if there is an unexpected response from AWS Service Catalog.
+     * @returns {*|Object}
+     * @memberof SyncEventRecord
+     */
+    function syncRecord(ppEventGR, serviceCatalog) {
+        if (!ppEventGR)
+            return;
+        if (ppEventGR.awsrecordid.nil()) {
+            ppEventGR.awssyncstatus = syncStatus.error;
+            throw new Error("Object does not have an awsrecordid: " + ppEventGR);
+        }
+        var recordId = ppEventGR.awsrecordid.toString();
+        if (!serviceCatalog) {
+            var provisionedProduct = ppEventGR.awsproduct;
+            var cred = void 0;
+            try {
+                cred = AwsCredentials.from(provisionedProduct).as(AwsCredentials.User.Sync);
+            }
+            catch (ex) {
+                ppEventGR.awssyncstatus = syncStatus.authFailure;
+                throw new Error("Unable to establish credentials for update: " + ex.message);
+            }
+            var region = provisionedProduct.awsregion.toString();
+            serviceCatalog = new AwsServiceCatalog(region, cred);
+        }
+        var response = serviceCatalog.describeRecord(recordId);
+        if (!response.haveError()) {
+            var detail = response.getJsonBody().RecordDetail;
+            ppEventGR.awscreatedtime = Util.toGlideDateTime(detail.CreatedTime);
+            ppEventGR.awsupdatedtime = Util.toGlideDateTime(detail.UpdatedTime);
+            ppEventGR.awspathid = detail.PathId;
+            ppEventGR.awsproductid = detail.ProductId;
+            ppEventGR.awsprovisionedproductid = detail.ProvisionedProductId;
+            ppEventGR.awsprovisionedproductname = detail.ProvisionedProductName;
+            ppEventGR.awsprovisionedproducttype = detail.ProvisionedProductType;
+            ppEventGR.awsprovisioningartifactid = detail.ProvisioningArtifactId;
+            ppEventGR.awsrecordid = detail.RecordId;
+            ppEventGR.awsrecordtype = detail.RecordType;
+            ppEventGR.awsstatus = detail.Status;
+            storeErrors(detail.RecordErrors, ppEventGR);
+            // Record outputs.
+            storeOutputs(response.getJsonBody().RecordOutputs, ppEventGR);
+            while (response.hasNextPage()) {
+                response = response.nextPage();
+                if (!response.haveError()) {
+                    storeOutputs(response.getJsonBody().RecordOutputs, ppEventGR);
+                }
+                else if (response.isRequestRetryable()) {
+                    ppEventGR.awssyncstatus = syncStatus.error;
+                    return {
+                        success: false,
+                        canRetry: true,
+                        message: 'Error retrieving record status: will be retried'
+                    };
+                }
+                else {
+                    ppEventGR.awssyncstatus = syncStatus.error;
+                    return {
+                        success: false,
+                        canRetry: false,
+                        message: "Error retrieving record status: " + response.getBody()
+                    };
+                }
+            }
+        }
+        else if (response.isRequestRetryable()) {
+            ppEventGR.awssyncstatus = syncStatus.error;
+            return {
+                success: false,
+                canRetry: true,
+                message: 'Error retrieving record status: will be retried'
+            };
+        }
+        else {
+            ppEventGR.awssyncstatus = syncStatus.error;
+            return {
+                success: false,
+                canRetry: false,
+                message: "Error retrieving record status: " + response.getBody()
+            };
+        }
+        ppEventGR.awssyncstatus = syncStatus.ok;
+        return {
+            success: true
+        };
+    }
+    return {
+        /**
+         * Record error descriptions longer than this value will be truncated.
+         * @memberof SyncEventRecord
+         */
+        maxRecordErrorDescriptionLength: 500,
+        sync: syncRecord,
+        syncStatusCodes: syncStatus
+    };
+})();
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2017-11-03 11:31:56</sys_created_on>
+        <sys_id>21b1ba800f5203008fcd48dce1050e61</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>SyncEventRecord</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_21b1ba800f5203008fcd48dce1050e61</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

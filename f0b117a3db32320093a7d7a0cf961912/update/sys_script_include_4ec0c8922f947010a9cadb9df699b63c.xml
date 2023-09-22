@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.AwsServiceCatalogAppRegistry</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>AwsServiceCatalogAppRegistry</name>
+        <script><![CDATA[/**
+ * @class AwsServiceCatalogAppRegistry
+ * @classdesc Make HTTP requests to AWS Service Catalog App Registry.
+ * @param region {String} An AWS region, e.g. "us-west-1"
+ * @param credential {Object} AWS account credentials.
+ * @param credential.identity {String} An AWS access key.
+ * @param credential.secret {String} An AWS secret access key.
+ * @param credential.session {String=} Required if using temporary credentials.
+ */
+var AwsServiceCatalogAppRegistry = /** @class */ (function (_super) {
+    Polyfill.__extends(AwsServiceCatalogAppRegistry, _super);
+    function AwsServiceCatalogAppRegistry(region, credential) {
+        var _this = _super.call(this, "servicecatalog", region, credential, true, "servicecatalog-appregistry") || this;
+        _this.defaultPageSize = 25;
+        Util.assertExists(region, "region");
+        return _this;
+    }
+    AwsServiceCatalogAppRegistry.prototype.headers = function (action) {
+        return {
+            "Content-Type": "application/json"
+        };
+    };
+    AwsServiceCatalogAppRegistry.prototype.getApplication = function (applicationId) {
+        Util.assertExists(applicationId, 'application id');
+        var headers = { "Content-Type": "application/json" };
+        return Response.of(this._get("/applications/" + applicationId, undefined, headers));
+    };
+    AwsServiceCatalogAppRegistry.prototype.listApplications = function () {
+        var headers = { "Content-Type": "application/json" };
+        var queryParameters = {
+            "maxResults": this.defaultPageSize
+        };
+        return this._paginatedGetApi("/applications", undefined, headers, queryParameters, "applications");
+    };
+    AwsServiceCatalogAppRegistry.prototype.getAttributeGroup = function (attributeGroupId) {
+        Util.assertExists(attributeGroupId);
+        var headers = { "Content-Type": "application/json" };
+        return Response.of(this._get("/attribute-groups/" + attributeGroupId, undefined, headers));
+    };
+    AwsServiceCatalogAppRegistry.prototype.listAttributeGroups = function () {
+        var headers = { "Content-Type": "application/json" };
+        var queryParameters = {
+            "maxResults": this.defaultPageSize
+        };
+        return this._paginatedGetApi("/attribute-groups", undefined, headers, queryParameters, "attributeGroups", "nextToken");
+    };
+    AwsServiceCatalogAppRegistry.prototype.listAssociatedAttributeGroups = function (applicationId) {
+        Util.assertExists(applicationId, 'application id');
+        var headers = { "Content-Type": "application/json" };
+        var queryParameters = {
+            "maxResults": this.defaultPageSize
+        };
+        return this._paginatedGetApi("/applications/" + applicationId + "/attribute-groups", undefined, headers, queryParameters, "attributeGroups");
+    };
+    AwsServiceCatalogAppRegistry.prototype.listAssociatedResources = function (applicationId) {
+        Util.assertExists(applicationId, 'application id');
+        var headers = { "Content-Type": "application/json" };
+        var queryParameters = {
+            "maxResults": this.defaultPageSize
+        };
+        return this._paginatedGetApi("/applications/" + applicationId + "/resources", undefined, headers, queryParameters, "resources");
+    };
+    return AwsServiceCatalogAppRegistry;
+}(AwsService));
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-05-25 09:38:01</sys_created_on>
+        <sys_id>4ec0c8922f947010a9cadb9df699b63c</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AwsServiceCatalogAppRegistry</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_4ec0c8922f947010a9cadb9df699b63c</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

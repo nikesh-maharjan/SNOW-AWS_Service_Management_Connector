@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_ui_action">
+    <sys_ui_action action="INSERT_OR_UPDATE">
+        <action_name>Create Finding</action_name>
+        <active>true</active>
+        <client>false</client>
+        <client_script_v2><![CDATA[function onClick(g_form) {
+
+}]]></client_script_v2>
+        <comments/>
+        <condition>!current.awsproblem</condition>
+        <form_action>true</form_action>
+        <form_button>true</form_button>
+        <form_button_v2>false</form_button_v2>
+        <form_context_menu>false</form_context_menu>
+        <form_link>true</form_link>
+        <form_menu_button_v2>false</form_menu_button_v2>
+        <form_style/>
+        <format_for_configurable_workspace>false</format_for_configurable_workspace>
+        <hint/>
+        <isolate_script>false</isolate_script>
+        <list_action>false</list_action>
+        <list_banner_button>false</list_banner_button>
+        <list_button>false</list_button>
+        <list_choice>false</list_choice>
+        <list_context_menu>false</list_context_menu>
+        <list_link>false</list_link>
+        <list_save_with_form_button>false</list_save_with_form_button>
+        <list_style/>
+        <messages/>
+        <name>Create Problem</name>
+        <onclick/>
+        <order>100</order>
+        <script><![CDATA[/**
+ * Creates a problem from the current finding if none exists.
+ */
+// UI Action condition:
+// !current.awsproblem
+// table: Finding (x_126749_aws_sc_finding)
+// @Deployable({table: 'sys_ui_action', column: 'script', sysId: 'ccc25af3dbaf101079bd2fb74896195e'})
+{
+    var finding = current;
+    if (!finding.awsproblem) {
+        var problem = new ProblemRepo().insertOrUpdateFromFinding(finding);
+        var problemLink = "<a href=\"problem.do?sys_id=" + problem.sys_id + "&sysparm_view=\">" + problem.number + "</a>";
+        gs.addInfoMessage("New problem " + problemLink + " created from this finding");
+    }
+    else {
+        gs.addErrorMessage("A problem already exists for this finding");
+    }
+}
+]]></script>
+        <show_insert>false</show_insert>
+        <show_multiple_update>false</show_multiple_update>
+        <show_query>false</show_query>
+        <show_update>true</show_update>
+        <sys_class_name>sys_ui_action</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-10-06 09:08:33</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>ccc25af3dbaf101079bd2fb74896195e</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Create Problem</sys_name>
+        <sys_overrides/>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_ui_action_ccc25af3dbaf101079bd2fb74896195e</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <table>x_126749_aws_sc_finding</table>
+        <ui11_compatible>true</ui11_compatible>
+        <ui16_compatible>false</ui16_compatible>
+    </sys_ui_action>
+</record_update>

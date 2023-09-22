@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.ProvisionedProductAction</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>ProvisionedProductAction</name>
+        <script><![CDATA[/**
+ * Create an instance.
+ * @classdesc Execute actions on provisioned products. Actions are designed to work with
+ * scripts in the "Execute Provisioned Product Action" workflow, but can be called from
+ * elsewhere too.
+ * @class AbstractAction
+ */
+var AbstractAction = /** @class */ (function () {
+    function AbstractAction(provisionedProduct, action, recordType) {
+        this.pp = Util.assertExists(provisionedProduct, "provisionedProduct");
+        this.action = Util.assertExists(action, "action");
+        this.recordType = recordType || "UNKNOWN";
+    }
+    /**
+     * True if this action is enabled given the current state of the provisioned product.
+     *
+     * For provisioned product p, it checks that all of the following conditions hold:
+     * <ul>
+     *     <li>p.awsidentity is set</li>
+     *     <li>p.awsid is set</li>
+     *     <li>p.awsproductstatus is provisioned</li>
+     *     <li>p.awsstatus is either AVAILABLE or TAINTED</li>
+     * </ul>
+     */
+    AbstractAction.prototype.isEnabled = function () {
+        var p = this.pp.gr();
+        return this.pp.getProduct() !== null && !p.awsid.nil() &&
+            p.awsproductstatus == ProvisionedProduct.Status.provisioned &&
+            (p.awsstatus.toString() === "AVAILABLE" || p.awsstatus.toString() === "TAINTED");
+    };
+    /**
+     * Check that this action is permitted to the current user.
+     * @return {boolean} True if the current user is the owner of the provisioned product
+     *   or if they have the portfolio manager role.
+     */
+    AbstractAction.prototype.isPermitted = function () {
+        return this.pp.isOwnedBy(gs.getUserID()) || Util.isCurrentUserPortfolioManager();
+    };
+    /**
+     * Start the flow of execution for an action on a provisioned product:
+     * create a change request, create a placeholder event and start the workflow to
+     * invoke it.
+     */
+    AbstractAction.prototype.request = function (parameters) {
+        var workflow = this.validateWorkflow();
+        parameters = parameters || {};
+        this.validateParameters(parameters);
+        // Check whether a different value for the deprecated terminate change request property.
+        // has been configured. If yes, that change request will handle the termination of the product.
+        if (this.action === 'terminate') {
+            var prop = gs.getProperty(C.sysprop.terminateChangeRequestType);
+            if (prop && prop !== 'AwsProductTermination') {
+                gs.info("Using change request configured by system property " + C.sysprop.terminateChangeRequestType +
+                    " to terminate " + this.pp.getName());
+                this.pp.createTerminationChangeRequest();
+                return;
+            }
+        }
+        var changeRequest = this.createChangeRequest(parameters);
+        gs.info("Created change request for " + this.action + " on " + this.pp.getName() + ": " + changeRequest.sys_id.toString());
+        var event = this.initEvent(changeRequest);
+        var context = this.startWorkflow(workflow, event, parameters);
+        gs.debug("Started workflow context " + context + " for action " + this.action + " on " + this.pp.getName());
+    };
+    AbstractAction.prototype.validateParameters = function (parameters) {
+        // Intentionally empty.
+    };
+    AbstractAction.prototype.createChangeRequest = function (parameters) {
+        var cr = new GlideRecord('change_request');
+        cr.initialize();
+        cr.category = "AWS Service Catalog Product";
+        cr.cmdb_ci = this.pp.gr().sys_id;
+        cr.type = (gs.getProperty(C.sysprop.changeRequestType) || 'AWSProvisionedProductEvent');
+        //New feature since Quebec version: A Change Model should be set
+        var changeModel = this.getChangeModel(cr.type.toString());
+        if (changeModel) {
+            Util.setValue(cr, 'chg_model', changeModel.sys_id);
+        }
+        else {
+            Util.setValue(cr, 'chg_model', null);
+        }
+        var assignmentGroup = this.getAssignmentGroup();
+        if (assignmentGroup) {
+            cr.assignment_group = assignmentGroup.sys_id;
+        }
+        this.configureChangeRequest(cr, parameters);
+        cr.insert();
+        return cr;
+    };
+    AbstractAction.prototype.configureChangeRequest = function (cr, parameters) {
+        // To be overridden by sub-classes
+    };
+    /**
+     * @returns {GlideRecord} The Workflow that has been configured for this action.
+     * @throws If no workflow can be loaded for the action.
+     */
+    AbstractAction.prototype.validateWorkflow = function () {
+        var wfOverride = C.sysprop.workflow.forAction(this.action), wfDefault = C.sysprop.workflow.executeAction;
+        var workflow = Util.getWorkflow(wfOverride);
+        if (!workflow) {
+            workflow = Util.getWorkflow(wfDefault);
+        }
+        if (!workflow) {
+            throw new Error('No valid workflow is configured in properties ' + wfOverride + ' and ' + wfDefault);
+        }
+        return workflow;
+    };
+    /**
+     * Create an event record to represent a pending operation, such as update, on a
+     * provisioned product.
+     *
+     * @see https://docs.aws.amazon.com/servicecatalog/latest/dg/API_RecordDetail.html
+     */
+    AbstractAction.prototype.initEvent = function (changeRequest) {
+        var ppe = new GlideRecord('x_126749_aws_sc_pp_event');
+        ppe.initialize();
+        ppe.awsproduct = this.pp.gr().sys_id.toString();
+        ppe.awsrecordtype = this.recordType;
+        if (changeRequest) {
+            ppe.change_request = changeRequest.sys_id.toString();
+        }
+        ppe.insert();
+        return ppe;
+    };
+    AbstractAction.prototype.startWorkflow = function (workflow, event, parameters) {
+        var workflowParams = {
+            'u_action': this.action,
+            'u_params': JSON.stringify(parameters)
+        };
+        var handler = Util.getWorkflowHandler();
+        return handler.startFlow(workflow.sys_id.toString(), event, event.operation(), workflowParams);
+    };
+    AbstractAction.prototype.getAssignmentGroup = function () {
+        var assignmentGroupProperty = gs.getProperty(C.sysprop.changeRequestAssignmentGroup);
+        if (assignmentGroupProperty) {
+            var groupGr = new GlideRecord('sys_user_group');
+            if (groupGr.get(assignmentGroupProperty) || groupGr.get('name', assignmentGroupProperty)) {
+                return groupGr;
+            }
+        }
+        return null;
+    };
+    //Get the default Change Model associated to the AWSProvisionedProductEvent Change Request Type
+    AbstractAction.prototype.getChangeModel = function (changeRequestType) {
+        if (changeRequestType === 'AWSProvisionedProductEvent') {
+            var changeModel = new GlideRecord('chg_model');
+            changeModel.addQuery('name', "AWS Provisioned Product Event");
+            changeModel.query();
+            if (changeModel.next()) {
+                return changeModel;
+            }
+        }
+        return null;
+    };
+    return AbstractAction;
+}());
+AbstractAction.prototype.type = 'AbstractAction';
+// ===== TERMINATE =============================================
+var TerminateAction = /** @class */ (function (_super) {
+    Polyfill.__extends(TerminateAction, _super);
+    function TerminateAction(product) {
+        return _super.call(this, product, 'terminate', 'TERMINATE_PROVISIONED_PRODUCT') || this;
+    }
+    TerminateAction.prototype.configureChangeRequest = function (cr) {
+        cr.short_description = "Terminate " + this.pp.getName();
+    };
+    TerminateAction.prototype.invoke = function (event, parameters, token, lastAttempt) {
+        var result = this.terminate(token);
+        Util.createRequestItemComment(this.pp.gr(), "Execution of \"" + this.action + "\" action (" + this.recordType + ") requested from AWS");
+        if (result.success === true) {
+            var recordDetail = Util.assertExists(result.result, "RecordDetail");
+            ProvisionedProductRepo.updateWithStatus(this.pp.gr(), ProvisionedProduct.Status.terminating);
+            ProvisionedProductRepo.updateProvisionedProductEvent(recordDetail, event);
+            return { success: true };
+        }
+        else {
+            var status = this.pp.gr().awsstatusmessage.nil()
+                ? ""
+                : this.pp.gr().awsstatusmessage.toString();
+            var message = status.indexOf("Cannot terminate:") >= 0
+                ? status
+                : "Cannot terminate: " + result.reason + ". Original status: " + status;
+            // Set the provisioned product to error if terminate has failed.
+            if (lastAttempt) {
+                ProvisionedProductRepo.updateWithStatus(this.pp.gr(), ProvisionedProduct.Status.error, message);
+                Util.createRequestItemComment(this.pp.gr(), message);
+            }
+            return {
+                success: false,
+                canRetry: result.isRetryable,
+                message: message
+            };
+        }
+    };
+    TerminateAction.prototype.terminate = function (token) {
+        if (this.pp.gr().awsid.nil() || this.pp.gr().awsid.toString().trim() === "") {
+            return Util.failure("Unable to terminate " + this.pp.getName() + ": product.awsid is unset");
+        }
+        var cred;
+        try {
+            cred = AwsCredentials.from(this.pp).as(AwsCredentials.User.End);
+        }
+        catch (ex) {
+            return Util.failure("Unable to terminate " + this.pp.getName() + ": Could not establish credentials (" + ex.message + ")");
+        }
+        if (this.pp.hasPlan()) {
+            var planId = this.pp.getPlan().getPlanId();
+            var result = this.pp.getPlan().deletePlan();
+            if (result.success === false) {
+                gs.warn("The deletion of plan " + planId + " when terminating product " + this.pp.getProductId() + " failed: " + result.reason);
+            }
+        }
+        var ppID = this.pp.gr().awsid.toString(), sc = this.pp._getServiceCatalog(this.pp.getRegion(), cred), response = sc.terminateProvisionedProduct(ppID, token);
+        if (response.haveError()) {
+            return Util.failure("Unable to terminate " + this.pp.getName() + " (" + ppID + "): " + response.getErrorMessage(), response.isRequestRetryable());
+        }
+        return Util.success(response.deserialize().RecordDetail);
+    };
+    TerminateAction.prototype.isEnabled = function () {
+        var p = this.pp.gr();
+        // noinspection EqualityComparisonWithCoercionJS
+        var provisionedOrError = (p.awsstatus === "ERROR" ||
+            p.awsproductstatus == ProvisionedProduct.Status.provisioned ||
+            p.awsproductstatus == ProvisionedProduct.Status.error ||
+            (p.awsproductstatus == ProvisionedProduct.Status.preProvisioning && p.awsstatus == "PLAN_IN_PROGRESS"));
+        return provisionedOrError && this.pp.getProduct() !== null && !p.awsid.nil();
+    };
+    return TerminateAction;
+}(AbstractAction));
+TerminateAction.prototype.type = 'TerminateAction';
+// ===== UPDATE ================================================
+var UpdateAction = /** @class */ (function (_super) {
+    Polyfill.__extends(UpdateAction, _super);
+    function UpdateAction(product) {
+        return _super.call(this, product, 'update', 'UPDATE_PROVISIONED_PRODUCT') || this;
+    }
+    UpdateAction.prototype.validateParameters = function (parameters) {
+        Util.assertExists(parameters.PathId, "Parameter PathId not set");
+        Util.assertExists(parameters.ProvisioningArtifactId, "Parameter ProvisioningArtifactId not set");
+        if (!Array.isArray(parameters.ProvisioningParameters)) {
+            throw new Error("Parameter ProvisioningParameters not set");
+        }
+    };
+    UpdateAction.prototype.configureChangeRequest = function (cr, parameters) {
+        cr.short_description = "Update " + this.pp.getName();
+        cr.description = "Set:\n" +
+            "* Launch path: " + parameters.PathId + "\n" +
+            "* Provisioning artifact: " + parameters.ProvisioningArtifactId;
+    };
+    UpdateAction.prototype.invoke = function (event, params, token, lastAttempt) {
+        var cred;
+        try {
+            cred = AwsCredentials.from(this.pp).as(AwsCredentials.User.End);
+        }
+        catch (ex) {
+            var noCreds = "Could not establish credentials (" + ex.message + ")";
+            gs.warn("Unable to update " + this.pp.getName() + ": " + noCreds);
+            return { 'success': false, message: noCreds };
+        }
+        //Numerical parameters cause a cast exception when included in a create plan call
+        params.ProvisioningParameters.forEach(function (param) {
+            param.Value = param.Value === null || !param.Value ? '' : param.Value.toString();
+        });
+        gs.info("Requesting update of " + this.pp.getName());
+        var sc = this.pp._getServiceCatalog(this.pp.getRegion(), cred);
+        var response = sc.updateProvisionedProduct(this.pp.getId(), this.pp.getProductId(), params.PathId, params.ProvisioningArtifactId, params.ProvisioningParameters, token);
+        var body = response.deserialize();
+        Util.createRequestItemComment(this.pp.gr(), "Execution of \"" + this.action + "\" action (" + this.recordType + ") requested from AWS");
+        if (!response.haveError()) {
+            var recordDetail = Util.assertExists(body.RecordDetail, "RecordDetail");
+            ProvisionedProductRepo.updateProvisionedProductEvent(recordDetail, event);
+            ProvisionedProductRepo.updateProvisionedProduct(recordDetail, this.pp.gr(), ProvisionedProduct.Status.provisioning);
+            return { success: true };
+        }
+        else {
+            if (lastAttempt) {
+                Util.createRequestItemComment(this.pp.gr(), body.message);
+            }
+            return {
+                success: false,
+                canRetry: response.isRequestRetryable(),
+                message: body.message
+            };
+        }
+    };
+    return UpdateAction;
+}(AbstractAction));
+UpdateAction.prototype.type = 'UpdateAction';
+// ===== SERVICE ACTION ========================================================
+var ExecuteServiceActionAction = /** @class */ (function (_super) {
+    Polyfill.__extends(ExecuteServiceActionAction, _super);
+    function ExecuteServiceActionAction(product) {
+        return _super.call(this, product, 'executeServiceAction', 'EXECUTE_PROVISIONED_PRODUCT_ACTION') || this;
+    }
+    ExecuteServiceActionAction.prototype.validateParameters = function (parameters) {
+        Util.assertExists(parameters.ServiceActionId, "Service Action ID not set");
+        Util.assertExists(parameters.ServiceActionName, "Service Action name not set");
+        Util.assertExists(parameters.ServiceActionDescription, "Service Action description not set");
+    };
+    ExecuteServiceActionAction.prototype.configureChangeRequest = function (cr, parameters) {
+        cr.short_description = "Execute provisioned product action " + parameters.ServiceActionId + " for " + this.pp.getName();
+        cr.description = "Set:\n" +
+            "* Service Action ID: " + parameters.ServiceActionId + "\n" +
+            "* Service Action name: " + parameters.ServiceActionName + "\n" +
+            "* Service Action description: " + parameters.ServiceActionDescription;
+    };
+    ExecuteServiceActionAction.prototype.invoke = function (event, params, token, lastAttempt) {
+        var cred;
+        try {
+            cred = AwsCredentials.from(this.pp).as(AwsCredentials.User.End);
+        }
+        catch (ex) {
+            var noCreds = "Could not establish credentials (" + ex.message + ")";
+            gs.warn("Unable to execute service action on " + this.pp.getName() + ": " + noCreds);
+            return { 'success': false, message: noCreds };
+        }
+        gs.info("Executing provisioned product action " + params.ServiceActionId + " for " + this.pp.getName());
+        var sc = this.pp._getServiceCatalog(this.pp.getRegion(), cred);
+        var response = sc.executeProvisionedProductServiceAction(this.pp.getId(), params.ServiceActionId, token);
+        var body = response.deserialize();
+        Util.createRequestItemComment(this.pp.gr(), "Execution of \"" + params.ServiceActionName + "\" action (" + this.recordType + ") requested from AWS");
+        if (!response.haveError()) {
+            var recordDetail = Util.assertExists(body.RecordDetail, "RecordDetail");
+            ProvisionedProductRepo.updateProvisionedProductEvent(recordDetail, event);
+            ProvisionedProductRepo.updateProvisionedProduct(recordDetail, this.pp.gr(), ProvisionedProduct.Status.provisioning);
+            return { success: true };
+        }
+        else {
+            if (lastAttempt) {
+                Util.createRequestItemComment(this.pp.gr(), body.message);
+            }
+            return {
+                success: false,
+                canRetry: response.isRequestRetryable(),
+                message: body.message
+            };
+        }
+    };
+    return ExecuteServiceActionAction;
+}(AbstractAction));
+ExecuteServiceActionAction.prototype.type = 'ExecuteServiceActionAction';
+// ===== PLANS ===============================================================
+var ExecutePlanAction = /** @class */ (function (_super) {
+    Polyfill.__extends(ExecutePlanAction, _super);
+    function ExecutePlanAction(product) {
+        return _super.call(this, product, 'executePlan', 'UPDATE_PROVISIONED_PRODUCT') || this;
+    }
+    ExecutePlanAction.prototype.configureChangeRequest = function (cr, parameters) {
+        cr.short_description = "Execute planned resource changes for " + this.pp.getName();
+    };
+    ExecutePlanAction.prototype.invoke = function (event, parameters, token, lastAttempt) {
+        var plan = this.pp.getPlan();
+        var result = plan.execute(token);
+        Util.createRequestItemComment(this.pp.gr(), "Execution of \"" + this.action + "\" action (" + this.recordType + ") requested from AWS");
+        if (result.success === true) {
+            var body = result.result;
+            var recordDetail = Util.assertExists(body.RecordDetail, "RecordDetail");
+            ProvisionedProductRepo.updateProvisionedProductEvent(recordDetail, event);
+            ProvisionedProductRepo.updateProvisionedProduct(recordDetail, this.pp.gr(), ProvisionedProduct.Status.provisioning);
+            return result;
+        }
+        else {
+            if (lastAttempt) {
+                Util.createRequestItemComment(this.pp.gr(), result.reason);
+            }
+            return {
+                success: false,
+                message: result.reason,
+                canRetry: result.isRetryable
+            };
+        }
+    };
+    /**
+     * As {@link AbstractAction#isEnabled}, but permits the provisioned product to have awsstatus
+     * PLAN_IN_PROGRESS and awsproductstatus preProvisioning, and checks that it has a reference
+     * to a plan that is CREATE_SUCCESS.
+     */
+    ExecutePlanAction.prototype.isEnabled = function () {
+        var p = this.pp.gr();
+        return this.pp.getProduct() !== null && !p.awsid.nil() &&
+            (p.awsstatus == "AVAILABLE" ||
+                p.awsstatus == "TAINTED" ||
+                p.awsstatus == "PLAN_IN_PROGRESS") &&
+            (p.awsproductstatus == ProvisionedProduct.Status.provisioned ||
+                p.awsproductstatus == ProvisionedProduct.Status.preProvisioning) &&
+            (!p.awsplan.nil() &&
+                p.awsplan.awsstatus == "CREATE_SUCCESS");
+    };
+    return ExecutePlanAction;
+}(AbstractAction));
+ExecutePlanAction.prototype.type = 'ExecutePlanAction';
+// The action classes are not visible outside of this script include.
+// ProvisionedProductAction must be the entrypoint.
+var ProvisionedProductAction = {
+    terminate: function (pp) {
+        return new TerminateAction(pp);
+    },
+    update: function (pp) {
+        return new UpdateAction(pp);
+    },
+    executeServiceAction: function (pp) {
+        return new ExecuteServiceActionAction(pp);
+    },
+    executePlan: function (pp) {
+        return new ExecutePlanAction(pp);
+    },
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-08-03 16:19:53</sys_created_on>
+        <sys_id>e79da9044ff3130056b5f82ca310c7b0</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>ProvisionedProductAction</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_e79da9044ff3130056b5f82ca310c7b0</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

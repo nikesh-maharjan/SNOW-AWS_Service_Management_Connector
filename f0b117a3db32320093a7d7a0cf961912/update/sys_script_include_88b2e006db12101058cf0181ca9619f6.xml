@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.Route53Ajax</api_name>
+        <caller_access/>
+        <client_callable>true</client_callable>
+        <description/>
+        <name>Route53Ajax</name>
+        <script><![CDATA[var Route53Ajax = /** @class */ (function (_super) {
+    Polyfill.__extends(Route53Ajax, _super);
+    function Route53Ajax() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.productParameter = AjaxParameterSupplier.required('sysparm_productSysId')
+            .gr('x_126749_aws_sc_product')
+            .notNil('name');
+        _this.isAwsParameterLookupParameter = AjaxParameterSupplier.optional('sysparm_awsParameterLookup').fromBoolean();
+        return _this;
+    }
+    Route53Ajax.prototype.listHostedZones = function () {
+        var _this = this;
+        return this._applyWith([
+            this.productParameter,
+            this.isAwsParameterLookupParameter
+        ], function (product, isAwsParameterLookup) {
+            var route53 = _this.getRoute53(product);
+            var response = route53.listHostedZones(isAwsParameterLookup);
+            if (response.haveError()) {
+                return _this._errorResponse("Error listing Hosted Zones: " + response.getBody());
+            }
+            var items = gs.xmlToJSON(response.getBody().trim())
+                .ListHostedZonesResponse.HostedZones.HostedZone || [];
+            if (!Array.isArray(items)) {
+                items = [items];
+            }
+            return _this._response(items);
+        });
+    };
+    Route53Ajax.prototype.getRoute53 = function (product) {
+        var credentials = AwsCredentials.from(product)
+            .as(AwsCredentials.User.End);
+        return this._getRoute53(credentials);
+    };
+    return Route53Ajax;
+}(AbstractAwsAjaxProcessor));
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-07-30 11:10:43</sys_created_on>
+        <sys_id>88b2e006db12101058cf0181ca9619f6</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Route53Ajax</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_88b2e006db12101058cf0181ca9619f6</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.SystemsManagerChangeRequestExecutioner</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>SystemsManagerChangeRequestExecutioner</name>
+        <script><![CDATA[/**
+ * @class SystemsManagerChangeRequestExecutioner
+ * @classdesc Support for a workflow on sc_cat_item_producer table, for execution of a Change Request from AWS Systems Manager Change Manager
+ *
+ * Use in a workflow as a "Run Script" step with script definition:
+ * <pre>
+ *     const executioner = new SystemsManagerChangeRequestExecutioner(workflow, context, activity, current);
+ *     executioner.requestExecution();
+ * </pre>
+ */
+var SystemsManagerChangeRequestExecutioner = /** @class */ (function () {
+    /**
+     * @param workflow The 'workflow' variable from ServiceNow
+     * @param context  The 'context' variable from ServiceNow
+     * @param activity The current 'activity' variable from ServiceNow
+     * @param current The 'current' variable itself from ServiceNow (a GlideRecord on sc_req_item)
+     */
+    function SystemsManagerChangeRequestExecutioner(workflow, context, activity, current) {
+        this.timeout = 30;
+        this.workflow = workflow;
+        this.scratchpad = workflow.scratchpad;
+        this.activity = activity;
+        this.changeRequestGR = current;
+    }
+    /**
+     * Request a new execution of an AWS Change Request.
+     */
+    SystemsManagerChangeRequestExecutioner.prototype.requestExecution = function () {
+        var result;
+        try {
+            result = this._executeChangeRequest();
+        }
+        catch (e) {
+            return this._fail(e.message);
+        }
+        if (result.success === true) {
+            return this._succeed();
+        }
+        else {
+            var message = "Fail to request execution of the Change Request from AWS. Failure was: ".concat(result.reason);
+            return this._fail(message);
+        }
+    };
+    SystemsManagerChangeRequestExecutioner.prototype._executeChangeRequest = function () {
+        var itemVariables = this.changeRequestGR.variables;
+        var changeTemplateDocumentName = itemVariables.DocumentName.toString();
+        var changeTemplateDocumentVersion = itemVariables.DocumentVersion.toString();
+        var region = this.changeRequestGR.x_126749_aws_sc_awsregion.toString();
+        var userName = this.changeRequestGR.opened_by.user_name.toString();
+        var number = this.changeRequestGR.number.toString();
+        var tags = [];
+        // Try to fail early
+        var maybeParams = Util.tryParseJson(itemVariables.Parameters, 'Parameters');
+        if (maybeParams.success === false) {
+            return maybeParams;
+        }
+        // Filling in the AutomationAssumeRole Runbook parameter with the account number + system property Role name
+        if (!maybeParams.result[0].Parameters["AutomationAssumeRole"]) {
+            var automationAssumeRole = gs.getProperty(C.sysprop.changeManagerAutomationAssumeRole);
+            var awsAccount = this.changeRequestGR.x_126749_aws_sc_awsaccount.getRefRecord();
+            if (automationAssumeRole && !awsAccount.awsaccountnumber.nil()) {
+                var accountNumber = awsAccount.awsaccountnumber;
+                maybeParams.result[0].Parameters["AutomationAssumeRole"] = ["arn:aws:iam::".concat(accountNumber, ":role/").concat(automationAssumeRole)];
+            }
+        }
+        //Adding additional information relevant on AWS Console as tags
+        if (!this.changeRequestGR.number.nil()) {
+            tags.push({
+                "Key": "ServiceNow Change Request number",
+                "Value": number
+            });
+        }
+        if (!this.changeRequestGR.requested_by.nil() && !this.changeRequestGR.requested_by.user_name.nil()) {
+            tags.push({
+                "Key": "Requested",
+                "Value": "By " + this.changeRequestGR.requested_by.user_name.toString()
+                    + " at " + this.changeRequestGR.sys_created_on.toString()
+            });
+        }
+        var approvers = this.getApproversFromChangeRequest();
+        if (approvers.approversUsername.length > 0 && approvers.approvedAt) {
+            tags.push({
+                "Key": "Approved",
+                "Value": "By " + approvers.approversUsername.join(',') +
+                    " at " + approvers.approvedAt
+            });
+        }
+        var maybeTags = Util.tryParseJson(itemVariables.Tags, 'tags');
+        if (maybeTags.success === false) {
+            return maybeTags;
+        }
+        tags.concat(maybeTags.result);
+        var credentialsEndUser;
+        try {
+            credentialsEndUser = AwsCredentials.from(this.changeRequestGR.x_126749_aws_sc_awsaccount).as(AwsCredentials.User.End);
+        }
+        catch (ex) {
+            return Util.failure("Could not establish credentials for ".concat(userName, ": ").concat(ex.message));
+        }
+        this.workflow.info("Requesting execution of change request ".concat(number, " for change template document ").concat(changeTemplateDocumentName, " (version ").concat(changeTemplateDocumentVersion, ") in ").concat(region, " for ").concat(userName));
+        var awsSystemsManager = new AwsSystemsManager(region, credentialsEndUser);
+        awsSystemsManager.setExponentialBackoff(this.timeout);
+        var account = this.changeRequestGR.x_126749_aws_sc_awsaccount.getRefRecord();
+        var executionResponse = awsSystemsManager.startChangeRequestExecution({
+            DocumentName: changeTemplateDocumentName,
+            DocumentVersion: changeTemplateDocumentVersion,
+            AutoApprove: true,
+            Runbooks: Object.keys(maybeParams.result).length > 0 ?
+                [
+                    {
+                        DocumentName: maybeParams.result[0].DocumentName,
+                        DocumentVersion: maybeParams.result[0].DocumentVersion,
+                        Parameters: Object.keys(maybeParams.result[0].Parameters).length > 0 ? maybeParams.result[0].Parameters : null
+                    }
+                ]
+                : null,
+            Tags: tags
+        });
+        if (executionResponse.haveError()) {
+            if (executionResponse.isRequestRetryable()) {
+                return Util.failure('Retryable failure execution change request', true);
+            }
+            return Util.failure(Util.explainError(executionResponse.deserialize()));
+        }
+        var body = executionResponse.deserialize();
+        //Insert the OpsItem ID (received from the API call above) into the change_request AWS Request ID custom field
+        this.updateChangeRequest(awsSystemsManager, body);
+        //Create any associated runbook executions record into table x_126749_aws_sc_cmdb_ci_ae
+        this.automationExecution = AutomationExecutionRepo.createAutomationExecutionFromId(body.AutomationExecutionId, account, region, maybeParams.result[0].DocumentName, maybeParams.result[0].DocumentVersion, userName);
+        //Create change task for the associated runbook execution created above (as configuration item)
+        this.createChangeTask();
+        return Util.success(body);
+    };
+    SystemsManagerChangeRequestExecutioner.prototype.updateChangeRequest = function (awsSystemsManager, body) {
+        var opsItemId = this.getOpsItemIdFromAutomationExecutionId(awsSystemsManager, body.AutomationExecutionId);
+        if (opsItemId) {
+            //persist a minimal opsItem record if none exists
+            var opsItem = Util.insertOrUpdate('x_126749_aws_sc_opsitem', {
+                awsopsitemid: opsItemId,
+                awstype: '/aws/changerequest',
+                awsregion: awsSystemsManager.region,
+            });
+            Util.setValue(this.changeRequestGR, 'x_126749_aws_sc_awsrequestid', opsItem.sys_id.toString());
+            Util.setValue(this.changeRequestGR, 'x_126749_aws_sc_automationexecutionid', body.AutomationExecutionId);
+        }
+        this.changeRequestGR.comments = 'Execution of the Change Request requested from AWS';
+        this.changeRequestGR.update();
+    };
+    SystemsManagerChangeRequestExecutioner.prototype.getOpsItemIdFromAutomationExecutionId = function (awsSystemsManager, automationExecutionId) {
+        var response = awsSystemsManager.getAutomationExecution(automationExecutionId);
+        if (!response.haveError()) {
+            var data = response.deserialize();
+            return data.AutomationExecution.OpsItemId;
+        }
+        return null;
+    };
+    SystemsManagerChangeRequestExecutioner.prototype.getApproversFromChangeRequest = function () {
+        var sysApprovalApprover = new GlideRecord("sysapproval_approver");
+        sysApprovalApprover.addQuery("sysapproval", this.changeRequestGR.sys_id);
+        sysApprovalApprover.addQuery("state", "approved");
+        sysApprovalApprover.orderByDesc("sys_updated_on");
+        sysApprovalApprover.query();
+        var approversUsername = [];
+        var approvedAt = null;
+        while (sysApprovalApprover.next()) {
+            if (!approvedAt) {
+                approvedAt = sysApprovalApprover.sys_updated_on.toString();
+            }
+            var approvalUser = sysApprovalApprover.approver.getRefRecord();
+            if (approvalUser && !approvalUser.user_name.nil()) {
+                approversUsername.push(approvalUser.user_name.toString());
+            }
+        }
+        return { approversUsername: approversUsername, approvedAt: approvedAt };
+    };
+    SystemsManagerChangeRequestExecutioner.prototype.createChangeTask = function () {
+        var changeTask = new GlideRecord('change_task');
+        changeTask.initialize();
+        var description = "Execution of the automation document " + this.automationExecution.sys_id;
+        Util.setValue(changeTask, "short_description", description);
+        Util.setValue(changeTask, "description", description);
+        Util.setValue(changeTask, "change_task_type", "implementation");
+        Util.setValue(changeTask, "state", "2"); // In Progress
+        Util.setValue(changeTask, "change_request", this.changeRequestGR.sys_id.toString());
+        Util.setValue(changeTask, "cmdb_ci", this.automationExecution.sys_id);
+        changeTask.insert();
+    };
+    SystemsManagerChangeRequestExecutioner.prototype._succeed = function () {
+        this.workflow.info("Change Request ".concat(this.changeRequestGR.number, " is executing"));
+        this.activity.result = 'yes';
+    };
+    SystemsManagerChangeRequestExecutioner.prototype._fail = function (message) {
+        this.workflow.warn("Error for Change Request ".concat(this.changeRequestGR.number, " on sending Change Request execution request to AWS: ").concat(message));
+        this.changeRequestGR.comments = message;
+        this.changeRequestGR.update();
+        this.activity.result = 'no';
+    };
+    return SystemsManagerChangeRequestExecutioner;
+}());
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-10-05 07:52:40</sys_created_on>
+        <sys_id>5c44a8052f433010ac4e18aa2799b667</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>SystemsManagerChangeRequestExecutioner</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_5c44a8052f433010ac4e18aa2799b667</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

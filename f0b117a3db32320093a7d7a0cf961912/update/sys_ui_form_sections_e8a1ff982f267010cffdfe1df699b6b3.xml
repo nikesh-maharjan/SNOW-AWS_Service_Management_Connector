@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update>
+    <sys_ui_form_sections form_id="e8a1ff982f267010cffdfe1df699b6b3" sys_domain="global" table="change_request" version="3">
+        <sys_ui_form_section action="INSERT_OR_UPDATE">
+            <position>0</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-09-08 18:23:04</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>6ca13fd82f267010cffdfe1df699b6b9</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_overrides/>
+            <sys_ui_form display_value="change_request" name="change_request" sys_domain="global" view="f021fb982f267010cffdfe1df699b621">e8a1ff982f267010cffdfe1df699b6b3</sys_ui_form>
+            <sys_ui_section caption="NULL" display_value="" name="change_request" sys_domain="global" view="f021fb982f267010cffdfe1df699b621">742177d82f267010cffdfe1df699b6be</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2021-09-08 18:23:04</sys_updated_on>
+        </sys_ui_form_section>
+        <sys_ui_form_section action="INSERT_OR_UPDATE">
+            <position>1</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-09-08 18:23:05</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>24a13fd82f267010cffdfe1df699b6bb</sys_id>
+            <sys_mod_count>2</sys_mod_count>
+            <sys_overrides/>
+            <sys_ui_form display_value="change_request" name="change_request" sys_domain="global" view="f021fb982f267010cffdfe1df699b621">e8a1ff982f267010cffdfe1df699b6b3</sys_ui_form>
+            <sys_ui_section caption="Planning" display_value="Planning" name="change_request" sys_domain="global" view="f021fb982f267010cffdfe1df699b621">24a13fd82f267010cffdfe1df699b6ba</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2021-09-08 18:56:45</sys_updated_on>
+        </sys_ui_form_section>
+        <sys_ui_form_section action="INSERT_OR_UPDATE">
+            <position>2</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-09-08 18:24:47</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>1502731c2f267010cffdfe1df699b6e3</sys_id>
+            <sys_mod_count>2</sys_mod_count>
+            <sys_overrides/>
+            <sys_ui_form display_value="change_request" name="change_request" sys_domain="global" view="f021fb982f267010cffdfe1df699b621">e8a1ff982f267010cffdfe1df699b6b3</sys_ui_form>
+            <sys_ui_section caption="Schedule" display_value="Schedule" name="change_request" sys_domain="global" view="f021fb982f267010cffdfe1df699b621">d102731c2f267010cffdfe1df699b6e1</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2021-09-08 18:56:45</sys_updated_on>
+        </sys_ui_form_section>
+        <sys_ui_form_section action="INSERT_OR_UPDATE">
+            <position>3</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-09-08 18:26:34</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>a362731c2f267010cffdfe1df699b6b4</sys_id>
+            <sys_mod_count>2</sys_mod_count>
+            <sys_overrides/>
+            <sys_ui_form display_value="change_request" name="change_request" sys_domain="global" view="f021fb982f267010cffdfe1df699b621">e8a1ff982f267010cffdfe1df699b6b3</sys_ui_form>
+            <sys_ui_section caption="Conflicts" display_value="Conflicts" name="change_request" sys_domain="global" view="f021fb982f267010cffdfe1df699b621">ef62731c2f267010cffdfe1df699b6b1</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2021-09-08 18:56:45</sys_updated_on>
+        </sys_ui_form_section>
+        <sys_ui_form_section action="INSERT_OR_UPDATE">
+            <position>4</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-09-08 18:27:22</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>db927b1c2f267010cffdfe1df699b6c0</sys_id>
+            <sys_mod_count>2</sys_mod_count>
+            <sys_overrides/>
+            <sys_ui_form display_value="change_request" name="change_request" sys_domain="global" view="f021fb982f267010cffdfe1df699b621">e8a1ff982f267010cffdfe1df699b6b3</sys_ui_form>
+            <sys_ui_section caption="Notes" display_value="Notes" name="change_request" sys_domain="global" view="f021fb982f267010cffdfe1df699b621">d392731c2f267010cffdfe1df699b6ba</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2021-09-08 18:56:45</sys_updated_on>
+        </sys_ui_form_section>
+        <sys_ui_form action="INSERT_OR_UPDATE">
+            <name>change_request</name>
+            <roles/>
+            <sys_class_name>sys_ui_form</sys_class_name>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-09-08 18:23:04</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>e8a1ff982f267010cffdfe1df699b6b3</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_name>change_request</sys_name>
+            <sys_overrides/>
+            <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+            <sys_policy/>
+            <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+            <sys_update_name>sys_ui_form_sections_e8a1ff982f267010cffdfe1df699b6b3</sys_update_name>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+            <sys_user/>
+            <view display_value="AWS Systems Manager Change Manager" name="aws_systems_manager_change_manager">f021fb982f267010cffdfe1df699b621</view>
+            <view_name/>
+        </sys_ui_form>
+    </sys_ui_form_sections>
+</record_update>
