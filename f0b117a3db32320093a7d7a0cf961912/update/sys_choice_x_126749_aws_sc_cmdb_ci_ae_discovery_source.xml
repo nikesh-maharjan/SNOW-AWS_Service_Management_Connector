@@ -6,7 +6,6 @@
             <sys_class_name>sys_choice_set</sys_class_name>
             <sys_created_by>admin</sys_created_by>
             <sys_created_on>2023-04-14 04:17:39</sys_created_on>
-            <sys_id>28074bb71bceed506158ca6a234bcbbe</sys_id>
             <sys_mod_count>0</sys_mod_count>
             <sys_name>discovery_source</sys_name>
             <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>

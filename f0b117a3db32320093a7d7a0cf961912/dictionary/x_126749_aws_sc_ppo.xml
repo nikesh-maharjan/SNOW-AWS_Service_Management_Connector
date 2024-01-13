@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="900a35ccdb310300a5d3ddd0cf9619f0" label="Provisioned Product Output" max_length="40" name="x_126749_aws_sc_ppo" type="collection">
+        <element label="Description" max_length="2048" name="awsdescription" type="string"/>
+        <element label="Key" max_length="2048" name="awskey" type="string"/>
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false" label="Provisioned Product Event" mandatory="true" max_length="32" name="awsppevent" reference="x_126749_aws_sc_pp_event" reference_cascade_rule="delete" type="reference"/>
+        <element display="true" label="Value" max_length="2048" name="awsvalue" type="string"/>
+        <index name="index">
+            <element name="awsppevent"/>
+        </index>
+    </element>
+</database>

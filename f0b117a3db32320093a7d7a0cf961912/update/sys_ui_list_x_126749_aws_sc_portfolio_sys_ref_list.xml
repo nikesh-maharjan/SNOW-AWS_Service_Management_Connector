@@ -3,7 +3,7 @@
         <sys_ui_list_element action="INSERT_OR_UPDATE">
             <average_value>false</average_value>
             <element>awsdisplayname</element>
-            <list_id display_value="x_126749_aws_sc_portfolio" element="NULL" name="x_126749_aws_sc_portfolio" parent="NULL" relationship="NULL" sys_domain="global" view="10ff1140db1110101350ae441b961960">163692c8db5d4300a5d3ddd0cf961988</list_id>
+            <list_id display_value="x_126749_aws_sc_portfolio" element="NULL" name="x_126749_aws_sc_portfolio" parent="NULL" relationship="NULL" sys_domain="global" view="93ce9072d423211095d7c105f1bf43ad">163692c8db5d4300a5d3ddd0cf961988</list_id>
             <max_value>false</max_value>
             <min_value>false</min_value>
             <position>0</position>
@@ -40,7 +40,7 @@
             <sys_updated_by>admin</sys_updated_by>
             <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
             <sys_user/>
-            <view display_value="Reference List" name="sys_ref_list">10ff1140db1110101350ae441b961960</view>
+            <view display_value="Reference List" name="sys_ref_list">93ce9072d423211095d7c105f1bf43ad</view>
             <view_name/>
         </sys_ui_list>
     </sys_ui_list>

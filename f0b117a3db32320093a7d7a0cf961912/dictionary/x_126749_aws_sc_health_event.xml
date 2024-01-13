@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="9b5fad542f9301101661ff1df699b671" label="Health event" max_length="40" name="x_126749_aws_sc_health_event" type="collection">
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false" label="Account" max_length="40" name="awsaccount" read_only="true" reference="x_126749_aws_sc_account" type="reference"/>
+        <element label="Arn" max_length="1600" name="awsarn" read_only="true" type="string"/>
+        <element label="Category" max_length="255" name="awscategory" read_only="true" type="string"/>
+        <element label="Description" max_length="32766" name="awsdescription" read_only="true" type="string"/>
+        <element label="End time" max_length="40" name="awsendtime" read_only="true" type="glide_date_time"/>
+        <element label="Last updated time" max_length="40" name="awslastupdatedtime" read_only="true" type="glide_date_time"/>
+        <element label="Metadata" max_length="32766" name="awsmetadata" read_only="true" type="string"/>
+        <element label="Region" max_length="25" name="awsregion" read_only="true" type="string"/>
+        <element label="Service" max_length="30" name="awsservice" read_only="true" type="string"/>
+        <element label="Start time" max_length="40" name="awsstarttime" read_only="true" type="glide_date_time"/>
+        <element label="Status" max_length="40" name="awsstatus" read_only="true" type="string"/>
+        <element label="Type" max_length="100" name="awstype" read_only="true" type="string"/>
+        <index name="index">
+            <element name="awsaccount"/>
+        </index>
+    </element>
+</database>

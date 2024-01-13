@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element attributes="no_update=true" db_object_id="0ec3f22edb390300a5d3ddd0cf96192b" label="AWS Request Log" max_length="40" name="x_126749_aws_sc_req_log" type="collection">
+        <element label="Access Key" max_length="128" name="accesskey" type="string"/>
+        <element display="true" label="Action" max_length="128" name="action" type="string"/>
+        <element label="Request Body" max_length="2048" name="body" type="string"/>
+        <element attributes="edge_encryption_enabled=true" label="Duration" max_length="40" name="duration" read_only="true" type="integer"/>
+        <element label="Endpoint" max_length="1024" name="endpoint" type="string"/>
+        <element label="Region" max_length="100" name="region" type="string"/>
+        <element label="Response Body" max_length="2048" name="responsebody" type="string"/>
+        <element label="Assumed Role" max_length="1024" name="role" type="string"/>
+        <element label="Service" max_length="254" name="service" type="string"/>
+        <element attributes="edge_encryption_enabled=true" label="Status Code" max_length="40" name="statuscode" type="integer"/>
+    </element>
+</database>

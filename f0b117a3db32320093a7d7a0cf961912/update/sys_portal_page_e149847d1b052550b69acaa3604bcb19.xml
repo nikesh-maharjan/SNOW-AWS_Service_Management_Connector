@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><record_update node_type="sys_portal_page" unload_date="2023-05-10 23:34:07">
+<?xml version="1.0" encoding="UTF-8"?><record_update node_type="sys_portal_page" unload_date="2024-01-13 13:53:42">
     <sys_portal_page action="INSERT_OR_UPDATE">
         <layout/>
         <order>3500</order>
@@ -38,7 +38,7 @@
                 <related_items_node>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>report_type</name>
-                        <portal_section display_value="Created 2023-02-20 08:36:10">06c338831b85e950b69acaa3604bcb09</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:36:10">06c338831b85e950b69acaa3604bcb09</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:36:10</sys_created_on>
                         <sys_id>02c338831b85e950b69acaa3604bcb0b</sys_id>
@@ -49,7 +49,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>renderer</name>
-                        <portal_section display_value="Created 2023-02-20 08:36:10">06c338831b85e950b69acaa3604bcb09</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:36:10">06c338831b85e950b69acaa3604bcb09</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:36:10</sys_created_on>
                         <sys_id>06c338831b85e950b69acaa3604bcb0a</sys_id>
@@ -60,7 +60,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>can_subscribe</name>
-                        <portal_section display_value="Created 2023-02-20 08:36:10">06c338831b85e950b69acaa3604bcb09</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:36:10">06c338831b85e950b69acaa3604bcb09</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:36:10</sys_created_on>
                         <sys_id>4ec338831b85e950b69acaa3604bcb0a</sys_id>
@@ -71,7 +71,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>sys_id</name>
-                        <portal_section display_value="Created 2023-02-20 08:36:10">06c338831b85e950b69acaa3604bcb09</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:36:10">06c338831b85e950b69acaa3604bcb09</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:36:10</sys_created_on>
                         <sys_id>8ac338831b85e950b69acaa3604bcb09</sys_id>
@@ -82,7 +82,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>can_real_time</name>
-                        <portal_section display_value="Created 2023-02-20 08:36:10">06c338831b85e950b69acaa3604bcb09</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:36:10">06c338831b85e950b69acaa3604bcb09</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:36:10</sys_created_on>
                         <sys_id>8ac338831b85e950b69acaa3604bcb0a</sys_id>
@@ -93,7 +93,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>is_using_database_view</name>
-                        <portal_section display_value="Created 2023-02-20 08:36:10">06c338831b85e950b69acaa3604bcb09</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:36:10">06c338831b85e950b69acaa3604bcb09</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:36:10</sys_created_on>
                         <sys_id>8ec338831b85e950b69acaa3604bcb0b</sys_id>
@@ -104,7 +104,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>title_align</name>
-                        <portal_section display_value="Created 2023-02-20 08:36:10">06c338831b85e950b69acaa3604bcb09</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:36:10">06c338831b85e950b69acaa3604bcb09</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:36:41</sys_created_on>
                         <sys_id>91e3b4831b85e950b69acaa3604bcba4</sys_id>
@@ -115,7 +115,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>filter_indicator</name>
-                        <portal_section display_value="Created 2023-02-20 08:36:10">06c338831b85e950b69acaa3604bcb09</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:36:10">06c338831b85e950b69acaa3604bcb09</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:36:41</sys_created_on>
                         <sys_id>91e3b4831b85e950b69acaa3604bcba5</sys_id>
@@ -126,7 +126,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>show_border</name>
-                        <portal_section display_value="Created 2023-02-20 08:36:10">06c338831b85e950b69acaa3604bcb09</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:36:10">06c338831b85e950b69acaa3604bcb09</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:36:41</sys_created_on>
                         <sys_id>95e3b4831b85e950b69acaa3604bcba4</sys_id>
@@ -137,7 +137,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>real_time</name>
-                        <portal_section display_value="Created 2023-02-20 08:36:10">06c338831b85e950b69acaa3604bcb09</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:36:10">06c338831b85e950b69acaa3604bcb09</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:36:41</sys_created_on>
                         <sys_id>95e3b4831b85e950b69acaa3604bcba5</sys_id>
@@ -148,7 +148,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>show_title</name>
-                        <portal_section display_value="Created 2023-02-20 08:36:10">06c338831b85e950b69acaa3604bcb09</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:36:10">06c338831b85e950b69acaa3604bcb09</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:36:41</sys_created_on>
                         <sys_id>99e3b4831b85e950b69acaa3604bcba3</sys_id>
@@ -159,7 +159,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>publisher_widget</name>
-                        <portal_section display_value="Created 2023-02-20 08:36:10">06c338831b85e950b69acaa3604bcb09</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:36:10">06c338831b85e950b69acaa3604bcb09</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:36:41</sys_created_on>
                         <sys_id>99e3b4831b85e950b69acaa3604bcba4</sys_id>
@@ -170,7 +170,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>show_header</name>
-                        <portal_section display_value="Created 2023-02-20 08:36:10">06c338831b85e950b69acaa3604bcb09</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:36:10">06c338831b85e950b69acaa3604bcb09</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:36:41</sys_created_on>
                         <sys_id>9de3b4831b85e950b69acaa3604bcba3</sys_id>
@@ -181,7 +181,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>subscriber_widget</name>
-                        <portal_section display_value="Created 2023-02-20 08:36:10">06c338831b85e950b69acaa3604bcb09</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:36:10">06c338831b85e950b69acaa3604bcb09</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:36:41</sys_created_on>
                         <sys_id>9de3b4831b85e950b69acaa3604bcba4</sys_id>
@@ -192,7 +192,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>title</name>
-                        <portal_section display_value="Created 2023-02-20 08:36:10">06c338831b85e950b69acaa3604bcb09</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:36:10">06c338831b85e950b69acaa3604bcb09</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:36:10</sys_created_on>
                         <sys_id>c2c338831b85e950b69acaa3604bcb0b</sys_id>
@@ -203,7 +203,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>help_text_window</name>
-                        <portal_section display_value="Created 2023-02-20 08:36:10">06c338831b85e950b69acaa3604bcb09</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:36:10">06c338831b85e950b69acaa3604bcb09</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:36:10</sys_created_on>
                         <sys_id>c6c338831b85e950b69acaa3604bcb0a</sys_id>
@@ -214,7 +214,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>header_color</name>
-                        <portal_section display_value="Created 2023-02-20 08:36:10">06c338831b85e950b69acaa3604bcb09</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:36:10">06c338831b85e950b69acaa3604bcb09</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:36:41</sys_created_on>
                         <sys_id>d9e3b4831b85e950b69acaa3604bcba5</sys_id>
@@ -239,7 +239,7 @@
                 <related_items_node>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>show_title</name>
-                        <portal_section display_value="Created 2023-02-20 08:31:10">34a2b8cf1b45e950b69acaa3604bcb21</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:31:10">34a2b8cf1b45e950b69acaa3604bcb21</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:31:59</sys_created_on>
                         <sys_id>20d2f4cf1b45e950b69acaa3604bcbb6</sys_id>
@@ -250,7 +250,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>publisher_widget</name>
-                        <portal_section display_value="Created 2023-02-20 08:31:10">34a2b8cf1b45e950b69acaa3604bcb21</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:31:10">34a2b8cf1b45e950b69acaa3604bcb21</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:31:59</sys_created_on>
                         <sys_id>20d2f4cf1b45e950b69acaa3604bcbb7</sys_id>
@@ -261,7 +261,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>show_header</name>
-                        <portal_section display_value="Created 2023-02-20 08:31:10">34a2b8cf1b45e950b69acaa3604bcb21</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:31:10">34a2b8cf1b45e950b69acaa3604bcb21</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:31:59</sys_created_on>
                         <sys_id>24d2f4cf1b45e950b69acaa3604bcbb6</sys_id>
@@ -272,7 +272,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>subscriber_widget</name>
-                        <portal_section display_value="Created 2023-02-20 08:31:10">34a2b8cf1b45e950b69acaa3604bcb21</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:31:10">34a2b8cf1b45e950b69acaa3604bcb21</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:31:59</sys_created_on>
                         <sys_id>24d2f4cf1b45e950b69acaa3604bcbb7</sys_id>
@@ -283,7 +283,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>header_color</name>
-                        <portal_section display_value="Created 2023-02-20 08:31:10">34a2b8cf1b45e950b69acaa3604bcb21</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:31:10">34a2b8cf1b45e950b69acaa3604bcb21</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:31:59</sys_created_on>
                         <sys_id>24d2f4cf1b45e950b69acaa3604bcbb8</sys_id>
@@ -294,7 +294,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>title_align</name>
-                        <portal_section display_value="Created 2023-02-20 08:31:10">34a2b8cf1b45e950b69acaa3604bcb21</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:31:10">34a2b8cf1b45e950b69acaa3604bcb21</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:31:59</sys_created_on>
                         <sys_id>28d2f4cf1b45e950b69acaa3604bcbb6</sys_id>
@@ -305,7 +305,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>filter_indicator</name>
-                        <portal_section display_value="Created 2023-02-20 08:31:10">34a2b8cf1b45e950b69acaa3604bcb21</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:31:10">34a2b8cf1b45e950b69acaa3604bcb21</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:31:59</sys_created_on>
                         <sys_id>28d2f4cf1b45e950b69acaa3604bcbb7</sys_id>
@@ -316,7 +316,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>show_border</name>
-                        <portal_section display_value="Created 2023-02-20 08:31:10">34a2b8cf1b45e950b69acaa3604bcb21</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:31:10">34a2b8cf1b45e950b69acaa3604bcb21</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:31:59</sys_created_on>
                         <sys_id>2cd2f4cf1b45e950b69acaa3604bcbb6</sys_id>
@@ -327,7 +327,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>real_time</name>
-                        <portal_section display_value="Created 2023-02-20 08:31:10">34a2b8cf1b45e950b69acaa3604bcb21</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:31:10">34a2b8cf1b45e950b69acaa3604bcb21</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:31:59</sys_created_on>
                         <sys_id>2cd2f4cf1b45e950b69acaa3604bcbb7</sys_id>
@@ -338,7 +338,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>renderer</name>
-                        <portal_section display_value="Created 2023-02-20 08:31:10">34a2b8cf1b45e950b69acaa3604bcb21</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:31:10">34a2b8cf1b45e950b69acaa3604bcb21</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:31:10</sys_created_on>
                         <sys_id>30a2b8cf1b45e950b69acaa3604bcb22</sys_id>
@@ -349,7 +349,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>report_type</name>
-                        <portal_section display_value="Created 2023-02-20 08:31:10">34a2b8cf1b45e950b69acaa3604bcb21</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:31:10">34a2b8cf1b45e950b69acaa3604bcb21</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:31:10</sys_created_on>
                         <sys_id>3ca2b8cf1b45e950b69acaa3604bcb22</sys_id>
@@ -360,7 +360,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>can_subscribe</name>
-                        <portal_section display_value="Created 2023-02-20 08:31:10">34a2b8cf1b45e950b69acaa3604bcb21</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:31:10">34a2b8cf1b45e950b69acaa3604bcb21</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:31:10</sys_created_on>
                         <sys_id>78a2b8cf1b45e950b69acaa3604bcb22</sys_id>
@@ -371,7 +371,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>can_real_time</name>
-                        <portal_section display_value="Created 2023-02-20 08:31:10">34a2b8cf1b45e950b69acaa3604bcb21</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:31:10">34a2b8cf1b45e950b69acaa3604bcb21</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:31:10</sys_created_on>
                         <sys_id>b4a2b8cf1b45e950b69acaa3604bcb22</sys_id>
@@ -382,7 +382,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>sys_id</name>
-                        <portal_section display_value="Created 2023-02-20 08:31:10">34a2b8cf1b45e950b69acaa3604bcb21</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:31:10">34a2b8cf1b45e950b69acaa3604bcb21</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:31:10</sys_created_on>
                         <sys_id>b8a2b8cf1b45e950b69acaa3604bcb21</sys_id>
@@ -393,7 +393,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>is_using_database_view</name>
-                        <portal_section display_value="Created 2023-02-20 08:31:10">34a2b8cf1b45e950b69acaa3604bcb21</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:31:10">34a2b8cf1b45e950b69acaa3604bcb21</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:31:10</sys_created_on>
                         <sys_id>b8a2b8cf1b45e950b69acaa3604bcb23</sys_id>
@@ -404,7 +404,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>help_text_window</name>
-                        <portal_section display_value="Created 2023-02-20 08:31:10">34a2b8cf1b45e950b69acaa3604bcb21</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:31:10">34a2b8cf1b45e950b69acaa3604bcb21</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:31:10</sys_created_on>
                         <sys_id>f0a2b8cf1b45e950b69acaa3604bcb22</sys_id>
@@ -415,7 +415,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>title</name>
-                        <portal_section display_value="Created 2023-02-20 08:31:10">34a2b8cf1b45e950b69acaa3604bcb21</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:31:10">34a2b8cf1b45e950b69acaa3604bcb21</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:31:10</sys_created_on>
                         <sys_id>fca2b8cf1b45e950b69acaa3604bcb22</sys_id>
@@ -440,7 +440,7 @@
                 <related_items_node>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>renderer</name>
-                        <portal_section display_value="Created 2023-03-16 19:38:38">49d3eab21b69611015ce25cb234bcbdc</portal_section>
+                        <portal_section display_value="Created 2023-03-16 22:38:38">49d3eab21b69611015ce25cb234bcbdc</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-03-17 02:38:38</sys_created_on>
                         <sys_id>01d3eab21b69611015ce25cb234bcbdd</sys_id>
@@ -451,7 +451,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>title</name>
-                        <portal_section display_value="Created 2023-03-16 19:38:38">49d3eab21b69611015ce25cb234bcbdc</portal_section>
+                        <portal_section display_value="Created 2023-03-16 22:38:38">49d3eab21b69611015ce25cb234bcbdc</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-03-17 02:38:38</sys_created_on>
                         <sys_id>0dd3eab21b69611015ce25cb234bcbdd</sys_id>
@@ -462,7 +462,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>header_color</name>
-                        <portal_section display_value="Created 2023-03-16 19:38:38">49d3eab21b69611015ce25cb234bcbdc</portal_section>
+                        <portal_section display_value="Created 2023-03-16 22:38:38">49d3eab21b69611015ce25cb234bcbdc</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-03-17 02:39:47</sys_created_on>
                         <sys_id>311462f21b69611015ce25cb234bcbf9</sys_id>
@@ -473,7 +473,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>report_type</name>
-                        <portal_section display_value="Created 2023-03-16 19:38:38">49d3eab21b69611015ce25cb234bcbdc</portal_section>
+                        <portal_section display_value="Created 2023-03-16 22:38:38">49d3eab21b69611015ce25cb234bcbdc</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-03-17 02:38:38</sys_created_on>
                         <sys_id>49d3eab21b69611015ce25cb234bcbdd</sys_id>
@@ -484,7 +484,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>can_subscribe</name>
-                        <portal_section display_value="Created 2023-03-16 19:38:38">49d3eab21b69611015ce25cb234bcbdc</portal_section>
+                        <portal_section display_value="Created 2023-03-16 22:38:38">49d3eab21b69611015ce25cb234bcbdc</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-03-17 02:38:38</sys_created_on>
                         <sys_id>85d3eab21b69611015ce25cb234bcbdd</sys_id>
@@ -495,7 +495,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>help_text_window</name>
-                        <portal_section display_value="Created 2023-03-16 19:38:38">49d3eab21b69611015ce25cb234bcbdc</portal_section>
+                        <portal_section display_value="Created 2023-03-16 22:38:38">49d3eab21b69611015ce25cb234bcbdc</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-03-17 02:38:38</sys_created_on>
                         <sys_id>c1d3eab21b69611015ce25cb234bcbdd</sys_id>
@@ -506,7 +506,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>sys_id</name>
-                        <portal_section display_value="Created 2023-03-16 19:38:38">49d3eab21b69611015ce25cb234bcbdc</portal_section>
+                        <portal_section display_value="Created 2023-03-16 22:38:38">49d3eab21b69611015ce25cb234bcbdc</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-03-17 02:38:38</sys_created_on>
                         <sys_id>c9d3eab21b69611015ce25cb234bcbdc</sys_id>
@@ -517,7 +517,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>show_header</name>
-                        <portal_section display_value="Created 2023-03-16 19:38:38">49d3eab21b69611015ce25cb234bcbdc</portal_section>
+                        <portal_section display_value="Created 2023-03-16 22:38:38">49d3eab21b69611015ce25cb234bcbdc</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-03-17 02:39:47</sys_created_on>
                         <sys_id>f11462f21b69611015ce25cb234bcbf7</sys_id>
@@ -528,7 +528,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>subscriber_widget</name>
-                        <portal_section display_value="Created 2023-03-16 19:38:38">49d3eab21b69611015ce25cb234bcbdc</portal_section>
+                        <portal_section display_value="Created 2023-03-16 22:38:38">49d3eab21b69611015ce25cb234bcbdc</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-03-17 02:39:47</sys_created_on>
                         <sys_id>f11462f21b69611015ce25cb234bcbf8</sys_id>
@@ -539,7 +539,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>title_align</name>
-                        <portal_section display_value="Created 2023-03-16 19:38:38">49d3eab21b69611015ce25cb234bcbdc</portal_section>
+                        <portal_section display_value="Created 2023-03-16 22:38:38">49d3eab21b69611015ce25cb234bcbdc</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-03-17 02:39:47</sys_created_on>
                         <sys_id>f51462f21b69611015ce25cb234bcbf7</sys_id>
@@ -550,7 +550,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>filter_indicator</name>
-                        <portal_section display_value="Created 2023-03-16 19:38:38">49d3eab21b69611015ce25cb234bcbdc</portal_section>
+                        <portal_section display_value="Created 2023-03-16 22:38:38">49d3eab21b69611015ce25cb234bcbdc</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-03-17 02:39:47</sys_created_on>
                         <sys_id>f51462f21b69611015ce25cb234bcbf8</sys_id>
@@ -561,7 +561,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>show_border</name>
-                        <portal_section display_value="Created 2023-03-16 19:38:38">49d3eab21b69611015ce25cb234bcbdc</portal_section>
+                        <portal_section display_value="Created 2023-03-16 22:38:38">49d3eab21b69611015ce25cb234bcbdc</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-03-17 02:39:47</sys_created_on>
                         <sys_id>f91462f21b69611015ce25cb234bcbf7</sys_id>
@@ -572,7 +572,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>real_time</name>
-                        <portal_section display_value="Created 2023-03-16 19:38:38">49d3eab21b69611015ce25cb234bcbdc</portal_section>
+                        <portal_section display_value="Created 2023-03-16 22:38:38">49d3eab21b69611015ce25cb234bcbdc</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-03-17 02:39:47</sys_created_on>
                         <sys_id>f91462f21b69611015ce25cb234bcbf8</sys_id>
@@ -583,7 +583,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>show_title</name>
-                        <portal_section display_value="Created 2023-03-16 19:38:38">49d3eab21b69611015ce25cb234bcbdc</portal_section>
+                        <portal_section display_value="Created 2023-03-16 22:38:38">49d3eab21b69611015ce25cb234bcbdc</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-03-17 02:39:47</sys_created_on>
                         <sys_id>fd1462f21b69611015ce25cb234bcbf6</sys_id>
@@ -594,7 +594,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>publisher_widget</name>
-                        <portal_section display_value="Created 2023-03-16 19:38:38">49d3eab21b69611015ce25cb234bcbdc</portal_section>
+                        <portal_section display_value="Created 2023-03-16 22:38:38">49d3eab21b69611015ce25cb234bcbdc</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-03-17 02:39:47</sys_created_on>
                         <sys_id>fd1462f21b69611015ce25cb234bcbf7</sys_id>
@@ -619,7 +619,7 @@
                 <related_items_node>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>header_color</name>
-                        <portal_section display_value="Created 2023-02-20 10:49:56">5562158f1b09e950b69acaa3604bcbd6</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:49:56">5562158f1b09e950b69acaa3604bcbd6</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:51:37</sys_created_on>
                         <sys_id>0ec2dd8f1b09e950b69acaa3604bcbde</sys_id>
@@ -630,7 +630,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>title</name>
-                        <portal_section display_value="Created 2023-02-20 10:49:56">5562158f1b09e950b69acaa3604bcbd6</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:49:56">5562158f1b09e950b69acaa3604bcbd6</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:49:56</sys_created_on>
                         <sys_id>1962158f1b09e950b69acaa3604bcbd7</sys_id>
@@ -641,7 +641,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>renderer</name>
-                        <portal_section display_value="Created 2023-02-20 10:49:56">5562158f1b09e950b69acaa3604bcbd6</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:49:56">5562158f1b09e950b69acaa3604bcbd6</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:49:56</sys_created_on>
                         <sys_id>1d62158f1b09e950b69acaa3604bcbd6</sys_id>
@@ -652,7 +652,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>report_type</name>
-                        <portal_section display_value="Created 2023-02-20 10:49:56">5562158f1b09e950b69acaa3604bcbd6</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:49:56">5562158f1b09e950b69acaa3604bcbd6</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:49:56</sys_created_on>
                         <sys_id>5562158f1b09e950b69acaa3604bcbd7</sys_id>
@@ -663,7 +663,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>can_subscribe</name>
-                        <portal_section display_value="Created 2023-02-20 10:49:56">5562158f1b09e950b69acaa3604bcbd6</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:49:56">5562158f1b09e950b69acaa3604bcbd6</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:49:56</sys_created_on>
                         <sys_id>9162158f1b09e950b69acaa3604bcbd7</sys_id>
@@ -674,7 +674,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>title_align</name>
-                        <portal_section display_value="Created 2023-02-20 10:49:56">5562158f1b09e950b69acaa3604bcbd6</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:49:56">5562158f1b09e950b69acaa3604bcbd6</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:51:37</sys_created_on>
                         <sys_id>c2c2dd8f1b09e950b69acaa3604bcbdd</sys_id>
@@ -685,7 +685,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>filter_indicator</name>
-                        <portal_section display_value="Created 2023-02-20 10:49:56">5562158f1b09e950b69acaa3604bcbd6</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:49:56">5562158f1b09e950b69acaa3604bcbd6</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:51:37</sys_created_on>
                         <sys_id>c2c2dd8f1b09e950b69acaa3604bcbde</sys_id>
@@ -696,7 +696,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>show_border</name>
-                        <portal_section display_value="Created 2023-02-20 10:49:56">5562158f1b09e950b69acaa3604bcbd6</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:49:56">5562158f1b09e950b69acaa3604bcbd6</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:51:37</sys_created_on>
                         <sys_id>c6c2dd8f1b09e950b69acaa3604bcbdd</sys_id>
@@ -707,7 +707,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>real_time</name>
-                        <portal_section display_value="Created 2023-02-20 10:49:56">5562158f1b09e950b69acaa3604bcbd6</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:49:56">5562158f1b09e950b69acaa3604bcbd6</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:51:37</sys_created_on>
                         <sys_id>c6c2dd8f1b09e950b69acaa3604bcbde</sys_id>
@@ -718,7 +718,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>show_title</name>
-                        <portal_section display_value="Created 2023-02-20 10:49:56">5562158f1b09e950b69acaa3604bcbd6</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:49:56">5562158f1b09e950b69acaa3604bcbd6</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:51:37</sys_created_on>
                         <sys_id>cac2dd8f1b09e950b69acaa3604bcbdc</sys_id>
@@ -729,7 +729,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>publisher_widget</name>
-                        <portal_section display_value="Created 2023-02-20 10:49:56">5562158f1b09e950b69acaa3604bcbd6</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:49:56">5562158f1b09e950b69acaa3604bcbd6</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:51:37</sys_created_on>
                         <sys_id>cac2dd8f1b09e950b69acaa3604bcbdd</sys_id>
@@ -740,7 +740,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>show_header</name>
-                        <portal_section display_value="Created 2023-02-20 10:49:56">5562158f1b09e950b69acaa3604bcbd6</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:49:56">5562158f1b09e950b69acaa3604bcbd6</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:51:37</sys_created_on>
                         <sys_id>cec2dd8f1b09e950b69acaa3604bcbdc</sys_id>
@@ -751,7 +751,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>subscriber_widget</name>
-                        <portal_section display_value="Created 2023-02-20 10:49:56">5562158f1b09e950b69acaa3604bcbd6</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:49:56">5562158f1b09e950b69acaa3604bcbd6</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:51:37</sys_created_on>
                         <sys_id>cec2dd8f1b09e950b69acaa3604bcbdd</sys_id>
@@ -762,7 +762,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>sys_id</name>
-                        <portal_section display_value="Created 2023-02-20 10:49:56">5562158f1b09e950b69acaa3604bcbd6</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:49:56">5562158f1b09e950b69acaa3604bcbd6</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:49:56</sys_created_on>
                         <sys_id>d562158f1b09e950b69acaa3604bcbd6</sys_id>
@@ -773,7 +773,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>help_text_window</name>
-                        <portal_section display_value="Created 2023-02-20 10:49:56">5562158f1b09e950b69acaa3604bcbd6</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:49:56">5562158f1b09e950b69acaa3604bcbd6</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:49:56</sys_created_on>
                         <sys_id>dd62158f1b09e950b69acaa3604bcbd6</sys_id>
@@ -798,7 +798,7 @@
                 <related_items_node>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>help_text_window</name>
-                        <portal_section display_value="Created 2023-02-20 10:57:02">9504dd031b49e950b69acaa3604bcb9e</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:57:02">9504dd031b49e950b69acaa3604bcb9e</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:57:02</sys_created_on>
                         <sys_id>1104dd031b49e950b69acaa3604bcb9f</sys_id>
@@ -809,7 +809,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>sys_id</name>
-                        <portal_section display_value="Created 2023-02-20 10:57:02">9504dd031b49e950b69acaa3604bcb9e</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:57:02">9504dd031b49e950b69acaa3604bcb9e</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:57:02</sys_created_on>
                         <sys_id>1904dd031b49e950b69acaa3604bcb9e</sys_id>
@@ -820,7 +820,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>title</name>
-                        <portal_section display_value="Created 2023-02-20 10:57:02">9504dd031b49e950b69acaa3604bcb9e</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:57:02">9504dd031b49e950b69acaa3604bcb9e</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:57:02</sys_created_on>
                         <sys_id>5904dd031b49e950b69acaa3604bcb9f</sys_id>
@@ -831,7 +831,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>renderer</name>
-                        <portal_section display_value="Created 2023-02-20 10:57:02">9504dd031b49e950b69acaa3604bcb9e</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:57:02">9504dd031b49e950b69acaa3604bcb9e</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:57:02</sys_created_on>
                         <sys_id>5d04dd031b49e950b69acaa3604bcb9e</sys_id>
@@ -842,7 +842,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>show_title</name>
-                        <portal_section display_value="Created 2023-02-20 10:57:02">9504dd031b49e950b69acaa3604bcb9e</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:57:02">9504dd031b49e950b69acaa3604bcb9e</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:57:39</sys_created_on>
                         <sys_id>9224dd031b49e950b69acaa3604bcbb9</sys_id>
@@ -853,7 +853,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>publisher_widget</name>
-                        <portal_section display_value="Created 2023-02-20 10:57:02">9504dd031b49e950b69acaa3604bcb9e</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:57:02">9504dd031b49e950b69acaa3604bcb9e</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:57:39</sys_created_on>
                         <sys_id>9224dd031b49e950b69acaa3604bcbba</sys_id>
@@ -864,7 +864,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>report_type</name>
-                        <portal_section display_value="Created 2023-02-20 10:57:02">9504dd031b49e950b69acaa3604bcb9e</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:57:02">9504dd031b49e950b69acaa3604bcb9e</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:57:02</sys_created_on>
                         <sys_id>9504dd031b49e950b69acaa3604bcb9f</sys_id>
@@ -875,7 +875,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>show_header</name>
-                        <portal_section display_value="Created 2023-02-20 10:57:02">9504dd031b49e950b69acaa3604bcb9e</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:57:02">9504dd031b49e950b69acaa3604bcb9e</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:57:39</sys_created_on>
                         <sys_id>9624dd031b49e950b69acaa3604bcbb9</sys_id>
@@ -886,7 +886,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>subscriber_widget</name>
-                        <portal_section display_value="Created 2023-02-20 10:57:02">9504dd031b49e950b69acaa3604bcb9e</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:57:02">9504dd031b49e950b69acaa3604bcb9e</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:57:39</sys_created_on>
                         <sys_id>9624dd031b49e950b69acaa3604bcbba</sys_id>
@@ -897,7 +897,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>title_align</name>
-                        <portal_section display_value="Created 2023-02-20 10:57:02">9504dd031b49e950b69acaa3604bcb9e</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:57:02">9504dd031b49e950b69acaa3604bcb9e</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:57:39</sys_created_on>
                         <sys_id>9a24dd031b49e950b69acaa3604bcbb9</sys_id>
@@ -908,7 +908,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>filter_indicator</name>
-                        <portal_section display_value="Created 2023-02-20 10:57:02">9504dd031b49e950b69acaa3604bcb9e</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:57:02">9504dd031b49e950b69acaa3604bcb9e</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:57:39</sys_created_on>
                         <sys_id>9a24dd031b49e950b69acaa3604bcbba</sys_id>
@@ -919,7 +919,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>show_border</name>
-                        <portal_section display_value="Created 2023-02-20 10:57:02">9504dd031b49e950b69acaa3604bcb9e</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:57:02">9504dd031b49e950b69acaa3604bcb9e</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:57:39</sys_created_on>
                         <sys_id>9e24dd031b49e950b69acaa3604bcbb9</sys_id>
@@ -930,7 +930,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>real_time</name>
-                        <portal_section display_value="Created 2023-02-20 10:57:02">9504dd031b49e950b69acaa3604bcb9e</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:57:02">9504dd031b49e950b69acaa3604bcb9e</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:57:39</sys_created_on>
                         <sys_id>9e24dd031b49e950b69acaa3604bcbba</sys_id>
@@ -941,7 +941,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>can_subscribe</name>
-                        <portal_section display_value="Created 2023-02-20 10:57:02">9504dd031b49e950b69acaa3604bcb9e</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:57:02">9504dd031b49e950b69acaa3604bcb9e</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:57:02</sys_created_on>
                         <sys_id>d104dd031b49e950b69acaa3604bcb9f</sys_id>
@@ -952,7 +952,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>header_color</name>
-                        <portal_section display_value="Created 2023-02-20 10:57:02">9504dd031b49e950b69acaa3604bcb9e</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:57:02">9504dd031b49e950b69acaa3604bcb9e</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:57:39</sys_created_on>
                         <sys_id>d224dd031b49e950b69acaa3604bcbbb</sys_id>
@@ -977,7 +977,7 @@
                 <related_items_node>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>sys_id</name>
-                        <portal_section display_value="Created 2023-02-20 08:39:04">9c74b4c31b85e950b69acaa3604bcb48</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:39:04">9c74b4c31b85e950b69acaa3604bcb48</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:39:04</sys_created_on>
                         <sys_id>1074b4c31b85e950b69acaa3604bcb49</sys_id>
@@ -988,7 +988,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>title</name>
-                        <portal_section display_value="Created 2023-02-20 08:39:04">9c74b4c31b85e950b69acaa3604bcb48</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:39:04">9c74b4c31b85e950b69acaa3604bcb48</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:39:04</sys_created_on>
                         <sys_id>1474b4c31b85e950b69acaa3604bcb4a</sys_id>
@@ -999,7 +999,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>help_text_window</name>
-                        <portal_section display_value="Created 2023-02-20 08:39:04">9c74b4c31b85e950b69acaa3604bcb48</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:39:04">9c74b4c31b85e950b69acaa3604bcb48</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:39:04</sys_created_on>
                         <sys_id>1874b4c31b85e950b69acaa3604bcb49</sys_id>
@@ -1010,7 +1010,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>title_align</name>
-                        <portal_section display_value="Created 2023-02-20 08:39:04">9c74b4c31b85e950b69acaa3604bcb48</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:39:04">9c74b4c31b85e950b69acaa3604bcb48</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:39:35</sys_created_on>
                         <sys_id>33847cc31b85e950b69acaa3604bcb54</sys_id>
@@ -1021,7 +1021,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>filter_indicator</name>
-                        <portal_section display_value="Created 2023-02-20 08:39:04">9c74b4c31b85e950b69acaa3604bcb48</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:39:04">9c74b4c31b85e950b69acaa3604bcb48</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:39:35</sys_created_on>
                         <sys_id>33847cc31b85e950b69acaa3604bcb55</sys_id>
@@ -1032,7 +1032,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>show_border</name>
-                        <portal_section display_value="Created 2023-02-20 08:39:04">9c74b4c31b85e950b69acaa3604bcb48</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:39:04">9c74b4c31b85e950b69acaa3604bcb48</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:39:35</sys_created_on>
                         <sys_id>37847cc31b85e950b69acaa3604bcb54</sys_id>
@@ -1043,7 +1043,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>real_time</name>
-                        <portal_section display_value="Created 2023-02-20 08:39:04">9c74b4c31b85e950b69acaa3604bcb48</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:39:04">9c74b4c31b85e950b69acaa3604bcb48</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:39:35</sys_created_on>
                         <sys_id>37847cc31b85e950b69acaa3604bcb55</sys_id>
@@ -1054,7 +1054,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>show_title</name>
-                        <portal_section display_value="Created 2023-02-20 08:39:04">9c74b4c31b85e950b69acaa3604bcb48</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:39:04">9c74b4c31b85e950b69acaa3604bcb48</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:39:35</sys_created_on>
                         <sys_id>3b847cc31b85e950b69acaa3604bcb53</sys_id>
@@ -1065,7 +1065,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>publisher_widget</name>
-                        <portal_section display_value="Created 2023-02-20 08:39:04">9c74b4c31b85e950b69acaa3604bcb48</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:39:04">9c74b4c31b85e950b69acaa3604bcb48</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:39:35</sys_created_on>
                         <sys_id>3b847cc31b85e950b69acaa3604bcb54</sys_id>
@@ -1076,7 +1076,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>show_header</name>
-                        <portal_section display_value="Created 2023-02-20 08:39:04">9c74b4c31b85e950b69acaa3604bcb48</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:39:04">9c74b4c31b85e950b69acaa3604bcb48</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:39:35</sys_created_on>
                         <sys_id>3f847cc31b85e950b69acaa3604bcb53</sys_id>
@@ -1087,7 +1087,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>subscriber_widget</name>
-                        <portal_section display_value="Created 2023-02-20 08:39:04">9c74b4c31b85e950b69acaa3604bcb48</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:39:04">9c74b4c31b85e950b69acaa3604bcb48</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:39:35</sys_created_on>
                         <sys_id>3f847cc31b85e950b69acaa3604bcb54</sys_id>
@@ -1098,7 +1098,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>report_type</name>
-                        <portal_section display_value="Created 2023-02-20 08:39:04">9c74b4c31b85e950b69acaa3604bcb48</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:39:04">9c74b4c31b85e950b69acaa3604bcb48</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:39:04</sys_created_on>
                         <sys_id>5074b4c31b85e950b69acaa3604bcb4a</sys_id>
@@ -1109,7 +1109,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>renderer</name>
-                        <portal_section display_value="Created 2023-02-20 08:39:04">9c74b4c31b85e950b69acaa3604bcb48</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:39:04">9c74b4c31b85e950b69acaa3604bcb48</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:39:04</sys_created_on>
                         <sys_id>5474b4c31b85e950b69acaa3604bcb49</sys_id>
@@ -1120,7 +1120,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>is_using_database_view</name>
-                        <portal_section display_value="Created 2023-02-20 08:39:04">9c74b4c31b85e950b69acaa3604bcb48</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:39:04">9c74b4c31b85e950b69acaa3604bcb48</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:39:04</sys_created_on>
                         <sys_id>5874b4c31b85e950b69acaa3604bcb4a</sys_id>
@@ -1131,7 +1131,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>header_color</name>
-                        <portal_section display_value="Created 2023-02-20 08:39:04">9c74b4c31b85e950b69acaa3604bcb48</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:39:04">9c74b4c31b85e950b69acaa3604bcb48</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:39:35</sys_created_on>
                         <sys_id>7b847cc31b85e950b69acaa3604bcb55</sys_id>
@@ -1142,7 +1142,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>can_subscribe</name>
-                        <portal_section display_value="Created 2023-02-20 08:39:04">9c74b4c31b85e950b69acaa3604bcb48</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:39:04">9c74b4c31b85e950b69acaa3604bcb48</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:39:04</sys_created_on>
                         <sys_id>9c74b4c31b85e950b69acaa3604bcb49</sys_id>
@@ -1153,7 +1153,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>can_real_time</name>
-                        <portal_section display_value="Created 2023-02-20 08:39:04">9c74b4c31b85e950b69acaa3604bcb48</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:39:04">9c74b4c31b85e950b69acaa3604bcb48</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:39:04</sys_created_on>
                         <sys_id>d874b4c31b85e950b69acaa3604bcb49</sys_id>
@@ -1178,7 +1178,7 @@
                 <related_items_node>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>sys_id</name>
-                        <portal_section display_value="Created 2023-02-20 10:33:01">a18e05c71b09e950b69acaa3604bcb4c</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:33:01">a18e05c71b09e950b69acaa3604bcb4c</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:33:01</sys_created_on>
                         <sys_id>298e05c71b09e950b69acaa3604bcb4c</sys_id>
@@ -1189,7 +1189,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>can_subscribe</name>
-                        <portal_section display_value="Created 2023-02-20 10:33:01">a18e05c71b09e950b69acaa3604bcb4c</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:33:01">a18e05c71b09e950b69acaa3604bcb4c</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:33:01</sys_created_on>
                         <sys_id>298e05c71b09e950b69acaa3604bcb4d</sys_id>
@@ -1200,7 +1200,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>show_border</name>
-                        <portal_section display_value="Created 2023-02-20 10:33:01">a18e05c71b09e950b69acaa3604bcb4c</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:33:01">a18e05c71b09e950b69acaa3604bcb4c</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:33:39</sys_created_on>
                         <sys_id>32ae49871b09e950b69acaa3604bcbb1</sys_id>
@@ -1211,7 +1211,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>show_title</name>
-                        <portal_section display_value="Created 2023-02-20 10:33:01">a18e05c71b09e950b69acaa3604bcb4c</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:33:01">a18e05c71b09e950b69acaa3604bcb4c</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:33:39</sys_created_on>
                         <sys_id>36ae49871b09e950b69acaa3604bcbb0</sys_id>
@@ -1222,7 +1222,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>publisher_widget</name>
-                        <portal_section display_value="Created 2023-02-20 10:33:01">a18e05c71b09e950b69acaa3604bcb4c</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:33:01">a18e05c71b09e950b69acaa3604bcb4c</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:33:39</sys_created_on>
                         <sys_id>36ae49871b09e950b69acaa3604bcbb1</sys_id>
@@ -1233,7 +1233,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>show_header</name>
-                        <portal_section display_value="Created 2023-02-20 10:33:01">a18e05c71b09e950b69acaa3604bcb4c</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:33:01">a18e05c71b09e950b69acaa3604bcb4c</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:33:39</sys_created_on>
                         <sys_id>3aae49871b09e950b69acaa3604bcbb0</sys_id>
@@ -1244,7 +1244,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>subscriber_widget</name>
-                        <portal_section display_value="Created 2023-02-20 10:33:01">a18e05c71b09e950b69acaa3604bcb4c</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:33:01">a18e05c71b09e950b69acaa3604bcb4c</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:33:39</sys_created_on>
                         <sys_id>3aae49871b09e950b69acaa3604bcbb1</sys_id>
@@ -1255,7 +1255,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>title_align</name>
-                        <portal_section display_value="Created 2023-02-20 10:33:01">a18e05c71b09e950b69acaa3604bcb4c</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:33:01">a18e05c71b09e950b69acaa3604bcb4c</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:33:39</sys_created_on>
                         <sys_id>3eae49871b09e950b69acaa3604bcbb0</sys_id>
@@ -1266,7 +1266,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>filter_indicator</name>
-                        <portal_section display_value="Created 2023-02-20 10:33:01">a18e05c71b09e950b69acaa3604bcb4c</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:33:01">a18e05c71b09e950b69acaa3604bcb4c</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:33:39</sys_created_on>
                         <sys_id>3eae49871b09e950b69acaa3604bcbb1</sys_id>
@@ -1277,7 +1277,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>help_text_window</name>
-                        <portal_section display_value="Created 2023-02-20 10:33:01">a18e05c71b09e950b69acaa3604bcb4c</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:33:01">a18e05c71b09e950b69acaa3604bcb4c</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:33:01</sys_created_on>
                         <sys_id>658e05c71b09e950b69acaa3604bcb4d</sys_id>
@@ -1288,7 +1288,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>real_time</name>
-                        <portal_section display_value="Created 2023-02-20 10:33:01">a18e05c71b09e950b69acaa3604bcb4c</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:33:01">a18e05c71b09e950b69acaa3604bcb4c</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:33:39</sys_created_on>
                         <sys_id>7aaec5c71b09e950b69acaa3604bcba3</sys_id>
@@ -1299,7 +1299,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>renderer</name>
-                        <portal_section display_value="Created 2023-02-20 10:33:01">a18e05c71b09e950b69acaa3604bcb4c</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:33:01">a18e05c71b09e950b69acaa3604bcb4c</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:33:01</sys_created_on>
                         <sys_id>a18e05c71b09e950b69acaa3604bcb4d</sys_id>
@@ -1310,7 +1310,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>title</name>
-                        <portal_section display_value="Created 2023-02-20 10:33:01">a18e05c71b09e950b69acaa3604bcb4c</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:33:01">a18e05c71b09e950b69acaa3604bcb4c</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:33:01</sys_created_on>
                         <sys_id>ad8e05c71b09e950b69acaa3604bcb4d</sys_id>
@@ -1321,7 +1321,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>header_color</name>
-                        <portal_section display_value="Created 2023-02-20 10:33:01">a18e05c71b09e950b69acaa3604bcb4c</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:33:01">a18e05c71b09e950b69acaa3604bcb4c</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:33:39</sys_created_on>
                         <sys_id>beaec5c71b09e950b69acaa3604bcba3</sys_id>
@@ -1332,7 +1332,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>report_type</name>
-                        <portal_section display_value="Created 2023-02-20 10:33:01">a18e05c71b09e950b69acaa3604bcb4c</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:33:01">a18e05c71b09e950b69acaa3604bcb4c</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:33:01</sys_created_on>
                         <sys_id>e98e05c71b09e950b69acaa3604bcb4d</sys_id>
@@ -1357,7 +1357,7 @@
                 <related_items_node>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>report_type</name>
-                        <portal_section display_value="Created 2023-02-20 10:27:55">c35d45c31b09e950b69acaa3604bcb51</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:27:55">c35d45c31b09e950b69acaa3604bcb51</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:27:55</sys_created_on>
                         <sys_id>035d01871b09e950b69acaa3604bcba9</sys_id>
@@ -1368,7 +1368,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>sys_id</name>
-                        <portal_section display_value="Created 2023-02-20 10:27:55">c35d45c31b09e950b69acaa3604bcb51</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:27:55">c35d45c31b09e950b69acaa3604bcb51</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:27:55</sys_created_on>
                         <sys_id>4b5d45c31b09e950b69acaa3604bcb51</sys_id>
@@ -1379,7 +1379,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>can_subscribe</name>
-                        <portal_section display_value="Created 2023-02-20 10:27:55">c35d45c31b09e950b69acaa3604bcb51</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:27:55">c35d45c31b09e950b69acaa3604bcb51</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:27:55</sys_created_on>
                         <sys_id>4f5d01871b09e950b69acaa3604bcba8</sys_id>
@@ -1390,7 +1390,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>show_title</name>
-                        <portal_section display_value="Created 2023-02-20 10:27:55">c35d45c31b09e950b69acaa3604bcb51</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:27:55">c35d45c31b09e950b69acaa3604bcb51</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:28:23</sys_created_on>
                         <sys_id>717d01871b09e950b69acaa3604bcb71</sys_id>
@@ -1401,7 +1401,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>publisher_widget</name>
-                        <portal_section display_value="Created 2023-02-20 10:27:55">c35d45c31b09e950b69acaa3604bcb51</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:27:55">c35d45c31b09e950b69acaa3604bcb51</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:28:23</sys_created_on>
                         <sys_id>717d01871b09e950b69acaa3604bcb72</sys_id>
@@ -1412,7 +1412,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>show_header</name>
-                        <portal_section display_value="Created 2023-02-20 10:27:55">c35d45c31b09e950b69acaa3604bcb51</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:27:55">c35d45c31b09e950b69acaa3604bcb51</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:28:23</sys_created_on>
                         <sys_id>757d01871b09e950b69acaa3604bcb71</sys_id>
@@ -1423,7 +1423,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>subscriber_widget</name>
-                        <portal_section display_value="Created 2023-02-20 10:27:55">c35d45c31b09e950b69acaa3604bcb51</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:27:55">c35d45c31b09e950b69acaa3604bcb51</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:28:23</sys_created_on>
                         <sys_id>757d01871b09e950b69acaa3604bcb72</sys_id>
@@ -1434,7 +1434,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>title_align</name>
-                        <portal_section display_value="Created 2023-02-20 10:27:55">c35d45c31b09e950b69acaa3604bcb51</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:27:55">c35d45c31b09e950b69acaa3604bcb51</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:28:23</sys_created_on>
                         <sys_id>797d01871b09e950b69acaa3604bcb71</sys_id>
@@ -1445,7 +1445,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>filter_indicator</name>
-                        <portal_section display_value="Created 2023-02-20 10:27:55">c35d45c31b09e950b69acaa3604bcb51</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:27:55">c35d45c31b09e950b69acaa3604bcb51</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:28:23</sys_created_on>
                         <sys_id>797d01871b09e950b69acaa3604bcb72</sys_id>
@@ -1456,7 +1456,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>show_border</name>
-                        <portal_section display_value="Created 2023-02-20 10:27:55">c35d45c31b09e950b69acaa3604bcb51</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:27:55">c35d45c31b09e950b69acaa3604bcb51</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:28:23</sys_created_on>
                         <sys_id>7d7d01871b09e950b69acaa3604bcb71</sys_id>
@@ -1467,7 +1467,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>real_time</name>
-                        <portal_section display_value="Created 2023-02-20 10:27:55">c35d45c31b09e950b69acaa3604bcb51</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:27:55">c35d45c31b09e950b69acaa3604bcb51</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:28:23</sys_created_on>
                         <sys_id>7d7d01871b09e950b69acaa3604bcb72</sys_id>
@@ -1478,7 +1478,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>help_text_window</name>
-                        <portal_section display_value="Created 2023-02-20 10:27:55">c35d45c31b09e950b69acaa3604bcb51</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:27:55">c35d45c31b09e950b69acaa3604bcb51</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:27:55</sys_created_on>
                         <sys_id>8b5d01871b09e950b69acaa3604bcba8</sys_id>
@@ -1489,7 +1489,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>header_color</name>
-                        <portal_section display_value="Created 2023-02-20 10:27:55">c35d45c31b09e950b69acaa3604bcb51</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:27:55">c35d45c31b09e950b69acaa3604bcb51</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:28:23</sys_created_on>
                         <sys_id>b17d01871b09e950b69acaa3604bcb73</sys_id>
@@ -1500,7 +1500,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>title</name>
-                        <portal_section display_value="Created 2023-02-20 10:27:55">c35d45c31b09e950b69acaa3604bcb51</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:27:55">c35d45c31b09e950b69acaa3604bcb51</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:27:55</sys_created_on>
                         <sys_id>c35d01871b09e950b69acaa3604bcba9</sys_id>
@@ -1511,7 +1511,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>renderer</name>
-                        <portal_section display_value="Created 2023-02-20 10:27:55">c35d45c31b09e950b69acaa3604bcb51</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:27:55">c35d45c31b09e950b69acaa3604bcb51</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:27:55</sys_created_on>
                         <sys_id>c75d01871b09e950b69acaa3604bcba8</sys_id>
@@ -1536,7 +1536,7 @@
                 <related_items_node>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>can_subscribe</name>
-                        <portal_section display_value="Created 2023-02-20 08:29:02">d122fc8f1b45e950b69acaa3604bcb5f</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:29:02">d122fc8f1b45e950b69acaa3604bcb5f</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:29:02</sys_created_on>
                         <sys_id>1d22fc8f1b45e950b69acaa3604bcb60</sys_id>
@@ -1547,7 +1547,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>filter_indicator</name>
-                        <portal_section display_value="Created 2023-02-20 08:29:02">d122fc8f1b45e950b69acaa3604bcb5f</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:29:02">d122fc8f1b45e950b69acaa3604bcb5f</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:29:33</sys_created_on>
                         <sys_id>414274cf1b45e950b69acaa3604bcb2a</sys_id>
@@ -1558,7 +1558,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>real_time</name>
-                        <portal_section display_value="Created 2023-02-20 08:29:02">d122fc8f1b45e950b69acaa3604bcb5f</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:29:02">d122fc8f1b45e950b69acaa3604bcb5f</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:29:33</sys_created_on>
                         <sys_id>454274cf1b45e950b69acaa3604bcb2a</sys_id>
@@ -1569,7 +1569,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>is_using_database_view</name>
-                        <portal_section display_value="Created 2023-02-20 08:29:02">d122fc8f1b45e950b69acaa3604bcb5f</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:29:02">d122fc8f1b45e950b69acaa3604bcb5f</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:29:02</sys_created_on>
                         <sys_id>5922f0cf1b45e950b69acaa3604bcb76</sys_id>
@@ -1580,7 +1580,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>sys_id</name>
-                        <portal_section display_value="Created 2023-02-20 08:29:02">d122fc8f1b45e950b69acaa3604bcb5f</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:29:02">d122fc8f1b45e950b69acaa3604bcb5f</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:29:02</sys_created_on>
                         <sys_id>5922fc8f1b45e950b69acaa3604bcb5f</sys_id>
@@ -1591,7 +1591,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>can_real_time</name>
-                        <portal_section display_value="Created 2023-02-20 08:29:02">d122fc8f1b45e950b69acaa3604bcb5f</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:29:02">d122fc8f1b45e950b69acaa3604bcb5f</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:29:02</sys_created_on>
                         <sys_id>5922fc8f1b45e950b69acaa3604bcb60</sys_id>
@@ -1602,7 +1602,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>header_color</name>
-                        <portal_section display_value="Created 2023-02-20 08:29:02">d122fc8f1b45e950b69acaa3604bcb5f</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:29:02">d122fc8f1b45e950b69acaa3604bcb5f</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:29:33</sys_created_on>
                         <sys_id>894274cf1b45e950b69acaa3604bcb2a</sys_id>
@@ -1613,7 +1613,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>title</name>
-                        <portal_section display_value="Created 2023-02-20 08:29:02">d122fc8f1b45e950b69acaa3604bcb5f</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:29:02">d122fc8f1b45e950b69acaa3604bcb5f</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:29:02</sys_created_on>
                         <sys_id>9122fc8f1b45e950b69acaa3604bcb61</sys_id>
@@ -1624,7 +1624,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>help_text_window</name>
-                        <portal_section display_value="Created 2023-02-20 08:29:02">d122fc8f1b45e950b69acaa3604bcb5f</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:29:02">d122fc8f1b45e950b69acaa3604bcb5f</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:29:02</sys_created_on>
                         <sys_id>9522fc8f1b45e950b69acaa3604bcb60</sys_id>
@@ -1635,7 +1635,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>title_align</name>
-                        <portal_section display_value="Created 2023-02-20 08:29:02">d122fc8f1b45e950b69acaa3604bcb5f</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:29:02">d122fc8f1b45e950b69acaa3604bcb5f</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:29:33</sys_created_on>
                         <sys_id>c1423c8f1b45e950b69acaa3604bcb83</sys_id>
@@ -1646,7 +1646,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>show_border</name>
-                        <portal_section display_value="Created 2023-02-20 08:29:02">d122fc8f1b45e950b69acaa3604bcb5f</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:29:02">d122fc8f1b45e950b69acaa3604bcb5f</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:29:33</sys_created_on>
                         <sys_id>c5423c8f1b45e950b69acaa3604bcb83</sys_id>
@@ -1657,7 +1657,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>show_title</name>
-                        <portal_section display_value="Created 2023-02-20 08:29:02">d122fc8f1b45e950b69acaa3604bcb5f</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:29:02">d122fc8f1b45e950b69acaa3604bcb5f</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:29:33</sys_created_on>
                         <sys_id>c9423c8f1b45e950b69acaa3604bcb82</sys_id>
@@ -1668,7 +1668,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>publisher_widget</name>
-                        <portal_section display_value="Created 2023-02-20 08:29:02">d122fc8f1b45e950b69acaa3604bcb5f</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:29:02">d122fc8f1b45e950b69acaa3604bcb5f</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:29:33</sys_created_on>
                         <sys_id>c9423c8f1b45e950b69acaa3604bcb83</sys_id>
@@ -1679,7 +1679,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>show_header</name>
-                        <portal_section display_value="Created 2023-02-20 08:29:02">d122fc8f1b45e950b69acaa3604bcb5f</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:29:02">d122fc8f1b45e950b69acaa3604bcb5f</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:29:33</sys_created_on>
                         <sys_id>cd423c8f1b45e950b69acaa3604bcb82</sys_id>
@@ -1690,7 +1690,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>subscriber_widget</name>
-                        <portal_section display_value="Created 2023-02-20 08:29:02">d122fc8f1b45e950b69acaa3604bcb5f</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:29:02">d122fc8f1b45e950b69acaa3604bcb5f</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:29:33</sys_created_on>
                         <sys_id>cd423c8f1b45e950b69acaa3604bcb83</sys_id>
@@ -1701,7 +1701,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>renderer</name>
-                        <portal_section display_value="Created 2023-02-20 08:29:02">d122fc8f1b45e950b69acaa3604bcb5f</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:29:02">d122fc8f1b45e950b69acaa3604bcb5f</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:29:02</sys_created_on>
                         <sys_id>d122fc8f1b45e950b69acaa3604bcb60</sys_id>
@@ -1712,7 +1712,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>report_type</name>
-                        <portal_section display_value="Created 2023-02-20 08:29:02">d122fc8f1b45e950b69acaa3604bcb5f</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:29:02">d122fc8f1b45e950b69acaa3604bcb5f</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:29:02</sys_created_on>
                         <sys_id>dd22fc8f1b45e950b69acaa3604bcb60</sys_id>
@@ -1737,7 +1737,7 @@
                 <related_items_node>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>can_real_time</name>
-                        <portal_section display_value="Created 2023-02-20 08:50:16">e007b40b1b85e950b69acaa3604bcbe9</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:50:16">e007b40b1b85e950b69acaa3604bcbe9</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:50:16</sys_created_on>
                         <sys_id>2007b40b1b85e950b69acaa3604bcbea</sys_id>
@@ -1748,7 +1748,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>title</name>
-                        <portal_section display_value="Created 2023-02-20 08:50:16">e007b40b1b85e950b69acaa3604bcbe9</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:50:16">e007b40b1b85e950b69acaa3604bcbe9</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:50:16</sys_created_on>
                         <sys_id>6007304b1b85e950b69acaa3604bcba2</sys_id>
@@ -1759,7 +1759,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>sys_id</name>
-                        <portal_section display_value="Created 2023-02-20 08:50:16">e007b40b1b85e950b69acaa3604bcbe9</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:50:16">e007b40b1b85e950b69acaa3604bcbe9</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:50:16</sys_created_on>
                         <sys_id>6407b40b1b85e950b69acaa3604bcbe9</sys_id>
@@ -1770,7 +1770,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>help_text_window</name>
-                        <portal_section display_value="Created 2023-02-20 08:50:16">e007b40b1b85e950b69acaa3604bcbe9</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:50:16">e007b40b1b85e950b69acaa3604bcbe9</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:50:16</sys_created_on>
                         <sys_id>6c07b40b1b85e950b69acaa3604bcbe9</sys_id>
@@ -1781,7 +1781,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>show_header</name>
-                        <portal_section display_value="Created 2023-02-20 08:50:16">e007b40b1b85e950b69acaa3604bcbe9</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:50:16">e007b40b1b85e950b69acaa3604bcbe9</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:50:36</sys_created_on>
                         <sys_id>9117f80b1b85e950b69acaa3604bcb80</sys_id>
@@ -1792,7 +1792,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>subscriber_widget</name>
-                        <portal_section display_value="Created 2023-02-20 08:50:16">e007b40b1b85e950b69acaa3604bcbe9</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:50:16">e007b40b1b85e950b69acaa3604bcbe9</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:50:36</sys_created_on>
                         <sys_id>9117f80b1b85e950b69acaa3604bcb81</sys_id>
@@ -1803,7 +1803,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>title_align</name>
-                        <portal_section display_value="Created 2023-02-20 08:50:16">e007b40b1b85e950b69acaa3604bcbe9</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:50:16">e007b40b1b85e950b69acaa3604bcbe9</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:50:36</sys_created_on>
                         <sys_id>9517f80b1b85e950b69acaa3604bcb80</sys_id>
@@ -1814,7 +1814,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>filter_indicator</name>
-                        <portal_section display_value="Created 2023-02-20 08:50:16">e007b40b1b85e950b69acaa3604bcbe9</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:50:16">e007b40b1b85e950b69acaa3604bcbe9</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:50:36</sys_created_on>
                         <sys_id>9517f80b1b85e950b69acaa3604bcb81</sys_id>
@@ -1825,7 +1825,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>show_border</name>
-                        <portal_section display_value="Created 2023-02-20 08:50:16">e007b40b1b85e950b69acaa3604bcbe9</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:50:16">e007b40b1b85e950b69acaa3604bcbe9</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:50:36</sys_created_on>
                         <sys_id>9917f80b1b85e950b69acaa3604bcb80</sys_id>
@@ -1836,7 +1836,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>real_time</name>
-                        <portal_section display_value="Created 2023-02-20 08:50:16">e007b40b1b85e950b69acaa3604bcbe9</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:50:16">e007b40b1b85e950b69acaa3604bcbe9</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:50:36</sys_created_on>
                         <sys_id>9917f80b1b85e950b69acaa3604bcb81</sys_id>
@@ -1847,7 +1847,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>show_title</name>
-                        <portal_section display_value="Created 2023-02-20 08:50:16">e007b40b1b85e950b69acaa3604bcbe9</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:50:16">e007b40b1b85e950b69acaa3604bcbe9</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:50:36</sys_created_on>
                         <sys_id>9d17f80b1b85e950b69acaa3604bcb7f</sys_id>
@@ -1858,7 +1858,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>publisher_widget</name>
-                        <portal_section display_value="Created 2023-02-20 08:50:16">e007b40b1b85e950b69acaa3604bcbe9</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:50:16">e007b40b1b85e950b69acaa3604bcbe9</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:50:36</sys_created_on>
                         <sys_id>9d17f80b1b85e950b69acaa3604bcb80</sys_id>
@@ -1869,7 +1869,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>is_using_database_view</name>
-                        <portal_section display_value="Created 2023-02-20 08:50:16">e007b40b1b85e950b69acaa3604bcbe9</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:50:16">e007b40b1b85e950b69acaa3604bcbe9</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:50:16</sys_created_on>
                         <sys_id>a407304b1b85e950b69acaa3604bcba2</sys_id>
@@ -1880,7 +1880,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>renderer</name>
-                        <portal_section display_value="Created 2023-02-20 08:50:16">e007b40b1b85e950b69acaa3604bcbe9</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:50:16">e007b40b1b85e950b69acaa3604bcbe9</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:50:16</sys_created_on>
                         <sys_id>a807b40b1b85e950b69acaa3604bcbe9</sys_id>
@@ -1891,7 +1891,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>report_type</name>
-                        <portal_section display_value="Created 2023-02-20 08:50:16">e007b40b1b85e950b69acaa3604bcbe9</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:50:16">e007b40b1b85e950b69acaa3604bcbe9</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:50:16</sys_created_on>
                         <sys_id>ac07304b1b85e950b69acaa3604bcba1</sys_id>
@@ -1902,7 +1902,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>header_color</name>
-                        <portal_section display_value="Created 2023-02-20 08:50:16">e007b40b1b85e950b69acaa3604bcbe9</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:50:16">e007b40b1b85e950b69acaa3604bcbe9</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:50:36</sys_created_on>
                         <sys_id>dd17f80b1b85e950b69acaa3604bcb81</sys_id>
@@ -1913,7 +1913,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>can_subscribe</name>
-                        <portal_section display_value="Created 2023-02-20 08:50:16">e007b40b1b85e950b69acaa3604bcbe9</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:50:16">e007b40b1b85e950b69acaa3604bcbe9</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:50:16</sys_created_on>
                         <sys_id>e007b40b1b85e950b69acaa3604bcbea</sys_id>
@@ -1938,7 +1938,7 @@
                 <related_items_node>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>show_header</name>
-                        <portal_section display_value="Created 2023-02-20 10:45:47">e4711d0f1b09e950b69acaa3604bcb53</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:45:47">e4711d0f1b09e950b69acaa3604bcb53</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:46:22</sys_created_on>
                         <sys_id>0191ddcb1b09e950b69acaa3604bcb6e</sys_id>
@@ -1949,7 +1949,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>subscriber_widget</name>
-                        <portal_section display_value="Created 2023-02-20 10:45:47">e4711d0f1b09e950b69acaa3604bcb53</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:45:47">e4711d0f1b09e950b69acaa3604bcb53</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:46:22</sys_created_on>
                         <sys_id>0191ddcb1b09e950b69acaa3604bcb6f</sys_id>
@@ -1960,7 +1960,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>title_align</name>
-                        <portal_section display_value="Created 2023-02-20 10:45:47">e4711d0f1b09e950b69acaa3604bcb53</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:45:47">e4711d0f1b09e950b69acaa3604bcb53</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:46:22</sys_created_on>
                         <sys_id>0591ddcb1b09e950b69acaa3604bcb6e</sys_id>
@@ -1971,7 +1971,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>filter_indicator</name>
-                        <portal_section display_value="Created 2023-02-20 10:45:47">e4711d0f1b09e950b69acaa3604bcb53</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:45:47">e4711d0f1b09e950b69acaa3604bcb53</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:46:22</sys_created_on>
                         <sys_id>0591ddcb1b09e950b69acaa3604bcb6f</sys_id>
@@ -1982,7 +1982,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>show_border</name>
-                        <portal_section display_value="Created 2023-02-20 10:45:47">e4711d0f1b09e950b69acaa3604bcb53</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:45:47">e4711d0f1b09e950b69acaa3604bcb53</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:46:22</sys_created_on>
                         <sys_id>0991ddcb1b09e950b69acaa3604bcb6e</sys_id>
@@ -1993,7 +1993,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>real_time</name>
-                        <portal_section display_value="Created 2023-02-20 10:45:47">e4711d0f1b09e950b69acaa3604bcb53</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:45:47">e4711d0f1b09e950b69acaa3604bcb53</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:46:22</sys_created_on>
                         <sys_id>0991ddcb1b09e950b69acaa3604bcb6f</sys_id>
@@ -2004,7 +2004,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>show_title</name>
-                        <portal_section display_value="Created 2023-02-20 10:45:47">e4711d0f1b09e950b69acaa3604bcb53</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:45:47">e4711d0f1b09e950b69acaa3604bcb53</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:46:22</sys_created_on>
                         <sys_id>0d91ddcb1b09e950b69acaa3604bcb6d</sys_id>
@@ -2015,7 +2015,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>publisher_widget</name>
-                        <portal_section display_value="Created 2023-02-20 10:45:47">e4711d0f1b09e950b69acaa3604bcb53</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:45:47">e4711d0f1b09e950b69acaa3604bcb53</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:46:22</sys_created_on>
                         <sys_id>0d91ddcb1b09e950b69acaa3604bcb6e</sys_id>
@@ -2026,7 +2026,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>report_type</name>
-                        <portal_section display_value="Created 2023-02-20 10:45:47">e4711d0f1b09e950b69acaa3604bcb53</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:45:47">e4711d0f1b09e950b69acaa3604bcb53</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:45:47</sys_created_on>
                         <sys_id>20711d0f1b09e950b69acaa3604bcb55</sys_id>
@@ -2037,7 +2037,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>header_color</name>
-                        <portal_section display_value="Created 2023-02-20 10:45:47">e4711d0f1b09e950b69acaa3604bcb53</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:45:47">e4711d0f1b09e950b69acaa3604bcb53</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:46:22</sys_created_on>
                         <sys_id>4d91ddcb1b09e950b69acaa3604bcb6f</sys_id>
@@ -2048,7 +2048,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>sys_id</name>
-                        <portal_section display_value="Created 2023-02-20 10:45:47">e4711d0f1b09e950b69acaa3604bcb53</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:45:47">e4711d0f1b09e950b69acaa3604bcb53</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:45:47</sys_created_on>
                         <sys_id>6c711d0f1b09e950b69acaa3604bcb53</sys_id>
@@ -2059,7 +2059,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>can_subscribe</name>
-                        <portal_section display_value="Created 2023-02-20 10:45:47">e4711d0f1b09e950b69acaa3604bcb53</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:45:47">e4711d0f1b09e950b69acaa3604bcb53</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:45:47</sys_created_on>
                         <sys_id>6c711d0f1b09e950b69acaa3604bcb54</sys_id>
@@ -2070,7 +2070,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>help_text_window</name>
-                        <portal_section display_value="Created 2023-02-20 10:45:47">e4711d0f1b09e950b69acaa3604bcb53</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:45:47">e4711d0f1b09e950b69acaa3604bcb53</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:45:47</sys_created_on>
                         <sys_id>a8711d0f1b09e950b69acaa3604bcb54</sys_id>
@@ -2081,7 +2081,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>title</name>
-                        <portal_section display_value="Created 2023-02-20 10:45:47">e4711d0f1b09e950b69acaa3604bcb53</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:45:47">e4711d0f1b09e950b69acaa3604bcb53</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:45:47</sys_created_on>
                         <sys_id>e0711d0f1b09e950b69acaa3604bcb55</sys_id>
@@ -2092,7 +2092,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>renderer</name>
-                        <portal_section display_value="Created 2023-02-20 10:45:47">e4711d0f1b09e950b69acaa3604bcb53</portal_section>
+                        <portal_section display_value="Created 2023-02-20 13:45:47">e4711d0f1b09e950b69acaa3604bcb53</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 18:45:47</sys_created_on>
                         <sys_id>e4711d0f1b09e950b69acaa3604bcb54</sys_id>
@@ -2117,7 +2117,7 @@
                 <related_items_node>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>can_subscribe</name>
-                        <portal_section display_value="Created 2023-02-20 08:48:17">ef8638c71b85e950b69acaa3604bcb56</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:48:17">ef8638c71b85e950b69acaa3604bcb56</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:48:17</sys_created_on>
                         <sys_id>2786700b1b85e950b69acaa3604bcbde</sys_id>
@@ -2128,7 +2128,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>show_header</name>
-                        <portal_section display_value="Created 2023-02-20 08:48:17">ef8638c71b85e950b69acaa3604bcb56</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:48:17">ef8638c71b85e950b69acaa3604bcb56</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:48:40</sys_created_on>
                         <sys_id>41a6fcc71b85e950b69acaa3604bcb29</sys_id>
@@ -2139,7 +2139,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>subscriber_widget</name>
-                        <portal_section display_value="Created 2023-02-20 08:48:17">ef8638c71b85e950b69acaa3604bcb56</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:48:17">ef8638c71b85e950b69acaa3604bcb56</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:48:41</sys_created_on>
                         <sys_id>41a6fcc71b85e950b69acaa3604bcb2a</sys_id>
@@ -2150,7 +2150,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>title_align</name>
-                        <portal_section display_value="Created 2023-02-20 08:48:17">ef8638c71b85e950b69acaa3604bcb56</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:48:17">ef8638c71b85e950b69acaa3604bcb56</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:48:40</sys_created_on>
                         <sys_id>45a6fcc71b85e950b69acaa3604bcb29</sys_id>
@@ -2161,7 +2161,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>filter_indicator</name>
-                        <portal_section display_value="Created 2023-02-20 08:48:17">ef8638c71b85e950b69acaa3604bcb56</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:48:17">ef8638c71b85e950b69acaa3604bcb56</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:48:41</sys_created_on>
                         <sys_id>45a6fcc71b85e950b69acaa3604bcb2a</sys_id>
@@ -2172,7 +2172,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>show_border</name>
-                        <portal_section display_value="Created 2023-02-20 08:48:17">ef8638c71b85e950b69acaa3604bcb56</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:48:17">ef8638c71b85e950b69acaa3604bcb56</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:48:40</sys_created_on>
                         <sys_id>49a6fcc71b85e950b69acaa3604bcb29</sys_id>
@@ -2183,7 +2183,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>real_time</name>
-                        <portal_section display_value="Created 2023-02-20 08:48:17">ef8638c71b85e950b69acaa3604bcb56</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:48:17">ef8638c71b85e950b69acaa3604bcb56</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:48:41</sys_created_on>
                         <sys_id>49a6fcc71b85e950b69acaa3604bcb2a</sys_id>
@@ -2194,7 +2194,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>show_title</name>
-                        <portal_section display_value="Created 2023-02-20 08:48:17">ef8638c71b85e950b69acaa3604bcb56</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:48:17">ef8638c71b85e950b69acaa3604bcb56</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:48:40</sys_created_on>
                         <sys_id>4da6fcc71b85e950b69acaa3604bcb28</sys_id>
@@ -2205,7 +2205,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>publisher_widget</name>
-                        <portal_section display_value="Created 2023-02-20 08:48:17">ef8638c71b85e950b69acaa3604bcb56</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:48:17">ef8638c71b85e950b69acaa3604bcb56</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:48:40</sys_created_on>
                         <sys_id>4da6fcc71b85e950b69acaa3604bcb29</sys_id>
@@ -2216,7 +2216,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>sys_id</name>
-                        <portal_section display_value="Created 2023-02-20 08:48:17">ef8638c71b85e950b69acaa3604bcb56</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:48:17">ef8638c71b85e950b69acaa3604bcb56</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:48:17</sys_created_on>
                         <sys_id>6386700b1b85e950b69acaa3604bcbdd</sys_id>
@@ -2227,7 +2227,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>can_real_time</name>
-                        <portal_section display_value="Created 2023-02-20 08:48:17">ef8638c71b85e950b69acaa3604bcb56</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:48:17">ef8638c71b85e950b69acaa3604bcb56</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:48:17</sys_created_on>
                         <sys_id>6386700b1b85e950b69acaa3604bcbde</sys_id>
@@ -2238,7 +2238,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>header_color</name>
-                        <portal_section display_value="Created 2023-02-20 08:48:17">ef8638c71b85e950b69acaa3604bcb56</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:48:17">ef8638c71b85e950b69acaa3604bcb56</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:48:41</sys_created_on>
                         <sys_id>8da6fcc71b85e950b69acaa3604bcb2a</sys_id>
@@ -2249,7 +2249,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>is_using_database_view</name>
-                        <portal_section display_value="Created 2023-02-20 08:48:17">ef8638c71b85e950b69acaa3604bcb56</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:48:17">ef8638c71b85e950b69acaa3604bcb56</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:48:17</sys_created_on>
                         <sys_id>a786700b1b85e950b69acaa3604bcbdf</sys_id>
@@ -2260,7 +2260,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>title</name>
-                        <portal_section display_value="Created 2023-02-20 08:48:17">ef8638c71b85e950b69acaa3604bcb56</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:48:17">ef8638c71b85e950b69acaa3604bcb56</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:48:17</sys_created_on>
                         <sys_id>ab86700b1b85e950b69acaa3604bcbde</sys_id>
@@ -2271,7 +2271,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>help_text_window</name>
-                        <portal_section display_value="Created 2023-02-20 08:48:17">ef8638c71b85e950b69acaa3604bcb56</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:48:17">ef8638c71b85e950b69acaa3604bcb56</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:48:17</sys_created_on>
                         <sys_id>af86700b1b85e950b69acaa3604bcbdd</sys_id>
@@ -2282,7 +2282,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>report_type</name>
-                        <portal_section display_value="Created 2023-02-20 08:48:17">ef8638c71b85e950b69acaa3604bcb56</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:48:17">ef8638c71b85e950b69acaa3604bcb56</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:48:17</sys_created_on>
                         <sys_id>e786700b1b85e950b69acaa3604bcbde</sys_id>
@@ -2293,7 +2293,7 @@
                     </sys_portal_preferences>
                     <sys_portal_preferences action="INSERT_OR_UPDATE">
                         <name>renderer</name>
-                        <portal_section display_value="Created 2023-02-20 08:48:17">ef8638c71b85e950b69acaa3604bcb56</portal_section>
+                        <portal_section display_value="Created 2023-02-20 11:48:17">ef8638c71b85e950b69acaa3604bcb56</portal_section>
                         <sys_created_by>SMC.Specialists2</sys_created_by>
                         <sys_created_on>2023-02-20 16:48:17</sys_created_on>
                         <sys_id>eb86700b1b85e950b69acaa3604bcbdd</sys_id>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sc_cat_item_category">
+    <sc_cat_item_category action="DELETE">
+        <sc_cat_item display_value="Apple iPad 3">060f3afa3731300054b6a3549dbe5d3e</sc_cat_item>
+        <sc_category display_value="AWS Service Catalog">e7ec31440f1103004dae09bce1050eae</sc_category>
+        <sys_class_name>sc_cat_item_category</sys_class_name>
+        <sys_created_by>nmaharjan</sys_created_by>
+        <sys_created_on>2023-09-22 11:52:07</sys_created_on>
+        <sys_id>7bf635f72fdd311061e12aa62799b672</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AWS Service Catalog.Apple iPad 3</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sc_cat_item_category_7bf635f72fdd311061e12aa62799b672</sys_update_name>
+        <sys_updated_by>nmaharjan</sys_updated_by>
+        <sys_updated_on>2023-09-22 11:52:07</sys_updated_on>
+    </sc_cat_item_category>
+    <sys_update_version action="INSERT_OR_UPDATE">
+        <action>DELETE</action>
+        <application display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</application>
+        <file_path/>
+        <instance_id>1db582b8db7e80182f68c59705961921</instance_id>
+        <instance_name>dev99158</instance_name>
+        <name>sc_cat_item_category_7bf635f72fdd311061e12aa62799b672</name>
+        <payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update table="sc_cat_item_category"><sc_cat_item_category action="INSERT_OR_UPDATE"><sc_cat_item display_value="Apple iPad 3">060f3afa3731300054b6a3549dbe5d3e</sc_cat_item><sc_category display_value="AWS Service Catalog">e7ec31440f1103004dae09bce1050eae</sc_category><sys_class_name>sc_cat_item_category</sys_class_name><sys_created_by>nmaharjan</sys_created_by><sys_created_on>2023-09-22 11:52:07</sys_created_on><sys_id>7bf635f72fdd311061e12aa62799b672</sys_id><sys_mod_count>0</sys_mod_count><sys_name>AWS Service Catalog.Apple iPad 3</sys_name><sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package><sys_policy/><sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope><sys_update_name>sc_cat_item_category_7bf635f72fdd311061e12aa62799b672</sys_update_name><sys_updated_by>nmaharjan</sys_updated_by><sys_updated_on>2023-09-22 11:52:07</sys_updated_on></sc_cat_item_category></record_update>]]></payload>
+        <payload_hash>-1618987570</payload_hash>
+        <record_name>AWS Service Catalog.Apple iPad 3</record_name>
+        <reverted_from/>
+        <source>bbf350332f59311061e12aa62799b6c3</source>
+        <source_table>sys_update_set</source_table>
+        <state>previous</state>
+        <sys_created_by>nmaharjan</sys_created_by>
+        <sys_created_on>2023-09-22 11:52:07</sys_created_on>
+        <sys_id>7ff635f72fdd311061e12aa62799b676</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_recorded_at>18abcbba1810000001</sys_recorded_at>
+        <sys_updated_by>nmaharjan</sys_updated_by>
+        <sys_updated_on>2023-09-22 11:52:07</sys_updated_on>
+        <type>Catalog Item Category</type>
+        <update_guid>77f635f73edd311076a4099d09b77676</update_guid>
+        <update_guid_history>77f635f73edd311076a4099d09b77676:-1618987570</update_guid_history>
+    </sys_update_version>
+    <sys_metadata_delete action="INSERT_OR_UPDATE">
+        <sys_audit_delete display_value="AWS Service Catalog.Apple iPad 3">2d6739f72fdd311061e12aa62799b6f2</sys_audit_delete>
+        <sys_class_name>sys_metadata_delete</sys_class_name>
+        <sys_created_by>nmaharjan</sys_created_by>
+        <sys_created_on>2023-09-22 11:53:53</sys_created_on>
+        <sys_db_object display_value="" name="sc_cat_item_category">sc_cat_item_category</sys_db_object>
+        <sys_id>6e5dcb2da7f5486095c77c644af69b10</sys_id>
+        <sys_metadata>7bf635f72fdd311061e12aa62799b672</sys_metadata>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AWS Service Catalog.Apple iPad 3</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_parent/>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_scope_delete display_value="">0d806ad583bf47b8831fd84f1ec17f41</sys_scope_delete>
+        <sys_update_name>sc_cat_item_category_7bf635f72fdd311061e12aa62799b672</sys_update_name>
+        <sys_update_version display_value="sc_cat_item_category_7bf635f72fdd311061e12aa62799b672">7ff635f72fdd311061e12aa62799b676</sys_update_version>
+        <sys_updated_by>nmaharjan</sys_updated_by>
+        <sys_updated_on>2023-09-22 11:53:53</sys_updated_on>
+    </sys_metadata_delete>
+</record_update>

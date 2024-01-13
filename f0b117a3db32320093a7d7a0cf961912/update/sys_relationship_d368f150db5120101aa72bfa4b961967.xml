@@ -42,9 +42,9 @@
     <sys_translated_text action="delete_multiple" query="documentkey=d368f150db5120101aa72bfa4b961967"/>
     <sys_ui_related_list_relationship_entry action="INSERT_OR_UPDATE">
         <filter/>
-        <list_id display_value="Incident - Default view" name="incident" related_list="NULL" sys_domain="global" view="Default view">97be62a10f130000b12e6903cfe01258</list_id>
+        <list_id display_value="Incident - Default view" name="incident" related_list="NULL" sys_domain="global" view="Default view">b88be7db53453010ae50ddeeff7b12fe</list_id>
         <order_by/>
-        <position>3</position>
+        <position>9</position>
         <related_list>REL:d368f150db5120101aa72bfa4b961967</related_list>
         <sys_class_name>sys_ui_related_list_relationship_entry</sys_class_name>
         <sys_created_by>admin</sys_created_by>
@@ -52,7 +52,7 @@
         <sys_id>362ce2da2f92201047d8b6a62799b633</sys_id>
         <sys_mod_count>0</sys_mod_count>
         <sys_relationship display_value="AWS Related Resources">d368f150db5120101aa72bfa4b961967</sys_relationship>
-        <sys_ui_related_list display_value="Incident - Default view" name="incident" related_list="NULL" sys_domain="global" view="Default view">97be62a10f130000b12e6903cfe01258</sys_ui_related_list>
+        <sys_ui_related_list display_value="Incident - Default view" name="incident" related_list="NULL" sys_domain="global" view="Default view">b88be7db53453010ae50ddeeff7b12fe</sys_ui_related_list>
         <sys_updated_by>admin</sys_updated_by>
         <sys_updated_on>2021-02-15 12:00:35</sys_updated_on>
     </sys_ui_related_list_relationship_entry>

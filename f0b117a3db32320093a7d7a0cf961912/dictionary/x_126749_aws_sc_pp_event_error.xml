@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="3ab5b8134f069300a7661b818110c75b" label="Provisioned Product Event Error" max_length="40" name="x_126749_aws_sc_pp_event_error" type="collection">
+        <element label="Code" max_length="40" name="awscode" read_only="true" type="string"/>
+        <element display="true" label="Description" max_length="500" name="awsdescription" read_only="true" type="string"/>
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false" label="Provisioned Product Event" mandatory="true" max_length="32" name="awsppevent" read_only="true" reference="x_126749_aws_sc_pp_event" type="reference"/>
+        <index name="index">
+            <element name="awsppevent"/>
+        </index>
+    </element>
+</database>

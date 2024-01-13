@@ -2,7 +2,7 @@
     <sys_ui_related sys_domain="global" table="x_126749_aws_sc_health_event" version="2" view="workspace">
         <sys_ui_related_list_entry action="INSERT_OR_UPDATE">
             <filter/>
-            <list_id display_value="Health event - Workspace" name="x_126749_aws_sc_health_event" related_list="NULL" sys_domain="global" view="a243a1c8dbd110101350ae441b96190e">b90c632f97664110bf93f3ffe153afb8</list_id>
+            <list_id display_value="Health event - Workspace" name="x_126749_aws_sc_health_event" related_list="NULL" sys_domain="global" view="b46160b2d4a3211095d7c105f1bf43c2">b90c632f97664110bf93f3ffe153afb8</list_id>
             <order_by/>
             <position>0</position>
             <related_list>x_126749_aws_sc_health_resource.awshealthevent</related_list>
@@ -36,7 +36,7 @@
             <sys_updated_by>admin</sys_updated_by>
             <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
             <sys_user/>
-            <view display_value="Workspace" name="workspace">a243a1c8dbd110101350ae441b96190e</view>
+            <view display_value="Workspace" name="workspace">b46160b2d4a3211095d7c105f1bf43c2</view>
             <view_name/>
         </sys_ui_related_list>
     </sys_ui_related>

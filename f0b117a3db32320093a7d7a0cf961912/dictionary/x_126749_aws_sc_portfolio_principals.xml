@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="504ff1284f610300c5883b728110c72f" label="Portfolio Principals" max_length="40" name="x_126749_aws_sc_portfolio_principals" type="collection">
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false" display="true" label="Identity" max_length="32" name="awsidentity" reference="x_126749_aws_sc_aws_identity" reference_cascade_rule="cascade" type="reference"/>
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false" label="Portfolio" max_length="32" name="awsportfolio" reference="x_126749_aws_sc_portfolio" reference_cascade_rule="cascade" type="reference"/>
+        <index name="index">
+            <element name="awsidentity"/>
+        </index>
+        <index name="index2">
+            <element name="awsportfolio"/>
+        </index>
+    </element>
+</database>

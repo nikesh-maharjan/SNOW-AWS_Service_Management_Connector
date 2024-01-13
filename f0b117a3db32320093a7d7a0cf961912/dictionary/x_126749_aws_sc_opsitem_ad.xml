@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="2f888e14db91201079bd2fb748961934" label="OpsItem Automation Document" max_length="40" name="x_126749_aws_sc_opsitem_ad" type="collection">
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false" label="OpsItem" max_length="32" name="awsopsitem" read_only="true" reference="x_126749_aws_sc_opsitem" type="reference"/>
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false" label="Name" max_length="128" name="awsrunbook" read_only="true" type="string"/>
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false" label="Configuration Item" max_length="32" name="configuration_item" read_only="true" reference="x_126749_aws_sc_document" type="reference"/>
+        <index name="index">
+            <element name="awsopsitem"/>
+        </index>
+        <index name="index2">
+            <element name="configuration_item"/>
+        </index>
+    </element>
+</database>

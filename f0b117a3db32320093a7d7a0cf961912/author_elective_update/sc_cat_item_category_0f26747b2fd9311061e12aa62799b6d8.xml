@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sc_cat_item_category">
+    <sc_cat_item_category action="DELETE">
+        <sc_cat_item display_value="test">1bd5743b2fd9311061e12aa62799b63a</sc_cat_item>
+        <sc_category display_value="SMC Example Portfolio">b04898372f59311061e12aa62799b6b6</sc_category>
+        <sys_class_name>sc_cat_item_category</sys_class_name>
+        <sys_created_by>nmaharjan</sys_created_by>
+        <sys_created_on>2023-09-22 07:08:54</sys_created_on>
+        <sys_id>0f26747b2fd9311061e12aa62799b6d8</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>SMC Example Portfolio.test</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sc_cat_item_category_0f26747b2fd9311061e12aa62799b6d8</sys_update_name>
+        <sys_updated_by>nmaharjan</sys_updated_by>
+        <sys_updated_on>2023-09-22 07:08:54</sys_updated_on>
+    </sc_cat_item_category>
+    <sys_update_version action="INSERT_OR_UPDATE">
+        <action>DELETE</action>
+        <application display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</application>
+        <file_path/>
+        <instance_id>1db582b8db7e80182f68c59705961921</instance_id>
+        <instance_name>dev99158</instance_name>
+        <name>sc_cat_item_category_0f26747b2fd9311061e12aa62799b6d8</name>
+        <payload><![CDATA[<?xml version="1.0" encoding="UTF-8"?><record_update table="sc_cat_item_category"><sc_cat_item_category action="INSERT_OR_UPDATE"><sc_cat_item display_value="test">1bd5743b2fd9311061e12aa62799b63a</sc_cat_item><sc_category display_value="SMC Example Portfolio">b04898372f59311061e12aa62799b6b6</sc_category><sys_class_name>sc_cat_item_category</sys_class_name><sys_created_by>nmaharjan</sys_created_by><sys_created_on>2023-09-22 07:08:54</sys_created_on><sys_id>0f26747b2fd9311061e12aa62799b6d8</sys_id><sys_mod_count>0</sys_mod_count><sys_name>SMC Example Portfolio.test</sys_name><sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package><sys_policy/><sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope><sys_update_name>sc_cat_item_category_0f26747b2fd9311061e12aa62799b6d8</sys_update_name><sys_updated_by>nmaharjan</sys_updated_by><sys_updated_on>2023-09-22 07:08:54</sys_updated_on></sc_cat_item_category></record_update>]]></payload>
+        <payload_hash>-452469580</payload_hash>
+        <record_name>SMC Example Portfolio.test</record_name>
+        <reverted_from/>
+        <source>bbf350332f59311061e12aa62799b6c3</source>
+        <source_table>sys_update_set</source_table>
+        <state>previous</state>
+        <sys_created_by>nmaharjan</sys_created_by>
+        <sys_created_on>2023-09-22 07:08:54</sys_created_on>
+        <sys_id>cb26787b2fd9311061e12aa62799b642</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_recorded_at>18abbb854b80000001</sys_recorded_at>
+        <sys_updated_by>nmaharjan</sys_updated_by>
+        <sys_updated_on>2023-09-22 07:08:54</sys_updated_on>
+        <type>Catalog Item Category</type>
+        <update_guid>0726787b42d93110d75234c276151542</update_guid>
+        <update_guid_history>0726787b42d93110d75234c276151542:-452469580</update_guid_history>
+    </sys_update_version>
+    <sys_metadata_delete action="INSERT_OR_UPDATE">
+        <sys_audit_delete display_value="SMC Example Portfolio.test">95cbfcbf2fd9311061e12aa62799b66a</sys_audit_delete>
+        <sys_class_name>sys_metadata_delete</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2023-09-22 07:33:21</sys_created_on>
+        <sys_db_object display_value="" name="sc_cat_item_category">sc_cat_item_category</sys_db_object>
+        <sys_id>7bc10a5df8a342c29c5e211d9f9d3951</sys_id>
+        <sys_metadata>0f26747b2fd9311061e12aa62799b6d8</sys_metadata>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>SMC Example Portfolio.test</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_parent/>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_scope_delete display_value="">0d806ad583bf47b8831fd84f1ec17f41</sys_scope_delete>
+        <sys_update_name>sc_cat_item_category_0f26747b2fd9311061e12aa62799b6d8</sys_update_name>
+        <sys_update_version display_value="sc_cat_item_category_0f26747b2fd9311061e12aa62799b6d8">cb26787b2fd9311061e12aa62799b642</sys_update_version>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2023-09-22 07:33:21</sys_updated_on>
+    </sys_metadata_delete>
+</record_update>

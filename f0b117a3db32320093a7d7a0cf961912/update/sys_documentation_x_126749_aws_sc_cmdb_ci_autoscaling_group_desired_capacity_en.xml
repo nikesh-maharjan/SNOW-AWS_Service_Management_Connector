@@ -11,7 +11,6 @@
             <sys_class_name>sys_documentation</sys_class_name>
             <sys_created_by>admin</sys_created_by>
             <sys_created_on>2020-05-14 11:20:49</sys_created_on>
-            <sys_id>27a2c45d2ff450102fd759372799b6be</sys_id>
             <sys_mod_count>0</sys_mod_count>
             <sys_name>Desired Capacity</sys_name>
             <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>

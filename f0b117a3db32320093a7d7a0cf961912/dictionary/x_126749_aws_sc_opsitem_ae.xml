@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="2f2041b2db4d20101aa72bfa4b961967" label="OpsItem Automation Execution" max_length="40" name="x_126749_aws_sc_opsitem_ae" type="collection">
+        <element label="Association Id" max_length="40" name="awsassociationid" read_only="true" reference="alm_asset" type="string"/>
+        <element label="Automation Execution Id" max_length="36" name="awsautomationexecutionid" read_only="true" type="string"/>
+        <element label="Automation Execution Status" max_length="40" name="awsautomationexecutionstatus" read_only="true" type="string"/>
+        <element label="Automation Subtype" max_length="40" name="awsautomationsubtype" read_only="true" type="string"/>
+        <element label="Change Request Name" max_length="1024" name="awschangerequestname" read_only="true" type="string"/>
+        <element label="Current Action" max_length="40" name="awscurrentaction" read_only="true" type="string"/>
+        <element label="Current Step Name" max_length="40" name="awscurrentstepname" read_only="true" type="string"/>
+        <element label="Document Name" max_length="128" name="awsdocumentname" read_only="true" type="string"/>
+        <element label="Document Version" max_length="10" name="awsdocumentversion" read_only="true" type="string"/>
+        <element label="Executed By" max_length="2048" name="awsexecutedby" read_only="true" type="string"/>
+        <element label="Execution End Time" max_length="40" name="awsexecutionendtime" read_only="true" type="glide_date_time"/>
+        <element label="Execution Start Time" max_length="40" name="awsexecutionstarttime" read_only="true" type="glide_date_time"/>
+        <element label="Failure Message" max_length="1024" name="awsfailuremessage" read_only="true" type="string"/>
+        <element label="Max Concurrency" max_length="7" name="awsmaxconcurrency" read_only="true" type="string"/>
+        <element label="Max Errors" max_length="7" name="awsmaxerrors" read_only="true" type="string"/>
+        <element label="Mode" max_length="11" name="awsmode" read_only="true" type="string"/>
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false" label="OpsItem" max_length="32" name="awsopsitem" read_only="true" reference="x_126749_aws_sc_opsitem" type="reference"/>
+        <element label="ParentAutomationExecutionId" max_length="36" name="awsparentautomationexecutionid" read_only="true" type="string"/>
+        <element attributes="edge_encryption_enabled=true" label="Progress Counter Cancelled Steps" max_length="40" name="awsprogresscountercancelledsteps" read_only="true" type="integer"/>
+        <element attributes="edge_encryption_enabled=true" label="Progress Counter Failed Steps" max_length="40" name="awsprogresscounterfailedsteps" read_only="true" type="integer"/>
+        <element attributes="edge_encryption_enabled=true" label="Progress Counter Success Steps" max_length="40" name="awsprogresscountersuccesssteps" read_only="true" type="integer"/>
+        <element attributes="edge_encryption_enabled=true" label="Progress Counter Timed Out Steps" max_length="40" name="awsprogresscountertimedoutsteps" read_only="true" type="integer"/>
+        <element attributes="edge_encryption_enabled=true" label="Progress Counter Total Steps" max_length="40" name="awsprogresscountertotalsteps" read_only="true" type="integer"/>
+        <element label="Scheduled Time" max_length="40" name="awsscheduledtime" read_only="true" type="glide_date_time"/>
+        <element label="Target" max_length="40" name="awstarget" read_only="true" type="string"/>
+        <element label="Target Parameter Name" max_length="50" name="awstargetparametername" read_only="true" type="string"/>
+        <index name="index">
+            <element name="awsopsitem"/>
+        </index>
+    </element>
+</database>

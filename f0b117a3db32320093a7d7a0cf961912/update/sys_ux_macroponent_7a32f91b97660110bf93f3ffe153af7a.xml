@@ -336,7 +336,6 @@
 } ]</data>
         <description/>
         <dispatched_events/>
-        <events/>
         <ext_controller_dep/>
         <extends display_value="Page Template">19be392623033300f4b4c50947bf65ba</extends>
         <handled_events/>
@@ -399,4 +398,5 @@
         <sys_updated_by>admin</sys_updated_by>
         <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
     </sys_ux_macroponent>
+    <sys_translated_text action="delete_multiple" query="documentkey=7a32f91b97660110bf93f3ffe153af7a"/>
 </record_update>

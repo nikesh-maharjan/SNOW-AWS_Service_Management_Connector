@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="4c1e4c042ff4d01047d8b6a62799b6dc" extends="cmdb_ci" label="Automation Execution" max_length="40" name="x_126749_aws_sc_cmdb_ci_ae" type="collection">
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false" label="Account" max_length="32" name="awsaccount" reference="x_126749_aws_sc_account" type="reference"/>
+        <element label="Automation Execution ID" max_length="36" name="awsautomationexecutionid" read_only="true" type="string"/>
+        <element attributes="edge_encryption_enabled=true" choice="1" label="Automation Execution Status" max_length="40" name="awsautomationexecutionstatus" read_only="true" type="choice">
+            <choice>
+                <element inactive_on_update="false" label="Approved" value="Approved"/>
+                <element inactive_on_update="false" label="Cancelled" value="Cancelled"/>
+                <element inactive_on_update="false" label="Cancelling" value="Cancelling"/>
+                <element inactive_on_update="false" label="Change Calendar Override Approved" value="ChangeCalendarOverrideApproved"/>
+                <element inactive_on_update="false" label="Change Calendar Override Rejected" value="ChangeCalendarOverrideRejected"/>
+                <element inactive_on_update="false" label="Completed With Failure" value="CompletedWithFailure"/>
+                <element inactive_on_update="false" label="Completed With Success" value="CompletedWithSuccess"/>
+                <element inactive_on_update="false" label="Failed" value="Failed"/>
+                <element inactive_on_update="false" label="In Progress" value="InProgress"/>
+                <element inactive_on_update="false" label="Pending" value="Pending"/>
+                <element inactive_on_update="false" label="Pending Approval" value="PendingApproval"/>
+                <element inactive_on_update="false" label="Pending Change Calendar Override" value="PendingChangeCalendarOverride"/>
+                <element inactive_on_update="false" label="Rejected" value="Rejected"/>
+                <element inactive_on_update="false" label="Runbook In Progress" value="RunbookInProgress"/>
+                <element inactive_on_update="false" label="Scheduled" value="Scheduled"/>
+                <element inactive_on_update="false" label="Success" value="Success"/>
+                <element inactive_on_update="false" label="TimedOut" value="TimedOut"/>
+                <element inactive_on_update="false" label="Waiting" value="Waiting"/>
+            </choice>
+        </element>
+        <element attributes="edge_encryption_enabled=true" choice="1" label="Automation Type" max_length="40" name="awsautomationtype" read_only="true" type="choice">
+            <choice>
+                <element inactive_on_update="false" label="CrossAccount" value="CrossAccount"/>
+                <element inactive_on_update="false" label="Local" value="Local"/>
+            </choice>
+        </element>
+        <element label="Current Action" max_length="40" name="awscurrentaction" read_only="true" type="string"/>
+        <element label="Current Step Name" max_length="40" name="awscurrentstepname" read_only="true" type="string"/>
+        <element label="Document Name" max_length="128" name="awsdocumentname" read_only="true" type="string"/>
+        <element label="Document Version" max_length="40" name="awsdocumentversion" read_only="true" type="string"/>
+        <element label="Executed By" max_length="40" name="awsexecutedby" read_only="true" type="string"/>
+        <element label="Execution End Time" max_length="40" name="awsexecutionendtime" read_only="true" type="glide_date_time"/>
+        <element label="Execution Start Time" max_length="40" name="awsexecutionstarttime" read_only="true" type="glide_date_time"/>
+        <element label="Failure Message" max_length="2048" name="awsfailuremessage" read_only="true" type="string"/>
+        <element label="Sync Time" max_length="40" name="awslastsynctime" read_only="true" type="glide_date_time"/>
+        <element label="Log File" max_length="40" name="awslogfile" read_only="true" type="string"/>
+        <element attributes="edge_encryption_enabled=true" choice="1" label="Mode" max_length="40" name="awsmode" read_only="true" type="choice">
+            <choice>
+                <element inactive_on_update="false" label="Auto" value="Auto"/>
+                <element inactive_on_update="false" label="Interactive" value="Interactive"/>
+            </choice>
+        </element>
+        <element label="Parent Automation Execution ID" max_length="36" name="awsparentautomationexecutionid" read_only="true" type="string"/>
+        <element label="Region" max_length="40" name="awsregion" read_only="true" type="string"/>
+        <element label="Sync Message" max_length="2048" name="awsstatusmessage" read_only="true" type="string"/>
+        <element attributes="edge_encryption_enabled=true" choice="1" label="Sync Status" max_length="40" name="awssyncstatus" read_only="true" type="choice">
+            <choice>
+                <element inactive_on_update="false" label="AUTH_FAILURE" value="3"/>
+                <element inactive_on_update="false" label="ERROR" value="2"/>
+                <element inactive_on_update="false" label="OK" value="1"/>
+            </choice>
+        </element>
+        <element label="Target" max_length="40" name="awstarget" read_only="true" type="string"/>
+    </element>
+</database>

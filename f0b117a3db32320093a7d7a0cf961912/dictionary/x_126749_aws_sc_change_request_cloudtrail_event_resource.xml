@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="a5be67e62f4f0110a082e83df699b663" label="CloudTrail Event Resource" max_length="40" name="x_126749_aws_sc_change_request_cloudtrail_event_resource" type="collection">
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false" label="CloudTrail Event" max_length="32" name="awscloudtrailevent" read_only="true" reference="x_126749_aws_sc_change_request_cloudtrail_event" type="reference"/>
+        <element label="Resource Name" max_length="40" name="awsresourcename" read_only="true" type="string"/>
+        <element label="Resource Type" max_length="40" name="awsresourcetype" read_only="true" type="string"/>
+        <index name="index">
+            <element name="awscloudtrailevent"/>
+        </index>
+    </element>
+</database>

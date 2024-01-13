@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="74c7f9c4db675010c281e4da4b961958" label="Finding Type" max_length="40" name="x_126749_aws_sc_finding_type" type="collection">
+        <element attributes="can_group=true" label="Description" max_length="1024" name="awsdescription" read_only="true" type="string"/>
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false" label="Finding" max_length="32" name="finding" read_only="true" reference="x_126749_aws_sc_finding" type="reference"/>
+        <index name="index">
+            <element name="finding"/>
+        </index>
+    </element>
+</database>

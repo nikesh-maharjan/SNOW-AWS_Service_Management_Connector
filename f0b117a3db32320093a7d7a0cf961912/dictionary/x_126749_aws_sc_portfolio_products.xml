@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="bdb85b05db010300959afe1ebf96193c" label="Portfolio Products" max_length="40" name="x_126749_aws_sc_portfolio_products" type="collection">
+        <element label="Last Sync Time" max_length="40" name="awslastsynctime" type="glide_date_time"/>
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false" label="Portfolio" max_length="32" name="awsportfolio" reference="x_126749_aws_sc_portfolio" reference_cascade_rule="cascade" type="reference"/>
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false" display="true" label="Product" max_length="32" name="awsproduct" reference="x_126749_aws_sc_product" reference_cascade_rule="cascade" type="reference"/>
+        <index name="index">
+            <element name="awsportfolio"/>
+        </index>
+        <index name="index2">
+            <element name="awsproduct"/>
+        </index>
+    </element>
+</database>

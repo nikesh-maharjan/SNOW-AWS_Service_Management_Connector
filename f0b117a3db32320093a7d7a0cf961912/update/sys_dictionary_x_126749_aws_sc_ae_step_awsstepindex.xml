@@ -52,7 +52,6 @@
         <sys_class_name>sys_dictionary</sys_class_name>
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2020-05-10 16:42:06</sys_created_on>
-        <sys_id>7b3794181b301010c059877ddc4bcbc7</sys_id>
         <sys_name>Step #</sys_name>
         <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
         <sys_policy/>

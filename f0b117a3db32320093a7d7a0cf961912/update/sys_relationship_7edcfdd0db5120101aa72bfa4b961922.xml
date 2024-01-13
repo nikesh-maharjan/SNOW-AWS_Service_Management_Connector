@@ -74,9 +74,9 @@
     </sys_ui_related_list_relationship_entry>
     <sys_ui_related_list_relationship_entry action="INSERT_OR_UPDATE">
         <filter/>
-        <list_id display_value="Incident - Default view" name="incident" related_list="NULL" sys_domain="global" view="Default view">97be62a10f130000b12e6903cfe01258</list_id>
+        <list_id display_value="Incident - Default view" name="incident" related_list="NULL" sys_domain="global" view="Default view">b88be7db53453010ae50ddeeff7b12fe</list_id>
         <order_by/>
-        <position>2</position>
+        <position>8</position>
         <related_list>REL:7edcfdd0db5120101aa72bfa4b961922</related_list>
         <sys_class_name>sys_ui_related_list_relationship_entry</sys_class_name>
         <sys_created_by>admin</sys_created_by>
@@ -84,7 +84,7 @@
         <sys_id>ddea265a2f92201047d8b6a62799b600</sys_id>
         <sys_mod_count>0</sys_mod_count>
         <sys_relationship display_value="AWS Runbook Executions">7edcfdd0db5120101aa72bfa4b961922</sys_relationship>
-        <sys_ui_related_list display_value="Incident - Default view" name="incident" related_list="NULL" sys_domain="global" view="Default view">97be62a10f130000b12e6903cfe01258</sys_ui_related_list>
+        <sys_ui_related_list display_value="Incident - Default view" name="incident" related_list="NULL" sys_domain="global" view="Default view">b88be7db53453010ae50ddeeff7b12fe</sys_ui_related_list>
         <sys_updated_by>admin</sys_updated_by>
         <sys_updated_on>2021-02-15 11:55:01</sys_updated_on>
     </sys_ui_related_list_relationship_entry>

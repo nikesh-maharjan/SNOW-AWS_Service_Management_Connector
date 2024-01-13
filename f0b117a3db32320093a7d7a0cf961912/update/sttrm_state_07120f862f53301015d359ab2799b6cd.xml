@@ -18,4 +18,5 @@
         <sys_updated_by>admin</sys_updated_by>
         <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
     </sttrm_state>
+    <sys_translated_text action="delete_multiple" query="documentkey=07120f862f53301015d359ab2799b6cd"/>
 </record_update>

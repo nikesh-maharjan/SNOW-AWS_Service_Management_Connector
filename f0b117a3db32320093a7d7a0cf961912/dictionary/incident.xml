@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element attributes="email_client=true,hasWorkflow=true,live_feed=true,all_tables.query_hints=true" audit="true" db_object_id="40b16076d4a3211095d7c105f1bf431c" extends="task" label="Incident" max_length="40" name="incident" text_index="true" type="collection">
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false" choice="1" label="AWS Account" max_length="32" name="x_126749_aws_sc_awsaccount" reference="x_126749_aws_sc_account" reference_qual="awsenablesupport=true^EQ" reference_qual_condition="awsenablesupport=true^EQ" type="reference">
+            <choice/>
+        </element>
+        <element label="AWS Case Communication Emails" max_length="1024" name="x_126749_aws_sc_awscasecommunicationemails" type="string"/>
+        <element label="AWS Case Created Time" max_length="40" name="x_126749_aws_sc_awscasecreatedtime" read_only="true" type="glide_date_time"/>
+        <element label="AWS Case Identifier" max_length="128" name="x_126749_aws_sc_awscaseidentifier" read_only="true" type="string"/>
+        <element label="AWS Case Status" max_length="128" name="x_126749_aws_sc_awscasestatus" read_only="true" type="string"/>
+        <element attributes="edge_encryption_enabled=true" choice="1" dependent="x_126749_aws_sc_awsservice" dependent_on_field="x_126749_aws_sc_awsservice" label="AWS Category" max_length="1024" name="x_126749_aws_sc_awscategory" reference="x_126749_aws_sc_support_case_category" reference_qual="awsactive=true^EQ" reference_qual_condition="awsactive=true^EQ" type="reference" use_dependent_field="true">
+            <choice/>
+        </element>
+        <element label="AWS Creation Time" max_length="40" name="x_126749_aws_sc_awscreationtime" read_only="true" type="glide_date_time"/>
+        <element label="AWS Incident ARN" max_length="1000" name="x_126749_aws_sc_awsincidentarn" read_only="true" type="string"/>
+        <element label="AWS Incident URL" max_length="1024" name="x_126749_aws_sc_awsincidenturl" read_only="true" type="url"/>
+        <element label="AWS Last Sync Time" max_length="40" name="x_126749_aws_sc_awslastsynctime" read_only="true" type="glide_date_time"/>
+        <element label="AWS Last Updated Time" max_length="40" name="x_126749_aws_sc_awslastupdatedtime" read_only="true" type="glide_date_time"/>
+        <element label="AWS Region" max_length="40" name="x_126749_aws_sc_awsregion" read_only="true" type="string"/>
+        <element label="AWS Resolve Time" max_length="40" name="x_126749_aws_sc_awsresolvetime" read_only="true" type="glide_date_time"/>
+        <element attributes="edge_encryption_enabled=true" choice="1" dependent="x_126749_aws_sc_awsaccount" dependent_on_field="x_126749_aws_sc_awsaccount" label="AWS Service" max_length="1024" name="x_126749_aws_sc_awsservice" reference="x_126749_aws_sc_support_case_service" reference_qual="awsactive=true^EQ" reference_qual_condition="awsactive=true^EQ" type="reference" use_dependent_field="true">
+            <choice/>
+        </element>
+        <element label="AWS Status" max_length="8" name="x_126749_aws_sc_awsstatus" read_only="true" type="string"/>
+        <element label="AWS Case Id" max_length="20" name="x_126749_aws_sc_awssupportcaseid" read_only="true" type="string"/>
+        <element label="AWS Last Scheduled Job Sync Time" max_length="40" name="x_126749_aws_sc_aws_last_scheduled_job_sync_time" read_only="true" type="glide_date_time"/>
+    </element>
+</database>

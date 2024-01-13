@@ -42,6 +42,20 @@
             <sys_updated_by>admin</sys_updated_by>
             <sys_updated_on>2020-10-08 14:23:04</sys_updated_on>
         </sys_ui_form_section>
+        <sys_ui_form_section action="INSERT_OR_UPDATE">
+            <position>3</position>
+            <sys_created_by>nmaharjan</sys_created_by>
+            <sys_created_on>2023-09-22 04:06:43</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>d67cc0f72f19311061e12aa62799b6c3</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_overrides/>
+            <sys_ui_form display_value="x_126749_aws_sc_finding" name="x_126749_aws_sc_finding" sys_domain="global" view="Default view">69dec7e9db6310106bb89444ca961959</sys_ui_form>
+            <sys_ui_section caption="Remediations" display_value="Remediations" name="x_126749_aws_sc_finding" sys_domain="global" view="Default view">9e355321dba310106bb89444ca961919</sys_ui_section>
+            <sys_updated_by>nmaharjan</sys_updated_by>
+            <sys_updated_on>2023-09-22 04:06:43</sys_updated_on>
+        </sys_ui_form_section>
         <sys_ui_form action="INSERT_OR_UPDATE">
             <name>x_126749_aws_sc_finding</name>
             <roles/>

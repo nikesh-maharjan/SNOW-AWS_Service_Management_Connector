@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="cfc9ba3ddb012300e9727d9ebf961944" label="Resource Account" max_length="40" name="x_126749_aws_sc_resource_account" type="collection">
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false" label="Account" mandatory="true" max_length="32" name="awsaccount" read_only="true" reference="x_126749_aws_sc_account" type="reference"/>
+        <element label="Last Sync Time" max_length="40" name="awslastsynctime" read_only="true" type="glide_date_time"/>
+        <element attributes="edge_encryption_enabled=true" choice="3" label="Relationship" mandatory="true" max_length="40" name="awsrelationship" read_only="true" type="choice">
+            <choice>
+                <element inactive_on_update="false" label="Local" value="10"/>
+                <element inactive_on_update="false" label="Shared" value="20"/>
+            </choice>
+        </element>
+        <element attributes="base_start=true,edge_encryption_enabled=true" label="Resource" mandatory="true" max_length="80" name="awsresource" read_only="true" type="table_name"/>
+        <element attributes="edge_encryption_enabled=true" dependent="awsresource" dependent_on_field="awsresource" display="true" label="Resource ID" mandatory="true" max_length="32" name="awsresourceid" read_only="true" type="document_id" use_dependent_field="true"/>
+        <index name="index">
+            <element name="awsaccount"/>
+        </index>
+        <index name="index2">
+            <element name="awsresourceid"/>
+        </index>
+    </element>
+</database>

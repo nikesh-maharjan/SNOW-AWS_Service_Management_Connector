@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?><record_update table="sys_package_dependency_m2m">
     <sys_package_dependency_m2m action="INSERT_OR_UPDATE">
-        <dependency display_value="User Criteria Scoped API" source="com.glideapp.user_criteria.scoped.api">e57327c0dbd910101350ae441b961901</dependency>
+        <dependency display_value="User Criteria Scoped API" source="com.glideapp.user_criteria.scoped.api">df4660b6d427211095d7c105f1bf43eb</dependency>
         <min_version/>
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2020-11-10 22:40:52</sys_created_on>

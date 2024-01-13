@@ -31,12 +31,12 @@
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2019-10-04 12:17:11</sys_created_on>
         <sys_id>c7053f15db10001087f3f7af29961947</sys_id>
-        <sys_mod_count>3</sys_mod_count>
-        <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2019-10-04 12:18:26</sys_updated_on>
+        <sys_mod_count>4</sys_mod_count>
+        <sys_updated_by>nmaharjan</sys_updated_by>
+        <sys_updated_on>2023-09-22 15:32:53</sys_updated_on>
         <table>x_126749_aws_sc_pp_event</table>
         <timezone/>
-        <validated>false</validated>
+        <validated>true</validated>
         <workflow display_value="AWS Service Catalog - Execute Provisioned Product Action">08f3e3c6db1313002dc6f6fdbf96199c</workflow>
     </wf_workflow_version>
     <wf_workflow action="INSERT_OR_UPDATE">

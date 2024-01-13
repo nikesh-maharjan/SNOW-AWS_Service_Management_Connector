@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="823e6e72dbc31010c281e4da4b9619f3" extends="cmdb_ci" label="AWS Config Compliance" max_length="40" name="x_126749_aws_sc_cmdb_ci_config_compliance" type="collection">
+        <element attributes="edge_encryption_enabled=true" label="Compliant" max_length="40" name="compliant" type="boolean"/>
+        <element attributes="edge_encryption_enabled=true" label="Terminated On" max_length="40" name="terminated_on" type="glide_date_time"/>
+    </element>
+</database>

@@ -5,21 +5,21 @@
         <content display_value="Add a change request type for closed change request from post provisioned actions">fda42b881ba23010a148a9f6624bcbaf</content>
         <effective_weight>1</effective_weight>
         <more_info_visited>false</more_info_visited>
-        <previous_status>0</previous_status>
-        <progress>0</progress>
-        <related_log_entry display_value="2021-11-10 02:04:27">6aab562487333010ee67caaf8bbb3551</related_log_entry>
-        <status>1</status>
+        <previous_status>1</previous_status>
+        <progress>100</progress>
+        <related_log_entry display_value="2023-09-22 02:09:44">58a8e4372f99311061e12aa62799b64c</related_log_entry>
+        <status>2</status>
         <sys_class_name>gsw_status_of_content</sys_class_name>
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2021-11-10 10:01:30</sys_created_on>
         <sys_id>d7fa16e087333010ee67caaf8bbb353e</sys_id>
-        <sys_mod_count>0</sys_mod_count>
-        <sys_name>1</sys_name>
+        <sys_mod_count>2</sys_mod_count>
+        <sys_name>2</sys_name>
         <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
         <sys_policy/>
         <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
         <sys_update_name>gsw_status_of_content_d7fa16e087333010ee67caaf8bbb353e</sys_update_name>
-        <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <sys_updated_by>nmaharjan</sys_updated_by>
+        <sys_updated_on>2023-09-22 06:09:44</sys_updated_on>
     </gsw_status_of_content>
 </record_update>

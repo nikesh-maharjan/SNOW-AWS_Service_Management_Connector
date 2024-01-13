@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="a1a268ff1b9c1010bdca97d7bd4bcb5e" extends="cmdb_ci" label="CloudFormation Stack" max_length="40" name="x_126749_aws_sc_cmdb_ci_cloudformation_stack" type="collection">
+        <element label="Object Id" max_length="512" name="object_id" type="string"/>
+        <element attributes="edge_encryption_enabled=true" label="Terminated On" max_length="40" name="terminated_on" type="glide_date_time"/>
+    </element>
+</database>

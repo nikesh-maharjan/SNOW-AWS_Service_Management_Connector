@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="6298ee092f203010e4a42d6df699b698" extends="cmdb_ci" label="AppRegistry Resource" max_length="40" name="x_126749_aws_sc_cmdb_ci_appregistry_resource" type="collection">
+        <element label="Arn" max_length="512" name="awsarn" type="string"/>
+        <element label="Last Synchronised Time" max_length="40" name="awslastsynchronisedtime" type="glide_date_time"/>
+        <element label="Name" max_length="256" name="awsname" type="string"/>
+    </element>
+</database>

@@ -9,6 +9,7 @@
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2022-04-05 09:24:01</sys_created_on>
         <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
         <sys_id>3a6acae797624110bf93f3ffe153afa4</sys_id>
         <sys_mod_count>0</sys_mod_count>
         <sys_name>AWS Health Dashboard Viewers</sys_name>

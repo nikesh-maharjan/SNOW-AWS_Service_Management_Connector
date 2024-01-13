@@ -10,7 +10,7 @@
         <create_access_controls>true</create_access_controls>
         <delete_access>false</delete_access>
         <is_extendable>false</is_extendable>
-        <label>x_126749_aws_sc_req_log</label>
+        <label>AWS Request Log</label>
         <live_feed_enabled>false</live_feed_enabled>
         <name>x_126749_aws_sc_req_log</name>
         <number_ref/>

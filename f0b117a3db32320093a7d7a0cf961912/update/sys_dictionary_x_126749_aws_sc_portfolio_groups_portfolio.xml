@@ -40,7 +40,7 @@
         <primary>false</primary>
         <read_only>false</read_only>
         <read_roles/>
-        <reference display_value="Portfolio" name="x_126749_aws_sc_portfolio">x_126749_aws_sc_portfolio</reference>
+        <reference display_value="" name="x_126749_aws_sc_portfolio">x_126749_aws_sc_portfolio</reference>
         <reference_cascade_rule/>
         <reference_floats>false</reference_floats>
         <reference_key/>
@@ -52,7 +52,6 @@
         <sys_class_name>sys_dictionary</sys_class_name>
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2020-04-27 08:14:59</sys_created_on>
-        <sys_id>433754181b301010c059877ddc4bcb1f</sys_id>
         <sys_name>Portfolio</sys_name>
         <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
         <sys_policy/>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="956acd952fef901047d8b6a62799b6f0" label="Resource Type Account" max_length="40" name="x_126749_aws_sc_resource_type_account" type="collection">
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false" label="Account" mandatory="true" max_length="40" name="awsaccount" reference="x_126749_aws_sc_account" reference_qual="awsenableconfig=true^EQ" reference_qual_condition="awsenableconfig=true^EQ" type="reference"/>
+        <element attributes="edge_encryption_enabled=true" choice="3" choice_field="awsregion" choice_table="x_126749_aws_sc_account_sync" label="Region" mandatory="true" max_length="40" name="awsregion" type="choice">
+            <choice>
+                <element inactive_on_update="false" label="US East (N. Virginia)" sequence="0" value="us-east-1"/>
+                <element inactive_on_update="false" label="US East (Ohio)" sequence="1" value="us-east-2"/>
+                <element inactive_on_update="false" label="US West (Oregon)" sequence="2" value="us-west-2"/>
+                <element inactive_on_update="false" label="EU (Ireland)" sequence="3" value="eu-west-1"/>
+                <element inactive_on_update="false" label="EU (Frankfurt)" sequence="4" value="eu-central-1"/>
+                <element inactive_on_update="false" label="EU (London)" sequence="5" value="eu-west-2"/>
+                <element inactive_on_update="false" label="EU (Paris)" sequence="6" value="eu-west-3"/>
+                <element inactive_on_update="false" label="Asia Pacific (Sydney)" sequence="7" value="ap-southeast-2"/>
+                <element inactive_on_update="false" label="Asia Pacific (Seoul)" sequence="8" value="ap-northeast-2"/>
+                <element inactive_on_update="false" label="Asia Pacific (Tokyo)" sequence="9" value="ap-northeast-1"/>
+                <element inactive_on_update="false" label="Canada (Central)" sequence="10" value="ca-central-1"/>
+                <element inactive_on_update="false" label="US West (N. California)" sequence="11" value="us-west-1"/>
+                <element inactive_on_update="false" label="Asia Pacific (Mumbai)" sequence="12" value="ap-south-1"/>
+                <element inactive_on_update="false" label="Asia Pacific (Singapore)" sequence="13" value="ap-southeast-1"/>
+                <element inactive_on_update="false" label="South America (São Paulo)" sequence="14" value="sa-east-1"/>
+                <element inactive_on_update="false" label="EU (Stockholm)" sequence="15" value="eu-north-1"/>
+                <element inactive_on_update="false" label="US GovCloud (US West)" sequence="16" value="us-gov-west-1"/>
+                <element inactive_on_update="false" label="US GovCloud (US West) - FIPS" sequence="17" value="us-gov-west-1:fips"/>
+                <element inactive_on_update="false" label="US GovCloud (US East)" sequence="18" value="us-gov-east-1"/>
+                <element inactive_on_update="false" label="US GovCloud (US East) - FIPS" sequence="19" value="us-gov-east-1:fips"/>
+            </choice>
+        </element>
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false,readonly_clickthrough=true" label="Registration Workflow" max_length="32" name="awsregistrationworkflow" read_only="true" reference="wf_context" type="reference"/>
+        <element label="Schema Version" max_length="40" name="awsschemaversion" read_only="true" type="string"/>
+        <element attributes="edge_encryption_enabled=true" choice="3" choice_field="type" label="Table" mandatory="true" max_length="80" name="table" type="choice">
+            <choice>
+                <element inactive_on_update="false" label=".NET Application (cmdb_ci_appl_dot_net)" sequence="0" value="cmdb_ci_appl_dot_net"/>
+                <element inactive_on_update="false" label="Apache Web Server (cmdb_ci_apache_web_server)" sequence="1" value="cmdb_ci_apache_web_server"/>
+                <element inactive_on_update="false" label="Application (cmdb_ci_appl)" sequence="2" value="cmdb_ci_appl"/>
+                <element inactive_on_update="false" label="Application Cluster (cmdb_ci_application_cluster)" sequence="3" value="cmdb_ci_application_cluster"/>
+                <element inactive_on_update="false" label="Application Server (cmdb_ci_app_server)" sequence="4" value="cmdb_ci_app_server"/>
+                <element inactive_on_update="false" label="Application Server Resource (cmdb_ci_application_server_resource)" sequence="5" value="cmdb_ci_application_server_resource"/>
+                <element inactive_on_update="false" label="Application Software (cmdb_ci_application_software)" sequence="6" value="cmdb_ci_application_software"/>
+                <element inactive_on_update="false" label="IBM Websphere (cmdb_ci_app_server_websphere)" sequence="7" value="cmdb_ci_app_server_websphere"/>
+                <element inactive_on_update="false" label="JavaServer (cmdb_ci_app_server_java)" sequence="8" value="cmdb_ci_app_server_java"/>
+                <element inactive_on_update="false" label="Kubernetes Cluster (cmdb_ci_kubernetes_cluster)" sequence="9" value="cmdb_ci_kubernetes_cluster"/>
+                <element inactive_on_update="false" label="Kubernetes Pod (cmdb_ci_kubernetes_pod)" sequence="10" value="cmdb_ci_kubernetes_pod"/>
+                <element inactive_on_update="false" label="Microsoft iis Web Server (cmdb_ci_microsoft_iis_web_server)" sequence="11" value="cmdb_ci_microsoft_iis_web_server"/>
+                <element inactive_on_update="false" label="MS SQL DataBase (cmdb_ci_db_mssql_database)" sequence="12" value="cmdb_ci_db_mssql_database"/>
+                <element inactive_on_update="false" label="MS SQL Server (cmdb_ci_db_mssql_server)" sequence="13" value="cmdb_ci_db_mssql_server"/>
+                <element inactive_on_update="false" label="MySQL Instance (cmdb_ci_db_mysql_instance)" sequence="14" value="cmdb_ci_db_mysql_instance"/>
+                <element inactive_on_update="false" label="Nginx Web Server (cmdb_ci_nginx_web_server)" sequence="15" value="cmdb_ci_nginx_web_server"/>
+                <element inactive_on_update="false" label="SAP Application (cmdb_ci_appl_sap)" sequence="16" value="cmdb_ci_appl_sap"/>
+                <element inactive_on_update="false" label="SAP Hana Db (cmdb_ci_appl_sap_hana_db)" sequence="17" value="cmdb_ci_appl_sap_hana_db"/>
+                <element inactive_on_update="false" label="SAP System (cmdb_ci_appl_sap_system)" sequence="18" value="cmdb_ci_appl_sap_system"/>
+                <element inactive_on_update="false" label="Service (cmdb_ci_service)" sequence="19" value="cmdb_ci_service"/>
+                <element inactive_on_update="false" label="ServiceNow Application (cmdb_ci_appl_now_app)" sequence="20" value="cmdb_ci_appl_now_app"/>
+                <element inactive_on_update="false" label="ServiceNow Application Component (cmdb_ci_appl_now_app_comp)" sequence="21" value="cmdb_ci_appl_now_app_comp"/>
+                <element inactive_on_update="false" label="SharePoint (cmdb_ci_appl_sharepoint)" sequence="22" value="cmdb_ci_appl_sharepoint"/>
+                <element inactive_on_update="false" label="Tomcat (cmdb_ci_app_server_tomcat)" sequence="23" value="cmdb_ci_app_server_tomcat"/>
+                <element inactive_on_update="false" label="Tomcat War (cmdb_ci_app_server_tomcat_war)" sequence="24" value="cmdb_ci_app_server_tomcat_war"/>
+                <element inactive_on_update="false" label="Web Application (cmdb_ci_web_application)" sequence="25" value="cmdb_ci_web_application"/>
+                <element inactive_on_update="false" label="Websphere EAR (cmdb_ci_app_server_ws_ear)" sequence="26" value="cmdb_ci_app_server_ws_ear"/>
+            </choice>
+        </element>
+        <index name="index">
+            <element name="awsaccount"/>
+        </index>
+        <index name="index2">
+            <element name="awsregistrationworkflow"/>
+        </index>
+    </element>
+</database>

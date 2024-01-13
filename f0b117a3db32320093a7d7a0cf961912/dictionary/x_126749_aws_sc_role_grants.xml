@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="699002e44f610300c5883b728110c702" label="Role Grants" max_length="40" name="x_126749_aws_sc_role_grants" type="collection">
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false" label="Identity" mandatory="true" max_length="32" name="awsidentity" reference="x_126749_aws_sc_aws_identity" reference_cascade_rule="delete" reference_qual="awsaccountISNOTEMPTY^EQ" reference_qual_condition="awsaccountISNOTEMPTY^EQ" type="reference"/>
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false" display="true" label="Role" mandatory="true" max_length="32" name="awssnrole" reference="sys_user_role" reference_cascade_rule="delete" type="reference" unique="true"/>
+        <index name="index">
+            <element name="awsidentity"/>
+        </index>
+        <index name="index2">
+            <element name="awssnrole"/>
+        </index>
+        <index name="index3" unique="true">
+            <element name="awssnrole"/>
+        </index>
+    </element>
+</database>
