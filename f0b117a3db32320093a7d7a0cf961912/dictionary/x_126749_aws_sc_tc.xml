@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="47103462db446300e9727d9ebf9619d8" label="Temporary Credential" max_length="40" name="x_126749_aws_sc_tc" type="collection">
+        <element label="Access Key" mandatory="true" max_length="128" name="awsaccesskey" read_only="true" type="string"/>
+        <element attributes="edge_encryption_enabled=true" label="Expiration" mandatory="true" max_length="40" name="awsexpiration" read_only="true" type="glide_date_time"/>
+        <element attributes="edge_encryption_enabled=true" label="AWS Identity" mandatory="true" max_length="32" name="awsidentity" read_only="true" reference="x_126749_aws_sc_aws_identity" reference_cascade_rule="delete" type="reference"/>
+        <element attributes="edge_encryption_enabled=true" label="Packed Policy Size" max_length="40" name="awspackedpolicysize" read_only="true" type="integer"/>
+        <element label="AWS Region" mandatory="true" max_length="40" name="awsregion" read_only="true" type="string"/>
+        <element label="Role ID" mandatory="true" max_length="193" name="awsroleid" read_only="true" type="string"/>
+        <element attributes="no_data_replicate=true,edge_encryption_enabled=true,is_legacy_password2=true" label="Secret Access Key" mandatory="true" max_length="255" name="awssecretaccesskey" read_only="true" type="password2"/>
+        <element label="Session Name" mandatory="true" max_length="64" name="awssessionname" read_only="true" type="string"/>
+        <element attributes="no_data_replicate=true,edge_encryption_enabled=true,is_legacy_password2=true" label="Session Token" mandatory="true" max_length="8192" name="awssessiontoken" read_only="true" type="password2"/>
+        <element label="User ARN" mandatory="true" max_length="2048" name="awsuserarn" read_only="true" type="string"/>
+        <index name="index">
+            <element name="awsidentity"/>
+        </index>
+    </element>
+</database>

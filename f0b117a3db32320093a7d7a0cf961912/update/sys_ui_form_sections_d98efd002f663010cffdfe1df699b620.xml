@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update>
+    <sys_ui_form_sections form_id="d98efd002f663010cffdfe1df699b620" sys_domain="global" table="x_126749_aws_sc_document" version="3">
+        <sys_ui_form_section action="INSERT_OR_UPDATE">
+            <position>0</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-09-07 15:21:40</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>9d8efd002f663010cffdfe1df699b623</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_overrides/>
+            <sys_ui_form display_value="x_126749_aws_sc_document" name="x_126749_aws_sc_document" sys_domain="global" view="e2ed31002f663010cffdfe1df699b6e4">d98efd002f663010cffdfe1df699b620</sys_ui_form>
+            <sys_ui_section caption="Change Template" display_value="Change Template" name="x_126749_aws_sc_document" sys_domain="global" view="e2ed31002f663010cffdfe1df699b6e4">598efd002f663010cffdfe1df699b61d</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2021-09-07 15:21:40</sys_updated_on>
+        </sys_ui_form_section>
+        <sys_ui_form_section action="INSERT_OR_UPDATE">
+            <position>1</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-09-07 15:21:40</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>998efd002f663010cffdfe1df699b624</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_overrides/>
+            <sys_ui_form display_value="x_126749_aws_sc_document" name="x_126749_aws_sc_document" sys_domain="global" view="e2ed31002f663010cffdfe1df699b6e4">d98efd002f663010cffdfe1df699b620</sys_ui_form>
+            <sys_ui_section caption="Description" display_value="Description" name="x_126749_aws_sc_document" sys_domain="global" view="e2ed31002f663010cffdfe1df699b6e4">118efd002f663010cffdfe1df699b61f</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2021-09-07 15:21:40</sys_updated_on>
+        </sys_ui_form_section>
+        <sys_ui_form_section action="INSERT_OR_UPDATE">
+            <position>2</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-09-07 15:21:40</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>198efd002f663010cffdfe1df699b634</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_overrides/>
+            <sys_ui_form display_value="x_126749_aws_sc_document" name="x_126749_aws_sc_document" sys_domain="global" view="e2ed31002f663010cffdfe1df699b6e4">d98efd002f663010cffdfe1df699b620</sys_ui_form>
+            <sys_ui_section caption="AWS Systems Manager Data" display_value="AWS Systems Manager Data" name="x_126749_aws_sc_document" sys_domain="global" view="e2ed31002f663010cffdfe1df699b6e4">d98efd002f663010cffdfe1df699b61f</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2021-09-07 15:21:40</sys_updated_on>
+        </sys_ui_form_section>
+        <sys_ui_form action="INSERT_OR_UPDATE">
+            <name>x_126749_aws_sc_document</name>
+            <roles/>
+            <sys_class_name>sys_ui_form</sys_class_name>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-09-07 15:21:40</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>d98efd002f663010cffdfe1df699b620</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_name>x_126749_aws_sc_document</sys_name>
+            <sys_overrides/>
+            <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+            <sys_policy/>
+            <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+            <sys_update_name>sys_ui_form_sections_d98efd002f663010cffdfe1df699b620</sys_update_name>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+            <sys_user/>
+            <view display_value="Change Template" name="change_template">e2ed31002f663010cffdfe1df699b6e4</view>
+            <view_name/>
+        </sys_ui_form>
+    </sys_ui_form_sections>
+</record_update>

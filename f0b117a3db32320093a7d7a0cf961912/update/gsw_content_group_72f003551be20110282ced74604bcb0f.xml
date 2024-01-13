@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="gsw_content_group">
+    <gsw_content_group action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <checksum>Bg4YMM6eV+HsjPa+TxAE39dU6Hg=</checksum>
+        <child_can_have_roles>false</child_can_have_roles>
+        <children_layout>1</children_layout>
+        <dependent_on_contents/>
+        <dependent_on_plugins/>
+        <dependent_on_plugins_ids/>
+        <description><![CDATA[<p>Users can view important events affecting their AWS resources via AWS Health Dashboard.</p>
+<p><em>Note: Make sure <strong>Integrate with AWS Health</strong> checkbox is checked on each AWS Account opted into the connector. If you are not using the integration, skip this section.</em></p>]]></description>
+        <display_child_max_num/>
+        <done_status_text/>
+        <hide_getting_started>false</hide_getting_started>
+        <icon>4ed48bd51be20110282ced74604bcbaa</icon>
+        <implicit_dependent_on/>
+        <implicit_plugin_dependencies/>
+        <is_root_content>false</is_root_content>
+        <order>1100</order>
+        <parent display_value="AWS Service Management Connector">c09fcac2dbd130100f00b298f496196f</parent>
+        <parents>c09fcac2dbd130100f00b298f496196f</parents>
+        <progress_text/>
+        <roles/>
+        <root_intro_frame_link/>
+        <root_parent display_value="AWS Service Management Connector">c09fcac2dbd130100f00b298f496196f</root_parent>
+        <skippable>true</skippable>
+        <supports_child_content>true</supports_child_content>
+        <sys_class_name>gsw_content_group</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2022-03-29 13:37:02</sys_created_on>
+        <sys_id>72f003551be20110282ced74604bcb0f</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Configure AWS Health</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>gsw_content_group_72f003551be20110282ced74604bcb0f</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <title>Configure AWS Health</title>
+        <weight>1</weight>
+    </gsw_content_group>
+    <sys_translated_text action="delete_multiple" query="documentkey=72f003551be20110282ced74604bcb0f"/>
+    <sys_attachment action="INSERT_OR_UPDATE">
+        <average_image_color>#db3f7a</average_image_color>
+        <chunk_size_bytes>700000</chunk_size_bytes>
+        <compressed>true</compressed>
+        <content_type>image/png</content_type>
+        <file_name>icon</file_name>
+        <hash>32f091c84aab386c29df9a0b92410f76b30d48a63b9d94e6fdf695ed4005ddd5</hash>
+        <image_height>64</image_height>
+        <image_width>64</image_width>
+        <size_bytes>5964</size_bytes>
+        <size_compressed>5987</size_compressed>
+        <state>available</state>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2022-03-29 13:52:29</sys_created_on>
+        <sys_id>4ed48bd51be20110282ced74604bcbaa</sys_id>
+        <sys_mod_count>3</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-03-29 13:52:29</sys_updated_on>
+        <table_name>ZZ_YYgsw_content_group</table_name>
+        <table_sys_id>72f003551be20110282ced74604bcb0f</table_sys_id>
+    </sys_attachment>
+    <sys_attachment_doc action="INSERT_OR_UPDATE">
+        <data>H4sIAAAAAAAAAA==</data>
+        <length>16</length>
+        <position>0</position>
+        <sys_attachment display_value="icon" sys_id="4ed48bd51be20110282ced74604bcbaa">4ed48bd51be20110282ced74604bcbaa</sys_attachment>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2022-03-29 13:52:29</sys_created_on>
+        <sys_id>8ed48bd51be20110282ced74604bcbaa</sys_id>
+    </sys_attachment_doc>
+    <sys_attachment_doc action="INSERT_OR_UPDATE">
+        <data>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</data>
+        <length>7972</length>
+        <position>1</position>
+        <sys_attachment display_value="icon" sys_id="4ed48bd51be20110282ced74604bcbaa">4ed48bd51be20110282ced74604bcbaa</sys_attachment>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2022-03-29 13:52:29</sys_created_on>
+        <sys_id>02d48bd51be20110282ced74604bcbab</sys_id>
+    </sys_attachment_doc>
+</record_update>

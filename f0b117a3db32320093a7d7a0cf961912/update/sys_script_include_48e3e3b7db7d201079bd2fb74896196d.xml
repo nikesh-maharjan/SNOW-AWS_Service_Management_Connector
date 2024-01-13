@@ -1,0 +1,415 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.PriorityMapping</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>PriorityMapping</name>
+        <script><![CDATA[var PriorityMapping = /** @class */ (function () {
+    function PriorityMapping() {
+    }
+    //takes a Finding or OpsItem and returns either the Impact or Urgency from the lookup table depending on the value of 'field'
+    PriorityMapping.prototype.getMappedFromFindingOrOpsItem = function (source) {
+        var results = {
+            impact: null,
+            urgency: null
+        };
+        var priorityLookupGr = new GlideRecord('x_126749_aws_sc_priority_lookup');
+        var tableName = source.getTableName();
+        if (tableName === "x_126749_aws_sc_finding") {
+            priorityLookupGr.addQuery('awsrecordtype', 'Finding');
+            var findingCriticality = source.awscriticality;
+            if (!findingCriticality.nil()) {
+                //criticality should be between the min and max specified
+                priorityLookupGr.addQuery('awsfindingcriticalityminimum', '<=', findingCriticality);
+                priorityLookupGr.addQuery('awsfindingcriticalitymaximum', '>=', findingCriticality);
+            }
+            else {
+                priorityLookupGr.addNullQuery('awsfindingcriticalityminimum');
+                priorityLookupGr.addNullQuery('awsfindingcriticalitymaximum');
+            }
+            var findingSeverityLabel = source.awsseveritylabel;
+            if (!findingSeverityLabel.nil()) {
+                priorityLookupGr.addQuery('awsfindingseveritylabel', findingSeverityLabel);
+            }
+            else {
+                priorityLookupGr.addNullQuery('awsfindingseveritylabel');
+            }
+        }
+        else if (tableName === "x_126749_aws_sc_opsitem") {
+            priorityLookupGr.addQuery('awsrecordtype', 'OpsItem');
+            var opsItemPriority = source.awspriority;
+            if (!opsItemPriority.nil()) {
+                priorityLookupGr.addQuery("awsopsitempriority", opsItemPriority);
+            }
+            else {
+                priorityLookupGr.addNullQuery('awsopsitempriority');
+            }
+            var opsItemSeverity = source.awsseverity;
+            if (!opsItemSeverity.nil()) {
+                priorityLookupGr.addQuery("awsopsitemseverity", opsItemSeverity);
+            }
+            else {
+                priorityLookupGr.addNullQuery("awsopsitemseverity");
+            }
+        }
+        priorityLookupGr.query();
+        if (priorityLookupGr.next()) {
+            var refRecord = priorityLookupGr.awsprioritylookupreference.getRefRecord();
+            results.impact = refRecord.getValue('impact');
+            results.urgency = refRecord.getValue('urgency');
+        }
+        else {
+            results.impact = this.getDefaultTaskImpact(source);
+            results.urgency = this.getDefaultTaskUrgency(source);
+        }
+        return results;
+    };
+    //For support cases we accept a caseDetails object and return the mapped impact, urgency, state and severity
+    PriorityMapping.prototype.getMappedFromAwsSupportCase = function (supportCase) {
+        //lookup priority lookup table for record where record type is supportCase.
+        var mappedPriority;
+        var priorityLookup = new GlideRecord('x_126749_aws_sc_priority_lookup');
+        priorityLookup.addQuery('awsrecordtype', 'SupportCase');
+        priorityLookup.addQuery('awssupportcaseseverity', supportCase.severityCode);
+        priorityLookup.query();
+        if (priorityLookup.next()) {
+            mappedPriority = parseInt(priorityLookup.getValue('awsservicenowsupportcaseseverity'));
+        }
+        else {
+            mappedPriority = this.getIncidentPriorityFromAwsSupportCase(supportCase);
+        }
+        var impactUrgency = this.getIncidentImpactUrgency(mappedPriority);
+        return {
+            incidentSeverity: this.getSeverityFromAwsSupportCase(supportCase),
+            incidentState: this.getSnowSupportState(supportCase.status),
+            incidentImpact: impactUrgency.incidentImpact,
+            incidentUrgency: impactUrgency.incidentUrgency
+        };
+    };
+    //For serviceNow support cases we return severity code and status of the case
+    //The severity pushed to aws should be based on the priority of the created case
+    PriorityMapping.prototype.getMappedFromSnowSupportCase = function (supportCase) {
+        var results = {
+            severityCode: 'low',
+            status: 'work-in-progress'
+        };
+        //lookup priority lookup table for record where record type is supportCase
+        var severity;
+        var priorityLookupGr = new GlideRecord('x_126749_aws_sc_priority_lookup');
+        priorityLookupGr.addQuery('awsrecordtype', 'SupportCase');
+        priorityLookupGr.addQuery('awsservicenowsupportcaseseverity', supportCase.priority);
+        priorityLookupGr.query();
+        if (priorityLookupGr.next()) {
+            severity = parseInt(priorityLookupGr.getValue('awssupportcaseseverity'));
+        }
+        else {
+            severity = parseInt(supportCase.getValue('priority'));
+        }
+        results.severityCode = this.getAwsSupportCaseSeverityCode(severity);
+        results.status = this.getAwsSupportCaseState(supportCase);
+        return results;
+    };
+    //in the other direction (value from incident or problem) look up the urgency and impact in the related table
+    //and return the values from the record in our table that the record in dl_u_priority is related to
+    //this will find the first record where the priority matches so we need to pass in whether it's for a finding or opsItem to
+    //ensure the correct record
+    PriorityMapping.prototype.getMappedFromTask = function (source, destination) {
+        var results = {
+            findingCriticality: null,
+            findingSeverityLabel: null,
+            findingSeverity: null,
+            opsItemPriority: null,
+            opsItemSeverity: null
+        };
+        var priorityLookupGr = new GlideRecord('x_126749_aws_sc_priority_lookup');
+        var tableName = destination.getTableName();
+        if (tableName === "x_126749_aws_sc_finding") {
+            priorityLookupGr.addQuery("awsrecordtype", 'Finding');
+        }
+        else {
+            priorityLookupGr.addQuery('awsrecordtype', 'OpsItem');
+        }
+        priorityLookupGr.addQuery("awsprioritylookupreference.priority", source.getValue('priority'));
+        priorityLookupGr.orderBy('awsprioritylookupreference.order');
+        priorityLookupGr.query();
+        if (priorityLookupGr.next()) {
+            results.findingCriticality = priorityLookupGr.getValue('awsfindingcriticalityminimum');
+            results.findingSeverityLabel = priorityLookupGr.getValue('awsfindingseveritylabel');
+            results.findingSeverity = this.getDefaultFindingSeverity(priorityLookupGr.getValue('awsfindingseveritylabel'));
+            results.opsItemPriority = priorityLookupGr.getValue('awsopsitempriority');
+            results.opsItemSeverity = priorityLookupGr.getValue('awsopsitemseverity');
+        }
+        else {
+            var severityLabel = this.getDefaultFindingSeverityLabel(source);
+            results.findingCriticality = this.getDefaultFindingCriticality(source),
+                results.findingSeverityLabel = severityLabel,
+                results.findingSeverity = this.getDefaultFindingSeverity(severityLabel),
+                results.opsItemPriority = this.getDefaultOpsItemPriority(source),
+                results.opsItemSeverity = this.getDefaultOpsItemSeverity(source);
+        }
+        return results;
+    };
+    /**
+     * AWS Incident from Systems Manager - Incident manager has an Impact field.
+     * We should update the ServiceNow Impact field accordingly
+     */
+    PriorityMapping.prototype.getMappedImpactFromSMIMImpact = function (awsImpact) {
+        var serviceNowImpact = 1;
+        switch (awsImpact) {
+            case 3: //AWS Impact 3 is mapped to ServiceNow Impact 2
+                serviceNowImpact = 2;
+                break;
+            case 4: //AWS Impact 4 is mapped to ServiceNow Impact 3
+            case 5: //AWS Impact 5 is mapped to ServiceNow Impact 3
+                serviceNowImpact = 3;
+                break;
+            case 1: //AWS Impact 1 is mapped to ServiceNow Impact 1
+            case 2: //AWS Impact 2 is mapped to ServiceNow Impact 1
+            default:
+                break;
+        }
+        return serviceNowImpact;
+    };
+    PriorityMapping.prototype.getDefaultTaskImpact = function (source) {
+        //if the record is a Finding we use criticality
+        var tableName = source.getTableName();
+        if (tableName === "x_126749_aws_sc_finding") {
+            var finding = source;
+            var criticalityValue = !finding.awscriticality.nil()
+                ? parseInt(finding.awscriticality.toString())
+                : 0;
+            return criticalityValue > 29 ? criticalityValue > 69 ? 1 : 2 : 3;
+        }
+        else if (tableName === "x_126749_aws_sc_opsitem") {
+            var opsItem = source;
+            var priorityValue = !opsItem.awspriority.nil()
+                ? parseInt(opsItem.awspriority.toString())
+                : 0;
+            //map priority 1 to1, 2, 3 to 2 and 4,5 to 3
+            return priorityValue === 1 ? 1 : priorityValue === 2 || priorityValue === 3 ? 2 : 3;
+        }
+        return null;
+    };
+    PriorityMapping.prototype.getDefaultTaskUrgency = function (source) {
+        var tableName = source.getTableName();
+        if (tableName === "x_126749_aws_sc_finding") {
+            var severityLabel = source.awsseveritylabel
+                ? source.awsseveritylabel.toUpperCase()
+                : '';
+            return severityLabel === "HIGH" || severityLabel === "CRITICAL" ?
+                1 : severityLabel === "MEDIUM" ? 2 : 3;
+        }
+        else if (tableName === "x_126749_aws_sc_opsitem") {
+            //map severity 1 to 1, 2 to 2 and 3, 4 to 3
+            var severityValue = source.getValue('awsseverity');
+            return severityValue === "1" ? 1 : severityValue === "2" ? 2 : 3;
+        }
+        return null;
+    };
+    PriorityMapping.prototype.getDefaultFindingSeverityLabel = function (source) {
+        //for Finding based on urgency
+        var task = source;
+        if (task.urgency.nil()) {
+            return null;
+        }
+        var urgency = task.getValue('urgency');
+        return urgency === '1' ? "CRITICAL" : urgency === '2' ? "MEDIUM" : "LOW";
+    };
+    //https://docs.aws.amazon.com/securityhub/1.0/APIReference/API_Severity.html
+    //normalized severity is deprecated. We set it based on the severityLabel to values specified in the link above
+    PriorityMapping.prototype.getDefaultFindingSeverity = function (severityLabel) {
+        var result = null;
+        switch (severityLabel) {
+            case "INFORMATIONAL":
+                result = 0;
+                break;
+            case "LOW":
+                result = 1;
+                break;
+            case "MEDIUM":
+                result = 40;
+                break;
+            case "HIGH":
+                result = 70;
+                break;
+            case "CRITICAL": result = 90;
+        }
+        return result;
+    };
+    PriorityMapping.prototype.getDefaultFindingCriticality = function (source) {
+        //for Finding based on impact. If no value for impact sets to 20
+        var task = source;
+        if (task.impact.nil()) {
+            return null;
+        }
+        var impact = task.getValue('impact');
+        return impact === '1' ? 80 : impact === '2' ? 60 : 20;
+    };
+    PriorityMapping.prototype.getDefaultOpsItemSeverity = function (source) {
+        //for OpsItem based on urgency.
+        var task = source;
+        if (task.urgency.nil()) {
+            return null;
+        }
+        return parseInt(task.getValue('urgency'));
+    };
+    PriorityMapping.prototype.getSeverityFromAwsSupportCase = function (source) {
+        var result;
+        switch (source.severityCode) {
+            case "critical":
+            case "urgent":
+            case "high":
+                result = 1;
+                break;
+            case "normal":
+                result = 2;
+                break;
+            case "low":
+                result = 3;
+                break;
+            default:
+                result = 2;
+        }
+        return result;
+    };
+    PriorityMapping.prototype.getDefaultOpsItemPriority = function (source) {
+        //for OpsItem based on impact
+        //impact = 1=> 1, 2 => 3, 3 =?> 5
+        var task = source;
+        if (task.impact.nil()) {
+            return null;
+        }
+        var impact = task.getValue('impact');
+        return impact === '1' ? 1 : impact === '2' ? 3 : 5;
+    };
+    PriorityMapping.prototype.getIncidentPriorityFromAwsSupportCase = function (caseDetails) {
+        //aws support case severityCode has values low,normal,high,urgent,critical
+        //critical only exists if the customer has enterprise support
+        var result;
+        switch (caseDetails.severityCode) {
+            case "critical": // Business Critical System Down
+                result = 1;
+                break;
+            case "urgent": // Production System Down
+                result = 2;
+                break;
+            case "high": // Production System Impaired
+                result = 3;
+                break;
+            case "normal": // System Impaired
+                result = 4;
+                break;
+            case "low": // General Guidance
+                result = 5;
+                break;
+            default:
+                result = 3;
+        }
+        return result;
+    };
+    //Because the user can modify the default mappings from impact/urgency to priority we should
+    //look up dl_u_priority for the required priority and use the values for impact/urgency that map to that priority
+    PriorityMapping.prototype.getIncidentImpactUrgency = function (priority) {
+        var priorityLookup = new GlideRecord('dl_u_priority');
+        priorityLookup.addQuery('priority', priority);
+        priorityLookup.query();
+        if (priorityLookup.next()) {
+            return { incidentUrgency: parseInt(priorityLookup.getValue('urgency')), incidentImpact: parseInt(priorityLookup.getValue('impact')) };
+        }
+        //default mappings as per feedback document in case there is no entry in dl_u_priority with the required priority.
+        var impact = priority > 3 ? 3 : priority > 2 ? 2 : 1;
+        var urgency = priority > 1 ? 2 : 1;
+        return { incidentUrgency: urgency, incidentImpact: impact };
+    };
+    PriorityMapping.prototype.getAwsSupportCaseSeverityCode = function (severity) {
+        var result;
+        switch (severity) {
+            case 5:
+                result = 'low';
+                break;
+            case 4:
+                result = 'normal';
+                break;
+            case 3:
+                result = 'high';
+                break;
+            case 2:
+                result = 'urgent';
+                break;
+            case 1:
+                result = 'critical';
+                break;
+            default:
+                result = 'low';
+        }
+        return result;
+    };
+    PriorityMapping.prototype.getSnowSupportState = function (status) {
+        var result;
+        switch (status) {
+            case "unassigned":
+            case "opened":
+                result = 1; //new
+                break;
+            case "work-in-progress":
+            case "reopened":
+                result = 2; //in progress
+                break;
+            case "pending-customer-action":
+                result = 3; //on hold
+                break;
+            case "resolved":
+                result = 6; //resolved
+                break;
+            default: result = 1; //this is the default value for the field
+        }
+        return result;
+    };
+    PriorityMapping.prototype.getAwsSupportCaseState = function (supportCase) {
+        //field x_126749_aws_sc_awscasestatus records the actual case status during sync from aws
+        //pass this through the getSnowSupportState method and compare the result with the value of the state field.
+        //if they're different then the status of the SNOW support case record has changed.
+        var result = supportCase.getValue('x_126749_aws_sc_awscasestatus');
+        var lastSyncedState = this.getSnowSupportState(result);
+        var currentState = parseInt(supportCase.getValue('state'));
+        if (lastSyncedState !== currentState) {
+            switch (currentState) {
+                case 1: //New
+                    result = 'opened';
+                    break;
+                case 2: //In Progress
+                    result = 'work-in-progress';
+                    break;
+                case 3: //On Hold
+                    result = 'pending-customer-action';
+                    break;
+                case 6: //Resolved
+                case 7: //Closed
+                case 8: //Cancelled
+                    result = 'resolved';
+                    break;
+                default: result = 'work-in-progress';
+            }
+        }
+        return result;
+    };
+    return PriorityMapping;
+}());
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-01-26 11:24:02</sys_created_on>
+        <sys_id>48e3e3b7db7d201079bd2fb74896196d</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>PriorityMapping</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_48e3e3b7db7d201079bd2fb74896196d</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

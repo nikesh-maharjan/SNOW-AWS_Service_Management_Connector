@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.ConfigResourceComplianceResourceType</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>ConfigResourceComplianceResourceType</name>
+        <script><![CDATA[var ConfigResourceComplianceResourceType = /** @class */ (function (_super) {
+    Polyfill.__extends(ConfigResourceComplianceResourceType, _super);
+    function ConfigResourceComplianceResourceType() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.MEMBERS_RELATIONSHIP = _this.getRelationTypeSysId(ConfigSyncProvider.RelationshipType.Members);
+        _this.customSyncFromAws = function (context, itemConfigs) {
+            // 1. We want to make sure we have only 2 items: "COMPLIANT" and "NON-COMPLIANT".
+            var isCompliantSysId = _this.initComplianceRecord(true);
+            var isNonCompliantSysId = _this.initComplianceRecord(false);
+            // 2. For each itemConfig that exists across all our tables, we want to create/maintain a relationship between itemConfig <-> compliance status
+            var supportedRules = ConfigSyncProvider.defaultRules()
+                .filter(function (rule) { return rule.syncType === ConfigSyncProvider.SYNC_DIR.FROM_AWS_CONFIG; })
+                .sort(function (r1, r2) { return (r1.order || 0) - (r2.order || 0); });
+            itemConfigs.forEach(function (itemConfig) {
+                var targetTables = supportedRules
+                    .filter(function (rule) { return rule.externalResourceType === itemConfig.data.targetResourceType; })
+                    .map(function (rule) { return rule.snTable; });
+                if (targetTables.length === 0) {
+                    return;
+                }
+				var correlationId;
+				if(targetTables[0] == 'cmdb_ci_cloud_db_cluster'){
+					correlationId = undefined;
+				} else {
+                correlationId = _this.getCorrelationId({
+                    accountId: itemConfig.item.accountId,
+                    awsRegion: itemConfig.item.awsRegion,
+                    resourceType: itemConfig.data.targetResourceType,
+                    resourceId: itemConfig.data.targetResourceId
+                });
+				}
+                var target = _this.getOrCreateResourceSysId(context, targetTables[0], itemConfig.data.targetResourceId, correlationId);
+                _this.purgeStaleComplianceRelationships(itemConfig.data.complianceType === 'COMPLIANT' ? isNonCompliantSysId : isCompliantSysId, target, _this.MEMBERS_RELATIONSHIP);
+                _this.updateRelationship(itemConfig.data.complianceType === 'COMPLIANT' ? isCompliantSysId : isNonCompliantSysId, target, _this.MEMBERS_RELATIONSHIP);
+            });
+        };
+        return _this;
+    }
+    ConfigResourceComplianceResourceType.prototype.rules = function () {
+        return [{
+                order: 1000,
+                syncType: ConfigSyncProvider.SYNC_DIR.FROM_AWS_CONFIG,
+                externalResourceType: 'AWS::Config::ResourceCompliance',
+                externalResourceId: 'resourceId',
+                snTable: 'x_126749_aws_sc_cmdb_ci_config_compliance',
+                syncFromAws: this.customSyncFromAws,
+            }];
+    };
+    ConfigResourceComplianceResourceType.prototype.fields = function () {
+        return [];
+    };
+    ConfigResourceComplianceResourceType.prototype.relationships = function () {
+        return [];
+    };
+    ConfigResourceComplianceResourceType.prototype.syncFromAwsAddRelationships = function (context, config, resourceSysId) {
+        // No-op. Relationship will be handled by customSyncFromAws
+    };
+    ConfigResourceComplianceResourceType.prototype.initComplianceRecord = function (isCompliant) {
+        var compliantName = isCompliant ? 'Compliant' : 'Non Compliant';
+        var configComplianceGr = new GlideRecord('x_126749_aws_sc_cmdb_ci_config_compliance');
+        configComplianceGr.addQuery('name', compliantName);
+        configComplianceGr.addQuery('compliant', isCompliant);
+        configComplianceGr.setLimit(1);
+        configComplianceGr.query();
+        if (configComplianceGr.hasNext()) {
+            configComplianceGr.next();
+            return configComplianceGr.sys_id.toString();
+        }
+        else {
+            configComplianceGr.initialize();
+            Util.setValue(configComplianceGr, 'name', compliantName);
+            Util.setValue(configComplianceGr, 'compliant', isCompliant);
+            return configComplianceGr.insert();
+        }
+    };
+    ConfigResourceComplianceResourceType.prototype.purgeStaleComplianceRelationships = function (complianceSysId, resourceSysId, typeSysId) {
+        var relationshipGr = new GlideRecord('cmdb_rel_ci');
+        relationshipGr.addQuery('parent', complianceSysId);
+        relationshipGr.addQuery('child', resourceSysId);
+        relationshipGr.addQuery('type', typeSysId);
+        relationshipGr.query();
+        if (relationshipGr.next()) {
+            relationshipGr.deleteRecord();
+        }
+    };
+    return ConfigResourceComplianceResourceType;
+}(AbstractResourceType));
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-11-25 12:37:55</sys_created_on>
+        <sys_id>0a4268082fb8601047d8b6a62799b60f</sys_id>
+        <sys_mod_count>1</sys_mod_count>
+        <sys_name>ConfigResourceComplianceResourceType</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_0a4268082fb8601047d8b6a62799b60f</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2023-03-30 20:37:32</sys_updated_on>
+    </sys_script_include>
+</record_update>

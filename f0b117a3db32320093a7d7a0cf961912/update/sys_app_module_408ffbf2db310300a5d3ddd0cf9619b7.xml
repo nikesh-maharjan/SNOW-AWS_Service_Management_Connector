@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_app_module">
+    <sys_app_module action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <application display_value="System Logs">ea32a07ac0a8016400838de06df17000</application>
+        <assessment/>
+        <device_type/>
+        <filter/>
+        <hint/>
+        <homepage/>
+        <image/>
+        <link_type>DIRECT</link_type>
+        <map_page/>
+        <mobile_title>AWS Request Log</mobile_title>
+        <mobile_view_name>Mobile</mobile_view_name>
+        <name>x_126749_aws_sc_req_log</name>
+        <order/>
+        <override_menu_roles>false</override_menu_roles>
+        <query>x_126749_aws_sc_req_log_list.do?sysparm_query=ORDERBYDESCsys_created_on&amp;sysparm_first_row=1&amp;sysparm_view=</query>
+        <report/>
+        <roles>x_126749_aws_sc_account_admin</roles>
+        <sys_class_name>sys_app_module</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2017-10-18 09:50:29</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>408ffbf2db310300a5d3ddd0cf9619b7</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AWS Request Log</sys_name>
+        <sys_overrides/>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_app_module_408ffbf2db310300a5d3ddd0cf9619b7</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <timeline_page/>
+        <title>AWS Request Log</title>
+        <uncancelable>false</uncancelable>
+        <view_name/>
+        <window_name/>
+    </sys_app_module>
+</record_update>

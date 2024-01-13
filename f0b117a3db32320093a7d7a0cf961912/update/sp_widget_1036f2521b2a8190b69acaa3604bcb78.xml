@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>custom</category>
+        <client_script><![CDATA[function searchWidgetClient($scope, $http, $window) {
+    var c = this;
+    $scope.awsaccount = {
+        displayValue: $scope.data.awsaccount_name,
+        value: $scope.data.awsaccount_sys_id,
+        name: 'awsaccount'
+    };
+
+    $scope.awsregion = {
+        displayValue: $scope.data.awsregion_name,
+        value: $scope.data.awsregion_sys_id,
+        name: 'awsregion'
+    };
+    $scope.awsportfolio = {
+        displayValue: $scope.data.awsportfolio_name,
+        value: $scope.data.awsportfolio_sys_id,
+        name: 'awsportfolio'
+    };
+    $scope.awsproduct = {
+        displayValue: $scope.data.awsproduct_name,
+        value: $scope.data.awsproduct_sys_id,
+        name: 'awsproduct'
+    };
+
+    $scope.$on("field.change", function(evt, parms) {
+        if (parms.field.name == 'awsaccount') {
+            if (c.data.awsaccount_name != parms.newValue || !parms.newValue) {
+                $scope.awsregion.displayValue = '';
+                $scope.awsregion.value = '';
+            }
+            c.data.awsaccount_name = parms.displayValue;
+            c.data.awsaccount_sys_id = parms.newValue;
+
+        }
+
+        if (parms.field.name == 'awsregion') {
+            if (c.data.awsregion_name != parms.newValue || !parms.newValue) {
+                $scope.awsportfolio.displayValue = '';
+                $scope.awsportfolio.value = '';
+            }
+
+            c.data.awsregion_name = parms.displayValue;
+            c.data.awsregion_sys_id = parms.newValue;
+
+            c.server.get({
+                parmeter1: c.data.awsregion_name,
+                action: "getStateValue"
+            }).then(function(response) {
+                $scope.data.newregionvalue = response.data.newregionvalue;
+
+            });
+
+        }
+        if (parms.field.name == 'awsportfolio') {
+            if (c.data.awsportfolio_name != parms.newValue || !parms.newValue) {
+                $scope.awsproduct.displayValue = '';
+                $scope.awsproduct.value = '';
+            }
+
+            c.data.awsportfolio_name = parms.displayValue;
+            c.data.awsportfolio_sys_id = parms.newValue;
+
+        }
+        if (parms.field.name == 'awsproduct') {
+
+            c.data.awsproduct_name = parms.displayValue;
+            c.data.awsproduct_sys_id = parms.newValue;
+        }
+    });
+
+
+    $scope.productSearch = function() {
+        $window.open('/sp?id=sc_cat_item&sys_id=' + c.data.awsproduct_sys_id, '_blank');
+    };
+}]]></client_script>
+        <controller_as>c</controller_as>
+        <css/>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>true</has_preview>
+        <id>aws-sc-product-search</id>
+        <internal>false</internal>
+        <link><![CDATA[function link(scope, element, attrs, controller) {
+  
+}]]></link>
+        <name>AWS Custom Product Search Widget</name>
+        <option_schema/>
+        <public>false</public>
+        <roles>x_126749_aws_sc.productsearchaccess</roles>
+        <script><![CDATA[(function() {
+
+    var currentUser = gs.getUser();
+    var myportfolios = [];
+    var myregions = [];
+    var myaccounts = [];
+    var pgroups = new GlideRecordSecure('x_126749_aws_sc_portfolio_groups');
+    pgroups.addNotNullQuery('portfolio');
+    pgroups.query();
+    while (pgroups.next()) {
+        if (currentUser.isMemberOf(pgroups.group.name.toString())) {
+            var portfolioInfo = getPortfolioInfo(pgroups.portfolio);
+            myportfolios.push(portfolioInfo.id);
+            myregions.push(portfolioInfo.awsregion);
+            myaccounts.push(portfolioInfo.awsaccount);
+        }
+    }
+
+    data.myportfolios = (myportfolios.join(','));
+    data.myregions = (myregions.join(','));
+    data.myaccounts = (myaccounts.join(','));
+
+    if (input && input.action == "getStateValue") {
+        data.newregionvalue = getChoiceValueFromLabel(input.parmeter1);
+    }
+ // get AWS region value
+    function getChoiceValueFromLabel(parmeter1) {
+        var choices = new GlideRecord('sys_choice');
+        choices.addQuery('name', 'x_126749_aws_sc_account_sync');
+        choices.addQuery('label', parmeter1);
+        choices.query();
+        if (choices.next()) {
+            return choices.getValue('value');
+        }
+        return undefined;
+    }
+  //query portfolio details
+    function getPortfolioInfo(portfolio) {
+        var portfolioInfo = {};
+        var portfoliogr = new GlideRecordSecure('x_126749_aws_sc_portfolio');
+        if (portfoliogr.get(portfolio)) {
+            portfolioInfo.id = portfoliogr.sys_id;
+            portfolioInfo.awsregion = portfoliogr.awsregion;
+            portfolioInfo.awsaccount = portfoliogr.awsaccount;
+        }
+        return portfolioInfo;
+    }
+
+})();]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>mjoethom</sys_created_by>
+        <sys_created_on>2022-04-01 15:23:31</sys_created_on>
+        <sys_id>1036f2521b2a8190b69acaa3604bcb78</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AWS Custom Product Search Widget</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sp_widget_1036f2521b2a8190b69acaa3604bcb78</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <template><![CDATA[<div class="panel panel-{{::c.options.color}} b">
+   <html ng-app="MyApp">
+      <!-- your widget template -->
+      <div class="panel-heading">
+         <h4 class="panel-title">Search AWS Products</h4>
+      </div>
+     
+      <div class=" panel-body ">
+            <sn-record-picker id="awsaccount" field="awsaccount" table="'x_126749_aws_sc_account'" display-field="'awsname'" value-field="'sys_id'" search-fields="'awsname'" page-size="100" default-query="'sys_idIN'+data.myaccounts" placeholder="Select AWS Account"></sn-record-picker>
+<br>
+        
+            <sn-record-picker id="awsregion" field="awsregion" table="'x_126749_aws_sc_account_sync'" display-field="'awsregion'" value-field="'awsregion'" search-fields="'awsregion'" page-size="100" default-query="'awsaccount=' + data.awsaccount_sys_id" sn-disabled="!data.awsaccount_sys_id" placeholder="Select AWS Region"></sn-record-picker>
+        <br>
+
+         
+            <sn-record-picker id="awsportfolio" field="awsportfolio" table="'x_126749_aws_sc_portfolio'" display-field="'awsdisplayname'" value-field="'sys_id'" search-fields="'awsdisplayname'" page-size="100" default-query="'awsaccount=' + data.awsaccount_sys_id +'^awsregion='+data.newregionvalue+'^sys_idIN'+data.myportfolios" sn-disabled="!data.awsregion_sys_id" placeholder="Select Portfolio"></sn-record-picker>
+       
+<br>
+            <sn-record-picker id="awsproduct" field="awsproduct" table="'x_126749_aws_sc_product'" display-field="'name'" value-field="'sys_id'" search-fields="'name'" page-size="100" default-query="'awsportfolio=' + data.awsportfolio_sys_id" sn-disabled="!data.awsportfolio_sys_id" placeholder="Select AWS Product"></sn-record-picker>
+        <br>
+         <div class="col-md-6"> 
+            <button type="submit" ng-click="productSearch();" class="btn btn-primary btn-group ng-scope" uib-tooltip="Search Products" tooltip-placement="bottom">Open form</button>
+         </div>
+      </div>
+      <div>
+      </div>
+   </html>
+</div>]]></template>
+    </sp_widget>
+</record_update>

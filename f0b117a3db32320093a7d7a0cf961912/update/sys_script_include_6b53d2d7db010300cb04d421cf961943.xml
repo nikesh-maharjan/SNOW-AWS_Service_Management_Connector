@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.AwsService</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>AwsService</name>
+        <script><![CDATA[/**
+ * @class
+ * @classdesc Make HTTP requests to AWS services.
+ * @param service {String} The name of the AWS service
+ * @param region {String} An AWS region, e.g. "us-west-1"
+ * @param credential {Object} AWS account credentials.
+ * @param credential.identity {String} An AWS access key.
+ * @param credential.secret {String} An AWS secret access key.
+ * @param credential.session {String=} Required if using temporary credentials.
+ */
+var AwsService = /** @class */ (function() {
+    function AwsService(service, region, credential, supportNonFips, host) {
+        this.logRequests = false;
+        this.logResponse = false;
+        /**
+         * Creating a system property with this name configures AwsService
+         * to use the object named by the property to make HTTP requests.
+         * @type {string}
+         */
+        this.httpRequesterSysProp = 'x_126749_aws_sc.httpRequester';
+        this.service = Util.assertExists(service, "service");
+        //For most calls the host and service are the same. However, for ServiceCatalog AppRegistry calls the host is
+        //servicecatalog-appregistry and the service is servicecatalog
+        this.host = host ? host : this.service;
+        this.supportNonFips = supportNonFips;
+        if (region) {
+            // FIPS endpoints for US gov cloud are different, they require '-fip' to be added to the service name.
+            // ServiceNow has 2 different "regions" for each US gov cloud region: one FIPS, one non-FIPS.
+            // This initialise correctly the host and region.
+            var regionFips = region.split(':');
+            if (regionFips.length > 1 && regionFips[1] === 'fips' && supportNonFips) {
+                this.host += '-fips';
+            }
+            region = regionFips[0];
+            if (region.match(/^([a-z0-9]|-)+$/g) === null) {
+                throw new Error("Region \"" + region + "\" is not supported");
+            }
+            this.host += "." + region;
+        }
+        if (region == "cn-north-1" || region == "cn-northwest-1") {
+            this.host += ".amazonaws.com.cn";
+        } else {
+            this.host += ".amazonaws.com";
+        }
+        this.endpoint = "https://" + this.host;
+        this.region = region ? region : "us-east-1";
+        if (credential && credential.identity && credential.secret) {
+            this.credential = credential;
+            this.requester = this.loadRequester();
+            this._requestCount = 0;
+        } else {
+            throw new Error("Invalid credential: object must be a supplier or have identity and secret properties");
+        }
+    }
+    /** @return string the time in format yyyymmddThhmmssZ */
+    AwsService.prototype.iso8601 = function() {
+        // "2017-05-15T16:44:55.288Z" --> 20170515T164455Z
+        var d = new Date().toISOString();
+        d = d.replace(/[-:]/g, '');
+        // strip milliseconds.
+        d = d.replace(/\.\d\d\dZ/, 'Z');
+        return d;
+    };
+    AwsService.prototype.loadRequester = function() {
+        var sysProp = gs.getProperty(this.httpRequesterSysProp);
+        if (sysProp) {
+            var o = Util.getObjectWithName(sysProp);
+            if (!o) {
+                throw new Error("Value configured for system property " + this.httpRequesterSysProp +
+                    " could not be loaded: " + sysProp);
+            }
+            return o;
+        }
+        return sn_ws.RESTMessageV2;
+    };
+    AwsService.prototype.loadVersion = function() {
+        // Get version from the "sys_scope" table
+        var appGr = new GlideRecord('sys_scope');
+        appGr.addQuery('scope', C.prefix);
+        appGr.setLimit(1);
+        appGr.query();
+        if (!appGr.next()) {
+            throw new Error("Impossible to retrieve the version of \"" + C.prefix + "\" scoped application");
+        }
+        return appGr.version.toString();
+    };
+    AwsService.prototype.agent = function() {
+        var instanceId = gs.getProperty("instance_id"),
+            userId = gs.getUserID(),
+            version = this.loadVersion();
+        return C.name + "/" + version + "/" + instanceId + (userId ? "/" + userId : "");
+    };
+    /**
+     * Enable the support for exponential backoff, until the given "maxDelay"
+     * @param timeout {number} The maximum amount of time to try the same requests, in seconds
+     */
+    AwsService.prototype.setExponentialBackoff = function(timeout) {
+        if (timeout < 0 || timeout > 600) {
+            throw new Error('Maximum delay invalid. It should be between 0 and 600 seconds');
+        }
+        this.timeout = timeout;
+    };
+    /**
+     * Make calls to the specified endpoint recursively until the next page token is null.
+     * @param action {String}
+     * @param focus {String}
+     * @param payload {(String|Object)}
+     * @param headers {Object}
+     * @param pageToken {String}
+     * @returns {}
+     * @memberof! AwsService#
+     * @alias _paginatedApi
+     * @private
+     */
+    AwsService.prototype._paginatedApi = function(action, payload, headers, focus, pageToken) {
+        var base = this._post(action, payload, headers);
+        var self = this;
+        return Response.paginated(base, focus, function(token) {
+            var newOptions = Object.extend({}, payload);
+            newOptions[pageToken ? pageToken : 'PageToken'] = token;
+            return self._paginatedApi(action, newOptions, headers, focus, pageToken);
+        }, pageToken);
+    };
+    /**
+     * Make calls to the specified endpoint recursively until the next page token is null.
+     * @param url {String}
+     * @param payload {Object}
+     * @param headers {Object}
+     * @param queryParameters {Object}
+     * @param focus {String} The portion of each response page that should be iterated in
+     *     {@link #collectAll} and {@link #map}.
+     * @param pageToken [String] The property in the response that indicates that there
+     *     is another page of data available. Defaults to "NextPageToken".
+     * @returns {}
+     * @memberof! AwsService#
+     * // @ alias _paginatedApi
+     * @private
+     */
+    AwsService.prototype._paginatedGetApi = function(url, payload, headers, queryParameters, focus, pageToken) {
+        var base = this._get(url, payload, headers, queryParameters);
+        var self = this;
+        return Response.paginated(base, focus, function(token) {
+            var newParameters = Object.extend({}, queryParameters);
+            newParameters[pageToken ? pageToken : 'PageToken'] = token;
+            return self._paginatedGetApi(url, payload, headers, newParameters, focus, pageToken);
+        }, pageToken);
+    };
+    /**
+     * Send an HTTP GET to the service.
+     * @param path {String}
+     * @param payload {(String|Object)}
+     * @param additionalHeaders {Object}
+     * @param queryParameters {Object=}
+     * @returns {sn_ws.RESTResponseV2}
+     * @throws Propagates errors thrown by credential suppliers.
+     * @memberof! AwsService#
+     * @alias _post
+     * @private
+     */
+    AwsService.prototype._get = function(path, payload, additionalHeaders, queryParameters) {
+        return this._request("GET", path, undefined, payload, additionalHeaders, queryParameters);
+    };
+    /**
+     * Send an HTTP POST to the service.
+     * @param action {String}
+     * @param payload {(String|Object)}
+     * @param additionalHeaders {Object}
+     * @param queryParameters {Object=}
+     * @param path {String}
+     * @returns {sn_ws.RESTResponseV2}
+     * @throws Propagates errors thrown by credential suppliers.
+     * @memberof! AwsService#
+     * @alias _post
+     * @private
+     */
+    AwsService.prototype._post = function(action, payload, additionalHeaders, queryParameters, path) {
+        return this._request("POST", path, action, payload, additionalHeaders, queryParameters);
+    };
+    /**
+     * Send an HTTP PATCH to the service.
+     * @param path {String}
+     * @param action {String}
+     * @param payload {(String|Object)}
+     * @param additionalHeaders {Object}
+     * @param queryParameters {Object=}
+     * @returns {sn_ws.RESTResponseV2}
+     * @throws Propagates errors thrown by credential suppliers.
+     * @memberof! AwsService#
+     * @alias _post
+     * @private
+     */
+    AwsService.prototype._patch = function(path, action, payload, additionalHeaders, queryParameters) {
+        return this._request("PATCH", path, action, payload, additionalHeaders, queryParameters);
+    };
+    AwsService.prototype._request = function(method, path, action, payload, additionalHeaders, queryParameters) {
+        if (!payload) {
+            payload = "";
+        } else if (typeof payload === 'object') {
+            payload = JSON.stringify(payload);
+        }
+        var request = new this.requester;
+        var endpoint = this.endpoint + (path ? path : '');
+        request.setEndpoint(endpoint);
+        request.setHttpMethod(method);
+        request.setRequestBody(payload);
+        if (queryParameters) {
+            Object.keys(queryParameters)
+                .forEach(function(key) {
+                    request.setQueryParameter(key, queryParameters[key]);
+                });
+        }
+        var isoDate = this.iso8601();
+        var headers = {
+            "Host": this.host,
+            "X-Amz-Date": isoDate,
+            "User-Agent": this.agent()
+        };
+        /*if (payload.length > 0) {
+            headers["Content-Length"] = payload.length;
+        }*/
+        headers = Object.extend(headers, additionalHeaders || {});
+        if (!this.credential.identity || !this.credential.secret) {
+            throw new Error("Credential must have identity and secret properties");
+        }
+        var signer = new AwsSignature(this.service, this.region, this.credential, isoDate);
+        headers["Authorization"] = signer.signV4(method, headers, path || "/", queryParameters, payload);
+        Object.keys(headers)
+            .forEach(function(key) {
+                request.setRequestHeader(key, headers[key]);
+            });
+        var startTime = new GlideDateTime();
+        this.logRequests && this.logRequest(endpoint, method, queryParameters, headers, payload);
+        var response = this._doRequest(request, method, action);
+        var duration = new GlideDateTime().getNumericValue() - startTime.getNumericValue();
+        this._logRequestResponse(path || action, payload, headers, this.credential, response, duration);
+        this._requestCount += 1;
+        this.logResponse && gs.info(JSON.stringify({
+            response: {
+                body: response.getBody()
+            }
+        }, null, 2));
+        return response;
+    };
+    AwsService.prototype.logRequest = function(endpoint, method, queryParameters, headers, payload) {
+        gs.info("AWS Request:\n" + JSON.stringify({
+            service: {
+                type: this.type,
+                service: this.service,
+                region: this.region,
+                host: this.host,
+                endpoint: this.endpoint,
+                requestor: this.requester
+            },
+            request: {
+                endpoint: endpoint,
+                method: method,
+                queryParameters: queryParameters,
+                headers: headers,
+                payload: payload
+            }
+        }, null, 2));
+    };
+    // The exponential-backoff implements a 'full-jitter' and is a requirement from AWS
+    AwsService.prototype._doRequest = function(request, method, action) {
+        var delay = 0;
+        var maxDelay = 0;
+        var retries = 0;
+        var startTime = new Date().getTime();
+        while (true) {
+            if (startTime + (delay * 1000) > new Date().getTime()) {
+                continue;
+            }
+            var response_1 = request.execute();
+            if (this.timeout === undefined) {
+                return response_1;
+            }
+            var wrappedResponse = Response.of(response_1);
+            if (wrappedResponse.isRequestRetryable()) {
+                var prefix = "\"" + method + " " + request.getEndpoint() + " " + action + "\" " + wrappedResponse.getStatusCode() + " \"" + wrappedResponse.getBody() + "\"";
+                if (new Date().getTime() > startTime + (this.timeout * 1000)) {
+                    gs.error(prefix + "\nRequest could not be resolved within maximum timeframe of " + this.timeout + "s, bailing out.");
+                    return response_1;
+                }
+                maxDelay = Math.pow(2, retries) * 0.1;
+                delay = maxDelay * Math.random();
+                retries++;
+                gs.debug(prefix + "\nRetry #" + retries + " after " + delay + "s ...");
+                continue;
+            }
+            return response_1;
+        }
+    };
+    AwsService.prototype.getRequestCount = function() {
+        return this._requestCount;
+    };
+    AwsService.prototype._logRequestResponse = function(action, payload, headers, requestCredential, response, duration) {
+        var requestLogGr = new GlideRecord('x_126749_aws_sc_req_log');
+        requestLogGr.initialize();
+        requestLogGr.accesskey = requestCredential.identity;
+        requestLogGr.role = requestCredential.role;
+        requestLogGr.service = this.service;
+        requestLogGr.region = this.region;
+        requestLogGr.endpoint = this.endpoint;
+        requestLogGr.action = action;
+        requestLogGr.body = payload;
+        requestLogGr.statuscode = response.getStatusCode();
+        requestLogGr.responsebody = response.getBody();
+        requestLogGr.duration = duration;
+        requestLogGr.insert();
+    };
+    return AwsService;
+}());
+AwsService.prototype.type = 'AwsService';]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2017-09-12 08:20:59</sys_created_on>
+        <sys_id>6b53d2d7db010300cb04d421cf961943</sys_id>
+        <sys_mod_count>4</sys_mod_count>
+        <sys_name>AwsService</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_6b53d2d7db010300cb04d421cf961943</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2023-03-01 17:55:54</sys_updated_on>
+    </sys_script_include>
+</record_update>

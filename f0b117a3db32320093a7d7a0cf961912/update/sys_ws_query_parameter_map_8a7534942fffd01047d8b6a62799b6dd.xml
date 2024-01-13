@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ws_query_parameter_map">
+    <sys_ws_query_parameter_map action="INSERT_OR_UPDATE">
+        <sys_class_name>sys_ws_query_parameter_map</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-10-07 15:43:50</sys_created_on>
+        <sys_id>8a7534942fffd01047d8b6a62799b6dd</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>20a678542fffd01047d8b6a62799b6de</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_ws_query_parameter_map_8a7534942fffd01047d8b6a62799b6dd</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <web_service_operation display_value="Key rotation">07d5677f2fa3d01047d8b6a62799b66f</web_service_operation>
+        <web_service_query_parameter display_value="validate">20a678542fffd01047d8b6a62799b6de</web_service_query_parameter>
+    </sys_ws_query_parameter_map>
+</record_update>

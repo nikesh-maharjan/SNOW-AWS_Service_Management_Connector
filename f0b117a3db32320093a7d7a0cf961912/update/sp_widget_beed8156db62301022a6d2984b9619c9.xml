@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>custom</category>
+        <client_script><![CDATA[function awsSsmChangeManagerPortalFormController ($scope, $document, connectorAjax) {
+
+    /* widget controller */
+    var c = this;
+
+    // On Kingston, and only on Kingston, on the order page on Service Portal,
+    // the page displays a field (a text box) for the UI Page variable.
+    // This should not be shown, so we remove it manually. This can be removed
+    // once Kingston is no longer supported.
+    function removeAnyUiPageField() {
+        if (c.data.uiPageId) {
+            var uiPageDiv = document.getElementById(c.data.uiPageId);
+            if (uiPageDiv) {
+                var uiPageParent = uiPageDiv.parentElement;
+                uiPageParent.removeChild(uiPageDiv);
+            }
+        }
+    }
+
+    c.setUserToken = function() {
+        connectorAjax.setUserToken(c.data.sessionToken);
+        c.tokenIsSet = true;
+    };
+
+    var scope = $scope.$parent;
+    var changeTemplateSysId = null;
+    while (scope) {
+        if (scope.data && scope.data.sc_cat_item) {
+            changeTemplateSysId = scope.data.sc_cat_item.sys_id;
+            break;
+        } else {
+            scope = scope.$parent;
+        }
+    }
+
+    $document.get(0).scSubmissionError = function () {
+        // signal validation error to all components contained in this scope
+        $scope.$broadcast('aws-ssm:validationFailure', {});
+    };
+
+    if (!changeTemplateSysId) {
+        throw new Error('Could not determine document ID');
+    }
+
+    c.data.changeTemplateSysId = changeTemplateSysId;
+
+    removeAnyUiPageField();
+
+    c.onError = function (errs) {
+        // no action needed on this page
+    };
+
+    $scope.page.g_form.setValue('AwsAccount', c.data.awsAccountSysId);
+    $scope.page.g_form.setValue('AwsRegion', c.data.awsRegion);
+
+    c.updateHiddenFields = function (model) {
+        $scope.page.g_form.setValue('DocumentName', model.documentName);
+        $scope.page.g_form.setValue('DocumentVersion', model.documentVersion);
+        $scope.page.g_form.setValue('Parameters', model.params);
+        $scope.page.g_form.setValue('Tags', model.tags);
+        $scope.page.g_form.setValue('IsValid', model.valid);
+    };
+
+    $scope.$watch('c.data.sessionToken', c.setUserToken);
+
+}
+]]></client_script>
+        <controller_as>c</controller_as>
+        <css/>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>false</has_preview>
+        <id>aws-ssm-changemanager-order-form</id>
+        <internal>false</internal>
+        <link><![CDATA[function link(scope, element, attrs, controller) {  }]]></link>
+        <name>AWS SSM ChangeManager Service Portal for</name>
+        <option_schema/>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[// TODO: Make this typescript + deployable annotation
+(function () {
+    var UI_PAGE_VARIABLE = 'uiPage';
+    var VARIABLE_SET = 'AWS Systems Manager Change Manager Variables';
+    data.sessionToken = gs.getSession().getSessionToken();
+    // The result of this query is used to remove the "UI Page" text box in Kingston.
+    var variableGr = new GlideRecord('item_option_new');
+    variableGr.addQuery('name', UI_PAGE_VARIABLE);
+    variableGr.addQuery('variable_set.name', VARIABLE_SET);
+    variableGr.query();
+    if (variableGr.next()) {
+        data.uiPageId = variableGr.sys_id.toString();
+    }
+    var documentSysId = RP.getParameterValue('sysparm_id');
+    var documentGr = new GlideRecordSecure('sc_cat_item_producer');
+    if (documentGr.get(documentSysId) && documentGr.isValidRecord()) {
+        var meta = JSON.parse(documentGr.meta);
+        data.awsAccountSysId = meta.account;
+        data.awsRegion = meta.region;
+    }
+})();
+]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-09-14 11:35:39</sys_created_on>
+        <sys_id>beed8156db62301022a6d2984b9619c9</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AWS SSM ChangeManager Service Portal for</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sp_widget_beed8156db62301022a6d2984b9619c9</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <template><![CDATA[<div ng-if="c.tokenIsSet">
+    <customize-template-form
+        change-template-sys-id="c.data.changeTemplateSysId"
+        on-model-update="c.updateHiddenFields(model)"
+        on-error="c.onError(errs)">
+    </customize-template-form>
+</div>
+]]></template>
+    </sp_widget>
+</record_update>

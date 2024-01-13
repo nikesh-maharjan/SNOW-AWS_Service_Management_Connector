@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.Provisioner</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>Provisioner</name>
+        <script><![CDATA[/**
+ * @class Provisioner
+ * @classdesc Support for a workflow on sc_req_item table, for provisioning a product from AWS Service Catalog.
+ *
+ * Use in a workflow as a "Run Script" step with script definition:
+ * <pre>
+ * const provisioning = new Provisioner(workflow, context, activity, current);
+ * provisioning.requestProduct();
+ * </pre>
+ */
+var Provisioner = /** @class */ (function () {
+    /**
+     * @param workflow The 'workflow' variable from ServiceNow
+     * @param context  The 'context' variable from ServiceNow
+     * @param activity The current 'activity' variable from ServiceNow
+     * @param current The 'current' variable itself from ServiceNow (a GlideRecord on sc_req_item)
+     */
+    function Provisioner(workflow, context, activity, current) {
+        this.type = 'Provisioner';
+        this.workflow = workflow;
+        this.scratchpad = workflow.scratchpad;
+        this.activity = activity;
+        this.scReqItemGR = current;
+    }
+    /**
+     * Deploy a new instance of a product in AWS by provisioning it or by executing a plan.
+     */
+    Provisioner.prototype.requestProduct = function () {
+        this.scratchpad.invoke_attempts += 1;
+        var maxRetries = this.scratchpad.retries_permitted, attempts = this.scratchpad.invoke_attempts;
+        var catalogProduct = this.getCatalogProduct();
+        if (!catalogProduct) {
+            return this.fail("Requested item " + this.scReqItemGR.sys_id.toString() + " is not an AWS Service Catalog Product");
+        }
+        var result;
+        try {
+            if (this.usePlanToProvision()) {
+                result = this.executePlan();
+            }
+            else {
+                result = this.provisionProduct();
+            }
+        }
+        catch (e) {
+            return this.fail(e.message);
+        }
+        if (result.success === true) {
+            this.scReqItemGR.configuration_item = this.provisionedProduct.getSysId();
+            this.scReqItemGR.update();
+            this.createProvisioningEvent(result.result);
+            var message = "Provisioning of the product";
+            if (this.usePlanToProvision()) {
+                message += " (from previously created plan)";
+            }
+            message += ' requested from AWS';
+            Util.createRequestItemComment(this.provisionedProduct.gr(), message);
+            return this.succeed();
+        }
+        else if (result.isRetryable && attempts < maxRetries) {
+            return this.retry();
+        }
+        else if (result.isRetryable) {
+            var message = "Failed to provision product after " + maxRetries + " attempts. Last failure was: " + result.reason;
+            Util.createRequestItemComment(this.provisionedProduct.gr(), message);
+            return this.fail(message);
+        }
+        else {
+            return this.fail(result.reason);
+        }
+    };
+    /**
+     * Provisions a product with the ExecuteProvisionedProductPlan action.
+     */
+    Provisioner.prototype.executePlan = function () {
+        var provisionedProductSysId = this.scReqItemGR.variables.ProvisionedProductSysId.toString();
+        this.provisionedProduct = ProvisionedProduct.from(provisionedProductSysId);
+        if (!this.provisionedProduct) {
+            return Util.failure("No such provisioned product: " + provisionedProductSysId);
+        }
+        else if (!this.provisionedProduct.hasPlan()) {
+            return Util.failure("Provisioner invoked on a provisioned product that does not have a plan: " + provisionedProductSysId);
+        }
+        // We need to save the provisioned product as configuration item when executing the plan
+        // otherwise we cannot infer the credentials.
+        this.scReqItemGR.configuration_item = this.provisionedProduct.getSysId();
+        this.scReqItemGR.update();
+        var plan = this.provisionedProduct.getPlan(), currentStatus = plan.getStatus(true);
+        switch (currentStatus) {
+            case "CREATE_IN_PROGRESS":
+                // Don't count requestExecute invocations that fail because the plan is
+                // creating as a failure.
+                this.scratchpad.invoke_attempts -= 1;
+                return Util.failure("Plan is still creating", true);
+            case "CREATE_SUCCESS":
+                this.workflow.info("Provisioning stack by executing plan");
+                var maybeOutput = plan.execute(this.scratchpad.token);
+                if (maybeOutput.success === true) {
+                    return Util.success(maybeOutput.result.RecordDetail);
+                }
+                else {
+                    return maybeOutput;
+                }
+            default:
+                return Util.failure("Cannot execute plan in state " + currentStatus);
+        }
+    };
+    /**
+     * Provisions a product with the ProvisionProduct action.
+     */
+    Provisioner.prototype.provisionProduct = function () {
+        var catalogProduct = this.getCatalogProduct();
+        var itemVariables = this.scReqItemGR.variables;
+        var region = catalogProduct.awsregion.toString();
+        var name = itemVariables.ProvisionedProductName.toString();
+        var userId = this.scReqItemGR.getValue('opened_by');
+        var userName = this.scReqItemGR.opened_by.user_name.toString();
+        var userRole = itemVariables.UserRole;
+        // Try to fail early
+        var maybeParams = Util.tryParseJson(Util.getDecryptedValue(itemVariables.ProvisioningParameters), "provisioning parameters");
+        if (maybeParams.success === false) {
+            return maybeParams;
+        }
+		
+		gs.info("Yash : after params " + Util.getDecryptedValue(itemVariables.ProvisioningParameters));
+        //Numerical parameters cause a cast exception when included in a provision product call
+        maybeParams.result.forEach(function (param) {
+            param.Value = param.Value === null || !param.Value ? '' : param.Value.toString();
+        });
+        var maybeTags = Util.tryParseJson(itemVariables.Tags, "tags");
+        if (maybeTags.success === false) {
+            return maybeTags;
+        }
+        var options = {};
+        if (itemVariables.ProvisioningPreferences) {
+            var maybePreferences = Util.tryParseJson(itemVariables.ProvisioningPreferences, "provisioning preferences");
+            if (maybePreferences.success === false) {
+                return maybePreferences;
+            }
+            options.ProvisioningPreferences = maybePreferences.result;
+        }
+        if (!ProductUserCriteria.mayView(userId, catalogProduct.sys_id.toString())) {
+            return Util.failure("User is not entitled to provisioned product " + catalogProduct.name.toString());
+        }
+        var credentials;
+        try {
+            credentials = AwsCredentials.from(catalogProduct).as(AwsCredentials.User.End);
+        }
+        catch (ex) {
+            return Util.failure('Could not establish credentials for ' + userName +
+                ' with role ' + userRole + ': ' + ex.message);
+        }
+        this.workflow.info("Requesting product " + name + " in " + region + " for " + userName);
+        var serviceCatalog = new AwsServiceCatalog(region, credentials);
+        var portfolio = this.getCatalogProduct().awsportfolio.getRefRecord();
+        var customTags = Util.getCustomTags(portfolio, this.scReqItemGR);
+        var provisioningResponse = serviceCatalog.provisionProduct(itemVariables.ProvisionedProductName.toString(), catalogProduct.awsproductid.toString(), itemVariables.PathId.toString(), itemVariables.ProvisioningArtifactId.toString(), maybeParams.result, maybeTags.result.concat(customTags), this.scratchpad.token, options);
+        if (provisioningResponse.haveError()) {
+            if (provisioningResponse.isRequestRetryable()) {
+                return Util.failure("Retryable failure provisioning product", true);
+            }
+            return Util.failure(Util.explainError(provisioningResponse.deserialize()));
+        }
+        var body = provisioningResponse.deserialize();
+        var provisionedProductGr = ProvisionedProductRepo.createProvisionedProductFromRecordDetail(catalogProduct, userId, '', body.RecordDetail, 2 /* PROVISIONING */, "UNDER_CHANGE");
+        this.provisionedProduct = new ProvisionedProduct(provisionedProductGr);
+        return Util.success(body.RecordDetail);
+    };
+    Provisioner.prototype.succeed = function () {
+        this.workflow.info("Product is provisioning");
+        this.activity.result = "yes";
+        ProvisionedProductRepo.updateWithStatus(this.provisionedProduct.gr(), ProvisionedProduct.Status.provisioning);
+    };
+    Provisioner.prototype.retry = function () {
+        this.activity.result = "retry";
+    };
+    Provisioner.prototype.fail = function (message) {
+        this.workflow.warn("Error sending provisioning request: " + message);
+        this.activity.result = "no";
+        if (this.provisionedProduct) {
+            ProvisionedProductRepo.updateWithStatus(this.provisionedProduct.gr(), ProvisionedProduct.Status.error, message);
+        }
+    };
+    Provisioner.prototype.usePlanToProvision = function () {
+        var variables = this.scReqItemGR.variables;
+        return variables.ProvisionedProductSysId &&
+            variables.ProvisionedProductSysId.toString().length > 0;
+    };
+    Provisioner.prototype.getCatalogProduct = function () {
+        var pgr = new GlideRecord('x_126749_aws_sc_product');
+        if (pgr.get(this.scReqItemGR.cat_item.toString())) {
+            return pgr;
+        }
+        return null;
+    };
+    Provisioner.prototype.createProvisioningEvent = function (details) {
+        ProvisionedProductRepo.updateProvisionedProduct(details, this.provisionedProduct.gr(), ProvisionedProduct.Status.provisioning);
+        var provisionedProductEventGr = ProvisionedProductRepo.saveProvisionedProductEvent(this.provisionedProduct.gr(), details);
+        provisionedProductEventGr.awssubmissionstatus = 'SUBMITTED';
+        provisionedProductEventGr.update();
+    };
+    return Provisioner;
+}());
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2017-10-13 21:48:45</sys_created_on>
+        <sys_id>fd65bce54ff90300c5883b728110c737</sys_id>
+        <sys_mod_count>4</sys_mod_count>
+        <sys_name>Provisioner</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_fd65bce54ff90300c5883b728110c737</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2023-04-27 03:54:59</sys_updated_on>
+    </sys_script_include>
+</record_update>

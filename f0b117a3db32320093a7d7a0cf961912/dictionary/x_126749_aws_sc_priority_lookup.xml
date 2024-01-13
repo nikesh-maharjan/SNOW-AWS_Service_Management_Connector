@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="14052cdcdb02201079bd2fb748961927" label="Priority Lookup" max_length="40" name="x_126749_aws_sc_priority_lookup" type="collection">
+        <element attributes="edge_encryption_enabled=true" hint="The maximum criticality of a finding for this rule. Must be between 0 and 100." label="Finding Criticality Maximum" max_length="40" name="awsfindingcriticalitymaximum" type="integer"/>
+        <element attributes="edge_encryption_enabled=true" hint="The minimum criticality of a finding for this rule. Must be between 0 and 100 and below the maximum value." label="Finding Criticality Minimum" max_length="40" name="awsfindingcriticalityminimum" type="integer"/>
+        <element attributes="edge_encryption_enabled=true" choice="1" label="Finding Severity Label" max_length="64" name="awsfindingseveritylabel" type="choice">
+            <choice>
+                <element inactive_on_update="false" label="Informational" sequence="10" value="INFORMATIONAL"/>
+                <element inactive_on_update="false" label="Low" sequence="20" value="LOW"/>
+                <element inactive_on_update="false" label="Medium" sequence="30" value="MEDIUM"/>
+                <element inactive_on_update="false" label="High" sequence="40" value="HIGH"/>
+                <element inactive_on_update="false" label="Critical" sequence="50" value="CRITICAL"/>
+            </choice>
+        </element>
+        <element attributes="edge_encryption_enabled=true" choice="1" label="OpsItem Priority" max_length="40" name="awsopsitempriority" type="choice">
+            <choice>
+                <element inactive_on_update="false" label="1" sequence="10" value="1"/>
+                <element inactive_on_update="false" label="2" sequence="20" value="2"/>
+                <element inactive_on_update="false" label="3" sequence="30" value="3"/>
+                <element inactive_on_update="false" label="4" sequence="40" value="4"/>
+                <element inactive_on_update="false" label="5" sequence="50" value="5"/>
+            </choice>
+        </element>
+        <element attributes="edge_encryption_enabled=true" choice="1" label="OpsItem Severity" max_length="40" name="awsopsitemseverity" type="choice">
+            <choice>
+                <element inactive_on_update="false" label="1" sequence="10" value="1"/>
+                <element inactive_on_update="false" label="2" sequence="20" value="2"/>
+                <element inactive_on_update="false" label="3" sequence="30" value="3"/>
+                <element inactive_on_update="false" label="4" sequence="40" value="4"/>
+            </choice>
+        </element>
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false" label="Priority Lookup Reference" max_length="32" name="awsprioritylookupreference" reference="dl_u_priority" type="reference"/>
+        <element attributes="edge_encryption_enabled=true" choice="1" hint="The ServiceNow priority associated with this rule." label="ServiceNow Priority" max_length="32" name="awsprioritylookupvalue" type="choice">
+            <choice>
+                <element inactive_on_update="false" label="1 - Critical" sequence="10" value="1"/>
+                <element inactive_on_update="false" label="2 - High" sequence="20" value="2"/>
+                <element inactive_on_update="false" label="3 - Moderate" sequence="30" value="3"/>
+                <element inactive_on_update="false" label="4 - Low" sequence="40" value="4"/>
+                <element inactive_on_update="false" label="5 - Planning" sequence="50" value="5"/>
+            </choice>
+        </element>
+        <element attributes="edge_encryption_enabled=true" choice="3" default="Finding" label="AWS Record Type" max_length="40" name="awsrecordtype" type="choice">
+            <choice>
+                <element inactive_on_update="false" label="Finding" sequence="10" value="Finding"/>
+                <element inactive_on_update="false" label="OpsItem" sequence="20" value="OpsItem"/>
+                <element inactive_on_update="false" label="Support Case" sequence="30" value="SupportCase"/>
+            </choice>
+        </element>
+        <element attributes="edge_encryption_enabled=true" choice="3" label="ServiceNow Incident Priority" max_length="40" name="awsservicenowsupportcaseseverity" type="choice">
+            <choice>
+                <element inactive_on_update="false" label="Critical" value="1"/>
+                <element inactive_on_update="false" label="High" sequence="10" value="2"/>
+                <element inactive_on_update="false" label="Moderate" sequence="20" value="3"/>
+                <element inactive_on_update="false" label="Low" sequence="30" value="4"/>
+                <element inactive_on_update="false" label="Planning" sequence="40" value="5"/>
+            </choice>
+        </element>
+        <element attributes="edge_encryption_enabled=true" choice="3" label="AWS Support Case Severity" max_length="40" name="awssupportcaseseverity" type="choice">
+            <choice>
+                <element inactive_on_update="false" label="Business-critical system down (Enterprise Support plan only)" value="1"/>
+                <element inactive_on_update="false" label="Production system down" sequence="10" value="2"/>
+                <element inactive_on_update="false" label="Production system impaired" sequence="20" value="3"/>
+                <element inactive_on_update="false" label="System impaired" sequence="30" value="4"/>
+                <element inactive_on_update="false" label="General guidance" sequence="40" value="5"/>
+            </choice>
+        </element>
+        <index name="index">
+            <element name="awsprioritylookupreference"/>
+        </index>
+    </element>
+</database>

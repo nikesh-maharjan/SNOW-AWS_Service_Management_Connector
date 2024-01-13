@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update>
+    <sys_choice action="INSERT_OR_UPDATE" field="awsworkflowstatus" table="x_126749_aws_sc_finding" version="3">
+        <sys_choice_set action="INSERT_OR_UPDATE">
+            <element>awsworkflowstatus</element>
+            <name>x_126749_aws_sc_finding</name>
+            <sys_class_name>sys_choice_set</sys_class_name>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2020-10-08 15:09:26</sys_created_on>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_name>awsworkflowstatus</sys_name>
+            <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+            <sys_policy/>
+            <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+            <sys_update_name>sys_choice_x_126749_aws_sc_finding_awsworkflowstatus</sys_update_name>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        </sys_choice_set>
+        <sys_choice action="INSERT_OR_UPDATE">
+            <dependent_value/>
+            <element>awsworkflowstatus</element>
+            <hint/>
+            <inactive>true</inactive>
+            <label>ASSIGNED</label>
+            <language>en</language>
+            <name>x_126749_aws_sc_finding</name>
+            <sequence>0</sequence>
+            <synonyms/>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2020-10-08 15:09:35</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>03a25ee7473351506c7dc787a46d43b9</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+            <value>ASSIGNED</value>
+        </sys_choice>
+        <sys_choice action="INSERT_OR_UPDATE">
+            <dependent_value/>
+            <element>awsworkflowstatus</element>
+            <hint/>
+            <inactive>false</inactive>
+            <label>NEW</label>
+            <language>en</language>
+            <name>x_126749_aws_sc_finding</name>
+            <sequence>0</sequence>
+            <synonyms/>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2020-10-08 15:09:26</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>cfa25ee7473351506c7dc787a46d43b9</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+            <value>NEW</value>
+        </sys_choice>
+        <sys_choice action="INSERT_OR_UPDATE">
+            <dependent_value/>
+            <element>awsworkflowstatus</element>
+            <hint/>
+            <inactive>true</inactive>
+            <label>IN_PROGRESS</label>
+            <language>en</language>
+            <name>x_126749_aws_sc_finding</name>
+            <sequence>1</sequence>
+            <synonyms/>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2020-10-08 15:09:45</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>8fa25ee7473351506c7dc787a46d43ba</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+            <value>IN_PROGRESS</value>
+        </sys_choice>
+        <sys_choice action="INSERT_OR_UPDATE">
+            <dependent_value/>
+            <element>awsworkflowstatus</element>
+            <hint/>
+            <inactive>false</inactive>
+            <label>NOTIFIED</label>
+            <language>en</language>
+            <name>x_126749_aws_sc_finding</name>
+            <sequence>1</sequence>
+            <synonyms/>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2020-10-20 15:21:33</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>4fa25ee7473351506c7dc787a46d43bb</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+            <value>NOTIFIED</value>
+        </sys_choice>
+        <sys_choice action="INSERT_OR_UPDATE">
+            <dependent_value/>
+            <element>awsworkflowstatus</element>
+            <hint/>
+            <inactive>true</inactive>
+            <label>DEFERRED</label>
+            <language>en</language>
+            <name>x_126749_aws_sc_finding</name>
+            <sequence>2</sequence>
+            <synonyms/>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2020-10-08 15:09:54</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>0fa25ee7473351506c7dc787a46d43bc</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+            <value>DEFERRED</value>
+        </sys_choice>
+        <sys_choice action="INSERT_OR_UPDATE">
+            <dependent_value/>
+            <element>awsworkflowstatus</element>
+            <hint/>
+            <inactive>false</inactive>
+            <label>RESOLVED</label>
+            <language>en</language>
+            <name>x_126749_aws_sc_finding</name>
+            <sequence>2</sequence>
+            <synonyms/>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2020-10-08 15:10:05</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>cba25ee7473351506c7dc787a46d43bd</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+            <value>RESOLVED</value>
+        </sys_choice>
+        <sys_choice action="INSERT_OR_UPDATE">
+            <dependent_value/>
+            <element>awsworkflowstatus</element>
+            <hint/>
+            <inactive>false</inactive>
+            <label>SUPPRESSED</label>
+            <language>en</language>
+            <name>x_126749_aws_sc_finding</name>
+            <sequence>3</sequence>
+            <synonyms/>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2020-10-20 15:21:33</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>8ba25ee7473351506c7dc787a46d43be</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+            <value>SUPPRESSED</value>
+        </sys_choice>
+    </sys_choice>
+</record_update>

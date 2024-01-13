@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>custom</category>
+        <client_script><![CDATA[function automationExecutionDetailClient(spModal, spUtil, $timeout, $rootScope, $scope) {
+    /* widget controller */
+    var c = this;
+    c.collapsible = {
+        outputs: true,
+        steps: true
+    };
+
+    init();
+
+    function init() {
+        $timeout(function() {
+            $rootScope.$broadcast('sp.update.breadcrumbs', c.data.breadcrumbs);
+        });
+        if(c.data.execution) {
+            spUtil.recordWatch($scope, "x_126749_aws_sc_cmdb_ci_ae",
+                "sys_id=" + c.data.execution.sys_id,
+                function(name, data) {
+                    spUtil.update($scope);
+                });
+        }
+
+        displayAnyWarnings();
+    }
+
+    function displayAnyWarnings() {
+        c.data.warnings.forEach(function (e) {
+            spUtil.addErrorMessage(e);
+        });
+    }
+}
+]]></client_script>
+        <controller_as>c</controller_as>
+        <css>.floatright {
+    float: right;
+}
+.panel-heading .panel-title {
+    display: inline;
+}
+.clickable {
+    cursor: pointer;
+}
+.invisible {
+    display: none;
+}
+</css>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>true</has_preview>
+        <id>aws_automation_execution_form</id>
+        <internal>false</internal>
+        <link><![CDATA[function link(scope, element, attrs, controller) {  }]]></link>
+        <name>AWS Automation Execution Form</name>
+        <option_schema/>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[(function () {
+    initialize();
+
+    function initialize() {
+        data.sys_id = $sp.getParameter("sys_id");
+        data.warnings = [];
+
+        if (!data.sys_id) {
+            gs.debug('Cannot determine sys_id for Automation Execution detail');
+            data.warnings.push('Cannot determine Automation Execution ID');
+            return;
+        }
+
+        try {
+            var grExecution = new GlideRecord('x_126749_aws_sc_cmdb_ci_ae');
+            grExecution.addQuery('sys_id', data.sys_id);
+            grExecution.addQuery('owned_by', gs.getUserID());
+            grExecution.query();
+
+            if (grExecution.next()) {
+                var listPage;
+                // Needs to be GlideRecord to set breadcrumbs correctly.
+                var page = new GlideRecord('sp_page');
+                if (page.get('id', 'aws_ssm_ae')) {
+                    listPage = page.title.toString();
+                    data.breadcrumbs = [
+                        {label: listPage, url: '?id=aws_ssm_ae'},
+                        {label: grExecution.awsdocumentname.toString(), url: '#'}
+                    ];
+                }
+                loadDetails(grExecution);
+            }
+        } catch (err) {
+            gs.info('Caught exception in retrieving Automation Execution details for ' +
+                data.sys_id + (err.message ? err.message : err));
+            data.warnings.push('Automation Execution not found');
+        }
+    }
+
+    function loadDetails(grExecution) {
+        data.execution = {
+            'sys_id': grExecution.sys_id.toString(),
+            'automationExecutionId': grExecution.awsautomationexecutionid.toString(),
+            'automationExecutionStatus': grExecution.awsautomationexecutionstatus.toString(),
+            'currentAction': grExecution.awscurrentaction.toString(),
+            'currentStepName': grExecution.awscurrentstepname.toString(),
+            'documentName': grExecution.awsdocumentname.toString(),
+            'executedBy': grExecution.awsexecutedby.toString(),
+            'executionEndTime': parseGlideDateTime(grExecution.awsexecutionendtime),
+            'executionStartTime': parseGlideDateTime(grExecution.awsexecutionstarttime),
+            'failureMessage': grExecution.awsfailuremessage.toString(),
+            'lastSyncTime': parseGlideDateTime(grExecution.awslastsynctime),
+            'logFile': grExecution.awslogfile.toString(),
+            'mode': grExecution.awsmode.toString(),
+            'target': grExecution.awstarget.toString(),
+            'parentAutomationExecutionId': grExecution.awsparentautomationexecutionid.toString()
+        };
+        data.outputs = getOutputs(grExecution);
+        data.steps = getSteps(grExecution);
+    }
+
+    function getOutputs(grExecution) {
+        var outputs = [];
+        var grAeo = new GlideRecordSecure('x_126749_aws_sc_ae_output');
+        grAeo.addQuery('awsdocumentexecution', grExecution.sys_id);
+        grAeo.query();
+        while (grAeo.next()) {
+            var output = {
+                'sys_id': grAeo.sys_id.toString(),
+                'key': grAeo.awskey.toString(),
+                'value': grAeo.awsvalue.toString()
+            };
+            outputs.push(output);
+        }
+        return outputs;
+    }
+
+    function getSteps(grExecution) {
+        var steps = [];
+        var grAes = new GlideRecordSecure('x_126749_aws_sc_ae_step');
+        grAes.addQuery('awsdocumentexecution', grExecution.sys_id);
+        grAes.query();
+        while (grAes.next()) {
+            var step = {
+                'action': grAes.awsaction.toString(),
+                'documentExecution': grAes.awsdocumentexecution.toString(),
+                'executionEndTime': parseGlideDateTime(grAes.awsexecutionendtime),
+                'executionStartTime': parseGlideDateTime(grAes.awsexecutionstarttime),
+                'inputs': grAes.awsinputs.toString(),
+                'outputs': grAes.awsoutputs.toString(),
+                'stepExecutionId': grAes.awsstepexecutionid.toString(),
+                'stepIndex': grAes.awsstepindex.toString(),
+                'stepName': grAes.awsstepname.toString(),
+                'stepStatus': grAes.awsstepstatus.toString()
+            };
+            steps.push(step);
+        }
+        return steps;
+    }
+
+    function parseGlideDateTime(date) {
+        var glideDateTime = date && !date.nil() ? new GlideDateTime(date) : null;
+        if (glideDateTime) {
+            return {
+                value: glideDateTime.getValue(),
+                displayValue: glideDateTime.getDisplayValue(),
+                numericValue: glideDateTime.getNumericValue(),
+                tzOffset:  glideDateTime.getTZOffset()
+            };
+        }
+        return null;
+    }
+})();
+]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-05-08 16:25:57</sys_created_on>
+        <sys_id>b6fece9b2f60181057985e972799b6ff</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AWS Automation Execution Form</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sp_widget_b6fece9b2f60181057985e972799b6ff</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <template><![CDATA[<!--
+    Automation Execution Detail
+-->
+<div ng-if="!c.data.execution" class="panel panel-{{c.options.color}} intro b">
+    No execution information available
+</div>
+<div ng-if="c.data.execution" class="panel panel-{{c.options.color}} intro b">
+
+    <h1>{{ data.execution.documentName }}</h1>
+
+    <div class="wrapper-md">
+        <div class="row">
+            <div class="col-xs-2">Status</div>
+            <div class="col-xs-10">
+                <div>{{ data.execution.automationExecutionStatus }}</div>
+                <div ng-if="data.execution.failureMessage">({{ data.execution.failureMessage }})</div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-2">Current action</div>
+            <div class="col-xs-10">{{ data.execution.currentAction }}</div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-2">Current step</div>
+            <div class="col-xs-10">{{ data.execution.currentStepName }}</div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-2">Execution ID</div>
+            <div class="col-xs-10">{{ data.execution.automationExecutionId }}</div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-2">Mode</div>
+            <div class="col-xs-10">{{ data.execution.mode }}</div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-2">Target</div>
+            <div class="col-xs-10">{{ data.execution.target }}</div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-2">Start time</div>
+            <div class="col-xs-10">{{ data.execution.executionStartTime.displayValue }}</div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-2">End time</div>
+            <div class="col-xs-10">{{ data.execution.executionEndTime.displayValue }}</div>
+        </div>
+
+    </div>
+
+    <div class="panel-heading">
+        <h4 class="panel-title">Outputs</h4>
+        <span class="clickable floatright glyphicon glyphicon-resize-full"
+              ng-class="{'invisible': c.collapsible.outputs}"
+              ng-click="c.collapsible.outputs = !c.collapsible.outputs"
+              data-toggle="collapse" data-target="#outputs"></span>
+        <span class="clickable floatright glyphicon glyphicon-resize-small"
+              ng-class="{'invisible': !c.collapsible.outputs}"
+              ng-click="c.collapsible.outputs = !c.collapsible.outputs"
+              data-toggle="collapse" data-target="#outputs"></span>
+    </div>
+
+    <div id="outputs" class="collapse in list-group result-container hide-x-overflow" style="overflow-y: auto;">
+        <div ng-if="data.outputs.length === 0">
+            <p>No outputs</p>
+        </div>
+        <div ng-if="data.outputs.length > 0">
+            <table class="table" ng-if="data.outputs.length > 0">
+                <thead>
+                    <tr>
+                        <th>Key</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="item in data.outputs">
+                        <td>{{item.key}}</td>
+                        <td>{{item.value}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="panel-heading">
+        <h4 class="panel-title">Steps</h4>
+        <span class="clickable floatright glyphicon glyphicon-resize-full"
+              ng-class="{'invisible': c.collapsible.steps}"
+              ng-click="c.collapsible.steps = !c.collapsible.steps"
+              data-toggle="collapse" data-target="#steps"></span>
+        <span class="clickable floatright glyphicon glyphicon-resize-small"
+              ng-class="{'invisible': !c.collapsible.steps}"
+              ng-click="c.collapsible.steps = !c.collapsible.steps"
+              data-toggle="collapse" data-target="#steps"></span>
+    </div>
+    <div id="steps" class="collapse in list-group result-container hide-x-overflow" style="overflow-y: auto;">
+        <div ng-if="data.steps.length === 0">
+            <p>No steps</p>
+        </div>
+        <div ng-if="data.steps.length > 0">
+            <table class="table" ng-if="data.steps.length > 0">
+                <thead>
+                <tr>
+                    <th>Step ID</th>
+                    <th>Step #</th>
+                    <th>Step name</th>
+                    <th>Action</th>
+                    <th>Status</th>
+                    <th>Start time</th>
+                    <th>End time</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="item in data.steps">
+                    <td>{{item.stepExecutionId}}</td>
+                    <td>{{item.stepIndex}}</td>
+                    <td>{{item.stepName}}</td>
+                    <td>{{item.action}}</td>
+                    <td>{{item.stepStatus}}</td>
+                    <td>
+                        <em class="item-update" ng-if="item.executionStartTime" uib-tooltip="{{ item.createdOn.executionStartTime }}" tooltip-placement="top">
+                            <i class="glyphicon glyphicon-calendar"></i>
+                            <sn-time-ago timestamp="item.executionStartTime.value"></sn-time-ago>
+                        </em>
+                    </td>
+                    <td>
+                        <em class="item-update" ng-if="item.executionEndTime" uib-tooltip="{{ item.executionEndTime.displayValue }}" tooltip-placement="top">
+                            <i class="glyphicon glyphicon-calendar"></i>
+                            <sn-time-ago timestamp="item.executionEndTime.value"></sn-time-ago>
+                        </em>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+]]></template>
+    </sp_widget>
+</record_update>

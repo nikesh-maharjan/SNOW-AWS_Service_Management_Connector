@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_security_acl_role">
+    <sys_security_acl_role action="INSERT_OR_UPDATE">
+        <sys_class_name>sys_security_acl_role</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-12-16 14:08:03</sys_created_on>
+        <sys_id>d35005fedb8d20101aa72bfa4b96195e</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>x_126749_aws_sc_opsitem_ae.x_126749_aws_sc.opscenter_manager</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_security_acl display_value="x_126749_aws_sc_opsitem_ae">575005fedb8d20101aa72bfa4b96195b</sys_security_acl>
+        <sys_update_name>sys_security_acl_role_d35005fedb8d20101aa72bfa4b96195e</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <sys_user_role display_value="x_126749_aws_sc.opscenter_manager" name="x_126749_aws_sc.opscenter_manager">7284b256db0120101aa72bfa4b961933</sys_user_role>
+        <transaction_id/>
+    </sys_security_acl_role>
+</record_update>

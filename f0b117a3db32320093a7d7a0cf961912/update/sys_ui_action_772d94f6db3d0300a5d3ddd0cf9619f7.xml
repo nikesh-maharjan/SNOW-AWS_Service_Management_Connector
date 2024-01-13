@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_ui_action">
+    <sys_ui_action action="INSERT_OR_UPDATE">
+        <action_name>Request Product Termination</action_name>
+        <active>true</active>
+        <client>true</client>
+        <client_script_v2><![CDATA[function onClick(g_form) {
+
+}]]></client_script_v2>
+        <comments/>
+        <condition>(function () {var a = new ProvisionedProduct(current).actions.terminate(); return a.isPermitted() &amp;&amp; a.isEnabled();}());</condition>
+        <form_action>true</form_action>
+        <form_button>false</form_button>
+        <form_button_v2>false</form_button_v2>
+        <form_context_menu>false</form_context_menu>
+        <form_link>true</form_link>
+        <form_menu_button_v2>false</form_menu_button_v2>
+        <form_style/>
+        <format_for_configurable_workspace>false</format_for_configurable_workspace>
+        <hint/>
+        <isolate_script>false</isolate_script>
+        <list_action>false</list_action>
+        <list_banner_button>false</list_banner_button>
+        <list_button>false</list_button>
+        <list_choice>false</list_choice>
+        <list_context_menu>false</list_context_menu>
+        <list_link>false</list_link>
+        <list_save_with_form_button>false</list_save_with_form_button>
+        <list_style/>
+        <messages/>
+        <name>Request Termination</name>
+        <onclick>showConfirmModal()</onclick>
+        <order>100</order>
+        <script><![CDATA[/**
+ * Creates a Change Request to terminate a provisioned product.
+ *
+ * Client side function called by clicking 'request termination' link causes a confirmation dialog to be displayed
+ */
+/**
+ @Deployable({
+     table: 'sys_ui_action',
+     column: 'script',
+     sysId: '772d94f6db3d0300a5d3ddd0cf9619f7',
+     metadata: {
+         action_name: 'Request Product Termination',
+         name: 'Request Termination',
+         table: 'x_126749_aws_sc_cmdb_ci_pp',
+         onclick: 'showConfirmModal()',
+         condition: "(function () {var a = new ProvisionedProduct(current).actions.terminate(); return a.isPermitted() && a.isEnabled();}());",
+         form_link: 1
+     }
+ })
+ */
+function showConfirmModal() {
+    var gm = new GlideModal('x_126749_aws_sc_confirm_delete', true, 400);
+    gm.setTitle("Terminate " + g_form.getValue('awsname') + "?");
+    gm.setPreference("sysparm_message", "Please confirm termination request");
+    gm.render();
+}
+//When the OK button on the confirmation dialog is clicked, it submits this UI action to the server causing this script to be run again.
+//This second run ignores any code enclosed in a function so the only part called is the section below.
+//After a check to ensure that the client code has finished (typeof window == undefined) the server side
+//function is called.
+// @ts-ignore
+if (typeof window == 'undefined') {
+    requestTermination(action, current);
+}
+//Server-side function
+// TODO: Transform this into typescript
+function requestTermination(action, ppGr) {
+    var pp = new ProvisionedProduct(ppGr);
+    var redirectUrl = ppGr;
+    // Don't create a change request for termination if the provisioned product is just a plan for a new stack.
+    if (pp.getStatus() === 'PLAN_IN_PROGRESS') {
+        var success = true;
+        // if there's no plan then it was deleted out-of-band.
+        if (pp.hasPlan()) {
+            // AWS Service Catalog deletes PLAN_IN_PROGRESS provisioned products when their
+            // associated plans are deleted.
+            var result = pp.getPlan().deletePlan();
+            if (result.success === false) {
+                success = false;
+                gs.addErrorMessage(result.reason);
+            }
+        }
+        if (success) {
+            ppGr.deleteRecord();
+            redirectUrl = 'x_126749_aws_sc_cmdb_ci_pp_list.do?sysparm_clear_stack=true';
+        }
+    }
+    else {
+        pp.actions.terminate().request();
+    }
+    action.setRedirectURL(redirectUrl);
+}
+]]></script>
+        <show_insert>false</show_insert>
+        <show_multiple_update>false</show_multiple_update>
+        <show_query>false</show_query>
+        <show_update>true</show_update>
+        <sys_class_name>sys_ui_action</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2017-10-17 17:19:16</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>772d94f6db3d0300a5d3ddd0cf9619f7</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Request Termination</sys_name>
+        <sys_overrides/>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_ui_action_772d94f6db3d0300a5d3ddd0cf9619f7</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <table>x_126749_aws_sc_cmdb_ci_pp</table>
+        <ui11_compatible>true</ui11_compatible>
+        <ui16_compatible>true</ui16_compatible>
+    </sys_ui_action>
+</record_update>

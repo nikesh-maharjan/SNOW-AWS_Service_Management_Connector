@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.RdsClusterResourceType</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>RdsClusterResourceType</name>
+        <script><![CDATA[var RdsClusterResourceType = /** @class */ (function(_super) {
+    Polyfill.__extends(RdsClusterResourceType, _super);
+
+    function RdsClusterResourceType() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    RdsClusterResourceType.prototype.rules = function() {
+        return [{
+            order: 18,
+            syncType: ConfigSyncProvider.SYNC_DIR.FROM_AWS_CONFIG,
+            externalResourceType: 'AWS::RDS::DBCluster',
+            externalResourceId: 'resourceId',
+            snTable: 'cmdb_ci_cloud_db_cluster',
+            syncFromAws: this.syncFromAws,
+        }];
+    };
+    RdsClusterResourceType.prototype.fields = function() {
+        return [{
+            mode: ConfigSyncProvider.FieldMode.FromAws,
+            snField: 'name',
+            transformFromAws: function(object, context) {
+                return object.item.resourceId;
+            }
+        }, {
+            mode: ConfigSyncProvider.FieldMode.FromAws,
+            snField: 'operational_status',
+            transformFromAws: function(object) {
+                return object.data.status === "available" ?
+                    1 :
+                    object.data.status === undefined ?
+                    6 :
+                    2;
+            }
+        }, {
+            mode: ConfigSyncProvider.FieldMode.FromAws,
+            snField: 'cluster_status',
+            transformFromAws: function(object) {
+                return object.data.status ?
+                    object.data.status :
+                    'terminated';
+            }
+        }, {
+            mode: ConfigSyncProvider.FieldMode.FromAws,
+            snField: 'cluster_version',
+            awsField: 'data.engineVersion'
+        }, {
+            mode: ConfigSyncProvider.FieldMode.FromAws,
+            snField: 'cluster_type',
+            awsField: 'data.engine'
+        }, {
+            mode: ConfigSyncProvider.FieldMode.FromAws,
+            snField: 'tcp_port',
+            awsField: 'data.port'
+        }, {
+            mode: ConfigSyncProvider.FieldMode.FromAws,
+            snField: 'fqdn',
+            awsField: 'data.endpoint.value'
+        }, {
+            mode: ConfigSyncProvider.FieldMode.FromAws,
+            snField: 'cluster_id',
+            awsField: 'data.dbclusterIdentifier'
+        }];
+    };
+    RdsClusterResourceType.prototype.relationships = function() {
+        return [{
+            relationship: ConfigSyncProvider.RelationshipType.HostedOn,
+            externalResourceType: 'AWS::Region',
+            snTable: 'cmdb_ci_aws_datacenter',
+            documentationOnly: true,
+        }, {
+            relationship: ConfigSyncProvider.RelationshipType.Contains,
+            externalResourceType: 'Availability Zone',
+            snTable: 'cmdb_ci_availability_zone',
+            documentationOnly: true
+        }];
+    };
+    RdsClusterResourceType.prototype.syncFromAwsAddRelationships = function(context, config, resourceSysId) {
+		var _this = this;
+        // Process relationships to AWS regions
+        this.addHostedOnRegionRelationship(context, config, resourceSysId);
+        // Process relationships to AWS Availability Zones
+        this.processAwsAvailabilityZonesRelationships(context, config, resourceSysId);
+        // Process a relationship to Database Instance if it exists
+        if (config.data.hasOwnProperty("dbclusterMembers")) {
+            if (config.data.dbclusterMembers.length > 0) {
+                config.data.dbclusterMembers.forEach(function(dbclusterMember) {
+                    var dbInstanceId = _this.getRdsInstanceId(dbclusterMember,config);
+                    var getClusterRelationshipId = _this.getRelationTypeSysId(ConfigSyncProvider.RelationshipType.ClusterOf);
+					if(dbInstanceId != undefined || dbInstanceId!=null || dbInstanceId!='')
+                    _this.updateRelationship(resourceSysId, dbInstanceId, getClusterRelationshipId);
+                });
+            }
+
+        }
+    };
+    RdsClusterResourceType.prototype.getRdsInstanceId = function(dbclusterMember,config) {
+		var dbInstanceId = new GlideRecord('cmdb_ci_cloud_database');
+        dbInstanceId.addQuery('name',dbclusterMember.dbinstanceIdentifier);
+		dbInstanceId.addQuery(gs.getProperty(C.sysprop.configDedupeDeleteFieldCorrelationId),'CONTAINS',config.item.accountId + ',' + config.item.awsRegion + ',' + 'AWS::RDS::DBInstance');
+        dbInstanceId.query();
+        if (dbInstanceId.next()) {
+            return dbInstanceId.sys_id;
+        }
+    };
+    return RdsClusterResourceType;
+}(AbstractResourceType));]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2023-03-30 18:58:26</sys_created_on>
+        <sys_id>a4c0895797f12110c830fbc71153afdd</sys_id>
+        <sys_mod_count>7</sys_mod_count>
+        <sys_name>RdsClusterResourceType</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_a4c0895797f12110c830fbc71153afdd</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2023-04-13 14:31:26</sys_updated_on>
+    </sys_script_include>
+</record_update>

@@ -1,0 +1,379 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update>
+    <sys_choice action="INSERT_OR_UPDATE" field="awsautomationexecutionstatus" table="x_126749_aws_sc_cmdb_ci_ae" version="3">
+        <sys_choice_set action="INSERT_OR_UPDATE">
+            <element>awsautomationexecutionstatus</element>
+            <name>x_126749_aws_sc_cmdb_ci_ae</name>
+            <sys_class_name>sys_choice_set</sys_class_name>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2020-07-21 09:12:55</sys_created_on>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_name>awsautomationexecutionstatus</sys_name>
+            <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+            <sys_policy/>
+            <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+            <sys_update_name>sys_choice_x_126749_aws_sc_cmdb_ci_ae_awsautomationexecutionstatus</sys_update_name>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        </sys_choice_set>
+        <sys_choice action="INSERT_OR_UPDATE">
+            <dependent_value/>
+            <element>awsautomationexecutionstatus</element>
+            <hint/>
+            <inactive>false</inactive>
+            <label>Approved</label>
+            <language>en</language>
+            <name>x_126749_aws_sc_cmdb_ci_ae</name>
+            <sequence/>
+            <synonyms/>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-11-04 11:14:22</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>2aa21ee7473351506c7dc787a46d433e</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+            <value>Approved</value>
+        </sys_choice>
+        <sys_choice action="INSERT_OR_UPDATE">
+            <dependent_value/>
+            <element>awsautomationexecutionstatus</element>
+            <hint/>
+            <inactive>false</inactive>
+            <label>Cancelled</label>
+            <language>en</language>
+            <name>x_126749_aws_sc_cmdb_ci_ae</name>
+            <sequence/>
+            <synonyms/>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2020-07-21 09:12:55</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>2aa21ee7473351506c7dc787a46d4342</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+            <value>Cancelled</value>
+        </sys_choice>
+        <sys_choice action="INSERT_OR_UPDATE">
+            <dependent_value/>
+            <element>awsautomationexecutionstatus</element>
+            <hint/>
+            <inactive>false</inactive>
+            <label>Cancelling</label>
+            <language>en</language>
+            <name>x_126749_aws_sc_cmdb_ci_ae</name>
+            <sequence/>
+            <synonyms/>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2020-07-21 09:12:55</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>3aa21ee7473351506c7dc787a46d4346</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+            <value>Cancelling</value>
+        </sys_choice>
+        <sys_choice action="INSERT_OR_UPDATE">
+            <dependent_value/>
+            <element>awsautomationexecutionstatus</element>
+            <hint/>
+            <inactive>false</inactive>
+            <label>Change Calendar Override Approved</label>
+            <language>en</language>
+            <name>x_126749_aws_sc_cmdb_ci_ae</name>
+            <sequence/>
+            <synonyms/>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-11-04 11:15:32</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>3aa21ee7473351506c7dc787a46d434a</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+            <value>ChangeCalendarOverrideApproved</value>
+        </sys_choice>
+        <sys_choice action="INSERT_OR_UPDATE">
+            <dependent_value/>
+            <element>awsautomationexecutionstatus</element>
+            <hint/>
+            <inactive>false</inactive>
+            <label>Change Calendar Override Rejected</label>
+            <language>en</language>
+            <name>x_126749_aws_sc_cmdb_ci_ae</name>
+            <sequence/>
+            <synonyms/>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-11-04 11:15:48</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>3aa21ee7473351506c7dc787a46d434e</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+            <value>ChangeCalendarOverrideRejected</value>
+        </sys_choice>
+        <sys_choice action="INSERT_OR_UPDATE">
+            <dependent_value/>
+            <element>awsautomationexecutionstatus</element>
+            <hint/>
+            <inactive>false</inactive>
+            <label>Completed With Failure</label>
+            <language>en</language>
+            <name>x_126749_aws_sc_cmdb_ci_ae</name>
+            <sequence/>
+            <synonyms/>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-11-04 11:16:11</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>3aa21ee7473351506c7dc787a46d4352</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+            <value>CompletedWithFailure</value>
+        </sys_choice>
+        <sys_choice action="INSERT_OR_UPDATE">
+            <dependent_value/>
+            <element>awsautomationexecutionstatus</element>
+            <hint/>
+            <inactive>false</inactive>
+            <label>Completed With Success</label>
+            <language>en</language>
+            <name>x_126749_aws_sc_cmdb_ci_ae</name>
+            <sequence/>
+            <synonyms/>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-11-04 11:16:01</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>3aa21ee7473351506c7dc787a46d4356</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+            <value>CompletedWithSuccess</value>
+        </sys_choice>
+        <sys_choice action="INSERT_OR_UPDATE">
+            <dependent_value/>
+            <element>awsautomationexecutionstatus</element>
+            <hint/>
+            <inactive>false</inactive>
+            <label>Failed</label>
+            <language>en</language>
+            <name>x_126749_aws_sc_cmdb_ci_ae</name>
+            <sequence/>
+            <synonyms/>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2020-07-21 09:12:55</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>3aa21ee7473351506c7dc787a46d435a</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+            <value>Failed</value>
+        </sys_choice>
+        <sys_choice action="INSERT_OR_UPDATE">
+            <dependent_value/>
+            <element>awsautomationexecutionstatus</element>
+            <hint/>
+            <inactive>false</inactive>
+            <label>In Progress</label>
+            <language>en</language>
+            <name>x_126749_aws_sc_cmdb_ci_ae</name>
+            <sequence/>
+            <synonyms/>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2020-07-21 09:12:55</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>3aa21ee7473351506c7dc787a46d435e</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+            <value>InProgress</value>
+        </sys_choice>
+        <sys_choice action="INSERT_OR_UPDATE">
+            <dependent_value/>
+            <element>awsautomationexecutionstatus</element>
+            <hint/>
+            <inactive>false</inactive>
+            <label>Pending</label>
+            <language>en</language>
+            <name>x_126749_aws_sc_cmdb_ci_ae</name>
+            <sequence/>
+            <synonyms/>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2020-07-21 09:12:55</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>3aa21ee7473351506c7dc787a46d4362</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+            <value>Pending</value>
+        </sys_choice>
+        <sys_choice action="INSERT_OR_UPDATE">
+            <dependent_value/>
+            <element>awsautomationexecutionstatus</element>
+            <hint/>
+            <inactive>false</inactive>
+            <label>Pending Approval</label>
+            <language>en</language>
+            <name>x_126749_aws_sc_cmdb_ci_ae</name>
+            <sequence/>
+            <synonyms/>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-11-04 11:13:35</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>3aa21ee7473351506c7dc787a46d4366</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+            <value>PendingApproval</value>
+        </sys_choice>
+        <sys_choice action="INSERT_OR_UPDATE">
+            <dependent_value/>
+            <element>awsautomationexecutionstatus</element>
+            <hint/>
+            <inactive>false</inactive>
+            <label>Pending Change Calendar Override</label>
+            <language>en</language>
+            <name>x_126749_aws_sc_cmdb_ci_ae</name>
+            <sequence/>
+            <synonyms/>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-11-04 11:15:18</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>3aa21ee7473351506c7dc787a46d436a</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+            <value>PendingChangeCalendarOverride</value>
+        </sys_choice>
+        <sys_choice action="INSERT_OR_UPDATE">
+            <dependent_value/>
+            <element>awsautomationexecutionstatus</element>
+            <hint/>
+            <inactive>false</inactive>
+            <label>Rejected</label>
+            <language>en</language>
+            <name>x_126749_aws_sc_cmdb_ci_ae</name>
+            <sequence/>
+            <synonyms/>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-11-04 11:14:35</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>3aa21ee7473351506c7dc787a46d436e</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+            <value>Rejected</value>
+        </sys_choice>
+        <sys_choice action="INSERT_OR_UPDATE">
+            <dependent_value/>
+            <element>awsautomationexecutionstatus</element>
+            <hint/>
+            <inactive>false</inactive>
+            <label>Runbook In Progress</label>
+            <language>en</language>
+            <name>x_126749_aws_sc_cmdb_ci_ae</name>
+            <sequence/>
+            <synonyms/>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-11-04 11:15:01</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>3aa21ee7473351506c7dc787a46d4372</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+            <value>RunbookInProgress</value>
+        </sys_choice>
+        <sys_choice action="INSERT_OR_UPDATE">
+            <dependent_value/>
+            <element>awsautomationexecutionstatus</element>
+            <hint/>
+            <inactive>false</inactive>
+            <label>Scheduled</label>
+            <language>en</language>
+            <name>x_126749_aws_sc_cmdb_ci_ae</name>
+            <sequence/>
+            <synonyms/>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-11-04 11:14:48</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>3aa21ee7473351506c7dc787a46d4376</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+            <value>Scheduled</value>
+        </sys_choice>
+        <sys_choice action="INSERT_OR_UPDATE">
+            <dependent_value/>
+            <element>awsautomationexecutionstatus</element>
+            <hint/>
+            <inactive>false</inactive>
+            <label>Success</label>
+            <language>en</language>
+            <name>x_126749_aws_sc_cmdb_ci_ae</name>
+            <sequence/>
+            <synonyms/>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2020-07-21 09:12:55</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>3aa21ee7473351506c7dc787a46d437a</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+            <value>Success</value>
+        </sys_choice>
+        <sys_choice action="INSERT_OR_UPDATE">
+            <dependent_value/>
+            <element>awsautomationexecutionstatus</element>
+            <hint/>
+            <inactive>false</inactive>
+            <label>TimedOut</label>
+            <language>en</language>
+            <name>x_126749_aws_sc_cmdb_ci_ae</name>
+            <sequence/>
+            <synonyms/>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2020-07-21 09:12:55</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>3aa21ee7473351506c7dc787a46d437e</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+            <value>TimedOut</value>
+        </sys_choice>
+        <sys_choice action="INSERT_OR_UPDATE">
+            <dependent_value/>
+            <element>awsautomationexecutionstatus</element>
+            <hint/>
+            <inactive>false</inactive>
+            <label>Waiting</label>
+            <language>en</language>
+            <name>x_126749_aws_sc_cmdb_ci_ae</name>
+            <sequence/>
+            <synonyms/>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2020-07-21 09:12:55</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>3aa21ee7473351506c7dc787a46d4382</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+            <value>Waiting</value>
+        </sys_choice>
+    </sys_choice>
+</record_update>

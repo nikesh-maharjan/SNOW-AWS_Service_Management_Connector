@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.ServiceCatalogSyncProvider</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>ServiceCatalogSyncProvider</name>
+        <script><![CDATA[var ServiceCatalogSyncProvider = /** @class */ (function (_super) {
+    Polyfill.__extends(ServiceCatalogSyncProvider, _super);
+    function ServiceCatalogSyncProvider() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.providerName = 'AWS Service Catalog';
+        _this.timeout = 120;
+        _this.USES_RELATIONSHIP_SYS_ID = Util.getRelationTypeSysId('Uses::Used by');
+        _this.MEMBER_RELATIONSHIP_SYS_ID = Util.getRelationTypeSysId('Members::Member of');
+        _this.CONNECTS_TO_SYS_ID = Util.getRelationTypeSysId('Connects to::Connected by');
+        _this.CORRELATION_ID_FIELD = gs.getProperty(C.sysprop.configDedupeDeleteFieldCorrelationId);
+        return _this;
+    }
+    ServiceCatalogSyncProvider.prototype.filterAccountSync = function (accountSync) {
+        _super.prototype.filterAccountSync.call(this, accountSync);
+        accountSync.addQuery('awsaccount.awsenableservicecatalog', 'true');
+    };
+    ServiceCatalogSyncProvider.prototype.fromAws = function (context) {
+        var start = new GlideDateTime();
+        // We want to process only the enabled accounts for AWS Service Catalog
+        var syncResults = _super.prototype.fromAws.call(this, context);
+        // But we also need to delete previous records if the integration becomes disabled, or the records are outdated
+        // Otherwise, the products will still be there which is unwanted.
+        if (syncResults.success) {
+            this._processRecordsLastUpdatedBefore(start);
+        }
+        return syncResults;
+    };
+    ServiceCatalogSyncProvider.prototype.fromAwsWith = function (account, region) {
+        var _this = this;
+        var syncResults = {
+            success: true,
+            seconds: 0,
+            requests: 0
+        };
+        var timer = Util.startTimer();
+        var credentials = AwsCredentials.from(account).as(AwsCredentials.User.Sync);
+        var serviceCatalog = this.getServiceCatalog(region, credentials);
+        var serviceCatalogAppRegistry = this.getServiceCatalogAppRegistry(region, credentials);
+        var budgets = this.getBudgets(region, credentials);
+        //appRegistryRepo is used for ingesting applications, resources and attribute groups
+        //so we create it only once
+        var appRegistryRepo = new AppRegistryRepo();
+        try {
+            var portfolios = this._ingestPortfolios(serviceCatalog, budgets, account);
+            portfolios.forEach(function (portfolio) {
+                _this._ingestProducts(serviceCatalog, budgets, portfolio);
+            });
+            this._ingestAttributeGroups(serviceCatalogAppRegistry, appRegistryRepo);
+            this._ingestAppRegistryApplications(serviceCatalogAppRegistry, appRegistryRepo, account, region);
+        }
+        catch (ex) {
+            syncResults.success = false;
+            syncResults.error = ex.message;
+        }
+        finally {
+            syncResults.seconds = timer.elapsed();
+            syncResults.requests = (serviceCatalog.getRequestCount() + budgets.getRequestCount() + serviceCatalogAppRegistry.getRequestCount());
+        }
+        return syncResults;
+    };
+    ServiceCatalogSyncProvider.prototype.fromSn = function () {
+        var syncResults = {
+            success: true,
+            seconds: 0,
+            requests: 0
+        };
+        return syncResults;
+    };
+    ServiceCatalogSyncProvider.prototype.validate = function () {
+        try {
+            new sn_uc.UserCriteria();
+        }
+        catch (e) {
+            gs.error("[SYNC] [".concat(this.providerName, "]- cannot create \"sn_uc.UserCriteria\". Check plugin \"com.glideapp.user_criteria.scoped.api\" is enabled. Error: ").concat(e.message));
+            return false;
+        }
+        this.createPortfolioSubcategories = Util.tableActionEnabled("sc_cat_item_category", true, true, true, true);
+        if (!this.createPortfolioSubcategories) {
+            gs.warn("[SYNC] [".concat(this.providerName, "] Synchronization job will skip the creation of portfolio sub-categories because \n                \"sc_cat_item_category\" table is misconfigured. Please allow scoped applications to read, create, update and delete records in this table."));
+        }
+        // Check the provisioning workflow exists.
+        try {
+            this.getProvisioningWorkflow(null);
+        }
+        catch (e) {
+            gs.error("[SYNC] [".concat(this.providerName, "] Validation failed: cannot load provisioning workflow: ").concat(e.message));
+            return false;
+        }
+        return true;
+    };
+    ServiceCatalogSyncProvider.prototype._ingestPortfolios = function (serviceCatalog, budgets, account) {
+        var _this = this;
+        var portfolios = [];
+        // Synchronize "local" portfolios
+        var localPortfolios = serviceCatalog.listPortfolios().collectAll();
+        if (!localPortfolios.success) {
+            throw new Error("Error loading local portfolios: ".concat(localPortfolios.message));
+        }
+        localPortfolios.all.forEach(function (localPortfolio) {
+            var portfolio = _this._ingestPortfolio(serviceCatalog, budgets, localPortfolio, account, "Local" /* LOCAL */);
+            portfolios.push(portfolio);
+        });
+        // Synchronize "shared" portfolios
+        var shareTypes = ['IMPORTED', 'AWS_ORGANIZATIONS'];
+        shareTypes.forEach(function (shareType) {
+            var sharedPortfolios = serviceCatalog.listAcceptedPortfolioShares({ PortfolioShareType: shareType }).collectAll();
+            if (!sharedPortfolios.success) {
+                throw new Error("Error loading shared portfolios \"".concat(shareType, "\": ").concat(sharedPortfolios.message));
+            }
+            sharedPortfolios.all.forEach(function (sharePortfolio) {
+                var portfolio = _this._ingestPortfolio(serviceCatalog, budgets, sharePortfolio, account, "Shared" /* SHARED */);
+                portfolios.push(portfolio);
+            });
+        });
+        return portfolios;
+    };
+    ServiceCatalogSyncProvider.prototype._ingestPortfolio = function (serviceCatalog, budgets, portfolioDetail, account, type) {
+        var budgetDetail = this._getBudgetDetail(serviceCatalog, budgets, account, portfolioDetail.Id);
+        var portfolioRepo = new PortfolioRepo(serviceCatalog.region, serviceCatalog);
+        var portfolio = portfolioRepo.insertOrUpdate(account, portfolioDetail, type, budgetDetail);
+        if (portfolio.sc_category.nil() && this.createPortfolioSubcategories) {
+            portfolioRepo.saveCategoryForPortfolio(portfolio);
+        }
+        return portfolio;
+    };
+    ServiceCatalogSyncProvider.prototype._ingestProducts = function (serviceCatalog, budgets, portfolio) {
+        var _this = this;
+        var products = serviceCatalog.searchProductsAsAdmin({ "PortfolioId": portfolio.awsid.toString() }).collectAll();
+        if (!products.success) {
+            throw new Error("Error loading products: ".concat(products.message));
+        }
+        products.all.forEach(function (productViewDetail) {
+            _this._ingestProduct(serviceCatalog, budgets, portfolio, productViewDetail.ProductViewSummary);
+        });
+    };
+    ServiceCatalogSyncProvider.prototype._ingestProduct = function (serviceCatalog, budgets, portfolio, productViewSummary) {
+        var budgetDetail = this._getBudgetDetail(serviceCatalog, budgets, portfolio.awsaccount.getRefRecord(), productViewSummary.ProductId);
+        var productRepo = new ProductRepo(serviceCatalog.region, serviceCatalog);
+        var product = productRepo.insertOrUpdate(portfolio, productViewSummary, this.getProvisioningWorkflow(portfolio), budgetDetail);
+        if (!portfolio.sc_category.nil() && this.createPortfolioSubcategories) {
+            productRepo.saveProductForPortfolioCategory(product, portfolio);
+        }
+        return product;
+    };
+    ServiceCatalogSyncProvider.prototype._getBudgetDetail = function (serviceCatalog, budgets, account, resourceId) {
+        var skipPrefix = 'Skipping budgets synchronization';
+        if (serviceCatalog.region.startsWith('us-gov')) {
+            gs.debug("[SYNC] [".concat(this.providerName, "] ").concat(skipPrefix, ": budgets are not supported in US GovCloud regions"));
+            return undefined;
+        }
+        var budgetsResponse = serviceCatalog.listBudgetsForResource(resourceId).collectAll();
+        if (!budgetsResponse.success) {
+            gs.debug("[SYNC] [".concat(this.providerName, "] ").concat(skipPrefix, ": could not list budgets for resource \"").concat(resourceId, "\""));
+            return undefined;
+        }
+        if (budgetsResponse.all.length === 0) {
+            gs.debug("[SYNC] [".concat(this.providerName, "] ").concat(skipPrefix, ": there is no budget for resource \"").concat(resourceId, "\"."));
+            return undefined;
+        }
+        var budgetName = budgetsResponse.all[0].BudgetName;
+        var budgetResponse = budgets.describeBudget(account.awsaccountnumber.toString(), budgetName);
+        if (budgetResponse.haveError()) {
+            gs.debug("[SYNC] [".concat(this.providerName, "] ").concat(skipPrefix, ": could not describe the budget for resource \"").concat(resourceId, "\"."));
+            return undefined;
+        }
+        return budgetResponse.deserialize().Budget;
+    };
+    ServiceCatalogSyncProvider.prototype._ingestAttributeGroups = function (serviceCatalogAppRegistry, repo) {
+        var _this = this;
+        var pageResult = serviceCatalogAppRegistry.listAttributeGroups().forEach(function (attributeGroup) {
+            _this._ingestAttributeGroup(serviceCatalogAppRegistry, attributeGroup, repo);
+        });
+        if (!pageResult.success) {
+            throw new Error("Error retrieving list of AppRegistry Attribute Groups: ".concat(pageResult.message));
+        }
+    };
+    ServiceCatalogSyncProvider.prototype._ingestAttributeGroup = function (serviceCatalogAppRegistry, attributeGroupSummary, repo) {
+        var res = serviceCatalogAppRegistry.getAttributeGroup(attributeGroupSummary.id);
+        if (res.haveError()) {
+            throw new Error("Error retrieving AppRegistry Attribute Group details: ".concat(res.getErrorMessage()));
+        }
+        repo.insertOrUpdateAttributeGroups(res.deserialize());
+    };
+    ServiceCatalogSyncProvider.prototype._ingestAppRegistryApplications = function (serviceCatalogAppRegistry, repo, account, region) {
+        var _this = this;
+        var pageResult = serviceCatalogAppRegistry.listApplications().forEach(function (application) {
+            _this._ingestAppRegistryApplication(serviceCatalogAppRegistry, application, repo, account, region);
+        });
+        if (!pageResult.success) {
+            throw new Error("Error retrieving AppRegistry Applications: ".concat(pageResult.message));
+        }
+    };
+    ServiceCatalogSyncProvider.prototype._ingestAppRegistryApplication = function (serviceCatalogAppRegistry, applicationSummary, repo, account, region) {
+        var res = serviceCatalogAppRegistry.getApplication(applicationSummary.id);
+        if (res.haveError()) {
+            throw new Error("Error retrieving AppRegistry Application: ".concat(res.getErrorMessage()));
+        }
+        var application = res.deserialize();
+        var record = repo.insertOrUpdateApplications(application, account, region);
+        this._updateApplicationRelationships(serviceCatalogAppRegistry, record, repo, account, region, application.associatedResourceCount);
+    };
+    ServiceCatalogSyncProvider.prototype._updateApplicationRelationships = function (serviceCatalogAppRegistry, application, repo, account, region, resourceCount) {
+        var existingAttributeGroupRelationIds = this.getExistingRelatedItemIds(application, this.USES_RELATIONSHIP_SYS_ID, 'x_126749_aws_sc_cmdb_ci_appregistry_attribute_group');
+        var staleAttributeGroupRecords = this._updateAssociatedAttributeGroups(serviceCatalogAppRegistry, application, repo, existingAttributeGroupRelationIds);
+        if (staleAttributeGroupRecords.length > 0) {
+            repo.deleteStaleRelationships(application, staleAttributeGroupRecords, this.USES_RELATIONSHIP_SYS_ID);
+        }
+        //get sys_ids of all current records in x_126749_aws_sc_appregistry_resource that have a relationship with this application
+        var existingResourceRecordIds = this.getExistingRelatedItemIds(application, this.MEMBER_RELATIONSHIP_SYS_ID, 'x_126749_aws_sc_cmdb_ci_appregistry_resource');
+        var staleRelatedResourceRecords = this._updateAssociatedResources(serviceCatalogAppRegistry, application, repo, account, region, resourceCount, existingResourceRecordIds);
+        if (staleRelatedResourceRecords.length > 0) {
+            repo.deleteStaleRelationships(application, staleRelatedResourceRecords, this.MEMBER_RELATIONSHIP_SYS_ID);
+        }
+    };
+    /**
+     *  The call to listAssociatedAttributeGroups returns an array of attributeGroup Ids. For each we look up the corresponding
+     *  record which should have been created since attributeGroups are synced before applications.
+     *  If the record is found, we create a relationship between the application record and the attribute group record
+     */
+    ServiceCatalogSyncProvider.prototype._updateAssociatedAttributeGroups = function (serviceCatalogAppRegistry, application, repo, existingAttributeGroupRecordIds) {
+        var _this = this;
+        var staleResourceRecordIds = existingAttributeGroupRecordIds;
+        var pageResult = serviceCatalogAppRegistry.listAssociatedAttributeGroups(application.awsid).forEach(function (item) {
+            var record = Util.getRecord('x_126749_aws_sc_cmdb_ci_appregistry_attribute_group', 'awsid', item.toString());
+            if (record.isValidRecord()) {
+                var attributeGroupId = record.getValue('sys_id');
+                repo.updateRelationship(application.getValue('sys_id'), attributeGroupId, _this.USES_RELATIONSHIP_SYS_ID);
+                var staleResourceIdIndex = staleResourceRecordIds.indexOf(attributeGroupId);
+                if (staleResourceIdIndex > -1) {
+                    staleResourceRecordIds.splice(staleResourceIdIndex, 1);
+                }
+            }
+        });
+        if (!pageResult.success) {
+            throw new Error("Error retrieving associated attribute groups: ".concat(pageResult.message));
+        }
+        return staleResourceRecordIds;
+    };
+    /**
+     *  The application object returned from AWS has a property 'associatedResourceCount'. If there are no associated resources it is 0.
+     *  We don't persist the associatedResourceCount, but if it's 0 we can skip this method and save an api call.
+     *  For each application we retrieve its related resources.
+     *  For each related resource we add/update a record in x_126749_aws_sc_appregistry_resource and create two relationships:
+     *  The first is between the application record and the resource record.
+     *  The second depends on the type of resource:
+     *  For stacks the relationship is between the resource record and the relevant record in x_126749_aws_sc_cmdb_ci_cloudformation_stack
+     *  For provisioned products the relationship is between the resource record and the relevant record in x_126749_aws_sc_cmdb_ci_config_pp
+     *
+     *  The result of listAssociatedResources is an array of objects with name and arn
+     *  For provisioned products the name is in the format "SC-xxxxxxxxxxxx-pp-xxxxxxxx" and we can detect this
+     *  The resourceId for provisioned products is the provisioned product id (pp-xxxxxxxx)
+     *  while for stacks it is the arn of the stack
+     *  We search the relevant table both by resourceId and correlationId
+     *  If no record is found we do nothing - most likely the resource is not yet synced. The relationships will be eventually consistent.
+     *
+     * To detect resources that are no longer associated with this application, a call is made to getExistingResourceIdsForApplication
+     * and the resulting list of ids is passed to this method. Once all related resources have been
+     * processed the list will contain only the ids of stale records which can then be processed.
+     * At present AWS will only allow a given resource to be associated with a single application.
+     */
+    ServiceCatalogSyncProvider.prototype._updateAssociatedResources = function (serviceCatalogAppRegistry, application, repo, account, region, associatedResourceCount, existingResourceRecordIds) {
+        var _this = this;
+        var staleResourceRecordIds = existingResourceRecordIds;
+        if (associatedResourceCount === 0) {
+            return staleResourceRecordIds;
+        }
+        var pageResult = serviceCatalogAppRegistry.listAssociatedResources(application.awsid).forEach(function (item) {
+            var resourceInfo = item;
+            var appRegistryResource = repo.insertOrUpdateAssociatedResource(resourceInfo);
+            var resourceSysId = appRegistryResource.getValue('sys_id');
+            var staleResourceIdIndex = staleResourceRecordIds.indexOf(resourceSysId);
+            if (staleResourceIdIndex > -1) {
+                staleResourceRecordIds.splice(staleResourceIdIndex, 1);
+            }
+            repo.updateRelationship(application.getValue('sys_id'), resourceSysId, _this.MEMBER_RELATIONSHIP_SYS_ID);
+            var ppId = _this.getProvisionedProductIdFromResourceName(appRegistryResource.name);
+            var resourceId;
+            var correlationId;
+            var table;
+            if (ppId) {
+                //associated resource is a provisioned product
+                resourceId = ppId;
+                table = 'x_126749_aws_sc_cmdb_ci_config_pp';
+                correlationId = Util.getCorrelationId(account.awsaccountnumber, region, 'AWS::ServiceCatalog::CloudFormationProvisionedProduct', resourceId);
+            }
+            else {
+                //associated resource is a stack
+                resourceId = resourceInfo.arn;
+                table = 'x_126749_aws_sc_cmdb_ci_cloudformation_stack';
+                correlationId = Util.getCorrelationId(account.awsaccountnumber, region, 'AWS::CloudFormation::Stack', resourceId);
+            }
+            var resourceRecord = Util.lookupConfigRecord(table, resourceId, correlationId, _this.CORRELATION_ID_FIELD);
+            if (resourceRecord && resourceRecord.isValidRecord()) {
+                repo.updateRelationship(appRegistryResource.getValue('sys_id'), resourceRecord.getValue('sys_id'), _this.CONNECTS_TO_SYS_ID);
+            }
+        });
+        if (!pageResult.success) {
+            throw new Error("Error retrieving associated resources: ".concat(pageResult.message));
+        }
+        //at this point the list will only contain ids of records that have not been updated
+        return staleResourceRecordIds;
+    };
+    /**
+     *  Queries cmdb_rel_ci for records where parent is the supplied application, child is a record in 'x_126749_aws_sc_cmdb_ci_appregistry_resource'
+     *  and type is Members::Member of
+     */
+    ServiceCatalogSyncProvider.prototype.getExistingRelatedItemIds = function (application, relationshipType, tableName) {
+        var results = [];
+        var relationshipGr = new GlideRecord('cmdb_rel_ci');
+        relationshipGr.addQuery('parent', application.getValue('sys_id'));
+        relationshipGr.addQuery('type', relationshipType);
+        relationshipGr.query();
+        while (relationshipGr.next()) {
+            var refRecord = relationshipGr.child.getRefRecord();
+            if (refRecord.getValue('sys_class_name') === tableName) {
+                results.push(refRecord.getValue('sys_id'));
+            }
+        }
+        return results;
+    };
+    /**
+     * Delete all Products, Portfolios, Identities and AppRegistry resources that haven't been updated since glideDateTime.
+     */
+    ServiceCatalogSyncProvider.prototype._processRecordsLastUpdatedBefore = function (glideDateTime) {
+        var productRepo = new ProductRepo("us-east-1", "unused");
+        var portfolioRepo = new PortfolioRepo("us-east-1", "unused");
+        var appregistryRepo = new AppRegistryRepo();
+        // Rely on cascade deletion rules for the deletion of unwanted product-portfolio,
+        // portfolio-identity associations and relationships between appRegistry resources
+        portfolioRepo.processLastUpdatedBefore(glideDateTime);
+        productRepo.processLastUpdatedBefore(glideDateTime);
+        appregistryRepo.processLastUpdatedBefore(glideDateTime);
+    };
+    ServiceCatalogSyncProvider.prototype.getServiceCatalog = function (region, credentials) {
+        var awsServiceCatalog = new AwsServiceCatalog(region, credentials);
+        awsServiceCatalog.setExponentialBackoff(this.timeout);
+        return awsServiceCatalog;
+    };
+    ServiceCatalogSyncProvider.prototype.getServiceCatalogAppRegistry = function (region, credentials) {
+        var awsServiceCatalogAppRegistry = new AwsServiceCatalogAppRegistry(region, credentials);
+        awsServiceCatalogAppRegistry.setExponentialBackoff(this.timeout);
+        return awsServiceCatalogAppRegistry;
+    };
+    ServiceCatalogSyncProvider.prototype.getBudgets = function (region, credentials) {
+        var awsBudgets = new AwsBudgets(region, credentials);
+        awsBudgets.setExponentialBackoff(this.timeout);
+        return awsBudgets;
+    };
+    ServiceCatalogSyncProvider.prototype.getProvisionedProductIdFromResourceName = function (resourceName) {
+        //regex to detect "SC-xxxxxxxxxxxx-pp-xxxxxxxx"
+        var re = /^SC-[0-9]{12}-pp-[0-9 a-z]+/;
+        if (re.test(resourceName)) {
+            return resourceName.substring(resourceName.indexOf('pp'));
+        }
+        return undefined;
+    };
+    /**
+     * Returns the sys_id of the workflow that requests provisioning of a product from AWS Service Catalog
+     * @return string
+     */
+    ServiceCatalogSyncProvider.prototype.getProvisioningWorkflow = function (portfolio) {
+        var wf;
+        if (portfolio && !portfolio.awsworkflowoverride.nil()) {
+            wf = portfolio.awsworkflowoverride.getRefRecord();
+        }
+        else {
+            wf = Util.getWorkflow(C.sysprop.workflow.provision);
+        }
+        if (!wf) {
+            throw new Error("Configuration error, please configure workflow name in system property: " + C.sysprop.workflow.provision);
+        }
+        return wf.sys_id;
+    };
+    return ServiceCatalogSyncProvider;
+}(AbstractSyncProvider));
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-12-17 16:09:30</sys_created_on>
+        <sys_id>81a5ae4fdb05201079bd2fb74896193c</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>ServiceCatalogSyncProvider</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_81a5ae4fdb05201079bd2fb74896193c</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

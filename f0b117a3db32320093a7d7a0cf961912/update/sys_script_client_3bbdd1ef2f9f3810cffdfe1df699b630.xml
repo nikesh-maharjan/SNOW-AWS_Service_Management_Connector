@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_script_client">
+    <sys_script_client action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <applies_extended>false</applies_extended>
+        <condition/>
+        <description>If the view is AWS Support Service we check that the description field has a value</description>
+        <field>x_126749_aws_sc_awsaccount</field>
+        <global>true</global>
+        <isolate_script>true</isolate_script>
+        <messages/>
+        <name>Ensure incident description has value</name>
+        <order/>
+        <script><![CDATA[/**
+ @Deployable({
+     table: 'sys_script_client',
+     column: 'script',
+     sysId: '3bbdd1ef2f9f3810cffdfe1df699b630'
+     metadata: {
+         name: 'Ensure incident description has value',
+         description: "If the view is AWS Support Service we check that the description field has a value",
+         collection: 'incident',
+         type: 'onSubmit',
+         global: true,
+     }
+ })
+ */
+//@ts-ignore
+function onSubmit() {
+    //Type appropriate comment here, and begin script below
+    if (g_form.getViewName() !== 'aws_support_case' || !g_form.isNewRecord()) {
+        return true;
+    }
+    if (g_form.getValue('description').trim().length === 0) {
+        g_form.addErrorMessage('The description field cannot be empty');
+        return false;
+    }
+    return true;
+}
+]]></script>
+        <sys_class_name>sys_script_client</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-10-25 16:57:23</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>3bbdd1ef2f9f3810cffdfe1df699b630</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Ensure incident description has value</sys_name>
+        <sys_overrides/>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_client_3bbdd1ef2f9f3810cffdfe1df699b630</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <table>incident</table>
+        <type>onSubmit</type>
+        <ui_type>0</ui_type>
+        <view/>
+    </sys_script_client>
+</record_update>

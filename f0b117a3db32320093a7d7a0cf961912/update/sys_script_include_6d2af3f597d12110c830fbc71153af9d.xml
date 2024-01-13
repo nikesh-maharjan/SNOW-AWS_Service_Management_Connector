@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.NonConfigSyncProvider</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>NonConfigSyncProvider</name>
+        <script><![CDATA[var NonConfigSyncProvider = /** @class */ (function(_super) {
+    Polyfill.__extends(NonConfigSyncProvider, _super);
+    /**
+     * @param configSyncRules The set of rules to synchronize
+     */
+    function NonConfigSyncProvider(rules) {
+        var _this = _super.call(this) || this;
+        _this.providerName = 'AWS Config';
+        _this.timeout = 600;
+        _this.SHOULD_DELETE_PREVIOUS_DEDUPE_RELATIONSHIPS = gs.getProperty(C.sysprop.configDedupeDeleteRelationshipDelete) === 'true';
+        _this.INSTALL_STATUS_FOR_STALE_ITEMS = gs.getProperty(C.sysprop.configDedupeDeleteStaleInstallStatus);
+        _this.LAST_SYNC_TIME_FIELD = gs.getProperty(C.sysprop.configDedupeDeleteFieldLastSyncTime);
+        _this.FULL_SYNC_INTERVAL_MINUTES = gs.getProperty(C.sysprop.configFullSyncIntervalMinutes);
+        _this.DEFAULT_INSTALL_STATUS_FOR_PLACEHOLDERS_VALUE = parseInt(Util.getChoiceValueFromLabel('cmdb_ci', 'install_status', C.config.defaultInstallStatusForPlaceholdersValue));
+        _this.isFullSync = false;
+        _this.configSyncRules = rules ? rules : NonConfigSyncProvider.defaultRules();
+        _this.validateRules();
+        _this.usemtmStaleitems = gs.getProperty('x_126749_aws_sc.stalestatususemtm') === 'true';
+        return _this;
+    }
+    NonConfigSyncProvider.defaultResourceTypes = function() {
+        return [
+            new AWSWorkspaceResourceType(),
+        ];
+    };
+    NonConfigSyncProvider.defaultRules = function() {
+        return NonConfigSyncProvider.defaultResourceTypes().reduce(function(acc, resourceType) {
+            acc.push.apply(acc, resourceType.rules());
+            return acc;
+        }, []);
+    };
+    /**
+     * @param context: Synchronizer.SyncContext
+     * @return Synchronizer.SyncResults
+     */
+    NonConfigSyncProvider.prototype.fromAws = function() {
+        var syncResults = {
+            success: true,
+            seconds: 0,
+            requests: 0
+        };
+        var account = new GlideRecord('x_126749_aws_sc_account');
+        account.addQuery('awsenableconfig', 'true');
+        account.query();
+        while (account.next()) {
+            var region = new GlideRecord('x_126749_aws_sc_account_sync');
+            region.addNotNullQuery('awsaccount');
+            region.addQuery('awsaccount', account.sys_id.toString());
+            region.query();
+            while (region.next()) {
+                var partialResults = this.fromAwsWith(account, region.awsregion.toString());
+                gs.info([
+                    "[SYNC] [STATS] [" + this.providerName + "] Finished synchronization for account \"" + account.awsname.toString() + "\" (" + account.awsaccountnumber.toString() + ") in region \"" + region.awsregion.toString() + "\"",
+                    "** Success: " + partialResults.success,
+                    "** Time: " + partialResults.seconds.toFixed(1) + "s",
+                    "** Requests: " + partialResults.requests
+                ].join('\n'));
+                syncResults.success = syncResults.success && partialResults.success;
+                syncResults.seconds += partialResults.seconds;
+                syncResults.requests += partialResults.requests;
+            }
+        }
+        if (this.isFullSync && this.LAST_SYNC_TIME_FIELD && this.INSTALL_STATUS_FOR_STALE_ITEMS !== 'do nothing') {
+            var choice = this.INSTALL_STATUS_FOR_STALE_ITEMS;
+            var choiceCapitalized = choice.charAt(0).toUpperCase() + choice.slice(1);
+            var choiceValue = Util.getChoiceValueFromLabel('cmdb_ci', 'install_status', choiceCapitalized);
+            try {
+                var defaultInstallStatusForPlaceholdersValue = this.DEFAULT_INSTALL_STATUS_FOR_PLACEHOLDERS_VALUE;
+                var excludeStatus = [defaultInstallStatusForPlaceholdersValue];
+                var choiceKey = parseInt(choiceValue);
+                if (choiceKey != defaultInstallStatusForPlaceholdersValue) {
+                    excludeStatus.push(choiceKey);
+                }
+                StaleConfigItems.forAll(this.updateStaleItemStatus, {
+                    excludeStatus: excludeStatus
+                });
+            } catch (ex) {
+                gs.warn('Error detecting stale config item ' + ex.message);
+            }
+        }
+        return syncResults;
+    };
+    NonConfigSyncProvider.prototype.fromAwsWith = function(account, region) {
+        var _this = this;
+        var syncResults = {
+            seconds: 0,
+            success: true,
+            requests: 0
+        };
+        var timer = Util.startTimer();
+        var awsConfig = this.getAwsConfig(account, region);
+        var syncStartTime = new GlideDateTime();
+        var syncStatus;
+        try {
+            this.configSyncRules.sort(function(r1, r2) {
+                return (r1.order || 0) - (r2.order || 0);
+            });
+            var resourceTypes = this.configSyncRules
+                .filter(function(rule) {
+                    return rule.externalResourceType;
+                })
+                .filter(function(rule) {
+                    return rule.syncType === NonConfigSyncProvider.SYNC_DIR.FROM_AWS_CONFIG;
+                })
+                .map(function(rule) {
+                    return rule.externalResourceType;
+                });
+            var lastSyncTimeDelta = undefined;
+            var lastFullSyncTime = StaleConfigItems.getMostRecentFullSyncTime(account.awsaccountnumber, region);
+            if (!!lastFullSyncTime) {
+                var lastFullSyncTimeGMT = new GlideDateTime(lastFullSyncTime);
+                this.isFullSync = this.isFullSync || this.shouldBeFullSync(syncStartTime, lastFullSyncTimeGMT);
+                if (!this.isFullSync) {
+                    var lastSyncTime = StaleConfigItems.getMostRecentSyncTime(account.awsaccountnumber, region);
+                    var lastSyncTimeGMT = new GlideDateTime(lastSyncTime);
+                    lastSyncTimeDelta = this.isFullSync ? undefined : this.calculateDeltaIfNotFullSync(lastSyncTimeGMT);
+                }
+            } else {
+                this.isFullSync = true;
+            }
+            syncStatus = this.getOrCreateSyncStatus(account.awsaccountnumber, region, syncStartTime);
+            var filteredRules = this.configSyncRules
+                .filter(function(rule) {
+                    return rule.externalResourceType;
+                })
+                .filter(function(rule) {
+                    return rule.syncType === NonConfigSyncProvider.SYNC_DIR.FROM_AWS_CONFIG;
+                });
+            var commonContext = {
+                startTime: syncStartTime,
+                account: account,
+                region: region,
+                connectorName: gs.getProperty(C.sysprop.discoverySourceName),
+                configApi: awsConfig,
+                configSyncRule: undefined,
+                syncStatus: syncStatus,
+                resourceIdAsName: gs.getProperty(C.sysprop.configNameAlwaysResourceId) === "true"
+            };
+            var params_1 = {
+                configSyncRules: filteredRules,
+                context: commonContext,
+            };
+            var AwsWorkspace = this.getAwsWorkspaces(account, region);
+            var paginatedResponse = AwsWorkspace.DescribeWorkspaces();
+            var syncResultsResponse = paginatedResponse.forEachPage(function(workspaceResponse) {
+			if(workspaceResponse){
+            workspaceResponse.forEach(function(workspace) {
+                var batchResponse = awsConfig.BatchGetResourceConfig('AWS::WorkSpaces::Workspace', workspace.WorkspaceId);
+				batchResponse = new global.JSON().decode(batchResponse.getBody());
+				batchResponse = batchResponse.baseConfigurationItems;
+                    var configItems = Array.isArray(batchResponse) ?
+                        batchResponse.map(function(selectedResource) {
+                            var item = selectedResource;
+                            item.workspace = workspace;
+                            var data = item && item.configuration && item.configuration !== "null" ?
+                                typeof item.configuration === "string" ?
+                                JSON.parse(item.configuration) :
+                                item.configuration : {};
+                            return {
+                                item: item,
+                                data: data
+                            };
+                        }) : [];
+
+                    if (configItems.length > 0) {
+                        _this.doSyncPerPage(configItems, params_1);
+                    }
+            });
+            if (syncResultsResponse != undefined) {
+                syncResults.success = syncResultsResponse.success;
+                syncResults.requests += syncResultsResponse.requests;
+                if (!syncResultsResponse.success) {
+                    gs.debug("[SYNC] [AWS Config] Failed to get AWS Config resources" + '' + (syncResultsResponse.message ? "\n" + syncResultsResponse.message : ''));
+                    throw new Error(syncResultsResponse.message ? syncResultsResponse.message : 'Unexpected error while requesting all AWS Config resources');
+                }
+            }
+			}
+			}, params_1);
+            filteredRules.forEach(function(rule) {
+                var listDiscoveredResourcesResponse = awsConfig.listDiscoveredResources(rule.externalResourceType).forEachPage(function(allResourcesForType) {
+                    // deletedResourcesForType contains all the "deleted" resource for a given resource type
+                    // The correlationId field is made up of several fields including account number and region
+                    // These fields don't exist on data returned by listDiscoveredResources so we add them.
+                    // listAggregateDiscoveredResources currently cannot currently include deleted items so we don't use it
+                    var deletedResourcesForType = Array.isArray(allResourcesForType) ?
+                        allResourcesForType
+                        .filter(function(resource) {
+                            return resource.hasOwnProperty('resourceDeletionTime');
+                        })
+                        .map(function(resource) {
+                            resource['accountId'] = account.awsaccountnumber;
+                            resource['awsRegion'] = region;
+                            return {
+                                item: resource,
+                                data: {}
+                            };
+                        }) : [];
+                    if (deletedResourcesForType.length > 0) {
+                        _this.doSyncPerPage(deletedResourcesForType, params_1);
+                    }
+                }, params_1);
+                if (!listDiscoveredResourcesResponse.success) {
+                    gs.debug("[SYNC] [AWS Config] Failed to get deleted AWS Config resources " + (listDiscoveredResourcesResponse.message ? "\n" + listDiscoveredResourcesResponse.message : ''));
+                    throw new Error(listDiscoveredResourcesResponse.message ? listDiscoveredResourcesResponse.message : "Unexpected error while requesting deleted AWS Config resources for type \"" + rule + "\"");
+                }
+            });
+        } catch (ex) {
+            syncResults.success = false;
+            syncResults.error = ex.message;
+            if (ex.message.includes('ThrottlingException')) {
+                gs.warn("[SYNC] [" + this.providerName + "] Synchronization of account \"" + account.awsname + "\" (" + account.awsaccountnumber + ") in region \"" + region + "\" has been throttled for over " + this.timeout / 60 + " minutes. This means that some resources might not appear in ServiceNow until at least the next synchronization. There is no data lost. For more information, please check the \"System Logs -> AWS Request Log\" as well as CloudTrail Log on the AWS Console.");
+            }
+            gs.warn("[SYNC] [" + this.providerName + "] Error synchronizing account \"" + account.awsname + "\" (" + account.awsaccountnumber + ") in region \"" + region + "\":\n" + ex.message);
+        }
+        if (this.SHOULD_DELETE_PREVIOUS_DEDUPE_RELATIONSHIPS) {
+            this.deletePrevSyncStatusRelationships(syncStatus);
+        }
+        if (syncStatus && syncStatus.isValidRecord()) {
+            syncStatus.awssyncstatus = syncResults.success ? 'Success' : 'Error';
+            syncStatus.is_full_sync = this.isFullSync;
+            syncStatus.update();
+        }
+
+        syncResults.seconds = timer.elapsed();
+        syncResults.requests = awsConfig.getRequestCount();
+        return syncResults;
+    };
+    NonConfigSyncProvider.prototype.doSyncPerPage = function(configItems, params) {
+        var configSyncRules = params.configSyncRules;
+        var context = params.context;
+        configSyncRules.forEach(function(rule) {
+            try {
+                // configItemsForType contains all the "live" resources for all resource types we are supporting.
+                var configItemsForType = configItems.filter(function(configItem) {
+                    return configItem.item.resourceType === rule.externalResourceType;
+                });
+                context.configSyncRule = rule;
+                rule.syncFromAws(context, configItemsForType);
+            } catch (ex) {
+                gs.warn("[SYNC] [AWS Config] Synchronization of resource type \"" + context.configSyncRule.externalResourceType + "\n                \" for account \"" + context.account.awsname + "\" (" + context.account.awsaccountnumber + ")\n                 in region \"" + context.region + "\" completed with the following error: " + ex.message);
+            }
+        });
+    };
+    NonConfigSyncProvider.prototype.getOrCreateSyncStatus = function(accountNumber, region, syncStartTime) {
+        var syncStatus = new GlideRecord('x_126749_aws_sc_cmdb_ci_sync_status');
+        syncStatus.addQuery('awsaccountnumber', accountNumber);
+        syncStatus.addQuery('awsregion', region);
+        syncStatus.addQuery('awssynctime', syncStartTime);
+        syncStatus.query();
+        if (!syncStatus.next()) {
+            syncStatus.initialize();
+            Util.setValue(syncStatus, 'awsaccountnumber', accountNumber);
+            Util.setValue(syncStatus, 'awsregion', region);
+            Util.setValue(syncStatus, 'awssynctime', syncStartTime);
+            syncStatus.insert();
+        }
+        return syncStatus;
+    };
+    NonConfigSyncProvider.prototype.deletePrevSyncStatusRelationships = function(syncStatus) {
+        var mtmtable = this.usemtmStaleitems ? 'x_126749_aws_sc_m2m_configuratio_sync_status' : 'cmdb_rel_ci';
+        // get all relationShips with the new syncStatus
+        var newRelationship = new GlideRecord(mtmtable);
+        newRelationship.addQuery('parent', syncStatus.sys_id);
+        newRelationship.query();
+        var relationshipType = undefined;
+        // this array could potentially be a memory problem if the run has sync thousands of items
+        var allSyncItems = [];
+        while (newRelationship.next()) {
+            if (relationshipType === undefined && !this.usemtmStaleitems) {
+                relationshipType = newRelationship.getValue('type');
+            }
+            allSyncItems.push(newRelationship.getValue('child'));
+        }
+        // delete all relationships different from the created from the last sync for items sync now
+        var prevRelationship = new GlideRecord(mtmtable);
+        prevRelationship.addQuery('parent', '!=', syncStatus.sys_id);
+        prevRelationship.addQuery('child', 'IN', allSyncItems.join(','));
+        if (!this.usemtmStaleitems) {
+            prevRelationship.addQuery('type', relationshipType);
+        }
+        prevRelationship.query();
+        while (prevRelationship.next()) {
+            prevRelationship.deleteRecord();
+        }
+    };
+
+    NonConfigSyncProvider.prototype.validate = function() {
+        // Check if the Discovery and Service Mapping Pattern is installed
+        var cmdbItomTablesPluginId = 'sn_itom_pattern';
+        if (!GlidePluginManager.isActive(cmdbItomTablesPluginId)) {
+            gs.error("[SYNC] [" + this.providerName + "] Validation failed: cannot find the plugin 'sn_itom_pattern'. Check it is enabled");
+            return false;
+        }
+        // Check if the discovery source name is set and exists as a choice list for cmdb_ci table
+        var discoverySourceName = gs.getProperty(C.sysprop.discoverySourceName);
+        if (!discoverySourceName) {
+            gs.warn("[SYNC] [" + this.providerName + "] Synchronization job won't be able to set the discovery source for all records because the property \"" + C.sysprop.discoverySourceName + "\" is empty");
+        } else {
+            var discoverSourcesGr = new GlideAggregate('sys_choice');
+            discoverSourcesGr.addQuery('name', 'cmdb_ci');
+            discoverSourcesGr.addQuery('element', 'discovery_source');
+            discoverSourcesGr.addQuery('value', discoverySourceName);
+            discoverSourcesGr.query();
+            if (!discoverSourcesGr.hasNext()) {
+                gs.warn("[SYNC] [" + this.providerName + "] The discovery source for AWS Config synchronization is misconfigured. Please add \"" + discoverySourceName + "\" as a choice for the \"cmdb_ci\" table, column \"discovery_source\"");
+            }
+        }
+        return true;
+    };
+    NonConfigSyncProvider.prototype.updateStaleItemStatus = function(item) {
+        var choice = gs.getProperty(C.sysprop.configDedupeDeleteStaleInstallStatus);
+        var choiceCapitalized = choice.charAt(0).toUpperCase() + choice.slice(1);
+        var choiceValue = Util.getChoiceValueFromLabel('cmdb_ci', 'install_status', choiceCapitalized);
+        Util.setValue(item.ci, 'install_status', choiceValue);
+        item.ci.update();
+    };
+    /**
+     * Validates if the rule definitions are valid. Does nothing if it is, throws an exception otherwise.
+     *
+     * @private
+     */
+    NonConfigSyncProvider.prototype.validateRules = function() {
+        this.configSyncRules.forEach(function(rule) {
+            if (rule.syncType === NonConfigSyncProvider.SYNC_DIR.FROM_AWS_CONFIG && !rule.syncFromAws) {
+                throw new Error("No callback \"syncFromAws\" specified for the rule " + JSON.stringify(rule));
+            }
+            if (rule.syncType === NonConfigSyncProvider.SYNC_DIR.TO_AWS_CONFIG) {
+                if (!rule.syncFromSn) {
+                    throw new Error("No callback \"syncFromSn\" specified for the rule " + JSON.stringify(rule));
+                }
+            }
+        });
+    };
+    NonConfigSyncProvider.prototype.getAwsWorkspaces = function(account, region) {
+        var credentials = AwsCredentials.from(account).as(AwsCredentials.User.Sync);
+        var awsWorkspace = new AWSWorkspace(region, credentials);
+        return awsWorkspace;
+    };
+
+    NonConfigSyncProvider.prototype.getAwsConfig = function(account, region) {
+        var credentials = AwsCredentials.from(account).as(AwsCredentials.User.Sync);
+        var awsConfig = new AwsConfig(region, credentials);
+        awsConfig.setExponentialBackoff(this.timeout);
+        return awsConfig;
+    };
+    NonConfigSyncProvider.prototype.shouldBeFullSync = function(currentSyncStartTime, lastFullSyncTime) {
+        var fullSyncIntervalMinutes = parseInt(this.FULL_SYNC_INTERVAL_MINUTES);
+        if (isNaN(fullSyncIntervalMinutes)) {
+            throw new Error("The value for the Full Sync Interval setting is not valid: " + this.FULL_SYNC_INTERVAL_MINUTES);
+        }
+        var difference = (currentSyncStartTime.getNumericValue() - lastFullSyncTime.getNumericValue()) / 60000;
+        return difference > fullSyncIntervalMinutes;
+    };
+    NonConfigSyncProvider.prototype.calculateDeltaIfNotFullSync = function(lastSyncTime) {
+        var offset = 15 * 60 * 1000; // TODO: calculate this value based on the scheduled job frequence
+        lastSyncTime.subtract(offset);
+        return Util.toISO8601String(lastSyncTime);
+    };
+    return NonConfigSyncProvider;
+}(AbstractSyncProvider));
+(function(NonConfigSyncProvider) {
+    var SYNC_DIR;
+    (function(SYNC_DIR) {
+        SYNC_DIR[SYNC_DIR["FROM_AWS_CONFIG"] = 0] = "FROM_AWS_CONFIG";
+        SYNC_DIR[SYNC_DIR["TO_AWS_CONFIG"] = 1] = "TO_AWS_CONFIG";
+    })(SYNC_DIR = NonConfigSyncProvider.SYNC_DIR || (NonConfigSyncProvider.SYNC_DIR = {}));
+    var FieldMode;
+    (function(FieldMode) {
+        FieldMode["FromAws"] = "FromAws";
+        FieldMode["FromSn"] = "FromSn";
+        FieldMode["BiDirectional"] = "BiDirectional";
+    })(FieldMode = NonConfigSyncProvider.FieldMode || (NonConfigSyncProvider.FieldMode = {}));
+    var RelationshipType;
+    (function(RelationshipType) {
+        RelationshipType["Contains"] = "Contains::Contained by";
+        RelationshipType["DefinesResourcesFor"] = "Defines resources for::Gets resources from";
+        RelationshipType["ImplementEndPointTo"] = "Implement End Point To::Implement End Point From";
+        RelationshipType["ProvidedBy"] = "Provided By::Provides";
+        RelationshipType["ProvidesStorageFor"] = "Provides storage for::Stored on";
+        RelationshipType["ProvisionedFrom"] = "Provisioned From::Provisioned";
+        RelationshipType["HostedOn"] = "Hosted on::Hosts";
+        RelationshipType["UsedBy"] = "Used by::Uses";
+        RelationshipType["Members"] = "Members::Member of";
+        RelationshipType["ClusterOf"] = "Cluster of::Cluster";
+    })(RelationshipType = NonConfigSyncProvider.RelationshipType || (NonConfigSyncProvider.RelationshipType = {}));
+    (function(RelationshipType) {
+        function left(relationshipType) {
+            return relationshipType.split('::')[0];
+        }
+        RelationshipType.left = left;
+
+        function right(relationshipType) {
+            return relationshipType.split('::')[1];
+        }
+        RelationshipType.right = right;
+    })(RelationshipType = NonConfigSyncProvider.RelationshipType || (NonConfigSyncProvider.RelationshipType = {}));
+})(NonConfigSyncProvider || (NonConfigSyncProvider = {}));]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2023-03-01 20:06:09</sys_created_on>
+        <sys_id>6d2af3f597d12110c830fbc71153af9d</sys_id>
+        <sys_mod_count>34</sys_mod_count>
+        <sys_name>NonConfigSyncProvider</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_6d2af3f597d12110c830fbc71153af9d</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2023-04-24 14:56:13</sys_updated_on>
+    </sys_script_include>
+</record_update>

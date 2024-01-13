@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ux_app_route">
+    <sys_ux_app_route action="INSERT_OR_UPDATE">
+        <app_config display_value="AWS Service Management Connector config">efd1b51b97660110bf93f3ffe153af1a</app_config>
+        <description/>
+        <extension_point/>
+        <fields/>
+        <icon/>
+        <name>Scheduled changes</name>
+        <optional_parameters/>
+        <order>200</order>
+        <parent_macroponent display_value="Health Dashboard">7a32f91b97660110bf93f3ffe153af7a</parent_macroponent>
+        <parent_macroponent_composition_element_id>clbbkqeeaahhhhaaaaaarccaiiddddlyibbuccee</parent_macroponent_composition_element_id>
+        <route_type>scheduled-changes</route_type>
+        <screen_type display_value="Scheduled changes">d0a4fd5b97660110bf93f3ffe153af61</screen_type>
+        <sys_class_name>sys_ux_app_route</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2022-04-04 13:09:51</sys_created_on>
+        <sys_id>a4a4f59b97660110bf93f3ffe153af89</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Scheduled changes</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_ux_app_route_a4a4f59b97660110bf93f3ffe153af89</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_ux_app_route>
+    <sys_translated_text action="delete_multiple" query="documentkey=a4a4f59b97660110bf93f3ffe153af89"/>
+</record_update>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.AWSWorkspace</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>AWSWorkspace</name>
+        <script><![CDATA[/**
+ * @class AWSWorkspaceService
+ * @classdesc Make HTTP requests to AWS Security Hub Service.
+ * @param credential {Object} AWS account credentials.
+ * @param credential.identity {String} An AWS access key.
+ * @param credential.secret {String} An AWS secret access key.
+ * @param credential.session {String=} Required if using temporary credentials.
+ */
+var AWSWorkspace = /** @class */ (function(_super) {
+    Polyfill.__extends(AWSWorkspace, _super);
+
+    function AWSWorkspace(region, credential, apiVersion) {
+        var _this = _super.call(this, "workspaces", region, credential, false) || this;
+        //_this.apiVersion = apiVersion || "2018-10-26";
+        return _this;
+    }
+	
+	AWSWorkspace.prototype.headers = function(action) {
+		return {
+            "Content-Type": "application/x-amz-json-1.1",
+            "X-Amz-Target": "WorkspacesService." + action
+        };
+    };
+		
+    AWSWorkspace.prototype.DescribeWorkspaces = function() {
+        var action = "DescribeWorkspaces";
+        var payload = {
+            "Limit": 25
+        };
+        return this._paginatedApi(action, payload, this.headers(action), 'Workspaces', 'NextToken');
+    };
+    return AWSWorkspace;
+}(AwsService));]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2023-02-28 20:54:04</sys_created_on>
+        <sys_id>0a8b322997952110c830fbc71153afe1</sys_id>
+        <sys_mod_count>9</sys_mod_count>
+        <sys_name>AWSWorkspace</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_0a8b322997952110c830fbc71153afe1</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2023-03-06 05:06:31</sys_updated_on>
+    </sys_script_include>
+</record_update>

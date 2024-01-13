@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.C</api_name>
+        <caller_access/>
+        <client_callable>true</client_callable>
+        <description/>
+        <name>C</name>
+        <script><![CDATA[/**
+ * AWS Service Management Connector constants.
+ */
+/**
+ @Deployable({
+     table: "sys_script_include",
+     column: "script",
+     sysId: "ba2d56f44fe31300248489dba310c72d",
+     metadata: {
+         name: 'C'
+     }
+ })
+ */
+var C = (function () {
+    var prefix = 'x_126749_aws_sc';
+    return {
+        /**
+         * Abbreviated name of the application.
+         */
+        name: 'AWS-SC-Connector',
+        /**
+         * Official marketing name of the application.
+         */
+        displayName: 'AWS Service Management Connector',
+        /**
+         * The prefix for all app tables and system properties
+         */
+        prefix: prefix,
+        /**
+         * Application system properties.
+         */
+        sysprop: {
+            /** The name of the change request type to create for provisioned product events. */
+            changeRequestType: prefix + '.changeRequest.type',
+            /** Value for the `cancelled` change request state */
+            changeRequestCancelled: prefix + '.changeRequest.state.cancelled',
+            /** Value for the `closed` change request state */
+            changeRequestClosed: prefix + '.changeRequest.state.closed',
+            /** Value for the assignment group to use for change request */
+            changeRequestAssignmentGroup: prefix + '.changeRequest.assignmentGroup',
+            /** Allow user to edit product name */
+            productNameEditable: prefix + '.product.name.editable',
+            /** Allow user to select a launch option */
+            launchOptionSelectable: prefix + '.launch.option.selectable',
+            /** Allow user to select product version */
+            productVersionSelectable: prefix + '.product.version.selectable',
+            /** Allow user to configure tags */
+            tagsConfigurable: prefix + '.tags.configurable',
+            /** Show or hide resource changes associated with a plan */
+            plansVisible: prefix + '.plans.visible',
+            /** Toggle enablement of user criteria on products. */
+            userCriteriaEnabled: prefix + '.catalog.userCriteria.enabled',
+            /** Value of the main Service Catalog category for the AWS Service Catalog products */
+            productCategory: prefix + '.product_category_name',
+            /** Decide the hierarchy of the categories in the Service Portal */
+            portalView: prefix + '.catalog.togglePortalView',
+            /** Value of the main System Manager category for the AWS System Manager Automation documents */
+            automationDocumentCategory: prefix + '.ssm.document.category',
+            /** Value of the main System Manager category for the AWS System Manager Change Template documents */
+            changeTemplateCategory: prefix + '.ssm.changetemplate.category',
+            /** Value of the Discovery Source name for AWS Config sync */
+            discoverySourceName: prefix + '.config.discovery_source.name',
+            /** The name of the S3 bucket where to get the resource provider ZIP files from */
+            resourceProvidersBucket: prefix + '.config.resourceProviders.bucket',
+            /** What "Install status" to put stale config item into. */
+            configFullSyncIntervalMinutes: prefix + '.config.fullSyncIntervalMinutes',
+            /** @deprecated since 1.4.0 Use changeRequestCancelled instead */
+            terminateChangeRequestCancelled: prefix + '.termination_state_cancelled',
+            /** @deprecated since 1.4.0 Use changeRequestClosed instead */
+            terminateChangeRequestClosed: prefix + '.termination_state_closed',
+            /** @deprecated since 1.4.0 Use changeRequestType instead */
+            terminateChangeRequestType: prefix + '.termination_change_request_type',
+            /** The number of times to retry requests to AWS. */
+            retryLimit: prefix + '.retry_limit',
+            /** The delay between retries of requests to AWS. */
+            retryDelaySeconds: prefix + '.retry_delay_seconds',
+            /**
+             * The duration, in seconds, of sessions requested from the AWS Security
+             * Token Service AssumeRole action.
+             */
+            stsRoleSessionDuration: prefix + '.sts.role_session_duration',
+            workflow: {
+                /** The workflow to provision a product. */
+                provision: prefix + '.provisioning_workflow',
+                /** The workflow to execute an action on a provisioned product. */
+                executeAction: prefix + '.executeAction_workflow',
+                /** @return string The name of the system property for a specific action on a product */
+                forAction: function (action) {
+                    return prefix + '.' + action + '_workflow';
+                },
+                /** The workflow to execution an automation document. */
+                execution: prefix + '.execution_workflow',
+            },
+            /** Whether or not the `Critical` type findings should be sync  */
+            securityHubSyncCritical: prefix + '.securityHub.finding.type.critical',
+            /** Whether or not the `High` type findings should be sync  */
+            securityHubSyncHigh: prefix + '.securityHub.finding.type.high',
+            /** Whether or not the `Medium` type findings should be sync  */
+            securityHubSyncMedium: prefix + '.securityHub.finding.type.medium',
+            /** Whether or not the `Low` type findings should be sync  */
+            securityHubSyncLow: prefix + '.securityHub.finding.type.low',
+            /** Whether or not the `Informational` type findings should be sync  */
+            securityHubSyncInformational: prefix + '.securityHub.finding.type.informational',
+            /** The action to be taken when new findings are synced*/
+            securityHubSyncFindingAction: prefix + '.securityHub.finding.action',
+            /** SQS name created by the CFN stack */
+            securityHubSyncSQSName: prefix + '.securityHub.finding.sqs.name',
+            /** The maximum number of Messages containing Findings to Receive from SQS per sync run **/
+            securityHubSyncFindingMessagesMax: prefix + '.securityHub.finding.messages.max',
+            /** Systems Manager - OpsCenter **/
+            /** What action to take when synchronizing a new OpsItem with a severity 1 */
+            opsCenterSyncSeverity1: prefix + '.opscenter.sync.severity.1',
+            /** What action to take when synchronizing a new OpsItem with a severity 2 */
+            opsCenterSyncSeverity2: prefix + '.opscenter.sync.severity.2',
+            /** What action to take when synchronizing a new OpsItem with a severity 3 */
+            opsCenterSyncSeverity3: prefix + '.opscenter.sync.severity.3',
+            /** What action to take when synchronizing a new OpsItem with a severity 4 */
+            opsCenterSyncSeverity4: prefix + '.opscenter.sync.severity.4',
+            /** Assignment Group for created Incidents/Problems */
+            opsCenterAssignmentGroup: prefix + '.opscenter.assignmentGroup',
+            /** Config Dedupe and Delete **/
+            /** What field to use for correlation ID. The default should be correlation_id */
+            configDedupeDeleteFieldCorrelationId: prefix + '.config.dedupedelete.field.correlation',
+            /** What field to use for AWS capture time. The default should be last_discovered */
+            configDedupeDeleteFieldLastDiscovered: prefix + '.config.dedupedelete.field.lastdiscovered',
+            /** What field to use for last sync time. The default should be checked_in */
+            configDedupeDeleteFieldLastSyncTime: prefix + '.config.dedupedelete.field.lastsynctime',
+            /** Enable/disable the creation of a relationship for state sync. Default to false. */
+            configDedupeDeleteRelationshipCreate: prefix + '.config.dedupedelete.relationship.create',
+            /** Enable/disable the deletion of the previous relationship for state sync. Default to false. */
+            configDedupeDeleteRelationshipDelete: prefix + '.config.dedupedelete.relationship.delete',
+            /** What "Install status" to put stale config item into. */
+            configDedupeDeleteStaleInstallStatus: prefix + '.config.dedupedelete.staleinstallstatus',
+            /**Always use the resource ID instead of name*/
+            configNameAlwaysResourceId: prefix + '.config.name.resourceId',
+            /** Enable/disable RDS Cluster Relationship */
+            configRDSClusterRelationship: prefix + '.config.enable.rdscluster.relationship',
+            /** Support API **/
+            /** Choose interval in minutes between updating Service and Category lists */
+            //Deprecated, not used since EventBridge update. (property has been unlinked from its System Property Category on ServiceNow)
+            supportFullSyncIntervalMinutes: prefix + '.support.fullSyncIntervalMinutes',
+            /** SQS name created by the CFN stack */
+            supportSQSName: prefix + '.support.sqs.name',
+            /** Maximum number of messages to take from SQS per scheduled job invocation **/
+            //Has been added by mistake. Not used since we set it to 50 max messages by default.
+            supportSqsMaxMessages: prefix + '.support.sqs.maxMessages',
+            //Enable the usage of an intermediate table, the SMC Support Case table, to synchronize data from and to AWS Support. This is an advanced mode that must be used with caution and that replace the default mode, targeting the Incident table. On enabling that property, any existing Support Case Incident records won't be synchronizing with AWS Support anymore => any existing Support Case Incident records **CREATED ON THE INCIDENT TABLE** won't be synchronizing with AWS Support anymore as well.
+            intermediateTableMode: prefix + '.support.intermediateTableMode',
+            /** Systems Manager - Change Manager **/
+            /** Name of the Change Manager category to assign to AWS Change Template from AWS Systems Manager Change Manager */
+            changeManagerCategory: prefix + '.changemanager.category',
+            /** Assignment Group (SYS_ID) to use when creating Change Requests from Change Template */
+            changeManagerAssignmentGroup: prefix + '.changemanager.assignmentGroup',
+            /** Default role name for AutomationAssumeRole if the value has not been set by the user when requesting a Change Request Execution */
+            changeManagerAutomationAssumeRole: prefix + '.changemanager.automationAssumeRole',
+            /** Optional: AWS CloudTrail Lake: Event Data Store Name **/
+            changeManagerEventDataStoreName: prefix + '.changemanager.eventDataStoreName',
+            /** OPTIONAL: AWS CloudTrail Lake: Maximum number of events to retrieve per synchronisation **/
+            changeManagerEventCountMax: prefix + '.changemanager.eventCountMax',
+            /** Health **/
+            healthSQSName: prefix + '.health.sqs.name',
+            /** Systems Manager - Incident Manager **/
+            /** Assignment Group value (SYS_ID) to use when creating ServiceNow Incidents from AWS Systems Manager Incident Manager synchronization **/
+            incidentManagerAssignmentGroup: prefix + '.incidentmanager.assignmentGroup',
+            /** Synchronization of the resolved status **/
+            incidentManagerSyncResolved: prefix + '.incidentmanager.sync.resolved',
+        },
+        config: {
+            defaultInstallStatusForPlaceholdersValue: 'Absent'
+        },
+        type: 'C'
+    };
+}());
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-07-24 17:27:17</sys_created_on>
+        <sys_id>ba2d56f44fe31300248489dba310c72d</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>C</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_ba2d56f44fe31300248489dba310c72d</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

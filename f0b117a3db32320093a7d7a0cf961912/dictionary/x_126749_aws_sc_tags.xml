@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="e24d16e91b08901039ed877ddc4bcb6d" label="Tags" max_length="40" name="x_126749_aws_sc_tags" type="collection">
+        <element attributes="edge_encryption_enabled=true" choice_field="use_reference_qualifier" choice_table="sys_dictionary" dependent="awstable" dependent_on_field="awstable" label="Table Field" max_length="80" name="awsfield" type="field_name" use_dependent_field="true"/>
+        <element attributes="edge_encryption_enabled=true" default="true" label="Global" max_length="40" name="awsglobal" type="boolean"/>
+        <element label="Key" mandatory="true" max_length="127" name="awskey" type="string"/>
+        <element attributes="edge_encryption_enabled=true" choice="1" label="Portfolio" max_length="32" name="awsportfolio" reference="x_126749_aws_sc_portfolio" type="reference">
+            <choice/>
+        </element>
+        <element attributes="edge_encryption_enabled=true" hint="When selected, an end-user will be able to select the value for this tag based on values coming form the specified table/column." label="Selectable by End User" max_length="40" name="awsselectable" type="boolean"/>
+        <element attributes="base_start=true,edge_encryption_enabled=true" choice="3" choice_field="access" label="Table Name" max_length="80" name="awstable" type="table_name">
+            <choice/>
+        </element>
+        <element attributes="edge_encryption_enabled=true" dependent="awstable" dependent_on_field="awstable" label="Table Filter" max_length="4000" name="awstablefilter" type="conditions" use_dependent_field="true"/>
+        <element label="Value" max_length="255" name="awsvalue" type="string"/>
+        <index name="index">
+            <element name="awsportfolio"/>
+        </index>
+    </element>
+</database>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="79b0e5c3dbb30010c57a8e4748961983" extends="sc_cat_item" label="Document" max_length="40" name="x_126749_aws_sc_document" type="collection">
+        <element attributes="edge_encryption_enabled=true,readonly_clickthrough=true" label="AWS Account" mandatory="true" max_length="32" name="awsaccount" read_only="true" reference="x_126749_aws_sc_account" type="reference"/>
+        <element label="Last sync time" max_length="40" name="awslastsynctime" read_only="true" type="glide_date_time"/>
+        <element label="Owner" max_length="254" name="awsowner" read_only="true" type="string"/>
+        <element label="Platform types" max_length="7" name="awsplatformtypes" read_only="true" type="string"/>
+        <element label="Region" max_length="40" name="awsregion" read_only="true" type="string"/>
+        <element label="Target type" max_length="200" name="awstargettype" read_only="true" type="string"/>
+        <element label="AWS Type" max_length="64" name="awstype" read_only="true" type="string"/>
+        <element attributes="edge_encryption_enabled=true" label="User Criteria" max_length="32" name="awsusercriteria" reference="user_criteria" type="reference"/>
+        <element label="Version name" max_length="128" name="awsversionname" read_only="true" type="string"/>
+        <index name="index">
+            <element name="awsaccount"/>
+        </index>
+        <index name="index2">
+            <element name="awsusercriteria"/>
+        </index>
+    </element>
+</database>

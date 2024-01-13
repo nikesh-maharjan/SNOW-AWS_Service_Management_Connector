@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.EFSResourceType</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>EFSResourceType</name>
+        <script><![CDATA[var EFSResourceType = /** @class */ (function(_super) {
+    Polyfill.__extends(EFSResourceType, _super);
+
+    function EFSResourceType() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    EFSResourceType.prototype.rules = function() {
+        return [{
+            order: 65,
+            syncType: ConfigSyncProvider.SYNC_DIR.FROM_AWS_CONFIG,
+            externalResourceType: 'AWS::EFS::FileSystem',
+            externalResourceId: 'resourceId',
+            snTable: 'cmdb_ci_cloud_file_service',
+            syncFromAws: this.syncFromAws,
+        }];
+    };
+    EFSResourceType.prototype.fields = function() {
+        return [{
+            mode: ConfigSyncProvider.FieldMode.FromAws,
+            snField: 'name',
+            transformFromAws: function (object, context) {
+                    var name = ((object.data.FileSystemTags || []).filter(function (tag) { return tag.key === 'Name'; })[0] || {}).value;
+                    return (context && context.resourceIdAsName) || !name
+                        ? object.item.resourceId : name;
+                }
+        }];
+    };
+    EFSResourceType.prototype.relationships = function() {
+        return [{
+            relationship: ConfigSyncProvider.RelationshipType.HostedOn,
+            externalResourceType: 'AWS::Region',
+            snTable: 'cmdb_ci_aws_datacenter',
+            documentationOnly: true,
+        }];
+    };
+    EFSResourceType.prototype.syncFromAwsAddRelationships = function(context, config, resourceSysId) {
+        // Process relationships to AWS regions
+        this.addHostedOnRegionRelationship(context, config, resourceSysId);
+    };
+    // the payload from AWS Config for API gateway has a tag attribute within configuration all the time, which has the incorrect details.
+    //tags that we want to process for API gateway is available within _config.item, hence setting as below
+    EFSResourceType.prototype.getResourceTags = function(_config) {
+        return _config.data.FileSystemTags || [];
+    };
+    return EFSResourceType;
+}(AbstractResourceType));]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2023-04-26 17:13:33</sys_created_on>
+        <sys_id>9fab6bf747922110c302d855d36d4313</sys_id>
+        <sys_mod_count>1</sys_mod_count>
+        <sys_name>EFSResourceType</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_9fab6bf747922110c302d855d36d4313</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2023-04-26 17:13:52</sys_updated_on>
+    </sys_script_include>
+</record_update>

@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update>
+    <sys_ui_list parent="" relationship="" sys_domain="global" table="incident" version="2" view="aws_support_case">
+        <sys_ui_list_element action="INSERT_OR_UPDATE">
+            <average_value>false</average_value>
+            <element>number</element>
+            <list_id display_value="incident" element="NULL" name="incident" parent="NULL" relationship="NULL" sys_domain="global" view="c0b1bfe71b43b410caebeb17624bcb4a">307030662fa13010cffdfe1df699b68a</list_id>
+            <max_value>false</max_value>
+            <min_value>false</min_value>
+            <position>0</position>
+            <sum>false</sum>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-08-04 10:13:04</sys_created_on>
+            <sys_id>91d1f9412f71301084a1d6ab2799b64d</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2021-08-04 10:13:04</sys_updated_on>
+        </sys_ui_list_element>
+        <sys_ui_list_element action="INSERT_OR_UPDATE">
+            <average_value>false</average_value>
+            <element>opened_at</element>
+            <list_id display_value="incident" element="NULL" name="incident" parent="NULL" relationship="NULL" sys_domain="global" view="c0b1bfe71b43b410caebeb17624bcb4a">307030662fa13010cffdfe1df699b68a</list_id>
+            <max_value>false</max_value>
+            <min_value>false</min_value>
+            <position>1</position>
+            <sum>false</sum>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-08-04 10:13:04</sys_created_on>
+            <sys_id>59d1f9412f71301084a1d6ab2799b64d</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2021-08-04 10:13:04</sys_updated_on>
+        </sys_ui_list_element>
+        <sys_ui_list_element action="INSERT_OR_UPDATE">
+            <average_value>false</average_value>
+            <element>short_description</element>
+            <list_id display_value="incident" element="NULL" name="incident" parent="NULL" relationship="NULL" sys_domain="global" view="c0b1bfe71b43b410caebeb17624bcb4a">307030662fa13010cffdfe1df699b68a</list_id>
+            <max_value>false</max_value>
+            <min_value>false</min_value>
+            <position>2</position>
+            <sum>false</sum>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-08-04 10:13:04</sys_created_on>
+            <sys_id>d9d1f9412f71301084a1d6ab2799b64d</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2021-08-04 10:13:04</sys_updated_on>
+        </sys_ui_list_element>
+        <sys_ui_list_element action="INSERT_OR_UPDATE">
+            <average_value>false</average_value>
+            <element>state</element>
+            <list_id display_value="incident" element="NULL" name="incident" parent="NULL" relationship="NULL" sys_domain="global" view="c0b1bfe71b43b410caebeb17624bcb4a">307030662fa13010cffdfe1df699b68a</list_id>
+            <max_value>false</max_value>
+            <min_value>false</min_value>
+            <position>3</position>
+            <sum>false</sum>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-08-04 10:13:04</sys_created_on>
+            <sys_id>5dd1f9412f71301084a1d6ab2799b64d</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2021-08-04 10:13:04</sys_updated_on>
+        </sys_ui_list_element>
+        <sys_ui_list_element action="INSERT_OR_UPDATE">
+            <average_value>false</average_value>
+            <element>x_126749_aws_sc_awsaccount</element>
+            <list_id display_value="incident" element="NULL" name="incident" parent="NULL" relationship="NULL" sys_domain="global" view="c0b1bfe71b43b410caebeb17624bcb4a">307030662fa13010cffdfe1df699b68a</list_id>
+            <max_value>false</max_value>
+            <min_value>false</min_value>
+            <position>4</position>
+            <sum>false</sum>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-08-04 10:13:04</sys_created_on>
+            <sys_id>ddd1f9412f71301084a1d6ab2799b64d</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2021-08-04 10:13:04</sys_updated_on>
+        </sys_ui_list_element>
+        <sys_ui_list_element action="INSERT_OR_UPDATE">
+            <average_value>false</average_value>
+            <element>x_126749_aws_sc_awssupportcaseid</element>
+            <list_id display_value="incident" element="NULL" name="incident" parent="NULL" relationship="NULL" sys_domain="global" view="c0b1bfe71b43b410caebeb17624bcb4a">307030662fa13010cffdfe1df699b68a</list_id>
+            <max_value>false</max_value>
+            <min_value>false</min_value>
+            <position>5</position>
+            <sum>false</sum>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-08-04 10:13:04</sys_created_on>
+            <sys_id>51d1f9412f71301084a1d6ab2799b64e</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2021-08-04 10:13:04</sys_updated_on>
+        </sys_ui_list_element>
+        <sys_ui_list_element action="INSERT_OR_UPDATE">
+            <average_value>false</average_value>
+            <element>x_126749_aws_sc_awsservice</element>
+            <list_id display_value="incident" element="NULL" name="incident" parent="NULL" relationship="NULL" sys_domain="global" view="c0b1bfe71b43b410caebeb17624bcb4a">307030662fa13010cffdfe1df699b68a</list_id>
+            <max_value>false</max_value>
+            <min_value>false</min_value>
+            <position>6</position>
+            <sum>false</sum>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-08-04 10:13:04</sys_created_on>
+            <sys_id>d1d1f9412f71301084a1d6ab2799b64e</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2021-08-04 10:13:04</sys_updated_on>
+        </sys_ui_list_element>
+        <sys_ui_list_element action="INSERT_OR_UPDATE">
+            <average_value>false</average_value>
+            <element>x_126749_aws_sc_awscategory</element>
+            <list_id display_value="incident" element="NULL" name="incident" parent="NULL" relationship="NULL" sys_domain="global" view="c0b1bfe71b43b410caebeb17624bcb4a">307030662fa13010cffdfe1df699b68a</list_id>
+            <max_value>false</max_value>
+            <min_value>false</min_value>
+            <position>7</position>
+            <sum>false</sum>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-08-04 10:13:04</sys_created_on>
+            <sys_id>55d1f9412f71301084a1d6ab2799b64e</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2021-08-04 10:13:04</sys_updated_on>
+        </sys_ui_list_element>
+        <sys_ui_list_element action="INSERT_OR_UPDATE">
+            <average_value>false</average_value>
+            <element>x_126749_aws_sc_awscasestatus</element>
+            <list_id display_value="incident" element="NULL" name="incident" parent="NULL" relationship="NULL" sys_domain="global" view="c0b1bfe71b43b410caebeb17624bcb4a">307030662fa13010cffdfe1df699b68a</list_id>
+            <max_value>false</max_value>
+            <min_value>false</min_value>
+            <position>8</position>
+            <sum>false</sum>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-08-04 10:13:04</sys_created_on>
+            <sys_id>d5d1f9412f71301084a1d6ab2799b64e</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2021-08-04 10:13:04</sys_updated_on>
+        </sys_ui_list_element>
+        <sys_ui_list action="INSERT_OR_UPDATE">
+            <average_value>false</average_value>
+            <element/>
+            <max_value>false</max_value>
+            <min_value>false</min_value>
+            <name>incident</name>
+            <parent/>
+            <position/>
+            <relationship/>
+            <sum>false</sum>
+            <sys_class_name>sys_ui_list</sys_class_name>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-08-04 10:13:04</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>307030662fa13010cffdfe1df699b68a</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_name>incident</sys_name>
+            <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+            <sys_policy/>
+            <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+            <sys_update_name>sys_ui_list_incident_aws_support_case</sys_update_name>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+            <sys_user/>
+            <view display_value="AWS Support Case" name="aws_support_case">c0b1bfe71b43b410caebeb17624bcb4a</view>
+            <view_name/>
+        </sys_ui_list>
+    </sys_ui_list>
+</record_update>

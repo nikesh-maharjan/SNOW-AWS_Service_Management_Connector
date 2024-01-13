@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_properties">
+    <sys_properties action="INSERT_OR_UPDATE">
+        <choices/>
+        <description>&lt;b&gt;AWS Systems Manager Change Manager role&lt;/b&gt;&#13;
+&lt;/br&gt;&#13;
+(Defines the default role name that allows Automation to perform the actions on your behalf. It is used only if the user does not fill in the "AutomationAssumeRole" field when requesting a change from AWS Systems Manager Change Manager. This value is case sensitive and MUST exists in every account using AWS Systems Manager Change Manager.)</description>
+        <ignore_cache>true</ignore_cache>
+        <is_private>false</is_private>
+        <name>x_126749_aws_sc.changemanager.automationAssumeRole</name>
+        <read_roles/>
+        <suffix>changemanager.automationAssumeRole</suffix>
+        <sys_class_name>sys_properties</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-10-14 15:42:12</sys_created_on>
+        <sys_id>1fc5e40c2f53f01084a1d6ab2799b619</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>x_126749_aws_sc.changemanager.automationAssumeRole</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_properties_1fc5e40c2f53f01084a1d6ab2799b619</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <type>string</type>
+        <value>ServiceNowChangeManagerRole</value>
+        <write_roles/>
+    </sys_properties>
+    <sys_translated_text action="delete_multiple" query="documentkey=1fc5e40c2f53f01084a1d6ab2799b619"/>
+</record_update>

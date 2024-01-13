@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="2c5493302f5030104510d6ab2799b6cb" extends="cmdb_ci" label="AppRegistry Application" max_length="40" name="x_126749_aws_sc_cmdb_ci_appregistry_application" type="collection">
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false,readonly_clickthrough=true" label="Account" max_length="32" name="awsaccount" read_only="true" reference="x_126749_aws_sc_account" type="reference"/>
+        <element label="Arn" max_length="512" name="awsarn" read_only="true" type="string"/>
+        <element label="Creation Time" max_length="40" name="awscreationtime" read_only="true" type="glide_date_time"/>
+        <element label="Description" max_length="1024" name="awsdescription" read_only="true" type="string"/>
+        <element label="Id" max_length="26" name="awsid" read_only="true" type="string"/>
+        <element label="Last Synchronised Time" max_length="40" name="awslastsynchronisedtime" read_only="true" type="glide_date_time"/>
+        <element label="Last Updated Time" max_length="40" name="awslastupdatedtime" read_only="true" type="glide_date_time"/>
+        <element label="Name" max_length="256" name="awsname" read_only="true" type="string"/>
+        <element label="Region" max_length="40" name="awsregion" read_only="true" type="string"/>
+    </element>
+</database>

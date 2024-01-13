@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="83e8fbdedb8120101aa72bfa4b961928" label="OpsItem Resource" max_length="40" name="x_126749_aws_sc_opsitem_resource" type="collection">
+        <element label="ARN" max_length="2048" name="awsarn" read_only="true" type="string"/>
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false" label="OpsItem" max_length="32" name="awsopsitem" read_only="true" reference="x_126749_aws_sc_opsitem" type="reference"/>
+        <index name="index">
+            <element name="awsopsitem"/>
+        </index>
+    </element>
+</database>

@@ -1,0 +1,1920 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="wf_workflow_version">
+    <wf_workflow_version action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <activity_stages>{"ends":["6646ff2a2f637010cffdfe1df699b6db"],"activities":{},"stages":{},"subflows":[]}</activity_stages>
+        <after_business_rules>false</after_business_rules>
+        <checked_out/>
+        <checked_out_by/>
+        <column_renderer display_value="Workflow-driven">a56213111b030100adca1e094f0713ac</column_renderer>
+        <condition table="change_request">type=AWSChangeRequest^EQ<item display_value="AWS Change Request" endquery="false" field="type" goto="false" newquery="false" operator="=" or="false" value="AWSChangeRequest"/>
+            <item endquery="true" field="" goto="false" newquery="false" operator="=" or="false" value=""/>
+        </condition>
+        <condition_type>run_match</condition_type>
+        <description/>
+        <expected_sequences>a646ff2a2f637010cffdfe1df699b6dc,2a46336a2f637010cffdfe1df699b680,fe46336a2f637010cffdfe1df699b687,ae46336a2f637010cffdfe1df699b686,2a46336a2f637010cffdfe1df699b681,fe46336a2f637010cffdfe1df699b688,2646ff2a2f637010cffdfe1df699b6dd,3246336a2f637010cffdfe1df699b68b,7e46336a2f637010cffdfe1df699b689,ae46336a2f637010cffdfe1df699b685,6646ff2a2f637010cffdfe1df699b6db</expected_sequences>
+        <expected_time>1970-01-01 14:00:00</expected_time>
+        <expected_time_type/>
+        <full_sequences>a646ff2a2f637010cffdfe1df699b6dc,2a46336a2f637010cffdfe1df699b680,fe46336a2f637010cffdfe1df699b687,ae46336a2f637010cffdfe1df699b686,2a46336a2f637010cffdfe1df699b681,fe46336a2f637010cffdfe1df699b688,3246336a2f637010cffdfe1df699b68c,2646ff2a2f637010cffdfe1df699b6dd,3246336a2f637010cffdfe1df699b68b,7e46336a2f637010cffdfe1df699b689,ae46336a2f637010cffdfe1df699b685,6646ff2a2f637010cffdfe1df699b6db</full_sequences>
+        <journal/>
+        <max_activity_count>100</max_activity_count>
+        <name>AWS Change Request</name>
+        <not_cacheable>false</not_cacheable>
+        <on_cancel><![CDATA[// This script executes if the workflow is cancelled.// The global variable context_sys_id contains the sys_id of the cancelled workflow context.]]></on_cancel>
+        <order>100</order>
+        <pin_type>set_by_activity</pin_type>
+        <published>true</published>
+        <relative_duration display_value="2 business days by 4pm">3bf802c20a0a0b52008e2859cd8abcf2</relative_duration>
+        <requires_ert>true</requires_ert>
+        <run_multiple>false</run_multiple>
+        <schedule/>
+        <stage_field/>
+        <stage_order>computed</stage_order>
+        <start display_value="Begin">a646ff2a2f637010cffdfe1df699b6dc</start>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:32</sys_created_on>
+        <sys_id>ea46ff2a2f637010cffdfe1df699b6d8</sys_id>
+        <sys_mod_count>9</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:33:18</sys_updated_on>
+        <table>change_request</table>
+        <timezone/>
+        <validated>false</validated>
+        <workflow display_value="AWS Change Request">23fc78c52f833010ac4e18aa2799b6de</workflow>
+    </wf_workflow_version>
+    <wf_workflow action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <description/>
+        <name>AWS Change Request</name>
+        <preview/>
+        <sys_class_name>wf_workflow</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-10-05 09:40:41</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>23fc78c52f833010ac4e18aa2799b6de</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AWS Change Request</sys_name>
+        <sys_overrides/>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>wf_workflow_23fc78c52f833010ac4e18aa2799b6de</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-10-20 09:32:53</sys_updated_on>
+        <table>change_request</table>
+        <template>false</template>
+        <vars/>
+    </wf_workflow>
+    <wf_stage action="INSERT_OR_UPDATE">
+        <name>Closed Incomplete</name>
+        <ola>1970-01-01 00:00:00</ola>
+        <order>1050</order>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:32</sys_created_on>
+        <sys_id>ae46ff2a2f637010cffdfe1df699b6da</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:32</sys_updated_on>
+        <value>closed_incomplete</value>
+        <workflow_version display_value="AWS Change Request">ea46ff2a2f637010cffdfe1df699b6d8</workflow_version>
+    </wf_stage>
+    <wf_stage action="INSERT_OR_UPDATE">
+        <name>Complete</name>
+        <ola>1970-01-01 00:00:00</ola>
+        <order>1100</order>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:32</sys_created_on>
+        <sys_id>2e46ff2a2f637010cffdfe1df699b6da</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:32</sys_updated_on>
+        <value>complete</value>
+        <workflow_version display_value="AWS Change Request">ea46ff2a2f637010cffdfe1df699b6d8</workflow_version>
+    </wf_stage>
+    <wf_stage action="INSERT_OR_UPDATE">
+        <name>Request Cancelled</name>
+        <ola>1970-01-01 00:00:00</ola>
+        <order>1000</order>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:32</sys_created_on>
+        <sys_id>aa46ff2a2f637010cffdfe1df699b6da</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:32</sys_updated_on>
+        <value>Request Cancelled</value>
+        <workflow_version display_value="AWS Change Request">ea46ff2a2f637010cffdfe1df699b6d8</workflow_version>
+    </wf_stage>
+    <wf_activity action="INSERT_OR_UPDATE">
+        <activity_definition display_value="Approval - Group">354e911f0a0a029a00e6a0e6ad74206f</activity_definition>
+        <activity_definition_updated>false</activity_definition_updated>
+        <databus_lookup_id>26</databus_lookup_id>
+        <height/>
+        <input>{}</input>
+        <is_parent>false</is_parent>
+        <name>Assignment group approval</name>
+        <new_activity_definition/>
+        <notes/>
+        <out_of_date>false</out_of_date>
+        <parent/>
+        <pinned>false</pinned>
+        <pinned_version/>
+        <stage/>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>2a46336a2f637010cffdfe1df699b681</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <timeout>1970-01-01 00:00:00</timeout>
+        <vars/>
+        <width/>
+        <workflow_version display_value="AWS Change Request">ea46ff2a2f637010cffdfe1df699b6d8</workflow_version>
+        <x>95</x>
+        <y>612</y>
+    </wf_activity>
+    <sys_variable_value action="delete_multiple" query="document_key=2a46336a2f637010cffdfe1df699b681"/>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2a46336a2f637010cffdfe1df699b681</document_key>
+        <order>900</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>2246336a2f637010cffdfe1df699b684</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value/>
+        <variable display_value="Schedule">a8abc43ac0a800664b9b89a9f3f2c7a1</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2a46336a2f637010cffdfe1df699b681</document_key>
+        <order>1100</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>2646336a2f637010cffdfe1df699b683</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value/>
+        <variable display_value="Duration">a8a5b2aac0a80066020adf74bd35c283</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2a46336a2f637010cffdfe1df699b681</document_key>
+        <order>200</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>2a46336a2f637010cffdfe1df699b682</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value>${assignment_group}</value>
+        <variable display_value="Groups">c35dc8950a0a0ba96248a70936f964a8</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2a46336a2f637010cffdfe1df699b681</document_key>
+        <order>110</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>2e46336a2f637010cffdfe1df699b681</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value/>
+        <variable display_value="Schedule based on">a8a89323c0a80066046c6c1fd0df6475</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2a46336a2f637010cffdfe1df699b681</document_key>
+        <order>115</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>2e46336a2f637010cffdfe1df699b684</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value/>
+        <variable display_value="Due date based on">a8a29434c0a80066575097078b386f8d</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2a46336a2f637010cffdfe1df699b681</document_key>
+        <order>350</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>6246336a2f637010cffdfe1df699b683</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value>reject</value>
+        <variable display_value="When anyone rejects">4fc0fabe0a6a803f7f0af58179445dbb</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2a46336a2f637010cffdfe1df699b681</document_key>
+        <order>1200</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>6646336a2f637010cffdfe1df699b682</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value/>
+        <variable display_value="Time zone">a8ad144ec0a8006638755cb3662df229</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2a46336a2f637010cffdfe1df699b681</document_key>
+        <order>2050</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>6a46336a2f637010cffdfe1df699b684</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value>eg answer = [];&#13;
+&#13;
+&#13;
+&#13;
+var gr = new GlideRecord("sys_user");&#13;
+&#13;
+gr.addQuery("user_name", "able.tuter");&#13;
+&#13;
+gr.query();&#13;
+&#13;
+&#13;
+&#13;
+while (gr.next()) {  &#13;
+&#13;
+   answer.push(gr.getValue("sys_id"));&#13;
+&#13;
+}&#13;
+&#13;
+workflow.scratchpad.approvers = answer;&#13;
+//       var answer = [];&#13;
+//       answer.push('id1');&#13;
+//       answer.push('id2');&#13;
+</value>
+        <variable display_value="Additional groups script">069c53740a0a0b260e35ee0ead2dbbcc</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2a46336a2f637010cffdfe1df699b681</document_key>
+        <order>1150</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>6e46336a2f637010cffdfe1df699b683</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value/>
+        <variable display_value="Due date field">a8a63d44c0a8006617a1a568e6ee0d9e</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2a46336a2f637010cffdfe1df699b681</document_key>
+        <order>1370</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>a246336a2f637010cffdfe1df699b682</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value>// Set the variable 'answer' to '', 'approved' or 'rejected' to indicate the overall approval status for this approval.&#13;
+//&#13;
+// This script is responsible for setting the approval state for each group that is part of this approval activity before&#13;
+// returning the overall approval state for all of the group(s).&#13;
+//&#13;
+// When called, the following variables are available to the script:&#13;
+//&#13;
+//    Overall for all of the groups that are part of this approval activity:&#13;
+//        counts.total = total number of groups that are part of this approval&#13;
+//        counts.approved = # of groups that approved so far&#13;
+//        counts.rejected = # of groups that rejected so far&#13;
+//        counts.requested = # of groups that are pending approval&#13;
+//        counts.not_requested = # of groups that are not pending approval&#13;
+//        counts.not_required = # of groups that approval is not required&#13;
+//&#13;
+//    And for each group:&#13;
+//        groups[group_id].total = total number of users that are part of this group's approval&#13;
+//        groups[group_id].approved = # of users that approved so far&#13;
+//        groups[group_id].rejected = # of users that rejected so far&#13;
+//        groups[group_id].requested = # of users that are pending approval&#13;
+//        groups[group_id].not_requested = # of users that are not pending approval&#13;
+//        groups[group_id].not_required = # of users that approval is not required&#13;
+//&#13;
+//        groups[group_id].approvalIDs[state] = array of user ids that are at the specified approval state&#13;
+//&#13;
+//        Note: Iterate the groups using:&#13;
+//            for (var id in groups) {&#13;
+//                 var group = groups[id];&#13;
+//                 ...  group.total ...&#13;
+//            }&#13;
+</value>
+        <variable display_value="Approval script">069e81530a0a0b264289c1e23fe52558</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2a46336a2f637010cffdfe1df699b681</document_key>
+        <order>100</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>a646336a2f637010cffdfe1df699b684</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value>any_each</value>
+        <variable display_value="Wait for">0698d53c0a0a0b2627f7cf654de211b6</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2a46336a2f637010cffdfe1df699b681</document_key>
+        <order>1200</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>aa46336a2f637010cffdfe1df699b683</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value>3bf802c20a0a0b52008e2859cd8abcf2</value>
+        <variable display_value="Relative duration">a8a7bc7dc0a800666777a9bd9b84fef8</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2a46336a2f637010cffdfe1df699b681</document_key>
+        <order>1360</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>ae46336a2f637010cffdfe1df699b682</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value>// Set 'answer' to the number of seconds this timer should wait&#13;
+answer = 0;</value>
+        <variable display_value="Due date script">a8a16056c0a800660449c1bbc94d797f</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2a46336a2f637010cffdfe1df699b681</document_key>
+        <order>900</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>e246336a2f637010cffdfe1df699b684</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value/>
+        <variable display_value="Schedule field">a8aaecf5c0a8006617527ddc62f2d668</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2a46336a2f637010cffdfe1df699b681</document_key>
+        <order>50</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>e646336a2f637010cffdfe1df699b683</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value>assignment_groupISNOTEMPTY^EQ</value>
+        <variable display_value="Condition">1bd4c8c00a0a0b26635e191420fd194c</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2a46336a2f637010cffdfe1df699b681</document_key>
+        <order>120</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>ea46336a2f637010cffdfe1df699b682</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value/>
+        <variable display_value="Time zone based on">a8ac8459c0a8006628d8903b8b2e579b</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2a46336a2f637010cffdfe1df699b681</document_key>
+        <order>2000</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>ee46336a2f637010cffdfe1df699b681</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value>0</value>
+        <variable display_value="Advanced">069bd78c0a0a0b267fa35f3d77e02a10</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2a46336a2f637010cffdfe1df699b681</document_key>
+        <order>1200</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>ee46336a2f637010cffdfe1df699b684</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value/>
+        <variable display_value="Time zone field">a8ae0641c0a800664ae7b95978e88d56</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2a46336a2f637010cffdfe1df699b681</document_key>
+        <order>50</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>e646336a2f637010cffdfe1df699b683</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value>assignment_groupISNOTEMPTY^EQ</value>
+        <variable display_value="Condition">1bd4c8c00a0a0b26635e191420fd194c</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2a46336a2f637010cffdfe1df699b681</document_key>
+        <order>100</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>a646336a2f637010cffdfe1df699b684</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value>any_each</value>
+        <variable display_value="Wait for">0698d53c0a0a0b2627f7cf654de211b6</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2a46336a2f637010cffdfe1df699b681</document_key>
+        <order>110</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>2e46336a2f637010cffdfe1df699b681</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value/>
+        <variable display_value="Schedule based on">a8a89323c0a80066046c6c1fd0df6475</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2a46336a2f637010cffdfe1df699b681</document_key>
+        <order>115</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>2e46336a2f637010cffdfe1df699b684</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value/>
+        <variable display_value="Due date based on">a8a29434c0a80066575097078b386f8d</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2a46336a2f637010cffdfe1df699b681</document_key>
+        <order>120</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>ea46336a2f637010cffdfe1df699b682</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value/>
+        <variable display_value="Time zone based on">a8ac8459c0a8006628d8903b8b2e579b</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2a46336a2f637010cffdfe1df699b681</document_key>
+        <order>200</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>2a46336a2f637010cffdfe1df699b682</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value>${assignment_group}</value>
+        <variable display_value="Groups">c35dc8950a0a0ba96248a70936f964a8</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2a46336a2f637010cffdfe1df699b681</document_key>
+        <order>350</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>6246336a2f637010cffdfe1df699b683</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value>reject</value>
+        <variable display_value="When anyone rejects">4fc0fabe0a6a803f7f0af58179445dbb</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2a46336a2f637010cffdfe1df699b681</document_key>
+        <order>900</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>e246336a2f637010cffdfe1df699b684</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value/>
+        <variable display_value="Schedule field">a8aaecf5c0a8006617527ddc62f2d668</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2a46336a2f637010cffdfe1df699b681</document_key>
+        <order>900</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>2246336a2f637010cffdfe1df699b684</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value/>
+        <variable display_value="Schedule">a8abc43ac0a800664b9b89a9f3f2c7a1</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2a46336a2f637010cffdfe1df699b681</document_key>
+        <order>1100</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>2646336a2f637010cffdfe1df699b683</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value/>
+        <variable display_value="Duration">a8a5b2aac0a80066020adf74bd35c283</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2a46336a2f637010cffdfe1df699b681</document_key>
+        <order>1150</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>6e46336a2f637010cffdfe1df699b683</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value/>
+        <variable display_value="Due date field">a8a63d44c0a8006617a1a568e6ee0d9e</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2a46336a2f637010cffdfe1df699b681</document_key>
+        <order>1200</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>aa46336a2f637010cffdfe1df699b683</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value>3bf802c20a0a0b52008e2859cd8abcf2</value>
+        <variable display_value="Relative duration">a8a7bc7dc0a800666777a9bd9b84fef8</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2a46336a2f637010cffdfe1df699b681</document_key>
+        <order>1200</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>ee46336a2f637010cffdfe1df699b684</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value/>
+        <variable display_value="Time zone field">a8ae0641c0a800664ae7b95978e88d56</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2a46336a2f637010cffdfe1df699b681</document_key>
+        <order>1200</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>6646336a2f637010cffdfe1df699b682</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value/>
+        <variable display_value="Time zone">a8ad144ec0a8006638755cb3662df229</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2a46336a2f637010cffdfe1df699b681</document_key>
+        <order>1360</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>ae46336a2f637010cffdfe1df699b682</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value>// Set 'answer' to the number of seconds this timer should wait&#13;
+answer = 0;</value>
+        <variable display_value="Due date script">a8a16056c0a800660449c1bbc94d797f</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2a46336a2f637010cffdfe1df699b681</document_key>
+        <order>1370</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>a246336a2f637010cffdfe1df699b682</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value>// Set the variable 'answer' to '', 'approved' or 'rejected' to indicate the overall approval status for this approval.&#13;
+//&#13;
+// This script is responsible for setting the approval state for each group that is part of this approval activity before&#13;
+// returning the overall approval state for all of the group(s).&#13;
+//&#13;
+// When called, the following variables are available to the script:&#13;
+//&#13;
+//    Overall for all of the groups that are part of this approval activity:&#13;
+//        counts.total = total number of groups that are part of this approval&#13;
+//        counts.approved = # of groups that approved so far&#13;
+//        counts.rejected = # of groups that rejected so far&#13;
+//        counts.requested = # of groups that are pending approval&#13;
+//        counts.not_requested = # of groups that are not pending approval&#13;
+//        counts.not_required = # of groups that approval is not required&#13;
+//&#13;
+//    And for each group:&#13;
+//        groups[group_id].total = total number of users that are part of this group's approval&#13;
+//        groups[group_id].approved = # of users that approved so far&#13;
+//        groups[group_id].rejected = # of users that rejected so far&#13;
+//        groups[group_id].requested = # of users that are pending approval&#13;
+//        groups[group_id].not_requested = # of users that are not pending approval&#13;
+//        groups[group_id].not_required = # of users that approval is not required&#13;
+//&#13;
+//        groups[group_id].approvalIDs[state] = array of user ids that are at the specified approval state&#13;
+//&#13;
+//        Note: Iterate the groups using:&#13;
+//            for (var id in groups) {&#13;
+//                 var group = groups[id];&#13;
+//                 ...  group.total ...&#13;
+//            }&#13;
+</value>
+        <variable display_value="Approval script">069e81530a0a0b264289c1e23fe52558</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2a46336a2f637010cffdfe1df699b681</document_key>
+        <order>2000</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>ee46336a2f637010cffdfe1df699b681</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value>0</value>
+        <variable display_value="Advanced">069bd78c0a0a0b267fa35f3d77e02a10</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2a46336a2f637010cffdfe1df699b681</document_key>
+        <order>2050</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>6a46336a2f637010cffdfe1df699b684</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value>eg answer = [];&#13;
+&#13;
+&#13;
+&#13;
+var gr = new GlideRecord("sys_user");&#13;
+&#13;
+gr.addQuery("user_name", "able.tuter");&#13;
+&#13;
+gr.query();&#13;
+&#13;
+&#13;
+&#13;
+while (gr.next()) {  &#13;
+&#13;
+   answer.push(gr.getValue("sys_id"));&#13;
+&#13;
+}&#13;
+&#13;
+workflow.scratchpad.approvers = answer;&#13;
+//       var answer = [];&#13;
+//       answer.push('id1');&#13;
+//       answer.push('id2');&#13;
+</value>
+        <variable display_value="Additional groups script">069c53740a0a0b260e35ee0ead2dbbcc</variable>
+    </sys_variable_value>
+    <wf_condition action="INSERT_OR_UPDATE">
+        <activity display_value="Assignment group approval">2a46336a2f637010cffdfe1df699b681</activity>
+        <condition>activity.result == 'approved' || activity.result == 'skipped'</condition>
+        <condition_default display_value="Approved">586cdc4c0a0a0b5c00888cdfcb07778b</condition_default>
+        <condition_type>standard</condition_type>
+        <else_flag>false</else_flag>
+        <error>false</error>
+        <event>false</event>
+        <event_name/>
+        <is_positive>true</is_positive>
+        <name>Approved</name>
+        <order>1</order>
+        <short_description>Approval request was approved</short_description>
+        <skip_during_generate>false</skip_during_generate>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>6646336a2f637010cffdfe1df699b685</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+    </wf_condition>
+    <wf_condition action="INSERT_OR_UPDATE">
+        <activity display_value="Assignment group approval">2a46336a2f637010cffdfe1df699b681</activity>
+        <condition>activity.result == 'rejected'</condition>
+        <condition_default display_value="Rejected">586d9d960a0a0b5c00509314d15d50d8</condition_default>
+        <condition_type>standard</condition_type>
+        <else_flag>false</else_flag>
+        <error>false</error>
+        <event>false</event>
+        <event_name/>
+        <is_positive>false</is_positive>
+        <name>Rejected</name>
+        <order>2</order>
+        <short_description>Approval request was rejected</short_description>
+        <skip_during_generate>true</skip_during_generate>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>e646336a2f637010cffdfe1df699b685</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+    </wf_condition>
+    <wf_activity action="INSERT_OR_UPDATE">
+        <activity_definition display_value="Begin">c7a5e32c0a0a0b3a002377c24ed8ea76</activity_definition>
+        <activity_definition_updated>false</activity_definition_updated>
+        <databus_lookup_id>1</databus_lookup_id>
+        <height/>
+        <input/>
+        <is_parent>false</is_parent>
+        <name>Begin</name>
+        <new_activity_definition/>
+        <notes/>
+        <out_of_date>false</out_of_date>
+        <parent/>
+        <pinned>false</pinned>
+        <pinned_version/>
+        <stage/>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:32</sys_created_on>
+        <sys_id>a646ff2a2f637010cffdfe1df699b6dc</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:32</sys_updated_on>
+        <timeout>1970-01-01 00:00:00</timeout>
+        <vars/>
+        <width>80</width>
+        <workflow_version display_value="AWS Change Request">ea46ff2a2f637010cffdfe1df699b6d8</workflow_version>
+        <x>16</x>
+        <y>118</y>
+    </wf_activity>
+    <sys_variable_value action="delete_multiple" query="document_key=a646ff2a2f637010cffdfe1df699b6dc"/>
+    <wf_condition action="INSERT_OR_UPDATE">
+        <activity display_value="Begin">a646ff2a2f637010cffdfe1df699b6dc</activity>
+        <condition>true</condition>
+        <condition_default/>
+        <condition_type>standard</condition_type>
+        <else_flag>false</else_flag>
+        <error>false</error>
+        <event>false</event>
+        <event_name/>
+        <is_positive>false</is_positive>
+        <name>Always</name>
+        <order>0</order>
+        <short_description/>
+        <skip_during_generate>false</skip_during_generate>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:32</sys_created_on>
+        <sys_id>6e46ff2a2f637010cffdfe1df699b6dc</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:32</sys_updated_on>
+    </wf_condition>
+    <wf_activity action="INSERT_OR_UPDATE">
+        <activity_definition display_value="Wait for condition">d93a02ae0a0a0aa30077abad3fdac035</activity_definition>
+        <activity_definition_updated>false</activity_definition_updated>
+        <databus_lookup_id>13</databus_lookup_id>
+        <height/>
+        <input>{}</input>
+        <is_parent>false</is_parent>
+        <name>Change moves to Closed</name>
+        <new_activity_definition/>
+        <notes/>
+        <out_of_date>false</out_of_date>
+        <parent/>
+        <pinned>false</pinned>
+        <pinned_version/>
+        <stage/>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>ae46336a2f637010cffdfe1df699b685</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <timeout>1970-01-01 00:00:00</timeout>
+        <vars/>
+        <width/>
+        <workflow_version display_value="AWS Change Request">ea46ff2a2f637010cffdfe1df699b6d8</workflow_version>
+        <x>960</x>
+        <y>537</y>
+    </wf_activity>
+    <sys_variable_value action="delete_multiple" query="document_key=ae46336a2f637010cffdfe1df699b685"/>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>ae46336a2f637010cffdfe1df699b685</document_key>
+        <order>2</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>2246336a2f637010cffdfe1df699b686</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value>// Set the variable 'answer' to true or false to indicate if the condition has been met or not.&#13;
+answer = true;&#13;
+</value>
+        <variable display_value="Condition script">c35debce0a0a0ba96248a709440cf31a</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>ae46336a2f637010cffdfe1df699b685</document_key>
+        <order>1</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>e246336a2f637010cffdfe1df699b686</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value>state=3^EQ</value>
+        <variable display_value="Condition">c35dc4cd0a0a0ba96248a70990c1ac54</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>ae46336a2f637010cffdfe1df699b685</document_key>
+        <order>1</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>e246336a2f637010cffdfe1df699b686</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value>state=3^EQ</value>
+        <variable display_value="Condition">c35dc4cd0a0a0ba96248a70990c1ac54</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>ae46336a2f637010cffdfe1df699b685</document_key>
+        <order>2</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>2246336a2f637010cffdfe1df699b686</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value>// Set the variable 'answer' to true or false to indicate if the condition has been met or not.&#13;
+answer = true;&#13;
+</value>
+        <variable display_value="Condition script">c35debce0a0a0ba96248a709440cf31a</variable>
+    </sys_variable_value>
+    <wf_condition action="INSERT_OR_UPDATE">
+        <activity display_value="Change moves to Closed">ae46336a2f637010cffdfe1df699b685</activity>
+        <condition>true</condition>
+        <condition_default/>
+        <condition_type>standard</condition_type>
+        <else_flag>false</else_flag>
+        <error>false</error>
+        <event>false</event>
+        <event_name/>
+        <is_positive>false</is_positive>
+        <name>Always</name>
+        <order>0</order>
+        <short_description/>
+        <skip_during_generate>false</skip_during_generate>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>e646336a2f637010cffdfe1df699b686</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+    </wf_condition>
+    <wf_activity action="INSERT_OR_UPDATE">
+        <activity_definition display_value="Wait for condition">d93a02ae0a0a0aa30077abad3fdac035</activity_definition>
+        <activity_definition_updated>false</activity_definition_updated>
+        <databus_lookup_id>11</databus_lookup_id>
+        <height/>
+        <input/>
+        <is_parent>false</is_parent>
+        <name>Change moves to Implement</name>
+        <new_activity_definition/>
+        <notes/>
+        <out_of_date>false</out_of_date>
+        <parent/>
+        <pinned>false</pinned>
+        <pinned_version/>
+        <stage/>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>3246336a2f637010cffdfe1df699b68b</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <timeout>1970-01-01 00:00:00</timeout>
+        <vars/>
+        <width/>
+        <workflow_version display_value="AWS Change Request">ea46ff2a2f637010cffdfe1df699b6d8</workflow_version>
+        <x>720</x>
+        <y>198</y>
+    </wf_activity>
+    <sys_variable_value action="delete_multiple" query="document_key=3246336a2f637010cffdfe1df699b68b"/>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>3246336a2f637010cffdfe1df699b68b</document_key>
+        <order>1</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>7646336a2f637010cffdfe1df699b68b</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value>state=-1^EQ</value>
+        <variable display_value="Condition">c35dc4cd0a0a0ba96248a70990c1ac54</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>3246336a2f637010cffdfe1df699b68b</document_key>
+        <order>2</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>b246336a2f637010cffdfe1df699b68b</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value>// Set the variable 'answer' to true or false to indicate if the condition has been met or not.&#13;
+answer = true;&#13;
+</value>
+        <variable display_value="Condition script">c35debce0a0a0ba96248a709440cf31a</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>3246336a2f637010cffdfe1df699b68b</document_key>
+        <order>1</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>7646336a2f637010cffdfe1df699b68b</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value>state=-1^EQ</value>
+        <variable display_value="Condition">c35dc4cd0a0a0ba96248a70990c1ac54</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>3246336a2f637010cffdfe1df699b68b</document_key>
+        <order>2</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>b246336a2f637010cffdfe1df699b68b</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value>// Set the variable 'answer' to true or false to indicate if the condition has been met or not.&#13;
+answer = true;&#13;
+</value>
+        <variable display_value="Condition script">c35debce0a0a0ba96248a709440cf31a</variable>
+    </sys_variable_value>
+    <wf_condition action="INSERT_OR_UPDATE">
+        <activity display_value="Change moves to Implement">3246336a2f637010cffdfe1df699b68b</activity>
+        <condition>true</condition>
+        <condition_default/>
+        <condition_type>standard</condition_type>
+        <else_flag>false</else_flag>
+        <error>false</error>
+        <event>false</event>
+        <event_name/>
+        <is_positive>false</is_positive>
+        <name>Always</name>
+        <order>0</order>
+        <short_description/>
+        <skip_during_generate>false</skip_during_generate>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>7a46336a2f637010cffdfe1df699b68b</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+    </wf_condition>
+    <wf_activity action="INSERT_OR_UPDATE">
+        <activity_definition display_value="Wait for condition">d93a02ae0a0a0aa30077abad3fdac035</activity_definition>
+        <activity_definition_updated>false</activity_definition_updated>
+        <databus_lookup_id>22</databus_lookup_id>
+        <height/>
+        <input>{}</input>
+        <is_parent>false</is_parent>
+        <name>Change moves to Scheduled</name>
+        <new_activity_definition/>
+        <notes/>
+        <out_of_date>false</out_of_date>
+        <parent/>
+        <pinned>false</pinned>
+        <pinned_version/>
+        <stage/>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:32</sys_created_on>
+        <sys_id>2646ff2a2f637010cffdfe1df699b6dd</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:32</sys_updated_on>
+        <timeout>1970-01-01 00:00:00</timeout>
+        <vars/>
+        <width/>
+        <workflow_version display_value="AWS Change Request">ea46ff2a2f637010cffdfe1df699b6d8</workflow_version>
+        <x>592</x>
+        <y>409</y>
+    </wf_activity>
+    <sys_variable_value action="delete_multiple" query="document_key=2646ff2a2f637010cffdfe1df699b6dd"/>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2646ff2a2f637010cffdfe1df699b6dd</document_key>
+        <order>2</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:32</sys_created_on>
+        <sys_id>e246336a2f637010cffdfe1df699b67f</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:32</sys_updated_on>
+        <value>// Set the variable 'answer' to true or false to indicate if the condition has been met or not.&#13;
+answer = true;&#13;
+</value>
+        <variable display_value="Condition script">c35debce0a0a0ba96248a709440cf31a</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2646ff2a2f637010cffdfe1df699b6dd</document_key>
+        <order>1</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:32</sys_created_on>
+        <sys_id>ea46336a2f637010cffdfe1df699b67f</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:32</sys_updated_on>
+        <value>state=-2^EQ</value>
+        <variable display_value="Condition">c35dc4cd0a0a0ba96248a70990c1ac54</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2646ff2a2f637010cffdfe1df699b6dd</document_key>
+        <order>1</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:32</sys_created_on>
+        <sys_id>ea46336a2f637010cffdfe1df699b67f</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:32</sys_updated_on>
+        <value>state=-2^EQ</value>
+        <variable display_value="Condition">c35dc4cd0a0a0ba96248a70990c1ac54</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2646ff2a2f637010cffdfe1df699b6dd</document_key>
+        <order>2</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:32</sys_created_on>
+        <sys_id>e246336a2f637010cffdfe1df699b67f</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:32</sys_updated_on>
+        <value>// Set the variable 'answer' to true or false to indicate if the condition has been met or not.&#13;
+answer = true;&#13;
+</value>
+        <variable display_value="Condition script">c35debce0a0a0ba96248a709440cf31a</variable>
+    </sys_variable_value>
+    <wf_condition action="INSERT_OR_UPDATE">
+        <activity display_value="Change moves to Scheduled">2646ff2a2f637010cffdfe1df699b6dd</activity>
+        <condition>true</condition>
+        <condition_default/>
+        <condition_type>standard</condition_type>
+        <else_flag>false</else_flag>
+        <error>false</error>
+        <event>false</event>
+        <event_name/>
+        <is_positive>false</is_positive>
+        <name>Always</name>
+        <order>0</order>
+        <short_description/>
+        <skip_during_generate>false</skip_during_generate>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:32</sys_created_on>
+        <sys_id>6246336a2f637010cffdfe1df699b680</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:32</sys_updated_on>
+    </wf_condition>
+    <wf_activity action="INSERT_OR_UPDATE">
+        <activity_definition display_value="End">c7a66f7d0a0a0b3a004544a6d2f14076</activity_definition>
+        <activity_definition_updated>false</activity_definition_updated>
+        <databus_lookup_id>2</databus_lookup_id>
+        <height/>
+        <input/>
+        <is_parent>false</is_parent>
+        <name>End</name>
+        <new_activity_definition/>
+        <notes/>
+        <out_of_date>false</out_of_date>
+        <parent/>
+        <pinned>false</pinned>
+        <pinned_version/>
+        <stage/>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:32</sys_created_on>
+        <sys_id>6646ff2a2f637010cffdfe1df699b6db</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:32</sys_updated_on>
+        <timeout>1970-01-01 00:00:00</timeout>
+        <vars/>
+        <width>80</width>
+        <workflow_version display_value="AWS Change Request">ea46ff2a2f637010cffdfe1df699b6d8</workflow_version>
+        <x>1172</x>
+        <y>678</y>
+    </wf_activity>
+    <sys_variable_value action="delete_multiple" query="document_key=6646ff2a2f637010cffdfe1df699b6db"/>
+    <wf_activity action="INSERT_OR_UPDATE">
+        <activity_definition display_value="Run Script">db8c65aec0a8016501d00259bc7203a4</activity_definition>
+        <activity_definition_updated>false</activity_definition_updated>
+        <databus_lookup_id>25</databus_lookup_id>
+        <height/>
+        <input>{}</input>
+        <is_parent>false</is_parent>
+        <name>Request AWS Change Request Execution</name>
+        <new_activity_definition/>
+        <notes/>
+        <out_of_date>false</out_of_date>
+        <parent/>
+        <pinned>false</pinned>
+        <pinned_version/>
+        <stage/>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>7e46336a2f637010cffdfe1df699b689</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <timeout>1970-01-01 00:00:00</timeout>
+        <vars/>
+        <width/>
+        <workflow_version display_value="AWS Change Request">ea46ff2a2f637010cffdfe1df699b6d8</workflow_version>
+        <x>877</x>
+        <y>281</y>
+    </wf_activity>
+    <sys_variable_value action="delete_multiple" query="document_key=7e46336a2f637010cffdfe1df699b689"/>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>7e46336a2f637010cffdfe1df699b689</document_key>
+        <order>1</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>7246336a2f637010cffdfe1df699b68a</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value>// Script to use as a "Run Script" activity in workflow for requesting a Change Request execution.&#13;
+// If you modify this file, don't forget to copy your changes to ServiceNow, it won't be deployed automatically&#13;
+(function () {&#13;
+    var executing = new SystemsManagerChangeRequestExecutioner(workflow, context, activity, current);&#13;
+    executing.requestExecution();&#13;
+})();&#13;
+</value>
+        <variable display_value="Script">c35ddef20a0a0ba96248a7090eccd518</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>7e46336a2f637010cffdfe1df699b689</document_key>
+        <order>1</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>7246336a2f637010cffdfe1df699b68a</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value>// Script to use as a "Run Script" activity in workflow for requesting a Change Request execution.&#13;
+// If you modify this file, don't forget to copy your changes to ServiceNow, it won't be deployed automatically&#13;
+(function () {&#13;
+    var executing = new SystemsManagerChangeRequestExecutioner(workflow, context, activity, current);&#13;
+    executing.requestExecution();&#13;
+})();&#13;
+</value>
+        <variable display_value="Script">c35ddef20a0a0ba96248a7090eccd518</variable>
+    </sys_variable_value>
+    <wf_condition action="INSERT_OR_UPDATE">
+        <activity display_value="Request AWS Change Request Execution">7e46336a2f637010cffdfe1df699b689</activity>
+        <condition/>
+        <condition_default/>
+        <condition_type>else_flag</condition_type>
+        <else_flag>true</else_flag>
+        <error>false</error>
+        <event>false</event>
+        <event_name/>
+        <is_positive>false</is_positive>
+        <name>Error</name>
+        <order>1</order>
+        <short_description>When the AWS request does not return a Success and an ID</short_description>
+        <skip_during_generate>false</skip_during_generate>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>7a46336a2f637010cffdfe1df699b68a</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+    </wf_condition>
+    <wf_condition action="INSERT_OR_UPDATE">
+        <activity display_value="Request AWS Change Request Execution">7e46336a2f637010cffdfe1df699b689</activity>
+        <condition>activity.result=='yes' </condition>
+        <condition_default/>
+        <condition_type>standard</condition_type>
+        <else_flag>false</else_flag>
+        <error>false</error>
+        <event>false</event>
+        <event_name/>
+        <is_positive>false</is_positive>
+        <name>Success</name>
+        <order>0</order>
+        <short_description>Request was successfully issued</short_description>
+        <skip_during_generate>false</skip_during_generate>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>f646336a2f637010cffdfe1df699b68a</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+    </wf_condition>
+    <wf_activity action="INSERT_OR_UPDATE">
+        <activity_definition display_value="Set Values">1ca8d7cf0a0a0b265e9a000c2c08248c</activity_definition>
+        <activity_definition_updated>false</activity_definition_updated>
+        <databus_lookup_id>29</databus_lookup_id>
+        <height/>
+        <input>{}</input>
+        <is_parent>false</is_parent>
+        <name>Set approval to approved when request receives approval</name>
+        <new_activity_definition/>
+        <notes/>
+        <out_of_date>false</out_of_date>
+        <parent/>
+        <pinned>false</pinned>
+        <pinned_version/>
+        <stage/>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>fe46336a2f637010cffdfe1df699b688</sys_id>
+        <sys_mod_count>3</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:33:15</sys_updated_on>
+        <timeout>1970-01-01 00:00:00</timeout>
+        <vars/>
+        <width/>
+        <workflow_version display_value="AWS Change Request">ea46ff2a2f637010cffdfe1df699b6d8</workflow_version>
+        <x>448</x>
+        <y>546</y>
+    </wf_activity>
+    <sys_variable_value action="delete_multiple" query="document_key=fe46336a2f637010cffdfe1df699b688"/>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>fe46336a2f637010cffdfe1df699b688</document_key>
+        <order>100</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>7246336a2f637010cffdfe1df699b689</sys_id>
+        <sys_mod_count>1</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:33:15</sys_updated_on>
+        <value>approval=approved^state=-2^EQ</value>
+        <variable display_value="Set these values">1cb38c8f0a0a0b266fb48e08de35f507</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>fe46336a2f637010cffdfe1df699b688</document_key>
+        <order>100</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>7246336a2f637010cffdfe1df699b689</sys_id>
+        <sys_mod_count>1</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:33:15</sys_updated_on>
+        <value>approval=approved^state=-2^EQ</value>
+        <variable display_value="Set these values">1cb38c8f0a0a0b266fb48e08de35f507</variable>
+    </sys_variable_value>
+    <wf_condition action="INSERT_OR_UPDATE">
+        <activity display_value="Set approval to approved when request receives approval">fe46336a2f637010cffdfe1df699b688</activity>
+        <condition>true</condition>
+        <condition_default/>
+        <condition_type>standard</condition_type>
+        <else_flag>false</else_flag>
+        <error>false</error>
+        <event>false</event>
+        <event_name/>
+        <is_positive>true</is_positive>
+        <name>Always</name>
+        <order>0</order>
+        <short_description/>
+        <skip_during_generate>false</skip_during_generate>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>7646336a2f637010cffdfe1df699b689</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+    </wf_condition>
+    <wf_activity action="INSERT_OR_UPDATE">
+        <activity_definition display_value="Set Values">1ca8d7cf0a0a0b265e9a000c2c08248c</activity_definition>
+        <activity_definition_updated>false</activity_definition_updated>
+        <databus_lookup_id>30</databus_lookup_id>
+        <height/>
+        <input>{}</input>
+        <is_parent>false</is_parent>
+        <name>Set approval to rejected if authorisation is denied</name>
+        <new_activity_definition/>
+        <notes/>
+        <out_of_date>false</out_of_date>
+        <parent/>
+        <pinned>false</pinned>
+        <pinned_version/>
+        <stage/>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>3246336a2f637010cffdfe1df699b68c</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <timeout>1970-01-01 00:00:00</timeout>
+        <vars/>
+        <width/>
+        <workflow_version display_value="AWS Change Request">ea46ff2a2f637010cffdfe1df699b6d8</workflow_version>
+        <x>327</x>
+        <y>440</y>
+    </wf_activity>
+    <sys_variable_value action="delete_multiple" query="document_key=3246336a2f637010cffdfe1df699b68c"/>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>3246336a2f637010cffdfe1df699b68c</document_key>
+        <order>100</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>b246336a2f637010cffdfe1df699b68c</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value>approval=rejected^state=-5^EQ</value>
+        <variable display_value="Set these values">1cb38c8f0a0a0b266fb48e08de35f507</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>3246336a2f637010cffdfe1df699b68c</document_key>
+        <order>100</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>b246336a2f637010cffdfe1df699b68c</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value>approval=rejected^state=-5^EQ</value>
+        <variable display_value="Set these values">1cb38c8f0a0a0b266fb48e08de35f507</variable>
+    </sys_variable_value>
+    <wf_condition action="INSERT_OR_UPDATE">
+        <activity display_value="Set approval to rejected if authorisation is denied">3246336a2f637010cffdfe1df699b68c</activity>
+        <condition>true</condition>
+        <condition_default/>
+        <condition_type>standard</condition_type>
+        <else_flag>false</else_flag>
+        <error>false</error>
+        <event>false</event>
+        <event_name/>
+        <is_positive>true</is_positive>
+        <name>Always</name>
+        <order>0</order>
+        <short_description/>
+        <skip_during_generate>false</skip_during_generate>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>b646336a2f637010cffdfe1df699b68c</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+    </wf_condition>
+    <wf_activity action="INSERT_OR_UPDATE">
+        <activity_definition display_value="Set Values">1ca8d7cf0a0a0b265e9a000c2c08248c</activity_definition>
+        <activity_definition_updated>false</activity_definition_updated>
+        <databus_lookup_id>28</databus_lookup_id>
+        <height/>
+        <input>{}</input>
+        <is_parent>false</is_parent>
+        <name>Set approval to requested when assignment group set</name>
+        <new_activity_definition/>
+        <notes/>
+        <out_of_date>false</out_of_date>
+        <parent/>
+        <pinned>false</pinned>
+        <pinned_version/>
+        <stage/>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>ae46336a2f637010cffdfe1df699b686</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <timeout>1970-01-01 00:00:00</timeout>
+        <vars/>
+        <width/>
+        <workflow_version display_value="AWS Change Request">ea46ff2a2f637010cffdfe1df699b6d8</workflow_version>
+        <x>64</x>
+        <y>482</y>
+    </wf_activity>
+    <sys_variable_value action="delete_multiple" query="document_key=ae46336a2f637010cffdfe1df699b686"/>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>ae46336a2f637010cffdfe1df699b686</document_key>
+        <order>100</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>b246336a2f637010cffdfe1df699b687</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value>approval=requested^EQ</value>
+        <variable display_value="Set these values">1cb38c8f0a0a0b266fb48e08de35f507</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>ae46336a2f637010cffdfe1df699b686</document_key>
+        <order>100</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>b246336a2f637010cffdfe1df699b687</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value>approval=requested^EQ</value>
+        <variable display_value="Set these values">1cb38c8f0a0a0b266fb48e08de35f507</variable>
+    </sys_variable_value>
+    <wf_condition action="INSERT_OR_UPDATE">
+        <activity display_value="Set approval to requested when assignment group set">ae46336a2f637010cffdfe1df699b686</activity>
+        <condition>true</condition>
+        <condition_default/>
+        <condition_type>standard</condition_type>
+        <else_flag>false</else_flag>
+        <error>false</error>
+        <event>false</event>
+        <event_name/>
+        <is_positive>true</is_positive>
+        <name>Always</name>
+        <order>0</order>
+        <short_description/>
+        <skip_during_generate>false</skip_during_generate>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>3a46336a2f637010cffdfe1df699b687</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+    </wf_condition>
+    <wf_activity action="INSERT_OR_UPDATE">
+        <activity_definition display_value="Wait for condition">d93a02ae0a0a0aa30077abad3fdac035</activity_definition>
+        <activity_definition_updated>false</activity_definition_updated>
+        <databus_lookup_id>31</databus_lookup_id>
+        <height/>
+        <input>{}</input>
+        <is_parent>false</is_parent>
+        <name>State moves to authorise</name>
+        <new_activity_definition/>
+        <notes/>
+        <out_of_date>false</out_of_date>
+        <parent/>
+        <pinned>false</pinned>
+        <pinned_version/>
+        <stage/>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>fe46336a2f637010cffdfe1df699b687</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <timeout>1970-01-01 00:00:00</timeout>
+        <vars/>
+        <width/>
+        <workflow_version display_value="AWS Change Request">ea46ff2a2f637010cffdfe1df699b6d8</workflow_version>
+        <x>90</x>
+        <y>353</y>
+    </wf_activity>
+    <sys_variable_value action="delete_multiple" query="document_key=fe46336a2f637010cffdfe1df699b687"/>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>fe46336a2f637010cffdfe1df699b687</document_key>
+        <order>1</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>3646336a2f637010cffdfe1df699b688</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value>state=-3^EQ</value>
+        <variable display_value="Condition">c35dc4cd0a0a0ba96248a70990c1ac54</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>fe46336a2f637010cffdfe1df699b687</document_key>
+        <order>2</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>7246336a2f637010cffdfe1df699b688</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value>// Set the variable 'answer' to true or false to indicate if the condition has been met or not.&#13;
+answer = true;&#13;
+</value>
+        <variable display_value="Condition script">c35debce0a0a0ba96248a709440cf31a</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>fe46336a2f637010cffdfe1df699b687</document_key>
+        <order>1</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>3646336a2f637010cffdfe1df699b688</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value>state=-3^EQ</value>
+        <variable display_value="Condition">c35dc4cd0a0a0ba96248a70990c1ac54</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>fe46336a2f637010cffdfe1df699b687</document_key>
+        <order>2</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>7246336a2f637010cffdfe1df699b688</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value>// Set the variable 'answer' to true or false to indicate if the condition has been met or not.&#13;
+answer = true;&#13;
+</value>
+        <variable display_value="Condition script">c35debce0a0a0ba96248a709440cf31a</variable>
+    </sys_variable_value>
+    <wf_condition action="INSERT_OR_UPDATE">
+        <activity display_value="State moves to authorise">fe46336a2f637010cffdfe1df699b687</activity>
+        <condition>true</condition>
+        <condition_default/>
+        <condition_type>standard</condition_type>
+        <else_flag>false</else_flag>
+        <error>false</error>
+        <event>false</event>
+        <event_name/>
+        <is_positive>true</is_positive>
+        <name>Always</name>
+        <order>0</order>
+        <short_description/>
+        <skip_during_generate>false</skip_during_generate>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>3a46336a2f637010cffdfe1df699b688</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+    </wf_condition>
+    <wf_activity action="INSERT_OR_UPDATE">
+        <activity_definition display_value="Wait for condition">d93a02ae0a0a0aa30077abad3fdac035</activity_definition>
+        <activity_definition_updated>false</activity_definition_updated>
+        <databus_lookup_id>27</databus_lookup_id>
+        <height/>
+        <input>{}</input>
+        <is_parent>false</is_parent>
+        <name>Wait for an assignment group to be defined</name>
+        <new_activity_definition/>
+        <notes/>
+        <out_of_date>false</out_of_date>
+        <parent/>
+        <pinned>false</pinned>
+        <pinned_version/>
+        <stage/>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>2a46336a2f637010cffdfe1df699b680</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <timeout>1970-01-01 00:00:00</timeout>
+        <vars/>
+        <width/>
+        <workflow_version display_value="AWS Change Request">ea46ff2a2f637010cffdfe1df699b6d8</workflow_version>
+        <x>157</x>
+        <y>210</y>
+    </wf_activity>
+    <sys_variable_value action="delete_multiple" query="document_key=2a46336a2f637010cffdfe1df699b680"/>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2a46336a2f637010cffdfe1df699b680</document_key>
+        <order>1</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>6e46336a2f637010cffdfe1df699b680</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value>assignment_groupISNOTEMPTY^EQ</value>
+        <variable display_value="Condition">c35dc4cd0a0a0ba96248a70990c1ac54</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2a46336a2f637010cffdfe1df699b680</document_key>
+        <order>2</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>aa46336a2f637010cffdfe1df699b680</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value>// Set the variable 'answer' to true or false to indicate if the condition has been met or not.&#13;
+answer = true;&#13;
+</value>
+        <variable display_value="Condition script">c35debce0a0a0ba96248a709440cf31a</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2a46336a2f637010cffdfe1df699b680</document_key>
+        <order>1</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>6e46336a2f637010cffdfe1df699b680</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value>assignment_groupISNOTEMPTY^EQ</value>
+        <variable display_value="Condition">c35dc4cd0a0a0ba96248a70990c1ac54</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>wf_activity</document>
+        <document_key>2a46336a2f637010cffdfe1df699b680</document_key>
+        <order>2</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>aa46336a2f637010cffdfe1df699b680</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <value>// Set the variable 'answer' to true or false to indicate if the condition has been met or not.&#13;
+answer = true;&#13;
+</value>
+        <variable display_value="Condition script">c35debce0a0a0ba96248a709440cf31a</variable>
+    </sys_variable_value>
+    <wf_condition action="INSERT_OR_UPDATE">
+        <activity display_value="Wait for an assignment group to be defined">2a46336a2f637010cffdfe1df699b680</activity>
+        <condition>true</condition>
+        <condition_default/>
+        <condition_type>standard</condition_type>
+        <else_flag>false</else_flag>
+        <error>false</error>
+        <event>false</event>
+        <event_name/>
+        <is_positive>true</is_positive>
+        <name>Always</name>
+        <order>0</order>
+        <short_description/>
+        <skip_during_generate>false</skip_during_generate>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>6246336a2f637010cffdfe1df699b681</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+    </wf_condition>
+    <wf_transition action="INSERT_OR_UPDATE">
+        <condition display_value="Always">6246336a2f637010cffdfe1df699b680</condition>
+        <from display_value="Change moves to Scheduled">2646ff2a2f637010cffdfe1df699b6dd</from>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>3246336a2f637010cffdfe1df699b68e</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <to display_value="Change moves to Implement">3246336a2f637010cffdfe1df699b68b</to>
+    </wf_transition>
+    <wf_transition action="INSERT_OR_UPDATE">
+        <condition display_value="Error">7a46336a2f637010cffdfe1df699b68a</condition>
+        <from display_value="Request AWS Change Request Execution">7e46336a2f637010cffdfe1df699b689</from>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>3246336a2f637010cffdfe1df699b68f</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <to display_value="End">6646ff2a2f637010cffdfe1df699b6db</to>
+    </wf_transition>
+    <wf_transition action="INSERT_OR_UPDATE">
+        <condition display_value="Always">6246336a2f637010cffdfe1df699b681</condition>
+        <from display_value="Wait for an assignment group to be defined">2a46336a2f637010cffdfe1df699b680</from>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>3a46336a2f637010cffdfe1df699b68e</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <to display_value="State moves to authorise">fe46336a2f637010cffdfe1df699b687</to>
+    </wf_transition>
+    <wf_transition action="INSERT_OR_UPDATE">
+        <condition display_value="Always">6e46ff2a2f637010cffdfe1df699b6dc</condition>
+        <from display_value="Begin">a646ff2a2f637010cffdfe1df699b6dc</from>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>3e46336a2f637010cffdfe1df699b68d</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <to display_value="Wait for an assignment group to be defined">2a46336a2f637010cffdfe1df699b680</to>
+    </wf_transition>
+    <wf_transition action="INSERT_OR_UPDATE">
+        <condition display_value="Always">7646336a2f637010cffdfe1df699b689</condition>
+        <from display_value="Set approval to approved when request receives approval">fe46336a2f637010cffdfe1df699b688</from>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>3e46336a2f637010cffdfe1df699b68f</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <to display_value="Change moves to Scheduled">2646ff2a2f637010cffdfe1df699b6dd</to>
+    </wf_transition>
+    <wf_transition action="INSERT_OR_UPDATE">
+        <condition display_value="Approved">6646336a2f637010cffdfe1df699b685</condition>
+        <from display_value="Assignment group approval">2a46336a2f637010cffdfe1df699b681</from>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>7646336a2f637010cffdfe1df699b68e</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <to display_value="Set approval to approved when request receives approval">fe46336a2f637010cffdfe1df699b688</to>
+    </wf_transition>
+    <wf_transition action="INSERT_OR_UPDATE">
+        <condition display_value="Always">7a46336a2f637010cffdfe1df699b68b</condition>
+        <from display_value="Change moves to Implement">3246336a2f637010cffdfe1df699b68b</from>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>7a46336a2f637010cffdfe1df699b68f</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <to display_value="Request AWS Change Request Execution">7e46336a2f637010cffdfe1df699b689</to>
+    </wf_transition>
+    <wf_transition action="INSERT_OR_UPDATE">
+        <condition display_value="Always">3a46336a2f637010cffdfe1df699b688</condition>
+        <from display_value="State moves to authorise">fe46336a2f637010cffdfe1df699b687</from>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>b646336a2f637010cffdfe1df699b68f</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <to display_value="Set approval to requested when assignment group set">ae46336a2f637010cffdfe1df699b686</to>
+    </wf_transition>
+    <wf_transition action="INSERT_OR_UPDATE">
+        <condition display_value="Success">f646336a2f637010cffdfe1df699b68a</condition>
+        <from display_value="Request AWS Change Request Execution">7e46336a2f637010cffdfe1df699b689</from>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>be46336a2f637010cffdfe1df699b68e</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <to display_value="Change moves to Closed">ae46336a2f637010cffdfe1df699b685</to>
+    </wf_transition>
+    <wf_transition action="INSERT_OR_UPDATE">
+        <condition display_value="Rejected">e646336a2f637010cffdfe1df699b685</condition>
+        <from display_value="Assignment group approval">2a46336a2f637010cffdfe1df699b681</from>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>f246336a2f637010cffdfe1df699b68e</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <to display_value="Set approval to rejected if authorisation is denied">3246336a2f637010cffdfe1df699b68c</to>
+    </wf_transition>
+    <wf_transition action="INSERT_OR_UPDATE">
+        <condition display_value="Always">e646336a2f637010cffdfe1df699b686</condition>
+        <from display_value="Change moves to Closed">ae46336a2f637010cffdfe1df699b685</from>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>f246336a2f637010cffdfe1df699b68f</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <to display_value="End">6646ff2a2f637010cffdfe1df699b6db</to>
+    </wf_transition>
+    <wf_transition action="INSERT_OR_UPDATE">
+        <condition display_value="Always">3a46336a2f637010cffdfe1df699b687</condition>
+        <from display_value="Set approval to requested when assignment group set">ae46336a2f637010cffdfe1df699b686</from>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>fa46336a2f637010cffdfe1df699b68e</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <to display_value="Assignment group approval">2a46336a2f637010cffdfe1df699b681</to>
+    </wf_transition>
+    <wf_transition action="INSERT_OR_UPDATE">
+        <condition display_value="Always">b646336a2f637010cffdfe1df699b68c</condition>
+        <from display_value="Set approval to rejected if authorisation is denied">3246336a2f637010cffdfe1df699b68c</from>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:33</sys_created_on>
+        <sys_id>fe46336a2f637010cffdfe1df699b68f</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:33</sys_updated_on>
+        <to display_value="Wait for an assignment group to be defined">2a46336a2f637010cffdfe1df699b680</to>
+    </wf_transition>
+    <wf_estimated_runtime_config action="INSERT_OR_UPDATE">
+        <estimated_run_time/>
+        <no_of_data_points>1</no_of_data_points>
+        <percentage_threshold_ert>20</percentage_threshold_ert>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-04 11:32:32</sys_created_on>
+        <sys_id>2246ff2a2f637010cffdfe1df699b6d9</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-11-04 11:32:32</sys_updated_on>
+        <workflow_version display_value="AWS Change Request">ea46ff2a2f637010cffdfe1df699b6d8</workflow_version>
+    </wf_estimated_runtime_config>
+    <wf_workflow_version action="update_multiple" query="workflow=23fc78c52f833010ac4e18aa2799b6de^sys_id!=ea46ff2a2f637010cffdfe1df699b6d8">
+        <published>false</published>
+    </wf_workflow_version>
+</record_update>

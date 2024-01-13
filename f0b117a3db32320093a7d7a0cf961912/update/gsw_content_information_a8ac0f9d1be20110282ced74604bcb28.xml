@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="gsw_content_information">
+    <gsw_content_information action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <article><![CDATA[<h6><span style="font-size: 10pt;"><strong>To view an AWS Health Dashboard</strong></span></h6>
+<ol style="list-style-position: inside;"><li>Log in to your ServiceNow instance as a user (for example, System Administrator) in the fulﬁller view (standard user interface view).</li><li>In the navigator, enter <strong>AWS Health</strong>.</li><li>Choose <strong>Dashboards</strong> under <strong>AWS Health</strong></li><li>Select the <strong>AWS Account</strong> to view its Dashboard data</li></ol>]]></article>
+        <best_practice_acceptable>false</best_practice_acceptable>
+        <dependent_on_contents/>
+        <dependent_on_plugins/>
+        <dependent_on_plugins_ids/>
+        <description/>
+        <embedded_help_qualifier/>
+        <end_point/>
+        <end_point_open_mode/>
+        <end_point_type/>
+        <field/>
+        <filter/>
+        <filter_result/>
+        <implicit_dependent_on/>
+        <implicit_plugin_dependencies/>
+        <is_dynamic>false</is_dynamic>
+        <more_info_available>false</more_info_available>
+        <more_info_html/>
+        <order>900</order>
+        <parent display_value="Validate configurations">3ca44ca71b0b3010bec096c6b04bcbb3</parent>
+        <parents>3ca44ca71b0b3010bec096c6b04bcbb3,c09fcac2dbd130100f00b298f496196f</parents>
+        <plugin_id/>
+        <property_name/>
+        <property_value/>
+        <quick_startable>false</quick_startable>
+        <root_parent display_value="AWS Service Management Connector">c09fcac2dbd130100f00b298f496196f</root_parent>
+        <skippable>true</skippable>
+        <supports_child_content>false</supports_child_content>
+        <sys_class_name>gsw_content_information</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2022-03-29 14:26:30</sys_created_on>
+        <sys_id>a8ac0f9d1be20110282ced74604bcb28</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AWS Health integration features</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>gsw_content_information_a8ac0f9d1be20110282ced74604bcb28</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <table/>
+        <title>AWS Health integration features</title>
+        <weight>1</weight>
+    </gsw_content_information>
+    <sys_translated_text action="delete_multiple" query="documentkey=a8ac0f9d1be20110282ced74604bcb28"/>
+</record_update>

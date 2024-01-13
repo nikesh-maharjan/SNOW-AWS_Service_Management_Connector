@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update>
+    <sys_ui_section caption="Correspondence" section_id="072057941ba51110132ffcc8cc4bcb9b" sys_domain="global" table="x_126749_aws_sc_smc_support_case" version="3" view="">
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>x_126749_aws_sc_comments</element>
+            <position>0</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2022-08-23 09:40:57</sys_created_on>
+            <sys_id>0bfccfa81b255110132ffcc8cc4bcb02</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="Correspondence" display_value="Correspondence" name="x_126749_aws_sc_smc_support_case" sys_domain="global" view="Default view">072057941ba51110132ffcc8cc4bcb9b</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-08-23 09:40:57</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>x_126749_aws_sc_work_notes</element>
+            <position>1</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2022-08-23 09:40:57</sys_created_on>
+            <sys_id>8bfccfa81b255110132ffcc8cc4bcb02</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="Correspondence" display_value="Correspondence" name="x_126749_aws_sc_smc_support_case" sys_domain="global" view="Default view">072057941ba51110132ffcc8cc4bcb9b</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-08-23 09:40:57</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>activity.xml</element>
+            <position>2</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2022-08-23 09:40:58</sys_created_on>
+            <sys_id>0ffccfa81b255110132ffcc8cc4bcb02</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter display_value="Activities (filtered)">444ea5c6bf310100e628555b3f0739d6</sys_ui_formatter>
+            <sys_ui_section caption="Correspondence" display_value="Correspondence" name="x_126749_aws_sc_smc_support_case" sys_domain="global" view="Default view">072057941ba51110132ffcc8cc4bcb9b</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-08-23 09:40:58</sys_updated_on>
+            <sys_user/>
+            <type>formatter</type>
+        </sys_ui_element>
+        <sys_ui_section action="INSERT_OR_UPDATE">
+            <caption>Correspondence</caption>
+            <header>false</header>
+            <name>x_126749_aws_sc_smc_support_case</name>
+            <roles/>
+            <sys_class_name>sys_ui_section</sys_class_name>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2022-08-22 15:16:24</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>072057941ba51110132ffcc8cc4bcb9b</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_name>x_126749_aws_sc_smc_support_case</sys_name>
+            <sys_overrides/>
+            <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+            <sys_policy/>
+            <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+            <sys_update_name>sys_ui_section_072057941ba51110132ffcc8cc4bcb9b</sys_update_name>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+            <sys_user/>
+            <title>false</title>
+            <view display_value="Default view" name="NULL">Default view</view>
+            <view_name/>
+        </sys_ui_section>
+    </sys_ui_section>
+</record_update>

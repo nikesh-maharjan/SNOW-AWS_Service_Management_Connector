@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.AwsSecurityHub</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>AwsSecurityHub</name>
+        <script><![CDATA[/**
+ * @class AwsSecurityHubService
+ * @classdesc Make HTTP requests to AWS Security Hub Service.
+ * @param credential {Object} AWS account credentials.
+ * @param credential.identity {String} An AWS access key.
+ * @param credential.secret {String} An AWS secret access key.
+ * @param credential.session {String=} Required if using temporary credentials.
+ */
+var AwsSecurityHub = /** @class */ (function (_super) {
+    Polyfill.__extends(AwsSecurityHub, _super);
+    function AwsSecurityHub(region, credential, apiVersion) {
+        var _this = _super.call(this, "securityhub", region, credential, false) || this;
+        _this.apiVersion = apiVersion || "2018-10-26";
+        return _this;
+    }
+    // N.B. UpdateFindings is deprecated - use BatchUpdateFindings instead
+    /**
+     * Fields that can be updated:
+     *
+     * Confidence
+     * Criticality
+     * Note
+     * RelatedFindings
+     * Severity
+     * Types
+     * UserDefinedFields
+     * VerificationState
+     * Workflow
+     */
+    AwsSecurityHub.prototype.batchUpdateFindings = function (findingArn, productArn, severityLabel, workflowStatus) {
+        var action = "BatchUpdateFindings";
+        var severityMap = {
+            "INFORMATIONAL": 0,
+            "LOW": 30,
+            "MEDIUM": 60,
+            "HIGH": 80,
+            "CRITICAL": 100
+        };
+        var severity = severityMap[severityLabel.toString()];
+        var payload = {
+            // The list of findings to update
+            "FindingIdentifiers": [
+                {
+                    "Id": findingArn.toString(),
+                    "ProductArn": productArn.toString()
+                }
+            ],
+            // the fields to update:
+            "Severity": {
+                "Label": severityLabel.toString(),
+                "Normalized": severity,
+            }
+        };
+        if (workflowStatus !== undefined) {
+            payload["Workflow"] = {
+                "Status": workflowStatus.toString()
+            };
+        }
+        return Response.of(this._patch("/findings/batchupdate", action, payload, undefined, undefined));
+    };
+    return AwsSecurityHub;
+}(AwsService));
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-10-19 11:08:04</sys_created_on>
+        <sys_id>2deae1ccdbcc2010928729464896190e</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AwsSecurityHub</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_2deae1ccdbcc2010928729464896190e</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

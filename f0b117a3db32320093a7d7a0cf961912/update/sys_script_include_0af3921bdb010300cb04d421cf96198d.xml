@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.AwsSignature</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>AwsSignature</name>
+        <script><![CDATA[var AwsSignature = /** @class */ (function () {
+    /**
+     * @param service The name of the AWS service
+     * @param region e.g. "us-west-1"
+     * @param credential Properties "identity" and "secret" are required, "session" is required if using temporary credentials.
+     * @param isoDate The date in ISO 8601 format.
+     */
+    function AwsSignature(service, region, credential, isoDate) {
+        this.crypto = CryptoJS;
+        this.service = service;
+        this.region = region ? region : "us-east-1";
+        this.credential = credential;
+        this.isoDate = isoDate;
+        this.date = isoDate.substring(0, 8);
+        this.credentialScope = this.date + "/" + this.region + "/" + this.service + "/aws4_request";
+    }
+    AwsSignature.prototype.signV4 = function (method, headers, path, query, payload) {
+        var cr = this._createCanonicalRequest(method, headers, path, query, payload);
+        var hashedCanonicalRequest = this._hashCanonicalRequest(cr.canonicalRequest);
+        var stringToSign = this._createStringToSign(hashedCanonicalRequest);
+        var signature = this._calculateSignature(stringToSign);
+        return this._getAuthorizationHeader(cr.signedHeaders, signature);
+    };
+    AwsSignature.prototype._createCanonicalRequest = function (method, headers, path, query, payload) {
+        // STAGE 1: create the canonical request
+        /*
+         CanonicalRequest =
+         HTTPRequestMethod + '\n' +
+         CanonicalURI + '\n' +
+         CanonicalQueryString + '\n' +
+         CanonicalHeaders + '\n' +
+         SignedHeaders + '\n' +
+         HexEncode(Hash(RequestPayload))
+         */
+        var canonicalRequest = method + "\n";
+        canonicalRequest += encodeURI(this._normalize(path)) + "\n";
+        if (query) {
+            var queryPieces_1 = [];
+            var encoder_1 = this._fixedEncodeURIComponent;
+            Object.keys(query).sort().forEach(function (key, idx, arr) {
+                var encKey = encoder_1(key);
+                var val = query[key];
+                function addParam(v) {
+                    queryPieces_1.push(encKey + "=" + encoder_1(v));
+                }
+                if (Array.isArray(val)) {
+                    // Slice to sort a copy of the value.
+                    val.slice().sort().forEach(addParam, this);
+                }
+                else {
+                    addParam(val);
+                }
+            }, this);
+            canonicalRequest += queryPieces_1.join('&');
+            canonicalRequest += "\n";
+        }
+        else {
+            canonicalRequest += "\n";
+        }
+        var caseSortedHeaderKeys = Object.keys(headers)
+            .sort(function (a, b) {
+            var aL = a.toLowerCase();
+            var bL = b.toLowerCase();
+            return (aL < bL) ? -1 : ((bL < aL) ? 1 : 0);
+        });
+        var canonicalHeaders = caseSortedHeaderKeys.map(function (h) {
+            // remove trailing spaces and sequential spaces within the rest of the string.
+            var value = headers[h];
+            if (value) {
+                value = value.toString().trim().replace(/ +/g, ' ');
+            }
+            else {
+                value = '';
+            }
+            return h.toLowerCase() + ":" + value + '\n';
+        }).join('');
+        var signedHeaders = caseSortedHeaderKeys.map(function (h) {
+            return h.toLowerCase();
+        }).join(';');
+        canonicalRequest += canonicalHeaders + "\n";
+        canonicalRequest += signedHeaders + "\n";
+        canonicalRequest += this.crypto.SHA256(payload).toString();
+        return {
+            canonicalRequest: canonicalRequest,
+            signedHeaders: signedHeaders
+        };
+    };
+    AwsSignature.prototype._hashCanonicalRequest = function (canonicalRequest) {
+        return this.crypto.SHA256(canonicalRequest).toString();
+    };
+    AwsSignature.prototype._createStringToSign = function (hashedCanonicalRequest) {
+        // STAGE 2: create a string to sign
+        /*
+         StringToSign =
+         Algorithm + \n +
+         RequestDateTime + \n +
+         CredentialScope + \n +
+         HashedCanonicalRequest
+         */
+        var stringToSign = "";
+        var algorithm = "AWS4-HMAC-SHA256";
+        stringToSign += algorithm + "\n";
+        stringToSign += this.isoDate + "\n";
+        stringToSign += this.credentialScope + "\n";
+        stringToSign += hashedCanonicalRequest;
+        return stringToSign;
+    };
+    AwsSignature.prototype._calculateSignature = function (stringToSign) {
+        // STAGE 3: calculate a signature
+        // Derive the signing key.
+        function getSignatureKey(Crypto, key, dateStamp, regionName, serviceName) {
+            var kDate = Crypto.HmacSHA256(dateStamp, "AWS4" + key);
+            var kRegion = Crypto.HmacSHA256(regionName, kDate);
+            var kService = Crypto.HmacSHA256(serviceName, kRegion);
+            var kSigning = Crypto.HmacSHA256("aws4_request", kService);
+            return kSigning;
+        }
+        // Service Now errors if you assign the result of getSignatureKey to interim variable!
+        return this.crypto.HmacSHA256(stringToSign, getSignatureKey(this.crypto, this.credential.secret, this.date, this.region, this.service)).toString();
+    };
+    AwsSignature.prototype._getAuthorizationHeader = function (signedHeaders, signature) {
+        // STAGE 4: add an authorization header
+        // Authorization: algorithm Credential=access key ID/credential scope, SignedHeaders=SignedHeaders, Signature=signature
+        return "AWS4-HMAC-SHA256 Credential=" + this.credential.identity + "/" + this.credentialScope +
+            ", SignedHeaders=" + signedHeaders + ", Signature=" + signature;
+    };
+    /** Normalize a URL */
+    AwsSignature.prototype._normalize = function (path) {
+        // see https://tools.ietf.org/html/rfc3986#section-5.2.4.
+        // Uses an index into path rather than deletions from the start of the string.
+        // Replace successive slashes with a single slash.
+        path = path.replace(/\/\/+|\/\.\//g, '/');
+        var output = '';
+        var index = 0;
+        while (index < path.length) {
+            // A
+            if (path.startsWith('./', index)) {
+                index += 2;
+            }
+            else if (path.startsWith('../', index)) {
+                index += 3;
+            }
+            // B
+            else if (path.startsWith('/./', index)) {
+                index += 2;
+            }
+            else if (path.startsWith('/.', index) && (index + 2 === path.length)) {
+                output += '/';
+                index += 2;
+            }
+            // C
+            else if (path.startsWith('/../', index)) {
+                index += 3;
+                output = output.substring(0, output.lastIndexOf('/'));
+            }
+            else if (path.startsWith('/..', index) && (index + 3 === path.length)) {
+                output = output.substring(0, output.lastIndexOf('/'));
+                output += '/';
+                index += 3;
+            }
+            // D
+            else if (path.substring(index) === '.' || path.substring(index) === '..') {
+                index = path.length;
+            }
+            // E
+            else {
+                output += path.charAt(index++);
+                while (index < path.length && path.charAt(index) !== '/') {
+                    output += path.charAt(index++);
+                }
+            }
+        }
+        return output;
+    };
+    AwsSignature.prototype._fixedEncodeURIComponent = function (s) {
+        if (s) {
+            // Snippet from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent.
+            return encodeURIComponent(s).replace(/[!'()*]/g, function (c) {
+                return '%' + c.charCodeAt(0).toString(16);
+            });
+        }
+        return '';
+    };
+    return AwsSignature;
+}());
+AwsSignature.prototype.type = 'AwsSignature';
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2017-09-12 08:23:46</sys_created_on>
+        <sys_id>0af3921bdb010300cb04d421cf96198d</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AwsSignature</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_0af3921bdb010300cb04d421cf96198d</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="42c18c1d2ff450102fd759372799b67c" extends="cmdb_ci" label="Auto Scaling Group" max_length="40" name="x_126749_aws_sc_cmdb_ci_autoscaling_group" type="collection">
+        <element attributes="edge_encryption_enabled=true" label="Default Cool Down" max_length="40" name="default_cool_down" type="integer"/>
+        <element attributes="edge_encryption_enabled=true" label="Desired Capacity" max_length="40" name="desired_capacity" type="integer"/>
+        <element attributes="edge_encryption_enabled=true" label="Health Check Grace Period" max_length="40" name="health_check_grace_period" type="integer"/>
+        <element label="Health Check Type" max_length="32" name="health_check_type" type="string"/>
+        <element attributes="edge_encryption_enabled=true" label="Max Size" max_length="40" name="max_size" type="integer"/>
+        <element attributes="edge_encryption_enabled=true" label="Min Size" max_length="40" name="min_size" type="integer"/>
+        <element label="Object ID" max_length="512" name="object_id" type="string"/>
+        <element attributes="edge_encryption_enabled=true" label="Terminated On" max_length="40" name="terminated_on" type="glide_date_time"/>
+    </element>
+</database>

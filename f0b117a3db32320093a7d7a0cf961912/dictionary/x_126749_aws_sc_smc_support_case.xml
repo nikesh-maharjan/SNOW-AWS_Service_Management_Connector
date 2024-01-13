@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element audit="true" db_object_id="6ac0e2d81be11110132ffcc8cc4bcb1e" label="SMC Support Case" max_length="40" name="x_126749_aws_sc_smc_support_case" type="collection">
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false" choice="1" label="AWS Account" mandatory="true" max_length="32" name="x_126749_aws_sc_awsaccount" reference="x_126749_aws_sc_account" reference_qual="awsenablesupport=true^EQ" reference_qual_condition="awsenablesupport=true^EQ" type="reference">
+            <choice/>
+        </element>
+        <element label="AWS Additional Contacts" max_length="1024" name="x_126749_aws_sc_awscasecommunicationemails" type="string"/>
+        <element label="AWS Case Created Time" max_length="40" name="x_126749_aws_sc_awscasecreatedtime" read_only="true" type="glide_date_time"/>
+        <element label="AWS Case identifier" max_length="64" name="x_126749_aws_sc_awscaseidentifier" type="string"/>
+        <element label="AWS Case Status" max_length="40" name="x_126749_aws_sc_awscasestatus" read_only="true" type="string"/>
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false" dependent="x_126749_aws_sc_awsservice" dependent_on_field="x_126749_aws_sc_awsservice" label="AWS Category" mandatory="true" max_length="32" name="x_126749_aws_sc_awscategory" reference="x_126749_aws_sc_support_case_category" type="reference" use_dependent_field="true"/>
+        <element label="AWS Case Language" max_length="40" name="x_126749_aws_sc_awslanguage" read_only="true" type="string"/>
+        <element label="AWS Last Sync Time" max_length="40" name="x_126749_aws_sc_awslastsynctime" read_only="true" type="glide_date_time"/>
+        <element label="AWS Opened By" max_length="128" name="x_126749_aws_sc_awsopenedby" read_only="true" type="string"/>
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false" dependent="x_126749_aws_sc_awsaccount" dependent_on_field="x_126749_aws_sc_awsaccount" label="AWS Service" mandatory="true" max_length="32" name="x_126749_aws_sc_awsservice" reference="x_126749_aws_sc_support_case_service" type="reference" use_dependent_field="true"/>
+        <element choice="3" label="AWS Severity" mandatory="true" max_length="40" name="x_126749_aws_sc_awsseverity" type="string">
+            <choice>
+                <element inactive_on_update="false" label="General guidance" sequence="0" value="low"/>
+                <element inactive_on_update="false" label="System impaired" sequence="1" value="normal"/>
+                <element inactive_on_update="false" label="Production system impaired" sequence="2" value="high"/>
+                <element inactive_on_update="false" label="Production system down" sequence="3" value="urgent"/>
+                <element inactive_on_update="false" label="Business-critical system down" sequence="4" value="critical"/>
+            </choice>
+        </element>
+        <element label="AWS Case Subject" mandatory="true" max_length="160" name="x_126749_aws_sc_awssubject" type="string"/>
+        <element label="AWS Case ID" max_length="64" name="x_126749_aws_sc_awssupportcaseid" read_only="true" type="string"/>
+        <element label="Additional comments" max_length="4000" name="x_126749_aws_sc_comments" type="journal_input"/>
+        <element label="AWS Case Description" max_length="4000" name="x_126749_aws_sc_description" type="string"/>
+        <element label="Work notes" max_length="40" name="x_126749_aws_sc_work_notes" type="journal_input"/>
+        <index name="index">
+            <element name="x_126749_aws_sc_awsaccount"/>
+        </index>
+        <index name="index2">
+            <element name="x_126749_aws_sc_awscategory"/>
+        </index>
+        <index name="index3">
+            <element name="x_126749_aws_sc_awsservice"/>
+        </index>
+    </element>
+</database>

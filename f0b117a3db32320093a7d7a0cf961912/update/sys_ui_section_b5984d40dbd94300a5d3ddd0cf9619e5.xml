@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update>
+    <sys_ui_section caption="AWS Service Catalog Data" section_id="b5984d40dbd94300a5d3ddd0cf9619e5" sys_domain="global" table="x_126749_aws_sc_product" version="3" view="">
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>awsregion</element>
+            <position>0</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2020-04-21 09:05:44</sys_created_on>
+            <sys_id>ec37857d2f5c101047d8b6a62799b6f3</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="AWS Service Catalog Data" display_value="AWS Service Catalog Data" name="x_126749_aws_sc_product" sys_domain="global" view="Default view">b5984d40dbd94300a5d3ddd0cf9619e5</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2020-04-21 09:05:44</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>awsid</element>
+            <position>1</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2020-04-21 09:05:44</sys_created_on>
+            <sys_id>6037857d2f5c101047d8b6a62799b6f4</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="AWS Service Catalog Data" display_value="AWS Service Catalog Data" name="x_126749_aws_sc_product" sys_domain="global" view="Default view">b5984d40dbd94300a5d3ddd0cf9619e5</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2020-04-21 09:05:44</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>awsproductid</element>
+            <position>2</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2020-04-21 09:05:44</sys_created_on>
+            <sys_id>e037857d2f5c101047d8b6a62799b6f4</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="AWS Service Catalog Data" display_value="AWS Service Catalog Data" name="x_126749_aws_sc_product" sys_domain="global" view="Default view">b5984d40dbd94300a5d3ddd0cf9619e5</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2020-04-21 09:05:44</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>awstype</element>
+            <position>3</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2020-04-21 09:05:44</sys_created_on>
+            <sys_id>6437857d2f5c101047d8b6a62799b6f4</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="AWS Service Catalog Data" display_value="AWS Service Catalog Data" name="x_126749_aws_sc_product" sys_domain="global" view="Default view">b5984d40dbd94300a5d3ddd0cf9619e5</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2020-04-21 09:05:44</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>.split</element>
+            <position>4</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2020-04-21 09:05:44</sys_created_on>
+            <sys_id>e437857d2f5c101047d8b6a62799b6f4</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="AWS Service Catalog Data" display_value="AWS Service Catalog Data" name="x_126749_aws_sc_product" sys_domain="global" view="Default view">b5984d40dbd94300a5d3ddd0cf9619e5</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2020-04-21 09:05:44</sys_updated_on>
+            <sys_user/>
+            <type>.split</type>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>awsportfolio</element>
+            <position>5</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2020-04-21 09:05:44</sys_created_on>
+            <sys_id>6837857d2f5c101047d8b6a62799b6f4</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="AWS Service Catalog Data" display_value="AWS Service Catalog Data" name="x_126749_aws_sc_product" sys_domain="global" view="Default view">b5984d40dbd94300a5d3ddd0cf9619e5</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2020-04-21 09:05:44</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>awssupportdescription</element>
+            <position>6</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2020-04-21 09:05:44</sys_created_on>
+            <sys_id>e837857d2f5c101047d8b6a62799b6f4</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="AWS Service Catalog Data" display_value="AWS Service Catalog Data" name="x_126749_aws_sc_product" sys_domain="global" view="Default view">b5984d40dbd94300a5d3ddd0cf9619e5</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2020-04-21 09:05:44</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>awssupporturl</element>
+            <position>7</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2020-04-21 09:05:44</sys_created_on>
+            <sys_id>6c37857d2f5c101047d8b6a62799b6f4</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="AWS Service Catalog Data" display_value="AWS Service Catalog Data" name="x_126749_aws_sc_product" sys_domain="global" view="Default view">b5984d40dbd94300a5d3ddd0cf9619e5</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2020-04-21 09:05:44</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>awssupportemail</element>
+            <position>8</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2020-04-21 09:05:44</sys_created_on>
+            <sys_id>ec37857d2f5c101047d8b6a62799b6f4</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="AWS Service Catalog Data" display_value="AWS Service Catalog Data" name="x_126749_aws_sc_product" sys_domain="global" view="Default view">b5984d40dbd94300a5d3ddd0cf9619e5</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2020-04-21 09:05:44</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_section action="INSERT_OR_UPDATE">
+            <caption>AWS Service Catalog Data</caption>
+            <header>false</header>
+            <name>x_126749_aws_sc_product</name>
+            <roles/>
+            <sys_class_name>sys_ui_section</sys_class_name>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2017-09-14 10:49:28</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>b5984d40dbd94300a5d3ddd0cf9619e5</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_name>x_126749_aws_sc_product</sys_name>
+            <sys_overrides/>
+            <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+            <sys_policy/>
+            <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+            <sys_update_name>sys_ui_section_b5984d40dbd94300a5d3ddd0cf9619e5</sys_update_name>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+            <sys_user/>
+            <title>false</title>
+            <view display_value="Default view" name="NULL">Default view</view>
+            <view_name/>
+        </sys_ui_section>
+    </sys_ui_section>
+</record_update>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="321a13714fc2030000b506f18110c7c4" label="Account Regions" max_length="40" name="x_126749_aws_sc_account_sync" type="collection">
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false" label="Account" max_length="32" name="awsaccount" reference="x_126749_aws_sc_account" reference_cascade_rule="cascade" type="reference"/>
+        <element attributes="edge_encryption_enabled=true" choice="3" default="us-east-1" display="true" label="Region" max_length="40" name="awsregion" type="choice">
+            <choice>
+                <element inactive_on_update="false" label="US East (N. Virginia)" sequence="0" value="us-east-1"/>
+                <element inactive_on_update="false" label="US East (Ohio)" sequence="1" value="us-east-2"/>
+                <element inactive_on_update="false" label="US West (Oregon)" sequence="2" value="us-west-2"/>
+                <element inactive_on_update="false" label="US West (N. California)" sequence="3" value="us-west-1"/>
+                <element inactive_on_update="false" label="EU (Frankfurt)" sequence="4" value="eu-central-1"/>
+                <element inactive_on_update="false" label="EU (Ireland)" sequence="5" value="eu-west-1"/>
+                <element inactive_on_update="false" label="EU (London)" sequence="6" value="eu-west-2"/>
+                <element inactive_on_update="false" label="EU (Paris)" sequence="7" value="eu-west-3"/>
+                <element inactive_on_update="false" label="EU (Stockholm)" sequence="8" value="eu-north-1"/>
+                <element inactive_on_update="false" label="EU (Milan)" sequence="9" value="eu-south-1"/>
+                <element inactive_on_update="false" label="Asia Pacific (Seoul)" sequence="10" value="ap-northeast-2"/>
+                <element inactive_on_update="false" label="Asia Pacific (Tokyo)" sequence="11" value="ap-northeast-1"/>
+                <element inactive_on_update="false" label="Asia Pacific (Hong Kong)" sequence="12" value="ap-east-1"/>
+                <element inactive_on_update="false" label="Asia Pacific (Osaka)" sequence="12" value="ap-northeast-3"/>
+                <element inactive_on_update="false" label="Asia Pacific (Sydney)" sequence="13" value="ap-southeast-2"/>
+                <element inactive_on_update="false" label="Asia Pacific (Mumbai)" sequence="14" value="ap-south-1"/>
+                <element inactive_on_update="false" label="Asia Pacific (Singapore)" sequence="15" value="ap-southeast-1"/>
+                <element inactive_on_update="false" label="Africa (Cape Town)" sequence="16" value="af-south-1"/>
+                <element inactive_on_update="false" label="Canada (Central)" sequence="17" value="ca-central-1"/>
+                <element inactive_on_update="false" label="South America (São Paulo)" sequence="18" value="sa-east-1"/>
+                <element inactive_on_update="false" label="Middle East (Bahrain)" sequence="19" value="me-south-1"/>
+                <element inactive_on_update="false" label="US GovCloud (US West)" sequence="20" value="us-gov-west-1"/>
+                <element inactive_on_update="false" label="US GovCloud (US West) - FIPS" sequence="21" value="us-gov-west-1:fips"/>
+                <element inactive_on_update="false" label="US GovCloud (US East)" sequence="22" value="us-gov-east-1"/>
+                <element inactive_on_update="false" label="US GovCloud (US East) - FIPS" sequence="23" value="us-gov-east-1:fips"/>
+                <element inactive_on_update="false" label="China (Beijing)" sequence="24" value="cn-north-1"/>
+                <element inactive_on_update="false" label="China (Ningxia)" sequence="24" value="cn-northwest-1"/>
+            </choice>
+        </element>
+        <index name="index">
+            <element name="awsaccount"/>
+        </index>
+    </element>
+</database>

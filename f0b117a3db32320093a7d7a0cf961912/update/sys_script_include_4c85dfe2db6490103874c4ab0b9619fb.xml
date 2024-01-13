@@ -1,0 +1,500 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.AbstractResourceType</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>AbstractResourceType</name>
+        <script><![CDATA[var AbstractResourceType = /** @class */ (function() {
+    function AbstractResourceType() {
+        var _this = this;
+        this.CORRELATION_ID_FIELD = gs.getProperty(C.sysprop.configDedupeDeleteFieldCorrelationId);
+        this.LAST_DISCOVERED_FIELD = gs.getProperty(C.sysprop.configDedupeDeleteFieldLastDiscovered);
+        this.LAST_SYNC_TIME_FIELD = gs.getProperty(C.sysprop.configDedupeDeleteFieldLastSyncTime);
+        this.SHOULD_CREATE_DEDUPE_RELATIONSHIP = gs.getProperty(C.sysprop.configDedupeDeleteRelationshipCreate) === 'true';
+        this.HOSTED_ON_RELATIONSHIP_SYS_ID = this.getRelationTypeSysId(ConfigSyncProvider.RelationshipType.HostedOn);
+        this.CONTAINS_RELATIONSHIP_SYS_ID = this.getRelationTypeSysId(ConfigSyncProvider.RelationshipType.Contains);
+        this.DEFINES_RESOURCES_FOR_RELATIONSHIP_SYS_ID = this.getRelationTypeSysId(ConfigSyncProvider.RelationshipType.DefinesResourcesFor);
+        this.DEFAULT_INSTALL_STATUS_FOR_PLACEHOLDERS_VALUE = parseInt(Util.getChoiceValueFromLabel('cmdb_ci', 'install_status', C.config.defaultInstallStatusForPlaceholdersValue));
+        this.INSTALL_STATUS_FOR_SYNCED_RESOURCES_VALUE = parseInt(Util.getChoiceValueFromLabel('cmdb_ci', 'install_status', 'Installed'));
+        /**
+         * Sync resource type defined by the given ConfigSyncProvider.SyncContext into ServiceNow.
+         * This is based on the collection of rules defined in each subclass of AbstractResourceType.
+         *
+         * Note this method is defined as arrow function. IT MUST REMAIN LIKE THAT TO CORRECTLY BIND TO "THIS"
+         * otherwise, the call to internal methods will fail.
+         *
+         * @param context The context to run the sync
+         */
+        this.syncFromAws = function(context, itemConfigs) {
+            _this.validateFields();
+            if (!context.aggregatorName) {
+                context.accountSysId = _this.getAccountSysId(context);
+                context.regionSysId = _this._getRegionSysId(context);
+            }
+            var okCount = 0;
+            var koCount = 0;
+            itemConfigs.forEach(function(itemConfig) {
+                try {
+                    if (context.aggregatorName) {
+                        context.accountSysId = _this.getAccountSysId(context, itemConfig.item.accountId);
+                        context.regionSysId = _this._getRegionSysId(context, itemConfig.item.awsRegion);
+                    }
+                    _this.syncItemFromAws(context, itemConfig);
+                    okCount++;
+                } catch (ex) {
+                    gs.debug([
+                        "[SYNC] [AWS Config] " + ex.message,
+                        "** Resource ID: " + itemConfig.item[context.configSyncRule.externalResourceId],
+                        "** Resource Type: " + context.configSyncRule.externalResourceType,
+                        "** Account: " + itemConfig.item.accountId,
+                        "** Region: " + itemConfig.item.awsRegion
+                    ].join('\n'));
+                    koCount++;
+                }
+            });
+            if (koCount > 0) {
+                throw new Error(koCount + " resource(s) out of " + (okCount + koCount) + " could not be synchronized. Please check the debug logs for more information.");
+            }
+        };
+        /**
+         * Sync resource type defined by the given ConfigSyncProvider.SyncContext and GlideRecord
+         * to push to AWS Config.
+         * This is based on the collection of rules defined in each subclass of AbstractResourceType.
+         *
+         * Note this method is defined as arrow function. IT MUST REMAIN LIKE THAT TO CORRECTLY BIND TO "THIS"
+         * otherwise, the call to internal methods will fail.
+         *
+         * @param context The context to run the sync
+         * @param resourceGr The GlideRecord of send to AWS.
+         */
+        this.syncFromSn = function(context, resourceGr) {
+            if (_this.shouldSkipItem(context, resourceGr)) {
+                return;
+            }
+            if (!context.schemaVersion) {
+                throw new Error("No schema version ID specified for the context " + JSON.stringify(context));
+            }
+            _this.validateFields();
+            var payload = _this.fields().filter(function(field) {
+                return field.mode === ConfigSyncProvider.FieldMode.FromSn || field.mode === ConfigSyncProvider.FieldMode.BiDirectional;
+            }).reduce(function(o, field) {
+                var value;
+                if (field.transformFromSn) {
+                    value = field.transformFromSn(resourceGr);
+                } else if (!resourceGr[field.snField].nil()) {
+                    value = resourceGr[field.snField].toString();
+                }
+                if (value) {
+                    o[field.awsField] = value;
+                }
+                return o;
+            }, {});
+            if (Object.keys(payload).length === 0) {
+                return;
+            }
+            return context.configApi.putResourceConfig(context.configSyncRule.externalResourceType, resourceGr.getValue('sys_id'), context.schemaVersion, payload, context.configSyncRule.internalResourceName ? resourceGr.getValue(context.configSyncRule.internalResourceName) : undefined);
+        };
+    }
+    /**
+     * Validates if the field definitions are valid. Does nothing if it is, throws an exception otherwise.
+     *
+     * @private
+     */
+    AbstractResourceType.prototype.validateFields = function() {
+        this.fields().forEach(function(field) {
+            if (field.mode === ConfigSyncProvider.FieldMode.BiDirectional && (!field.awsField || !field.snField)) {
+                throw new Error("No target fields for \"ServiceNow <=> AWS\" conversion defined on field: " + JSON.stringify(field) + ". It requires \"awsField\" and \"snField\" string");
+            }
+            if (field.mode === ConfigSyncProvider.FieldMode.FromAws || field.mode === ConfigSyncProvider.FieldMode.BiDirectional) {
+                if (!field.snField) {
+                    throw new Error("No ServiceNow mapping defined for the field: " + JSON.stringify(field) + ". It requires \"snField\" string");
+                }
+                if (!field.awsField && !field.transformFromAws) {
+                    throw new Error("No \"AWS => ServiceNow\" conversion defined for the field: " + JSON.stringify(field) + ". It requires either \"awsField\" string or \"transformFromAws\" function");
+                }
+            }
+            if (field.mode === ConfigSyncProvider.FieldMode.FromSn || field.mode === ConfigSyncProvider.FieldMode.BiDirectional) {
+                if (!field.awsField) {
+                    throw new Error("No AWS mapping defined for the field: " + JSON.stringify(field) + ". It requires \"awsField\" string");
+                }
+                if (!field.snField && !field.transformFromSn) {
+                    throw new Error("No \"ServiceNow => AWS\" conversion defined for the field: " + JSON.stringify(field) + ". It requires either \"snField\" string or \"transformFromSn\" function");
+                }
+            }
+        });
+    };
+    AbstractResourceType.prototype.syncItemFromAws = function(context, config) {
+        if (!config.item) {
+            return;
+        }
+        var awsResourceId = config.awsResourceId = config.item[context.configSyncRule.externalResourceId];
+        var correlationId = this.getCorrelationId(config.item);
+        // In order to be backward compatible we need to lookup the CMDB record by `object_id` AND:
+        // - correlation ID = NULL (the connector did not set this prior to v3.5.4) OR
+        // - correlation ID = what we calculate (from v3.5.4 onward, we do set the correlation ID)
+        // That is assuming the configuration is properly set for AWS Config. If not, then the behaviour remains
+        // the same as v.3.5.4 and below, i.e. we search only by `object_id`
+        //TODO this method can replaced by the method lookupConfigRecord in Util
+        var resourceGr = new GlideRecord(context.configSyncRule.snTable);
+        if (context.configSyncRule.snTable != 'cmdb_ci_kubernetes_cluster' && context.configSyncRule.snTable != 'cmdb_ci_cloud_db_cluster' ) //object_id column does not exist for kubernetes cluster table or cloud database cluster
+            resourceGr.addQuery('object_id', awsResourceId);
+        if (this.CORRELATION_ID_FIELD) {
+            resourceGr.addNullQuery(this.CORRELATION_ID_FIELD).addOrCondition(this.CORRELATION_ID_FIELD, correlationId);
+            resourceGr.orderByDesc(this.CORRELATION_ID_FIELD);
+        }
+        resourceGr.setLimit(1);
+        resourceGr.query();
+        var editing = resourceGr.next();
+        if (this.shouldSkipItem(context, resourceGr, config)) {
+            return;
+        }
+        // TODO should this be set when we read from AWS and stored in `context` ?
+        var timestamp = config.timestamp = new GlideDateTime();
+        if (context.configSyncRule.snTable == 'cmdb_ci_kubernetes_cluster') {
+            var definitional = {
+                name: config.awsResourceId,
+            };
+        } else if(context.configSyncRule.snTable == 'cmdb_ci_cloud_db_cluster'){
+				definitional = {
+                cluster_id: config.item.configuration.dbclusterIdentifier,
+            };
+
+		} else {
+            definitional = {
+                object_id: config.awsResourceId,
+            };
+        }
+        var additional = {
+            skip_sync: !!config.item.resourceDeletionTime,
+            install_status: this.INSTALL_STATUS_FOR_SYNCED_RESOURCES_VALUE,
+        };
+        if (this.CORRELATION_ID_FIELD) {
+            if (editing && resourceGr.isValidRecord() && !resourceGr[this.CORRELATION_ID_FIELD].nil()) {
+                definitional[this.CORRELATION_ID_FIELD] = correlationId;
+            } else {
+                additional[this.CORRELATION_ID_FIELD] = correlationId;
+            }
+        }
+        if (this.LAST_DISCOVERED_FIELD) {
+            additional[this.LAST_DISCOVERED_FIELD] =
+                config.item.configurationItemCaptureTime ?
+                Util.toGlideDateTime(config.item.configurationItemCaptureTime) :
+                undefined;
+        }
+        if (this.LAST_SYNC_TIME_FIELD) {
+            additional[this.LAST_SYNC_TIME_FIELD] = context.startTime;
+        }
+        if (!editing) {
+            additional.first_discovered = timestamp;
+            additional.discovery_source = context.connectorName;
+        }
+        this.fields().filter(function(field) {
+            return field.mode === ConfigSyncProvider.FieldMode.FromAws || field.mode === ConfigSyncProvider.FieldMode.BiDirectional;
+        }).forEach(function(field) {
+            try {
+                if (field.transformFromAws) {
+                    additional[field.snField] = field.transformFromAws(config, context);
+                } else {
+                    additional[field.snField] = Util.evaluate(config, field.awsField);
+                }
+            } catch (ex) {
+                throw new Error("Failed to set \"" + field.snField + "\" field (table \"" + context.configSyncRule.snTable + "\"): " + ex.message);
+            }
+        });
+        var resourceSysId = Util.insertOrUpdate(context.configSyncRule.snTable, definitional, additional).sys_id;
+        this.processAwsTags(config, resourceSysId, context.configSyncRule.snTable);
+        this.processAwsRelationships(context, config, resourceSysId);
+        this.syncFromAwsAddRelationships(context, config, resourceSysId);
+        if (this.SHOULD_CREATE_DEDUPE_RELATIONSHIP && context.syncStatus && context.syncStatus.isValidRecord()) {
+            var syncStatus = context.syncStatus;
+            if (gs.getProperty('x_126749_aws_sc.stalestatususemtm') == 'true') {
+                this.upsertmtmSyncStatus(syncStatus.sys_id.toString(), resourceSysId);
+            } else {
+                this.updateRelationship(syncStatus.sys_id.toString(), resourceSysId, this.DEFINES_RESOURCES_FOR_RELATIONSHIP_SYS_ID);
+            }
+        }
+    };
+    AbstractResourceType.prototype.addHostedOnRegionRelationship = function(context, _config, resourceSysId) {
+        // by default we add a hosted-on-region relationship; subclasses can override
+        this.updateRelationship(resourceSysId, context.regionSysId, this.HOSTED_ON_RELATIONSHIP_SYS_ID);
+    };
+    AbstractResourceType.prototype.shouldSkipItem = function(context, resourceGr, config) {
+        // Record exists and is already marked as skip_sync, then we skip
+        if (resourceGr.isValidRecord() && resourceGr.getValue('skip_sync') === "1") {
+            return true;
+        }
+        // Record exists and it hasn't changed since the last sync, then we skip
+        if (resourceGr.isValidRecord() && config && resourceGr.getValue(this.LAST_DISCOVERED_FIELD) === config.item.configurationItemCaptureTime) {
+            return true;
+        }
+        // Record doesn't exist but the item is marked as deleted in AWS Config, then we skip
+        if (!resourceGr.isValidRecord() && config && config.item.hasOwnProperty('resourceDeletionTime')) {
+            return true;
+        }
+        return false;
+    };
+    AbstractResourceType.prototype.updateRelationship = function(parentSysId, childSysId, typeSysId) {
+        Util.insertOrUpdate('cmdb_rel_ci', {
+            parent: parentSysId,
+            child: childSysId,
+            type: typeSysId
+        }, {});
+    };
+
+    AbstractResourceType.prototype.upsertmtmSyncStatus = function(parentSysId, childSysId) {
+        Util.insertOrUpdate('x_126749_aws_sc_m2m_configuratio_sync_status', {
+            parent: parentSysId,
+            child: childSysId
+        }, {});
+    };
+
+    AbstractResourceType.prototype.processAwsAvailabilityZonesRelationships = function(context, config, resourceSysId) {
+        var _this = this;
+        var _a;
+        var availabilityZones = [];
+        if (config.data.hasOwnProperty('availabilityZones')) {
+            availabilityZones.push.apply(availabilityZones, config.data.availabilityZones.map(function(availabilityZone) {
+                return availabilityZone.hasOwnProperty('value') ? availabilityZone.value : availabilityZone;
+            }).filter(function(azs) {
+                return azs && azs.length > 0;
+            }));
+        }
+        if (config.data.hasOwnProperty('availabilityZone') && config.data.availabilityZone) {
+            availabilityZones.push(config.data.availabilityZone);
+        }
+        var placementAz = (_a = config.data.placement) === null || _a === void 0 ? void 0 : _a.availabilityZone;
+        if (!!placementAz) {
+            availabilityZones.push(placementAz);
+        }
+        if (availabilityZones.length === 0) {
+            return;
+        }
+        if (this.CONTAINS_RELATIONSHIP_SYS_ID === null) {
+            gs.warn("Skipped relationship [type=\"Contains::Contained by\", parent=\"" + availabilityZones.toString() + "\", child=\"" + config.awsResourceId + " (" + context.configSyncRule.externalResourceType + ")\"] => relationship type does not exist");
+            return;
+        }
+        availabilityZones.forEach(function(availabilityZone) {
+            var azSysId;
+            var az = new GlideRecord('cmdb_ci_availability_zone');
+            az.addQuery('object_id', availabilityZone);
+            az.addJoinQuery('cmdb_rel_ci', 'sys_id', 'child')
+                .addCondition('type', _this.CONTAINS_RELATIONSHIP_SYS_ID)
+                .addCondition('parent', context.regionSysId);
+            az.query();
+            if (az.next()) {
+                azSysId = az.getValue('sys_id');
+            } else {
+                az.initialize();
+                Util.setValue(az, 'object_id', availabilityZone);
+                Util.setValue(az, 'name', availabilityZone);
+                Util.setValue(az, 'first_discovered', new GlideDateTime());
+                Util.setValue(az, 'discovery_source', context.connectorName);
+                azSysId = az.insert();
+                _this.updateRelationship(context.regionSysId, azSysId, _this.CONTAINS_RELATIONSHIP_SYS_ID);
+            }
+            _this.updateRelationship(azSysId, resourceSysId, _this.CONTAINS_RELATIONSHIP_SYS_ID);
+        });
+    };
+    AbstractResourceType.prototype.processAwsTags = function(_config, resourceSysId, tableName) {
+        //updates tags for the specified resource in cmdb_key_value
+        //we want to add any tags that are not there, update any tags whose value has changed and remove
+        //any tags that are no longer attached to the resource
+        var resourceTags = this.getResourceTags(_config);
+        var keyValueGr = new GlideRecord('cmdb_key_value');
+        keyValueGr.addQuery('configuration_item', resourceSysId);
+        keyValueGr.query();
+        while (keyValueGr.next()) {
+            var currentTag = resourceTags.filter(function(tag) {
+                return (tag.key !== undefined ? tag.key : tag.Key) === keyValueGr.getValue('key');
+            })[0] || undefined;
+            if (!currentTag) {
+                //the tag has been deleted from the resource
+                keyValueGr.deleteRecord();
+            } else {
+                //check the value. If changed, edit. If unchanged do nothing
+                if (keyValueGr.getValue('value') !== (currentTag.value !== undefined ? currentTag.value : currentTag.Value)) {
+                    Util.setValue(keyValueGr, 'value', currentTag.value !== undefined ? currentTag.value : currentTag.Value);
+                    keyValueGr.update();
+                }
+                //remove from resourceTags
+                resourceTags.splice(resourceTags.indexOf(currentTag), 1);
+            }
+        }
+        //Resource tags will now only contain new tags
+        resourceTags.forEach(function(tag) {
+            keyValueGr.initialize();
+            Util.setValue(keyValueGr, 'configuration_item', resourceSysId);
+            Util.setValue(keyValueGr, 'key', tag.key !== undefined ? tag.key : tag.Key);
+            Util.setValue(keyValueGr, 'value', tag.value !== undefined ? tag.value : tag.Value);
+            keyValueGr.insert();
+        });
+    };
+    AbstractResourceType.prototype.getResourceTags = function(_config) {
+        var tags = _config.data.tags || _config.item.tags || [];
+        //return this.customTagFiltering(tags);
+		return tags;
+    };
+
+    AbstractResourceType.prototype.customTagFiltering = function(tags) {
+        //var filtertags = tags.filter(function (tag) { return tag.key === "Entity" || tag.key === "Product"; });
+        var filtertags = tags.filter(function(tag) {
+            return tag.key === "Name" || tag.key === "serviceEnvironment";
+        });
+        return filtertags;
+    };
+    AbstractResourceType.prototype._getRegionSysId = function(context, itemAwsRegion) {
+        //retrieves sys_id of the record in cmdb_ci_aws_datacenter for the specified region
+        //or adds a new record if not found
+        var awsDatacenterGr = new GlideRecord('cmdb_ci_aws_datacenter');
+        var region = context.region;
+        if (itemAwsRegion) {
+            region = itemAwsRegion;
+        }
+        awsDatacenterGr.addQuery('object_id', region);
+        awsDatacenterGr.addJoinQuery('cmdb_rel_ci', 'sys_id', 'parent')
+            .addCondition('type', this.HOSTED_ON_RELATIONSHIP_SYS_ID)
+            .addCondition('child', context.accountSysId);
+        awsDatacenterGr.query();
+        if (awsDatacenterGr.next()) {
+            return awsDatacenterGr.getValue('sys_id');
+        } else {
+            awsDatacenterGr.initialize();
+            Util.setValue(awsDatacenterGr, 'object_id', region);
+            Util.setValue(awsDatacenterGr, 'name', region);
+            Util.setValue(awsDatacenterGr, 'region', region);
+            Util.setValue(awsDatacenterGr, "first_discovered", context.startTime);
+            Util.setValue(awsDatacenterGr, 'discovery_source', context.connectorName);
+            var regionSysId = awsDatacenterGr.insert();
+            this.updateRelationship(regionSysId, context.accountSysId, this.HOSTED_ON_RELATIONSHIP_SYS_ID);
+            return regionSysId;
+        }
+    };
+    AbstractResourceType.prototype.getRelationTypeSysId = function(relationTypeName) {
+        var relationshipGr = new GlideRecord('cmdb_rel_type');
+        relationshipGr.addQuery('name', relationTypeName);
+        relationshipGr.query();
+        if (relationshipGr.next()) {
+            return relationshipGr.getValue('sys_id');
+        } else {
+            return null;
+        }
+    };
+    AbstractResourceType.prototype.getAccountSysId = function(context, aggregatedAccountId) {
+        var cloudServiceAccountGr = new GlideRecord('cmdb_ci_cloud_service_account');
+        var accountId = context.aggregatorName && aggregatedAccountId ? aggregatedAccountId : context.account.awsaccountnumber;
+        cloudServiceAccountGr.addQuery("object_id", accountId);
+        cloudServiceAccountGr.query();
+        if (cloudServiceAccountGr.next()) {
+            return cloudServiceAccountGr.getValue('sys_id');
+        } else {
+            var accountName = context.resourceIdAsName || context.aggregatorName && aggregatedAccountId ? accountId : context.account.awsname;
+            cloudServiceAccountGr.initialize();
+            Util.setValue(cloudServiceAccountGr, "object_id", accountId);
+            Util.setValue(cloudServiceAccountGr, "account_id", accountId);
+            Util.setValue(cloudServiceAccountGr, "name", accountName);
+            Util.setValue(cloudServiceAccountGr, "first_discovered", context.startTime);
+            Util.setValue(cloudServiceAccountGr, "discovery_source", context.connectorName);
+            return cloudServiceAccountGr.insert();
+        }
+    };
+    AbstractResourceType.prototype.processRelationships = function(context, config, resourceSysId, resourceType, relationshipName, tableName, options) {
+        var _this = this;
+        if (!options)
+            options = {};
+        var relationshipSysId = this.getRelationTypeSysId(relationshipName);
+        if (!config.item.relationships) {
+            return;
+        }
+        config.item.relationships
+            .filter(function(relationship) {
+                return relationship.resourceType === resourceType;
+            })
+            .forEach(function(relationship) {
+                var correlationId = options.knownSameAccountAndRegion ? _this.getCorrelationId({
+                    accountId: config.item.accountId,
+                    awsRegion: config.item.awsRegion,
+                    resourceType: relationship.resourceType,
+                    resourceId: relationship.resourceId
+                }) : null;
+                // We want to capture all relationships, but because we don't control the order of batch synchronisation
+                // some resources involved into the relationship we are trying to create here might come later on.
+                // To solve this issue, the method `getOrCreateResourceSysId` will, as the name suggest, do a lookup of
+                // the target resource and return its sys_id. If the target resource doesn't exist yet, then we create a
+                // placeholder with the right `object_id` and `correlation_id` so the synchronisation can update it later on.
+                // The point being that all relationship will be create, regardless of the synchronisation state of the target resource.
+                var relatedResourceSysId = _this.getOrCreateResourceSysId(context, tableName, relationship.resourceId, correlationId);
+                var parentSysId = options.reverse ? relatedResourceSysId : resourceSysId;
+                var childSysId = options.reverse ? resourceSysId : relatedResourceSysId;
+                _this.updateRelationship(parentSysId, childSysId, relationshipSysId);
+            });
+    };
+    AbstractResourceType.prototype.getOrCreateResourceSysId = function(context, table, resourceId, correlationId) {
+        var resourceGr = new GlideRecord(table);
+        if (table != 'cmdb_ci_kubernetes_cluster' && table !='cmdb_ci_cloud_db_cluster') // object_id column does not exist for kubernetes cluster table or Cloud database cluster
+            resourceGr.addQuery('object_id', resourceId);
+        if (this.CORRELATION_ID_FIELD && correlationId) {
+            resourceGr.addNullQuery(this.CORRELATION_ID_FIELD).addOrCondition(this.CORRELATION_ID_FIELD, correlationId);
+            resourceGr.orderByDesc(this.CORRELATION_ID_FIELD);
+        }
+        resourceGr.query();
+        if (!resourceGr.next()) {
+            resourceGr.initialize();
+            Util.setValue(resourceGr, 'name', resourceId);
+            Util.setValue(resourceGr, 'object_id', resourceId);
+            Util.setValue(resourceGr, 'install_status', this.DEFAULT_INSTALL_STATUS_FOR_PLACEHOLDERS_VALUE);
+            Util.setValue(resourceGr, 'discovery_source', context.connectorName);
+            if (this.CORRELATION_ID_FIELD && correlationId) {
+                Util.setValue(resourceGr, this.CORRELATION_ID_FIELD, correlationId);
+            }
+            return resourceGr.insert();
+        }
+        return resourceGr.sys_id.toString();
+    };
+    //TODO replace with the method getCorrelationId in Util
+    AbstractResourceType.prototype.getCorrelationId = function(configItem) {
+		if(configItem.resourceType == 'AWS::RDS::DBCluster' && configItem.hasOwnProperty("configuration")){ // configuration property does not exists for stale items
+			return [
+            configItem.accountId,
+            configItem.awsRegion,
+            configItem.resourceType,
+            configItem.configuration.dbclusterIdentifier
+        ].join(',');
+		}
+        return [
+            configItem.accountId,
+            configItem.awsRegion,
+            configItem.resourceType,
+            configItem.resourceId
+        ].join(',');
+    };
+    AbstractResourceType.prototype.processAwsRelationships = function(context, config, resourceSysId) {
+        var _this = this;
+        this.relationships()
+            .filter(function(rel) {
+                return !rel.documentationOnly;
+            })
+            .forEach(function(rel) {
+                _this.processRelationships(context, config, resourceSysId, rel.resourceType.rules()[0].externalResourceType, rel.relationship, rel.resourceType.rules()[0].snTable, {
+                    reverse: rel.reverse
+                });
+            });
+    };
+    return AbstractResourceType;
+}());]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-05-06 13:39:09</sys_created_on>
+        <sys_id>4c85dfe2db6490103874c4ab0b9619fb</sys_id>
+        <sys_mod_count>151</sys_mod_count>
+        <sys_name>AbstractResourceType</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_4c85dfe2db6490103874c4ab0b9619fb</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2023-05-03 19:44:00</sys_updated_on>
+    </sys_script_include>
+</record_update>

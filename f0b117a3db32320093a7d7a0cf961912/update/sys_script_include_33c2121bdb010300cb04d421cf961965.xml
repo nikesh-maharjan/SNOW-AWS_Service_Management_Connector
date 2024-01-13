@@ -1,0 +1,872 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.Util</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>Util</name>
+        <script><![CDATA[/**
+ @Deployable({
+     table: 'sys_script_include',
+     column: 'script',
+     sysId: '33c2121bdb010300cb04d421cf961965'
+ })
+ */
+var Util = (function () {
+    var sessionNamePattern = /^[\w+=,.@-]*$/;
+    /**
+     * Capture a reference to the global object at the time this function is executed, for use in loadObject.
+     */
+    var thisCapture = this;
+    function failure(a, b, c) {
+        var reason, error, retry = false;
+        if (a instanceof Error) {
+            reason = a.message;
+            error = a;
+        }
+        else {
+            reason = a;
+            if (typeof b === "boolean") {
+                retry = b;
+            }
+            else {
+                error = b;
+                retry = c;
+            }
+        }
+        return {
+            success: false,
+            reason: reason,
+            error: error,
+            isRetryable: retry
+        };
+    }
+    return {
+        assertExists: function assertExists(val, msg) {
+            if (!val) {
+                throw new Error(msg || "missing value");
+            }
+            return val;
+        },
+        assertMatches: function assertMatches(string, regex) {
+            if (!regex.test(string)) {
+                throw new Error("value does not conform to pattern: " + string);
+            }
+            return string;
+        },
+        /**
+         * @returns true if scoped applications have permission to read, create, update or delete records
+         * on the given table.
+         */
+        tableActionEnabled: function tableActionEnabled(table, read, create, update, deleteRecord) {
+            var dbObjectGr = new GlideRecord('sys_db_object');
+            if (!dbObjectGr.get('name', table)) {
+                return false;
+            }
+            var valid = true;
+            if (read) {
+                valid = valid && read && dbObjectGr.read_access;
+            }
+            if (create) {
+                valid = valid && create && dbObjectGr.create_access;
+            }
+            if (update) {
+                valid = valid && update && dbObjectGr.update_access;
+            }
+            if (deleteRecord) {
+                valid = valid && deleteRecord && dbObjectGr.delete_access;
+            }
+            return valid;
+        },
+        /**
+         * @param obj {Object} An object with properties <code>__type</code> and <code>[mM]essage</code>.
+         * @returns {String} A user-friendly description of an AWS request error.
+         * @see https://docs.aws.amazon.com/IAM/latest/APIReference/CommonErrors.html
+         */
+        explainError: function explainError(obj) {
+            if (!obj)
+                return "";
+            switch (obj.__type) {
+                case "InvalidSignatureException":
+                    return "The request signature was invalid. Check that the Access Key and Secret Access Key are correct.";
+                case "UnrecognizedClientException":
+                    return "The security token included in the request is invalid. Check that the Access Key and Secret Access Key are correct.";
+            }
+            if (obj.message) {
+                return obj.message;
+            }
+            else if (obj.Message) {
+                return obj.Message;
+            }
+            if (obj.ErrorResponse && obj.ErrorResponse.Error) {
+                return obj.ErrorResponse.Error.Message;
+            }
+            return "";
+        },
+        escapeText: function escapeText(unsafe) {
+            var subs = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return unsafe.replace(/[&<>"']/g, function (m) {
+                return subs[m];
+            });
+        },
+        unescapeText: function unescapeText(safe) {
+            var subs = {
+                '&amp;': '&',
+                '&lt;': '<',
+                '&gt;': '>',
+                '&quot;': '"',
+                '&#039;': "'"
+            };
+            return safe.replace(/&amp;|&lt;|&gt;|&quot;|&#039;/g, function (m) {
+                return subs[m];
+            });
+        },
+        /**
+         * Split a string on '&' and URI decode the key=value components.
+         * @param str
+         * @return {object}
+         */
+        formDecode: function formDecode(str) {
+            var obj = {};
+            str.split('&').forEach(function (value) {
+                var sp = value.split('=');
+                obj[decodeURIComponent(sp[0])] = (sp.length > 1)
+                    ? decodeURIComponent(sp[1])
+                    : "";
+            });
+            return obj;
+        },
+        /**
+         * Form-encode the keys and values in an object. Undefined and null values are ignored.
+         * @param object
+         * @returns {string}
+         */
+        formEncode: function formEncode(object) {
+            return Object.keys(object).map(function (k) {
+                var enc = encodeURIComponent(k) + "=", v = object[k];
+                if (v !== undefined && v !== null) {
+                    enc += encodeURIComponent(v);
+                }
+                return enc;
+            }).join("&");
+        },
+        getSystemPropertyInt: function getSystemPropertyInt(name, defaultValue) {
+            return parseInt(gs.getProperty(name), 10) || defaultValue;
+        },
+        /**
+         * @param workflowProperty {String} The name of a system property.
+         * @return {GlideRecord}
+         *     <code>wf_workflow</code> record of the workflow named in the system property, or null if the property
+         *     has no value or the workflow does not exist.
+         */
+        getWorkflow: function getWorkflow(workflowProperty) {
+            var workflowName = gs.getProperty(workflowProperty);
+            if (workflowName) {
+                var wfGR = new GlideRecord('wf_workflow');
+                if (wfGR.get('name', workflowName)) {
+                    return wfGR;
+                }
+            }
+            return null;
+        },
+        /**
+         * Returns a Workflow object from ServiceNow, to allow scripted invocation of workflows.
+         * @return {global.Workflow} The workflow handler.
+         */
+        getWorkflowHandler: function getWorkflowHandler() {
+            return new global.Workflow();
+        },
+        /**
+         * @param name The fully qualified name of a type, for example <code>x_126749_aws_sc.AwsServiceCatalogConnector</code>.
+         * @param [context] Optional object in which name should be found, default to the value of `this` when the script include was created.
+         * @return Object A reference to the object or undefined if it was not accessible.
+         */
+        getObjectWithName: function getObjectWithName(name, context) {
+            if (!name)
+                return undefined;
+            if (!context)
+                context = thisCapture;
+            var parts = name.split("."), current = context, i = 0, l = parts.length;
+            do {
+                current = current[parts[i++]];
+            } while (current !== undefined && i < l);
+            return current;
+        },
+        idempotencyToken: function idempotencyToken(t) {
+            return t + gs.generateGUID();
+        },
+        /**
+         * Attempts to determine the ServiceNow instance version.
+         * @returns {string} Lower-case string of the version.
+         */
+        instanceVersion: function instanceVersion() {
+            // Try to match it from the mid.version property
+            var midVersion = gs.getProperty('mid.version');
+            if (midVersion) {
+                return midVersion.split("-")[0].toLowerCase();
+            }
+            // Otherwise get the Glide build name from xmlstats.do.
+            var request = new sn_ws.RESTMessageV2();
+            request.setEndpoint(gs.getProperty('glide.servlet.uri') + "/xmlstats.do");
+            request.setHttpMethod("GET");
+            request.setQueryParameter("include", "status");
+            var response = request.execute();
+            if (!response.haveError()) {
+                // XMLDocument object is private to the global scope so turn it into an object.
+                // xmlToJSON returns null if it fails to parse.
+                var obj = gs.xmlToJSON(response.getBody());
+                if (obj && obj['xmlstats'] && obj['xmlstats']['glide.build.name']) {
+                    var v = obj['xmlstats']['glide.build.name'];
+                    return v.toLowerCase();
+                }
+            }
+            throw new Error("Unable to determine instance version from mid.version property or from " +
+                "xmlstats.do. Response from the latter: " + response.getBody());
+        },
+        isCurrentUserAccountAdmin: function isCurrentUserAccountAdmin() {
+            return gs.getUser().hasRole('x_126749_aws_sc_account_admin');
+        },
+        isCurrentUserPortfolioManager: function isCurrentUserPortfolioManager() {
+            return gs.getUser().hasRole('x_126749_aws_sc_portfolio_manager');
+        },
+        isCurrentUserAutomationManager: function isCurrentUserPortfolioManager() {
+            return gs.getUser().hasRole('x_126749_aws_sc.automation_manager');
+        },
+        isCurrentUserFindingsManager: function isCurrentUserPortfolioManager() {
+            return gs.getUser().hasRole('x_126749_aws_sc.finding_manager');
+        },
+        isCurrentUserOpsCenterManager: function isCurrentUserPortfolioManager() {
+            return gs.getUser().hasRole('x_126749_aws_sc.opscenter_manager');
+        },
+        isCurrentUserSupportCaseManager: function () {
+            return gs.getUser().hasRole('x_126749_aws_sc.support_case_manager');
+        },
+        isCurrentUserHealthDashboardViewer: function () {
+            return gs.getUser().hasRole('x_126749_aws_sc.health_dashboard_viewer');
+        },
+        isUserCriteriaEnabled: function isUserCriteriaEnabled() {
+            return gs.getProperty(C.sysprop.userCriteriaEnabled) !== "false";
+        },
+        /**
+         * Test whether a value conforms to the constraints of the RoleSessionName parameter
+         * in an AssumeRole request.
+         * @param name
+         * @returns {boolean}
+         * @see https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html
+         * @memberof! AwsSecurityTokenService
+         */
+        isValidSessionName: function isValidSessionName(name) {
+            return !!(name
+                && typeof name === "string"
+                && name.length >= 2
+                && name.length <= 64
+                && name.match(thisCapture.sessionNamePattern));
+        },
+        mergeInto: function mergeInto(base) {
+            var rest = [];
+            for (var _i = 1; _i < arguments.length; _i++) {
+                rest[_i - 1] = arguments[_i];
+            }
+            if (arguments.length % 2 === 0) {
+                throw new Error("function requires an odd number of arguments");
+            }
+            if (typeof base !== 'object') {
+                throw new Error("function requires first argument to be an object");
+            }
+            var obj = Object.extend({}, base);
+            for (var i = 1, l = arguments.length - 1; i < l; i += 2) {
+                var key = arguments[i];
+                var value = arguments[i + 1];
+                if (key && value) {
+                    obj[key] = value;
+                }
+            }
+            return obj;
+        },
+        /**
+         * Transforms a number of milliseconds into a readable string.
+         * @param millis
+         */
+        renderDuration: function renderDuration(millis) {
+            function r(a, unitA, b, unitB) {
+                var str = a + unitA;
+                if (b)
+                    str += " " + b + unitB;
+                return str;
+            }
+            var h = Math.floor((millis / 3600000) % 60);
+            var m = Math.floor((millis / 60000) % 60);
+            var s = Math.floor((millis / 1000) % 60);
+            var ms = millis % 1000;
+            if (h) {
+                return r(h, "h", m, "m");
+            }
+            else if (m) {
+                return r(m, "m", s, "s");
+            }
+            else if (s) {
+                return r(s, "s", ms, "ms");
+            }
+            else {
+                return r(ms, "ms", undefined, "");
+            }
+        },
+        setBudgetOnGlideRecord: function setBudgetOnGlideRecord(recordGr, budgetDetail) {
+            var budgetLimit = budgetDetail ?
+                "".concat(budgetDetail.BudgetLimit.Unit, ";").concat(budgetDetail.BudgetLimit.Amount) : 'USD;0.0';
+            var budgetActual = budgetDetail ?
+                "".concat(budgetDetail.CalculatedSpend.ActualSpend.Unit, ";").concat(budgetDetail.CalculatedSpend.ActualSpend.Amount) : 'USD;0.0';
+            //Forecasted spend is not always present in the response
+            var budgetForecasted = budgetDetail && budgetDetail.CalculatedSpend && budgetDetail.CalculatedSpend.ForecastedSpend ?
+                "".concat(budgetDetail.CalculatedSpend.ForecastedSpend.Unit, ";").concat(budgetDetail.CalculatedSpend.ForecastedSpend.Amount) : 'USD;0.0';
+            Util.setValue(recordGr, 'awsbudgetname', budgetDetail ? budgetDetail.BudgetName : '');
+            Util.setValue(recordGr, 'awsbudgetlimit', budgetLimit);
+            Util.setValue(recordGr, 'awsbudgetactual', budgetActual);
+            Util.setValue(recordGr, 'awsbudgetforecasted', budgetForecasted);
+        },
+        setValue: function setValue(recordGr, col, value) {
+            if (!recordGr.isValidField(col)) {
+                return;
+            }
+            if (!value && value !== 0) {
+                // this is how ServiceNow sets an empty field
+                // see https://docs.servicenow.com/bundle/jakarta-servicenow-platform/page/script/server-scripting/reference/r_SettingAGlideRecordVariableToNull.html
+                value = 'NULL';
+            }
+            recordGr[col] = value;
+        },
+        /**
+         * Returns sys_id of cmdb_ci_service entry for the named AWS service.
+         */
+        getAwsServiceId: function (serviceName) {
+            var serviceGr = new GlideRecord("cmdb_ci_service");
+            serviceGr.addQuery('name', '=', serviceName);
+            serviceGr.setLimit(1);
+            serviceGr.query();
+            if (serviceGr.next()) {
+                return serviceGr.sys_id;
+            }
+            else {
+                serviceGr.initialize();
+                this.setValue(serviceGr, "name", serviceName);
+                serviceGr.insert();
+                return serviceGr.sys_id;
+            }
+        },
+        /** queries for a record matching the "definitional" values, creating it if not.
+         *  if additional values are passed, they are set in the found or created record.
+         *  (insertOrUpdate = "update or insert").
+         *  eg:
+         *    _upsert('cmdb_rel_ci', { parent: resourceSysId, child: regionSysId, type: hostedOnRelationTypeSysId } );
+         *    _upsert('some_table', 'record_id', { field1_to_update: newValue });
+         *
+         * @param [table] SN table where the record should be upserted
+         * @param [definitional] a string being the `object_id` or an object indicating the keys and values
+         *                       to look up to find the record (or to set on a new record if none is found)
+         * @param [additional] optional map of additional properties to set on the object found using `definitional`
+         * @param [allowWorkflow] optional flag to avoid business rules from triggering each other on our tables only
+         * @param [defaults] optional map of properties to set only when inserting a new record
+         */
+        insertOrUpdate: function insertOrUpdate(table, definitional, additional, allowWorkflow, defaults) {
+            if (additional === void 0) { additional = null; }
+            if (allowWorkflow === void 0) { allowWorkflow = true; }
+            if (defaults === void 0) { defaults = undefined; }
+            var itemGr = new GlideRecord(table);
+            if (typeof definitional === 'string') {
+                definitional = { object_id: definitional };
+            }
+            for (var property in definitional) {
+                if (definitional.hasOwnProperty(property)) {
+                    itemGr.addQuery(property, definitional[property]);
+                }
+            }
+            itemGr.query();
+            var editing = itemGr.next();
+            if (!editing) {
+                itemGr.initialize();
+                if (defaults) {
+                    for (var property in defaults) {
+                        if (defaults.hasOwnProperty(property)) {
+                            Util.setValue(itemGr, property, defaults[property]);
+                        }
+                    }
+                }
+            }
+            for (var property in definitional) {
+                if (definitional.hasOwnProperty(property) && property !== "sys_id") {
+                    Util.setValue(itemGr, property, definitional[property]);
+                }
+            }
+            if (additional) {
+                for (var property in additional) {
+                    if (additional.hasOwnProperty(property)) {
+                        Util.setValue(itemGr, property, additional[property]);
+                    }
+                }
+            }
+            if (table.startsWith(C.prefix)) {
+                itemGr.setWorkflow(allowWorkflow);
+            }
+            if (editing) {
+                itemGr.update();
+            }
+            else {
+                itemGr.insert();
+            }
+            return itemGr;
+        },
+        /**
+         * Queries for a record matching the "key" values, creating it if not.
+         *
+         * @param insertUpdateRequest a request object
+         *
+         * - table - the ServiceNowTable where the record should be upserted
+         * - key - a string being the records sys_id, or an object with key/values
+         *         to lookup to find the record to update. If none found, these
+         *         values are set on the new record.
+         * - fields - an optional map of fields and values to be set on the record
+         * - defaults - an optional map of fields and values to be set only when the record is inserted
+         * - blockWorkflow - optional flag to prevent business rules from triggering on the table
+         */
+        upsert: function (_a) {
+            var table = _a.table, key = _a.key, fields = _a.fields, defaults = _a.defaults, blockWorkflow = _a.blockWorkflow;
+            var allowWorkflow = !blockWorkflow;
+            return this.insertOrUpdate(table, key, fields, allowWorkflow, defaults);
+        },
+        /**
+         * @param [user] Optional GlideRecord for a user. Defaults to the session user if unset.
+         * @return {String}
+         *      A value suitable for use as an STS session name, or null if no such value
+         *      could be determined.
+         * @memberof! AwsSecurityTokenService
+         */
+        sessionNameForUser: function sessionNameForUser(user) {
+            // Distinguish between no argument and empty GlideRecord
+            var useArg = user !== undefined && user !== null;
+            var name = useArg ? user.user_name.toString() : gs.getUserName();
+            if (Util.isValidSessionName(name)) {
+                return name;
+            }
+            var id = useArg ? user.sys_id.toString() : gs.getUserID();
+            if (Util.isValidSessionName(id)) {
+                return id;
+            }
+            return null;
+        },
+        /**
+         * Convert a timestamp to a GlideDateTime.
+         *
+         * Timestamp can be either an ISO8601 string like '2017-06-06T09:54:08.739Z'
+         * or an epoch time; the function guesses whether this is a plain epoch time
+         * in seconds (returned in some AWS responses) or whether it is in milliseconds,
+         * so it can be used with the result of a Javascript Date.valueOf().
+         *
+         * @return {GlideDateTime}
+         */
+        toGlideDateTime: function toGlideDateTime(timestamp) {
+            if (typeof timestamp === "number" && timestamp < 10000000000) {
+                // timestamp is in seconds, convert to milliseconds
+                timestamp *= 1000;
+            }
+            var jsDate = new Date(timestamp);
+            // Check it could be parsed
+            if (jsDate) {
+                var gdt = new GlideDateTime();
+                gdt.setValue(jsDate.valueOf());
+                return gdt;
+            }
+            else {
+                return null;
+            }
+        },
+        toISO8601String: function toISO8601String(glideDateTime) {
+            var jsDate = new Date(glideDateTime.getNumericValue());
+            return jsDate.toISOString();
+        },
+        getCustomTags: function getCustomTags(portfolio, scReqItemGR) {
+            //get tags that are defined as global and those specific to this portfolio
+            var customTags = [];
+            var tagsGr = new GlideRecord('x_126749_aws_sc_tags');
+            tagsGr.addNullQuery('awsportfolio').addOrCondition('awsportfolio', '=', portfolio.sys_id.toString());
+            tagsGr.addQuery('awsselectable', '=', 'false');
+            tagsGr.query();
+            while (tagsGr.next()) {
+                var tag = {
+                    'Key': tagsGr.getValue('awskey'),
+                    'Value': tagsGr.getValue('awsvalue')
+                };
+                customTags.push(tag);
+            }
+            return this.resolveDynamicTags(customTags, scReqItemGR);
+        },
+        resolveDynamicTags: function resolveDynamicTags(storedTags, scReqItemGR) {
+            function getDynamicTagValue(dynamicTagName) {
+                if (Util.tagNotSupported(dynamicTagName)) {
+                    return "Not implemented " + dynamicTagName.replace("${", "-").replace("}", "-");
+                }
+                // values from GS
+                if ("${USERNAME}" === dynamicTagName) {
+                    return gs.getUserName();
+                }
+                // values from the request
+                if (!scReqItemGR) {
+                    return "Not supported when provisioning with plan";
+                }
+                var request = scReqItemGR.request.nil() ? null : scReqItemGR.request.getRefRecord();
+                if (!request) {
+                    return "Unknown request";
+                }
+                switch (dynamicTagName) {
+                    case "${REQUEST_NUMBER}":
+                        return request.number.toString();
+                    case "${REQUESTED_FOR}":
+                        var requested_by = request.requested_for.getRefRecord();
+                        return requested_by ? requested_by.user_name.toString() : "Unknown requester";
+                    case "${OPENED_BY}":
+                        var opened_by = request.opened_by.getRefRecord();
+                        return opened_by ? opened_by.user_name.toString() : "Unknown opener";
+                }
+            }
+            var resolvedTags = [];
+            storedTags.forEach(function (value, index) {
+                var dynamicTagName = Util.getDynamicTags(value.Value);
+                if (dynamicTagName.length === 0) {
+                    resolvedTags.push(value);
+                }
+                else {
+                    var dynamicValue_1 = value.Value;
+                    dynamicTagName.forEach(function (item) {
+                        dynamicValue_1 = dynamicValue_1.replace(item, getDynamicTagValue(item));
+                    });
+                    var tag = {
+                        'Key': value.Key,
+                        'Value': dynamicValue_1
+                    };
+                    resolvedTags.push(tag);
+                }
+            });
+            return resolvedTags;
+        },
+        getDynamicTags: function getDynamicTags(tagValue) {
+            var tagPattern = /\$\{(.*?)\}/g;
+            var match = tagValue.match(tagPattern);
+            return match != null ? match : [];
+        },
+        getSupportedDynamicTags: function getSupportedDynamicTags() {
+            return [
+                "${USERNAME}",
+                "${REQUEST_NUMBER}",
+                "${REQUESTED_FOR}",
+                "${OPENED_BY}",
+            ];
+        },
+        tagNotSupported: function tagNotSupported(dynamicTagName) {
+            return this.getSupportedDynamicTags().indexOf(dynamicTagName) < 0;
+        },
+        success: function success(value) {
+            return {
+                success: true,
+                result: value
+            };
+        },
+        failure: failure,
+        /**
+         * Created a new comment on the requested item associated with an automation execution record.
+         *
+         * @param configurationItem {GlideRecord} GlideRecord of the configuration item
+         * @param comment {string} The comment to add on the requested item
+         */
+        createRequestItemComment: function (configurationItem, comment) {
+            var reqItemGr = new GlideRecord('sc_req_item');
+            reqItemGr.addQuery('configuration_item', '=', configurationItem.sys_id.toString());
+            reqItemGr.query();
+            if (reqItemGr.next()) {
+                reqItemGr.comments = comment;
+                reqItemGr.update();
+            }
+            else {
+                gs.warn("There is no requested item linked to the configuration item \"".concat(configurationItem.sys_id.toString(), "\", cannot add a comment"));
+            }
+        },
+        getShortDescription: function (text) {
+            // In theory should not be required as short description is mandatory, but coding defensively
+            if (!text) {
+                return null;
+            }
+            // You can't use Java's reserved words for variable names in ServiceNow.
+            var overview = text;
+            if (text.length > 200) {
+                // find the last whitespace in the first 196 characters and replace
+                // the three characters after it with "..."
+                var idx = 197;
+                do {
+                    if (text.charAt(idx - 1).match(/\s/)) {
+                        break;
+                    }
+                } while (--idx > 0);
+                if (idx <= 0) {
+                    // just truncate the string if it's 200 characters without whitespace!
+                    idx = 197;
+                }
+                overview = text.substring(0, idx) + "...";
+            }
+            return overview;
+        },
+        evaluate: function (object, path) {
+            var segments = path.split('.');
+            var match = segments.shift();
+            if (object.hasOwnProperty(match)) {
+                return segments.length === 0 ? object[match] : Util.evaluate(object[match], segments.join('.'));
+            }
+            return undefined;
+        },
+        startTimer: function () {
+            var glideDateTime = new GlideDateTime();
+            var started = glideDateTime.getNumericValue();
+            return {
+                'started': glideDateTime,
+                'elapsed': function () { return (new GlideDateTime().getNumericValue() - started) / 1000.0; }
+            };
+        },
+        getIncidentResolvedCode: function () {
+            switch (Util.instanceVersion()) {
+                case "quebec" /* QUEBEC */:
+                case "rome" /* ROME */:
+                    // legacy format
+                    return Util.getChoiceValueFromLabel('incident', 'close_code', 'Closed/Resolved by Caller');
+                case "sandiego" /* SANDIEGO */:
+                // new label format added in San Diego
+                // https://docs.servicenow.com/bundle/sandiego-release-notes/page/release-notes/it-service-management/incident-management-rn.html#:~:text=Enhancement%20to%20resolution,User%20error
+                default: // future proofing - use the new format
+                    return Util.getChoiceValueFromLabel('incident', 'close_code', 'Resolved by Caller');
+            }
+        },
+        //Looks up the choice list of the specified element of the specified table
+        // by label and returns the integer value of that field if found
+        getChoiceValueFromLabel: function (table, element, label) {
+            var choices = new GlideRecord('sys_choice');
+            choices.addQuery('name', table);
+            choices.addQuery('element', element);
+            choices.addQuery('label', label);
+            choices.query();
+            if (choices.next()) {
+                return choices.getValue('value');
+            }
+            return undefined;
+        },
+        //Looks up the choice list of the specified element of the specified table
+        // by value and returns the strong label of that field if found
+        getChoiceLabelFromValue: function (table, element, value) {
+            var choices = new GlideRecord('sys_choice');
+            choices.addQuery('name', table);
+            choices.addQuery('element', element);
+            choices.addQuery('value', value);
+            choices.query();
+            if (choices.next()) {
+                return choices.getValue('label');
+            }
+            return undefined;
+        },
+        getRelationTypeSysId: function (relationTypeName) {
+            var relationshipTypeGr = new GlideRecord('cmdb_rel_type');
+            relationshipTypeGr.addQuery('name', relationTypeName);
+            relationshipTypeGr.query();
+            if (relationshipTypeGr.next()) {
+                return relationshipTypeGr.getValue('sys_id');
+            }
+            else {
+                return null;
+            }
+        },
+        getDataLookupMatcherTable: function (lookupName, sourceTableName) {
+            var definitionGr = new GlideRecord('dl_definition');
+            definitionGr.addQuery('name', lookupName);
+            if (sourceTableName) {
+                definitionGr.addQuery('source_table', sourceTableName);
+            }
+            definitionGr.addQuery('active', 'true');
+            definitionGr.query();
+            if (definitionGr.next()) {
+                return definitionGr.matcher_table;
+            }
+            return null;
+        },
+        //TODO this method can be used in AbstractResourceType in place of the existing code
+        lookupConfigRecord: function (table, resourceId, correlationId, correlationIdField) {
+            var resourceGr = new GlideRecord(table);
+            resourceGr.addQuery('object_id', resourceId);
+            if (correlationIdField) {
+                resourceGr.addNullQuery(correlationIdField).addOrCondition(correlationIdField, correlationId);
+                resourceGr.orderByDesc(correlationIdField);
+            }
+            resourceGr.setLimit(1);
+            resourceGr.query();
+            if (resourceGr.next()) {
+                return resourceGr;
+            }
+            return undefined;
+        },
+        //TODO this method can be used in AbstractResourceType in place of the similarly named method
+        getCorrelationId: function (accountId, region, resourceType, resourceId) {
+            return [
+                accountId,
+                region,
+                resourceType,
+                resourceId
+            ].join(',');
+        },
+        getRecord: function (table, column, value) {
+            var recordGr = new GlideRecord(table);
+            recordGr.addQuery(column, value);
+            recordGr.query();
+            recordGr.next();
+            return recordGr;
+        },
+        getQueryString: function (paramName) {
+            var value;
+            try {
+                value = RP.getParameterValue(paramName);
+            }
+            catch (ex) {
+                value = new GlideURI().get(paramName);
+            }
+            return value;
+        },
+        tryParseJson: function (obj, name) {
+            try {
+                return Util.success(JSON.parse(obj));
+            }
+            catch (e) {
+                return Util.failure("Error deserializing ".concat(name, ": ").concat(e), e);
+            }
+        },
+        //Check is the account's regions enabled contain at least one govCloud region (checking the presence of `-gov-`)
+        //If so, `us-gov-west-1` region should be returned, else returns `us-east-1`
+        isGovCloudAccount: function (accountSysId) {
+            var regions = [];
+            var grRegions = new GlideRecord('x_126749_aws_sc_account_sync');
+            grRegions.addNotNullQuery('awsaccount');
+            grRegions.addQuery('awsaccount', accountSysId);
+            grRegions.query();
+            while (grRegions.next()) {
+                regions.push(grRegions.awsregion.toString());
+            }
+            return regions.some(function (region) { return region.includes("-gov-"); });
+        },
+		//Check is the account's regions enabled contain at least one china region (checking the presence of `cn-`)
+        //If so, `cn-north-1` region should be returned, else returns `us-east-1`
+		isBeijingRegionAccount: function (accountSysId) {
+            var regions = [];
+            var grRegions = new GlideRecord('x_126749_aws_sc_account_sync');
+            grRegions.addNotNullQuery('awsaccount');
+            grRegions.addQuery('awsaccount', accountSysId);
+            grRegions.query();
+            while (grRegions.next()) {
+                regions.push(grRegions.awsregion.toString());
+            }
+            return regions.some(function (region) { return region.includes("cn-north-1"); });
+        },
+		isNingxiaRegionAccount: function (accountSysId) {
+            var regions = [];
+            var grRegions = new GlideRecord('x_126749_aws_sc_account_sync');
+            grRegions.addNotNullQuery('awsaccount');
+            grRegions.addQuery('awsaccount', accountSysId);
+            grRegions.query();
+            while (grRegions.next()) {
+                regions.push(grRegions.awsregion.toString());
+            }
+            return regions.some(function (region) { return region.includes("cn-northwest-1"); });
+        },
+        getDecryptedValue: function (encryptedString) {
+            var decryptedValue = encryptedString.getDecryptedValue();
+            if (decryptedValue === null) {
+                gs.warn("Connector is only supported on Quebec Patch 5 and later");
+            }
+            return decryptedValue;
+        },
+        errorMessageFormat: function (message) {
+            switch (message) {
+                case "Cannot read property 'toString' of undefined":
+                case "Cannot read properties of undefined (reading 'toString')":
+                    return "Cannot read properties of undefined (reading 'toString')";
+                default:
+                    return message;
+            }
+        },
+        toEpochSeconds: function (record, fieldName) {
+            var fieldValue = record.getValue(fieldName);
+            return new GlideDateTime(fieldValue).getNumericValue() / 1000;
+        },
+        logDebug: function (object) {
+            gs.debug(JSON.stringify(object, null, 2));
+        },
+        recordUrl: function (tableName, record, viewName) {
+            if (viewName === void 0) { viewName = 'Default view'; }
+            var instanceName = gs.getProperty('instance_name');
+            var sysId = record.sys_id.toString();
+            return "https://".concat(instanceName, ".service-now.com/nav_to.do?uri=/").concat(tableName, ".do?sys_id=").concat(sysId, "&sysparm_view=").concat(viewName);
+        },
+        //this method will be used by advanced reference qualifier of 'awsworkflowoverride' of the Portfolio table
+        //It provides a filter for end users to select a workflow that is active or user checked-out and based on the table
+        //where the field exists
+        getActiveCatalogWorkflows: function (tableName) {
+            var grWorkflows = new GlideRecord('wf_workflow_version');
+            if (tableName)
+                grWorkflows.addQuery('table', tableName);
+            grWorkflows.addActiveQuery();
+            var qc = grWorkflows.addQuery('published', 'true');
+            qc.addOrCondition('checked_out_by', gs.getUserID());
+            grWorkflows.query();
+            var ids = [];
+            while (grWorkflows.next()) {
+                ids.push(grWorkflows.workflow.toString());
+            }
+            return 'sys_idIN' + ids.join(',');
+        },
+        foldMaybe: function (args) {
+            var maybe = args.maybe, onSuccess = args.onSuccess, onError = args.onError;
+            if (maybe.success == true) {
+                return onSuccess(maybe.result);
+            }
+            else {
+                return onError(maybe);
+            }
+        },
+        /**
+         * Copy the values of all the enumerable own properties from one source object to a
+         * target object. Returns the target object.
+         *
+         * Simple implementation of Object.assign as ServiceNow doesn't support it.
+         *
+         * @param target The target object to copy to.
+         * @param source The source object from which to copy properties.
+         */
+        assign: function (target, source) {
+            Object.keys(source).forEach(function (key) { return target[key] = source[key]; });
+            return target;
+        },
+    };
+})();
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2017-09-12 08:18:42</sys_created_on>
+        <sys_id>33c2121bdb010300cb04d421cf961965</sys_id>
+        <sys_mod_count>2</sys_mod_count>
+        <sys_name>Util</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_33c2121bdb010300cb04d421cf961965</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2023-03-14 18:59:51</sys_updated_on>
+    </sys_script_include>
+</record_update>

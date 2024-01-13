@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.AwsSecurityTokenService</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>AwsSecurityTokenService</name>
+        <script><![CDATA[/**
+ * @class AwsSecurityTokenService
+ * @classdesc Make HTTP requests to AWS Security Token Service.
+ * @param credential {Object} AWS account credentials.
+ * @param credential.identity {String} An AWS access key.
+ * @param credential.secret {String} An AWS secret access key.
+ * @param credential.session {String=} Required if using temporary credentials.
+ * @param apiVersion {String=} Optional version of STS. Defaults to "2011-06-15".
+ */
+var AwsSecurityTokenService = /** @class */ (function (_super) {
+    Polyfill.__extends(AwsSecurityTokenService, _super);
+    function AwsSecurityTokenService(region, credential, apiVersion) {
+        var _this = _super.call(this, "sts", region, credential, false) || this;
+        _this.apiVersion = apiVersion || "2011-06-15";
+        return _this;
+    }
+    /**
+     * Return information about the role or account calling this function
+     * @see https://docs.aws.amazon.com/cli/latest/reference/sts/get-caller-identity.html
+     * @returns {AWS.STS.GetCallerIdentityResponse}
+     * @memberof! AwsSecurityTokenService#
+     * @alias getCallerIdentity
+     */
+    AwsSecurityTokenService.prototype.getCallerIdentity = function () {
+        var action = "GetCallerIdentity";
+        var params = {
+            "Action": action,
+            "Version": this.apiVersion
+        };
+        var response = this._post(action, Util.formEncode(params), {
+            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+            "Accept": "application/json"
+        });
+        var responseObject = JSON.parse(response.getBody());
+        if (responseObject.Error) {
+            var details = responseObject.Error.Code + ": " + responseObject.Error.Message;
+            throw new Error(details);
+        }
+        return responseObject.GetCallerIdentityResponse.GetCallerIdentityResult;
+    };
+    return AwsSecurityTokenService;
+}(AwsService));
+AwsSecurityTokenService.prototype.type = 'AwsSecurityTokenService';
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2017-10-05 18:13:05</sys_created_on>
+        <sys_id>a9577e324f210300c5883b728110c700</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AwsSecurityTokenService</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_a9577e324f210300c5883b728110c700</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

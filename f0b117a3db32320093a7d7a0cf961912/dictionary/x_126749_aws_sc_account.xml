@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="30b0dbc1db010300959afe1ebf96199b" label="Account" max_length="40" name="x_126749_aws_sc_account" type="collection">
+        <element active="false" label="Access Key" max_length="128" name="awsaccesskey" type="string"/>
+        <element label="Access Key (End User)" mandatory="true" max_length="128" name="awsaccesskeyenduser" type="string"/>
+        <element label="Access Key (Sync User)" mandatory="true" max_length="128" name="awsaccesskeysyncuser" type="string"/>
+        <element label="Account Number" max_length="12" name="awsaccountnumber" read_only="true" type="string"/>
+        <element attributes="edge_encryption_enabled=true" label="Integrate with AWS Systems Manager Change Manager" max_length="40" name="awsenablechangemanager" type="boolean"/>
+        <element attributes="edge_encryption_enabled=true" label="Integrate with AWS Config" max_length="40" name="awsenableconfig" type="boolean"/>
+        <element attributes="edge_encryption_enabled=true" label="Integrate with AWS Health" max_length="40" name="awsenablehealthdashboard" type="boolean"/>
+        <element attributes="edge_encryption_enabled=true" label="Integrate with AWS Systems Manager Incident Manager" max_length="40" name="awsenableincidentmanager" type="boolean"/>
+        <element attributes="edge_encryption_enabled=true" label="Integrate with AWS Systems Manager OpsCenter" max_length="40" name="awsenableopscenter" type="boolean"/>
+        <element attributes="edge_encryption_enabled=true" label="Integrate with AWS Security Hub" max_length="40" name="awsenablesecurityhub" type="boolean"/>
+        <element attributes="edge_encryption_enabled=true" label="Integrate with AWS Service Catalog (including AppRegistry)" max_length="40" name="awsenableservicecatalog" type="boolean"/>
+        <element attributes="edge_encryption_enabled=true" label="Integrate with AWS Support" max_length="40" name="awsenablesupport" type="boolean"/>
+        <element attributes="edge_encryption_enabled=true" label="Integrate with AWS Systems Manager Automation" max_length="40" name="awsenablesystemsmanager" type="boolean"/>
+        <element label="AWS Systems Manager Incident Manager enabled time" max_length="40" name="awsincidentmanagerenabledtime" read_only="true" type="glide_date_time"/>
+        <element display="true" label="Name" mandatory="true" max_length="254" name="awsname" type="string"/>
+        <element label="Ops Center Enabled Time" max_length="40" name="awsopscenterenabledtime" type="glide_date_time"/>
+        <element active="false" attributes="no_data_replicate=true,edge_encryption_enabled=true,is_legacy_password2=true" label="Secret Access Key" max_length="255" name="awssecretaccesskey" type="password2"/>
+        <element attributes="edge_encryption_enabled=true,no_data_replicate=true,is_legacy_password2=true" label="Secret Access Key (End User)" mandatory="true" max_length="255" name="awssecretaccesskeyenduser" type="password2"/>
+        <element attributes="edge_encryption_enabled=true,no_data_replicate=true,is_legacy_password2=true" label="Secret Access Key (Sync User)" mandatory="true" max_length="255" name="awssecretaccesskeysyncuser" type="password2"/>
+        <element label="AWS Support enabled time" max_length="40" name="awssupportenabledtime" type="glide_date_time"/>
+        <element label="AWS Support last full sync time" max_length="40" name="awssupportlastfullsynctime" read_only="true" type="glide_date_time"/>
+        <element attributes="edge_encryption_enabled=true" choice="3" default="javascript:var regionsGr = new GlideRecord('x_126749_aws_sc_account_sync'); regionsGr.addQuery('awsaccount', '=', current.sys_id); regionsGr.query(); current.type = regionsGr.getRowCount() === 0 ? 'end-user' : 'sync-user';" label="Type" max_length="40" name="type" type="choice">
+            <choice>
+                <element inactive_on_update="false" label="Sync user" sequence="1" value="sync-user"/>
+                <element inactive_on_update="false" label="End user" sequence="2" value="end-user"/>
+            </choice>
+        </element>
+    </element>
+</database>

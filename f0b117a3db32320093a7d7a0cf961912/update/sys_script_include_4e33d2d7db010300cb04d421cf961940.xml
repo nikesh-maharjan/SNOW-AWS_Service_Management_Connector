@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.ProductRepo</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>ProductRepo</name>
+        <script><![CDATA[var ProductRepo = /** @class */ (function () {
+    function ProductRepo(region, serviceCatalog) {
+        this.region = Util.assertExists(region, "region");
+        this.serviceCatalog = Util.assertExists(serviceCatalog, "serviceCatalog");
+    }
+    ProductRepo.prototype.get = function (productId, portfolioSysId) {
+        var productGr = new GlideRecord('x_126749_aws_sc_product');
+        productGr.addQuery('awsproductid', "=", productId);
+        productGr.addQuery('awsportfolio', "=", portfolioSysId);
+        productGr.addQuery('awsregion', "=", this.region);
+        productGr.setLimit(1);
+        productGr.query();
+        if (productGr.next()) {
+            return productGr;
+        }
+        return null;
+    };
+    ProductRepo.prototype.insertOrUpdate = function (portfolio, productViewSummary, workflowSysId, budgetDetail) {
+        var message = "product " + productViewSummary.Name + " (" + productViewSummary.ProductId + ") for portfolio " + portfolio.awsdisplayname.toString() + " in account " + portfolio.awsaccount.getRefRecord().awsname;
+        var glideRecord = this.get(productViewSummary.ProductId, portfolio.sys_id.toString());
+        if (glideRecord) {
+            message = "Updating " + message;
+            this.update(glideRecord, portfolio, productViewSummary, budgetDetail);
+        }
+        else {
+            message = "Inserting " + message;
+            glideRecord = this.insert(portfolio, productViewSummary, workflowSysId, budgetDetail);
+        }
+        gs.debug("[SYNC] [AWS ServiceCatalog] " + message);
+        return glideRecord;
+    };
+    ProductRepo.prototype.insert = function (portfolio, productViewSummary, workflowSysId, budgetDetail) {
+        var productGr = new GlideRecord('x_126749_aws_sc_product');
+        productGr.initialize();
+        Util.setValue(productGr, 'awsproductid', productViewSummary.ProductId);
+        Util.setValue(productGr, 'awsregion', this.region);
+        this._setProductProperties(productGr, portfolio, productViewSummary);
+        this._setBudgetProperties(productGr, budgetDetail);
+        // Set category
+        var productCategory = ProductRepo.getProductCategory();
+        if (productCategory) {
+            productGr.category = productCategory.sys_id.toString();
+        }
+        productGr.insert();
+        // Associate the variable set and user criteria.
+        this._attachVariableSet(productGr.sys_id, this._getVariableSet().sys_id);
+        if (Util.isUserCriteriaEnabled()) {
+            var userCriteriaSysId = this._createUserCriteria(productGr.sys_id);
+            Util.setValue(productGr, 'awsusercriteria', userCriteriaSysId);
+        }
+        Util.setValue(productGr, 'workflow', workflowSysId);
+        productGr.update();
+        return productGr;
+    };
+    ProductRepo.prototype.update = function (existingProductGR, portfolio, productViewSummary, budgetDetail) {
+        this._setProductProperties(existingProductGR, portfolio, productViewSummary);
+        this._setBudgetProperties(existingProductGR, budgetDetail);
+        existingProductGR.update();
+    };
+    ProductRepo.prototype.saveProductForPortfolioCategory = function (product, portfolio) {
+        var catItemCategory = new GlideRecord('sc_cat_item_category');
+        catItemCategory.addQuery('sc_cat_item', product.sys_id.toString());
+        catItemCategory.addQuery('sc_category', portfolio.sc_category);
+        catItemCategory.query();
+        if (!catItemCategory.hasNext()) {
+            catItemCategory.initialize();
+            catItemCategory.sc_cat_item = product.sys_id.toString();
+            catItemCategory.sc_category = portfolio.sc_category;
+            catItemCategory.insert();
+        }
+    };
+    ProductRepo.prototype.processLastUpdatedBefore = function (glideDateTime) {
+        this._deleteOlderThan(glideDateTime);
+    };
+    ProductRepo.getProductCategory = function () {
+        var categoryProperty = gs.getProperty(C.sysprop.productCategory);
+        if (categoryProperty) {
+            var categoryGr = new GlideRecord('sc_category');
+            if (categoryGr.get(categoryProperty) || categoryGr.get('title', categoryProperty)) {
+                return categoryGr;
+            }
+        }
+        return null;
+    };
+    ProductRepo.prototype._deleteOlderThan = function (glideDateTime) {
+        var message = Util.isUserCriteriaEnabled() ? "Deleting products, portfolio associations and user criteria older than " + glideDateTime
+            : "Deleting products and portfolio associations older than " + glideDateTime;
+        var deleteUserCriteria = Util.isUserCriteriaEnabled();
+        gs.debug("[SYNC] [AWS ServiceCatalog] " + message);
+        var prod = new GlideRecord('x_126749_aws_sc_product');
+        prod.addQuery('sys_updated_on', '<', glideDateTime);
+        prod.query();
+        var productsToDelete = [];
+        var criteriaToDelete = [];
+        while (prod.next()) {
+            productsToDelete.push(prod.sys_id.toString());
+            if (deleteUserCriteria && !prod.awsusercriteria.nil()) {
+                criteriaToDelete.push(prod.awsusercriteria.toString());
+            }
+        }
+        gs.debug("[SYNC] [AWS ServiceCatalog] Products to delete: " + productsToDelete.join(','));
+        var products = new GlideRecord('x_126749_aws_sc_product');
+        products.addQuery('sys_id', 'IN', productsToDelete.join(','));
+        products.query();
+        while (products.next()) {
+            // budget information is stored in Currency type fields
+            // GlideRecord#deleteMultiple() cannot be used with these fields
+            // https://docs.servicenow.com/bundle/madrid-platform-administration/page/administer/currency/concept/currency-values-scripts.html
+            products.deleteRecord();
+        }
+        if (deleteUserCriteria) {
+            for (var i = 0; i < criteriaToDelete.length; i++) {
+                var ucapi = new sn_uc.UserCriteria(criteriaToDelete[i]);
+                ucapi.deleteRecord();
+            }
+        }
+        // delete associations that have not been updated as these must have been
+        // removed from the portfolio within AWS Service Catalog since last sync
+        var portProdAssoc = new GlideRecord('x_126749_aws_sc_portfolio_products');
+        portProdAssoc.addQuery('sys_updated_on', '<', glideDateTime);
+        portProdAssoc.deleteMultiple();
+    };
+    ProductRepo.prototype._setProductProperties = function (productGr, portfolio, productViewSummary) {
+        Util.setValue(productGr, 'awsid', productViewSummary.Id);
+        Util.setValue(productGr, "name", productViewSummary.Name); // from sc_cat_item
+        Util.setValue(productGr, 'awsowner', productViewSummary.Owner);
+        Util.setValue(productGr, 'awsdistributor', productViewSummary.Distributor);
+        Util.setValue(productGr, 'awstype', productViewSummary.Type);
+        Util.setValue(productGr, 'awshasdefaultpath', productViewSummary.HasDefaultPath);
+        Util.setValue(productGr, 'awssupportdescription', productViewSummary.SupportDescription);
+        Util.setValue(productGr, 'awssupportemail', productViewSummary.SupportEmail);
+        Util.setValue(productGr, 'awssupporturl', productViewSummary.SupportUrl);
+        Util.setValue(productGr, 'awsportfolio', portfolio.sys_id.toString());
+        // Descriptions are from sc_cat_item
+        var awsDescription = productViewSummary['ShortDescription'];
+        Util.setValue(productGr, "short_description", Util.getShortDescription(awsDescription));
+        Util.setValue(productGr, "description", this._formatDescription(portfolio, productViewSummary));
+        // ensure the record is always marked as updated, as 'setForceUpdate' is not available to scoped apps
+        Util.setValue(productGr, 'awslastsynctime', new GlideDateTime());
+    };
+    ProductRepo.prototype._formatDescription = function (portfolio, productViewSummary) {
+        return "\n            <p>" + productViewSummary.ShortDescription + "</p>\n            <p>Available from:</p>\n            <ul>\n                <li>Portfolio \"" + portfolio.awsdisplayname + "\"</li>\n                <li>Region \"" + portfolio.awsregion + "\" </li>\n                <li>AWS account \"" + portfolio.awsaccount.awsname + "\" (" + portfolio.awsaccount.awsaccountnumber + ")</li>\n            </ul>\n        ";
+    };
+    ProductRepo.prototype._setBudgetProperties = function (productGr, budgetDetail) {
+        Util.setBudgetOnGlideRecord(productGr, budgetDetail);
+    };
+    ProductRepo.prototype._getVariableSet = function () {
+        var variableSetGr = new GlideRecord('item_option_new_set');
+        // Could obtain this from a system property.
+        if (variableSetGr.get('name', 'AWS Service Catalog Variables')) {
+            return variableSetGr;
+        }
+        return null;
+    };
+    ProductRepo.prototype._attachVariableSet = function (catalogItemId, variableSetId) {
+        var m2m = new sn_sc.CatalogItemVariableSetM2M();
+        m2m.setAttributes({ "sc_cat_item": catalogItemId, "variable_set": variableSetId });
+        m2m.create(true);
+    };
+    /**
+     * Create a user criteria to control access to this product.
+     * @private
+     */
+    ProductRepo.prototype._createUserCriteria = function (productSysId) {
+        // Create the user criteria
+        var uc = new sn_uc.UserCriteria();
+        uc.setName('Controls access to AWS Service Catalog product: ' + productSysId);
+        uc.setAdvanced(true);
+        uc.setScript(ProductUserCriteria.create(productSysId));
+        var ucSysId = uc.create();
+        // And associate it with the product.
+        var link = new GlideRecord('sc_cat_item_user_criteria_mtom');
+        link.initialize();
+        link.sc_cat_item = productSysId;
+        link.user_criteria = ucSysId;
+        link.insert();
+        return ucSysId;
+    };
+    return ProductRepo;
+}());
+ProductRepo.prototype.type = "ProductRepo";
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2017-09-12 08:20:26</sys_created_on>
+        <sys_id>4e33d2d7db010300cb04d421cf961940</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>ProductRepo</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_4e33d2d7db010300cb04d421cf961940</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

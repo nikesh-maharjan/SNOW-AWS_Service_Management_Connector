@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_fix">
+    <sys_script_fix action="INSERT_OR_UPDATE">
+        <before>false</before>
+        <description>Meant to be executed after the "Migrate ELB data" Fix Script. This Fix Script will delete all CI relationships from the legacy ELB records with discovery_source "AWS Service Management Connector"</description>
+        <name>AWS SMC - Delete ELB legacy relationship</name>
+        <record_for_rollback>false</record_for_rollback>
+        <script><![CDATA[/**
+ @Deployable({
+    table: 'sys_script_fix',
+    column: 'script',
+    sysId: '9913764c2f16b41084a1d6ab2799b61a'
+    metadata: {
+         name: 'AWS SMC - Delete ELB legacy relationships',
+         global: true,
+         description: 'Meant to be executed after the "Migrate ELB data" Fix Script. This Fix Script will delete all CI relationships from the legacy ELB records with discovery_source "AWS Service Management Connector"'
+      }
+    })
+ */
+deleteLegacyElbRelationships();
+//search for every relationship having legacyRecord has either child or parent then delete them
+function deleteLegacyElbRelationships() {
+    var recCount = 0;
+    var elbChildrenRelationships = new GlideRecord('cmdb_rel_ci');
+    elbChildrenRelationships.addJoinQuery('cmdb_ci_lb_service', 'child', 'sys_id');
+    elbChildrenRelationships.query();
+    while (elbChildrenRelationships.next()) {
+        var child = elbChildrenRelationships.child.getRefRecord();
+        if (child.discovery_source.toString() === C.displayName) {
+            elbChildrenRelationships.deleteRecord();
+            recCount++;
+        }
+    }
+    var elbParentRelationships = new GlideRecord('cmdb_rel_ci');
+    elbParentRelationships.addJoinQuery('cmdb_ci_lb_service', 'parent', 'sys_id');
+    elbParentRelationships.query();
+    while (elbParentRelationships.next()) {
+        var parent_1 = elbParentRelationships.parent.getRefRecord();
+        if (parent_1.discovery_source.toString() === C.displayName) {
+            elbParentRelationships.deleteRecord();
+            recCount++;
+        }
+    }
+    if (recCount > 0) {
+        gs.info("[AWS SMC] Successfully deleted " + recCount + " in table cmdb_rel_ci \n        from legacy ELB relationships with discovery_source " + C.displayName + " in table cmdb_ci_lb_service");
+    }
+    else {
+        gs.info("[AWS SMC] No legacy ELB relationships with discovery_source " + C.displayName + " have been found");
+    }
+}
+]]></script>
+        <sys_class_name>sys_script_fix</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-08-26 08:55:41</sys_created_on>
+        <sys_id>9913764c2f16b41084a1d6ab2799b61a</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AWS SMC - Delete ELB legacy relationship</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_fix_9913764c2f16b41084a1d6ab2799b61a</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <unloadable>false</unloadable>
+    </sys_script_fix>
+</record_update>

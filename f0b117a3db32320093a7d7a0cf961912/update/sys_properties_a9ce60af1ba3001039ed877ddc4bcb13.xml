@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_properties">
+    <sys_properties action="INSERT_OR_UPDATE">
+        <choices/>
+        <description>Enable selection of launch options for AWS Service Catalog Products. Warning: If false the first launch option will be selected and the launch options section will be hidden.</description>
+        <ignore_cache>false</ignore_cache>
+        <is_private>false</is_private>
+        <name>x_126749_aws_sc.launch.option.selectable</name>
+        <read_roles/>
+        <suffix>launch.option.selectable</suffix>
+        <sys_class_name>sys_properties</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-03-20 11:02:05</sys_created_on>
+        <sys_id>a9ce60af1ba3001039ed877ddc4bcb13</sys_id>
+        <sys_mod_count>2</sys_mod_count>
+        <sys_name>x_126749_aws_sc.launch.option.selectable</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_properties_a9ce60af1ba3001039ed877ddc4bcb13</sys_update_name>
+        <sys_updated_by>nmaharjan</sys_updated_by>
+        <sys_updated_on>2023-09-22 06:46:59</sys_updated_on>
+        <type>boolean</type>
+        <value>true</value>
+        <write_roles/>
+    </sys_properties>
+    <sys_translated_text action="delete_multiple" query="documentkey=a9ce60af1ba3001039ed877ddc4bcb13"/>
+</record_update>

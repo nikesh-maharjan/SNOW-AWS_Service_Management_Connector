@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_properties_category_m2m">
+    <sys_properties_category_m2m action="INSERT_OR_UPDATE">
+        <category display_value="AWS Service Catalog">a44cf9040f1103004dae09bce1050e96</category>
+        <order>250</order>
+        <property display_value="x_126749_aws_sc.changeRequest.assignmentGroup" name="x_126749_aws_sc.changeRequest.assignmentGroup">69f028a24f6833001a959acf9310c7f7</property>
+        <sys_class_name>sys_properties_category_m2m</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-04-04 13:47:08</sys_created_on>
+        <sys_id>b18e212a4fe833001a959acf9310c72a</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>x_126749_aws_sc.changeRequest.assignmentGroup.AWS Service Catalog</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_properties_category_m2m_b18e212a4fe833001a959acf9310c72a</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_properties_category_m2m>
+</record_update>

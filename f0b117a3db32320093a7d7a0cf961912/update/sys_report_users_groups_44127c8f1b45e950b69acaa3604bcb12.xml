@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_report_users_groups">
+    <sys_report_users_groups action="INSERT_OR_UPDATE">
+        <group_id/>
+        <report_id display_value="# of Aggregators for AWS Config">cc127c8f1b45e950b69acaa3604bcb11</report_id>
+        <sys_class_name>sys_report_users_groups</sys_class_name>
+        <sys_created_by>SMC.Specialists2</sys_created_by>
+        <sys_created_on>2023-02-20 16:28:40</sys_created_on>
+        <sys_id>44127c8f1b45e950b69acaa3604bcb12</sys_id>
+        <sys_mod_count>1</sys_mod_count>
+        <sys_name>cc127c8f1b45e950b69acaa3604bcb11</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_report_users_groups_44127c8f1b45e950b69acaa3604bcb12</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2023-04-17 02:00:05</sys_updated_on>
+        <user_id/>
+    </sys_report_users_groups>
+</record_update>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="5ea236c4dbb10300a5d3ddd0cf961971" label="Provisioned Product Event" max_length="40" name="x_126749_aws_sc_pp_event" type="collection">
+        <element label="Created Time" max_length="40" name="awscreatedtime" type="glide_date_time"/>
+        <element label="Path Id" max_length="100" name="awspathid" type="string"/>
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false" label="Product" max_length="32" name="awsproduct" reference="x_126749_aws_sc_cmdb_ci_pp" reference_cascade_rule="delete" type="reference"/>
+        <element label="Product Id" max_length="100" name="awsproductid" type="string"/>
+        <element label="Provisioned Product Id" max_length="100" name="awsprovisionedproductid" type="string"/>
+        <element label="Provisioned Product Name" max_length="128" name="awsprovisionedproductname" type="string"/>
+        <element label="Provisioned Product Type" max_length="40" name="awsprovisionedproducttype" type="string"/>
+        <element label="Provisioning Artifact Id" max_length="100" name="awsprovisioningartifactid" type="string"/>
+        <element label="Record Id" max_length="100" name="awsrecordid" type="string"/>
+        <element display="true" label="Record Type" max_length="40" name="awsrecordtype" type="string"/>
+        <element attributes="edge_encryption_enabled=true" choice="3" default="CREATED" label="Status" mandatory="true" max_length="40" name="awsstatus" type="choice">
+            <choice>
+                <element inactive_on_update="false" label="Created" value="CREATED"/>
+                <element inactive_on_update="false" label="Failed" value="FAILED"/>
+                <element inactive_on_update="false" label="In Progress" value="IN_PROGRESS"/>
+                <element inactive_on_update="false" label="In Progress in Error" value="IN_PROGRESS_IN_ERROR"/>
+                <element inactive_on_update="false" label="Succeeded" value="SUCCEEDED"/>
+            </choice>
+        </element>
+        <element attributes="edge_encryption_enabled=true" choice="3" default="UNSUBMITTED" label="Submission Status" max_length="40" name="awssubmissionstatus" read_only="true" type="choice">
+            <choice>
+                <element inactive_on_update="false" label="Unsubmitted" sequence="10" value="UNSUBMITTED"/>
+                <element inactive_on_update="false" label="Submitted" sequence="20" value="SUBMITTED"/>
+                <element inactive_on_update="false" label="Submission Failed" sequence="30" value="SUBMISSION_FAILED"/>
+            </choice>
+        </element>
+        <element attributes="edge_encryption_enabled=true" choice="1" label="Sync Status" max_length="40" name="awssyncstatus" type="choice">
+            <choice>
+                <element inactive_on_update="false" label="Authentication Failure" value="3"/>
+                <element inactive_on_update="false" label="Error" value="2"/>
+                <element inactive_on_update="false" label="Ok" value="1"/>
+            </choice>
+        </element>
+        <element label="Updated Time" max_length="40" name="awsupdatedtime" type="glide_date_time"/>
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false" label="Change Request" max_length="32" name="change_request" read_only="true" reference="change_request" type="reference"/>
+        <index name="index">
+            <element name="awsproduct"/>
+        </index>
+        <index name="index2">
+            <element name="change_request"/>
+        </index>
+    </element>
+</database>

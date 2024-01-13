@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="586fed542f9301101661ff1df699b607" label="Affected resources" max_length="40" name="x_126749_aws_sc_health_resource" type="collection">
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false" label="Health event" max_length="40" name="awshealthevent" reference="x_126749_aws_sc_health_event" type="reference"/>
+        <element label="Resource ID/ARN" max_length="40" name="awsresourceid" type="string"/>
+        <element active="false" label="Resource ID/ARN (deprecated)" max_length="40" name="resource_id_arn" type="string"/>
+        <index name="index">
+            <element name="awshealthevent"/>
+        </index>
+    </element>
+</database>

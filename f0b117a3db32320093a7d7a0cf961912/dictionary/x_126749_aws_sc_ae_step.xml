@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="e1e118082ff4d01047d8b6a62799b634" label="Automation Execution Step" max_length="40" name="x_126749_aws_sc_ae_step" type="collection">
+        <element label="Action" max_length="25" name="awsaction" read_only="true" type="string"/>
+        <element attributes="edge_encryption_enabled=true" label="Automation Execution" max_length="32" name="awsdocumentexecution" read_only="true" reference="x_126749_aws_sc_cmdb_ci_ae" type="reference"/>
+        <element label="Execution End Time" max_length="40" name="awsexecutionendtime" read_only="true" type="glide_date_time"/>
+        <element label="Execution Start Time" max_length="40" name="awsexecutionstarttime" read_only="true" type="glide_date_time"/>
+        <element label="Inputs" max_length="5120" name="awsinputs" read_only="true" type="string"/>
+        <element label="Outputs" max_length="5120" name="awsoutputs" read_only="true" type="string"/>
+        <element label="Step Execution ID" max_length="40" name="awsstepexecutionid" read_only="true" type="string"/>
+        <element attributes="edge_encryption_enabled=true" label="Step #" max_length="40" name="awsstepindex" read_only="true" type="integer"/>
+        <element label="Step Name" max_length="40" name="awsstepname" read_only="true" type="string"/>
+        <element attributes="edge_encryption_enabled=true" choice="1" label="Step Status" max_length="40" name="awsstepstatus" read_only="true" type="choice">
+            <choice>
+                <element inactive_on_update="false" label="Cancelled" value="Cancelled"/>
+                <element inactive_on_update="false" label="Cancelling" value="Cancelling"/>
+                <element inactive_on_update="false" label="Failed" value="Failed"/>
+                <element inactive_on_update="false" label="In Progress" value="InProgress"/>
+                <element inactive_on_update="false" label="Pending" value="Pending"/>
+                <element inactive_on_update="false" label="Success" value="Success"/>
+                <element inactive_on_update="false" label="TimedOut" value="TimedOut"/>
+                <element inactive_on_update="false" label="Waiting" value="Waiting"/>
+            </choice>
+        </element>
+        <index name="index">
+            <element name="awsdocumentexecution"/>
+        </index>
+    </element>
+</database>

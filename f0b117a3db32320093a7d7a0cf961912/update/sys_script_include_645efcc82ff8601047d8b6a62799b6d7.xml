@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.SsmManagedInstanceInventoryResourceType</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>SsmManagedInstanceInventoryResourceType</name>
+        <script><![CDATA[var SsmManagedInstanceInventoryResourceType = /** @class */ (function (_super) {
+    Polyfill.__extends(SsmManagedInstanceInventoryResourceType, _super);
+    function SsmManagedInstanceInventoryResourceType() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.customSyncFromAws = function (context, itemConfigs) {
+            // 1. We want track only OS details. We also need to calculate a unique ID for the field "object_id" and put that into "genResourceId"
+            var customItemConfigs = itemConfigs
+                .filter(function (itemConfig) { return _this.getInstanceInformation(itemConfig) !== undefined; })
+                .map(function (itemConfig) {
+                var instanceInformation = _this.getInstanceInformation(itemConfig);
+                itemConfig.item['genResourceId'] = _this.normalize(instanceInformation.PlatformType) + "-" + _this.normalize(instanceInformation.PlatformName) + "-" + _this.normalize(instanceInformation.PlatformVersion);
+                return itemConfig;
+            });
+            // 2. We continue as normal
+            _this.syncFromAws(context, customItemConfigs);
+        };
+        return _this;
+    }
+    SsmManagedInstanceInventoryResourceType.prototype.rules = function () {
+        return [{
+                order: 1000,
+                syncType: ConfigSyncProvider.SYNC_DIR.FROM_AWS_CONFIG,
+                externalResourceType: 'AWS::SSM::ManagedInstanceInventory',
+                externalResourceId: 'genResourceId',
+                snTable: 'cmdb_ci_os_template',
+                syncFromAws: this.customSyncFromAws,
+            }];
+    };
+    SsmManagedInstanceInventoryResourceType.prototype.fields = function () {
+        var _this = this;
+        return [{
+                mode: ConfigSyncProvider.FieldMode.FromAws,
+                snField: 'name',
+                transformFromAws: function (object, context) {
+                    var instanceInformation = _this.getInstanceInformation(object);
+                    var instanceName = instanceInformation ? instanceInformation.PlatformName + " " + instanceInformation.PlatformVersion : undefined;
+                    return (context && context.resourceIdAsName) || !instanceName
+                        ? object.item.resourceId : instanceName;
+                }
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromAws,
+                snField: 'guest_os',
+                transformFromAws: function (object) {
+                    var instanceInformation = _this.getInstanceInformation(object);
+                    return instanceInformation.PlatformName;
+                }
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromAws,
+                snField: 'version',
+                transformFromAws: function (object) {
+                    var instanceInformation = _this.getInstanceInformation(object);
+                    return instanceInformation.PlatformVersion;
+                }
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromAws,
+                snField: 'image_type',
+                transformFromAws: function (object) {
+                    var instanceInformation = _this.getInstanceInformation(object);
+                    return instanceInformation.PlatformType;
+                }
+            }];
+    };
+    SsmManagedInstanceInventoryResourceType.prototype.relationships = function () {
+        return [
+            {
+                resourceType: new Ec2ResourceType(),
+                relationship: ConfigSyncProvider.RelationshipType.ProvisionedFrom,
+                reverse: true
+            }
+        ];
+    };
+    SsmManagedInstanceInventoryResourceType.prototype.syncFromAwsAddRelationships = function (context, config, resourceSysId) {
+        // No-op
+    };
+    SsmManagedInstanceInventoryResourceType.prototype.normalize = function (originalString) {
+        return originalString.toString().trim().toLowerCase().replace(/ +/g, '_');
+    };
+    SsmManagedInstanceInventoryResourceType.prototype.getInstanceInformation = function (itemConfig) {
+        if (!itemConfig.data || !itemConfig.data.hasOwnProperty('AWS:InstanceInformation')) {
+            return undefined;
+        }
+        var instanceId = itemConfig.item.resourceId;
+        return itemConfig.data['AWS:InstanceInformation'].Content[instanceId];
+    };
+    return SsmManagedInstanceInventoryResourceType;
+}(AbstractResourceType));
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-11-25 14:40:47</sys_created_on>
+        <sys_id>645efcc82ff8601047d8b6a62799b6d7</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>SsmManagedInstanceInventoryResourceType</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_645efcc82ff8601047d8b6a62799b6d7</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

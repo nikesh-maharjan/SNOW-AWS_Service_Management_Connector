@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update>
+    <sys_ui_section caption="Change Template" section_id="598efd002f663010cffdfe1df699b61d" sys_domain="global" table="x_126749_aws_sc_document" version="3" view="change_template">
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>name</element>
+            <position>0</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-09-17 12:50:47</sys_created_on>
+            <sys_id>24eb7c13dbe6b01022a6d2984b961995</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="Change Template" display_value="Change Template" name="x_126749_aws_sc_document" sys_domain="global" view="e2ed31002f663010cffdfe1df699b6e4">598efd002f663010cffdfe1df699b61d</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2021-09-17 12:50:47</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>active</element>
+            <position>1</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-09-17 12:50:47</sys_created_on>
+            <sys_id>a8eb7c13dbe6b01022a6d2984b961995</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="Change Template" display_value="Change Template" name="x_126749_aws_sc_document" sys_domain="global" view="e2ed31002f663010cffdfe1df699b6e4">598efd002f663010cffdfe1df699b61d</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2021-09-17 12:50:47</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>availability</element>
+            <position>2</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-09-17 12:50:47</sys_created_on>
+            <sys_id>20eb7c13dbe6b01022a6d2984b961996</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="Change Template" display_value="Change Template" name="x_126749_aws_sc_document" sys_domain="global" view="e2ed31002f663010cffdfe1df699b6e4">598efd002f663010cffdfe1df699b61d</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2021-09-17 12:50:47</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>sc_catalogs</element>
+            <position>3</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-09-17 12:50:47</sys_created_on>
+            <sys_id>a4eb7c13dbe6b01022a6d2984b961996</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="Change Template" display_value="Change Template" name="x_126749_aws_sc_document" sys_domain="global" view="e2ed31002f663010cffdfe1df699b6e4">598efd002f663010cffdfe1df699b61d</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2021-09-17 12:50:47</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>category</element>
+            <position>4</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-09-17 12:50:47</sys_created_on>
+            <sys_id>2ceb7c13dbe6b01022a6d2984b961996</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="Change Template" display_value="Change Template" name="x_126749_aws_sc_document" sys_domain="global" view="e2ed31002f663010cffdfe1df699b6e4">598efd002f663010cffdfe1df699b61d</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2021-09-17 12:50:47</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>workflow</element>
+            <position>5</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-09-17 12:50:47</sys_created_on>
+            <sys_id>a0eb7c13dbe6b01022a6d2984b961997</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="Change Template" display_value="Change Template" name="x_126749_aws_sc_document" sys_domain="global" view="e2ed31002f663010cffdfe1df699b6e4">598efd002f663010cffdfe1df699b61d</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2021-09-17 12:50:47</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>delivery_plan</element>
+            <position>6</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-09-17 12:50:47</sys_created_on>
+            <sys_id>28eb7c13dbe6b01022a6d2984b961997</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="Change Template" display_value="Change Template" name="x_126749_aws_sc_document" sys_domain="global" view="e2ed31002f663010cffdfe1df699b6e4">598efd002f663010cffdfe1df699b61d</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2021-09-17 12:50:47</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>icon</element>
+            <position>7</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-09-17 12:50:47</sys_created_on>
+            <sys_id>aceb7c13dbe6b01022a6d2984b961997</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="Change Template" display_value="Change Template" name="x_126749_aws_sc_document" sys_domain="global" view="e2ed31002f663010cffdfe1df699b6e4">598efd002f663010cffdfe1df699b61d</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2021-09-17 12:50:47</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>.split</element>
+            <position>8</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-09-17 12:50:47</sys_created_on>
+            <sys_id>24eb7c13dbe6b01022a6d2984b961998</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="Change Template" display_value="Change Template" name="x_126749_aws_sc_document" sys_domain="global" view="e2ed31002f663010cffdfe1df699b6e4">598efd002f663010cffdfe1df699b61d</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2021-09-17 12:50:47</sys_updated_on>
+            <sys_user/>
+            <type>.split</type>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>sys_scope</element>
+            <position>9</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-09-17 12:50:47</sys_created_on>
+            <sys_id>a8eb7c13dbe6b01022a6d2984b961998</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="Change Template" display_value="Change Template" name="x_126749_aws_sc_document" sys_domain="global" view="e2ed31002f663010cffdfe1df699b6e4">598efd002f663010cffdfe1df699b61d</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2021-09-17 12:50:47</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>price</element>
+            <position>10</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-09-17 12:50:47</sys_created_on>
+            <sys_id>20eb7c13dbe6b01022a6d2984b961999</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="Change Template" display_value="Change Template" name="x_126749_aws_sc_document" sys_domain="global" view="e2ed31002f663010cffdfe1df699b6e4">598efd002f663010cffdfe1df699b61d</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2021-09-17 12:50:47</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>recurring_price</element>
+            <position>11</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-09-17 12:50:47</sys_created_on>
+            <sys_id>a4eb7c13dbe6b01022a6d2984b961999</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="Change Template" display_value="Change Template" name="x_126749_aws_sc_document" sys_domain="global" view="e2ed31002f663010cffdfe1df699b6e4">598efd002f663010cffdfe1df699b61d</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2021-09-17 12:50:47</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>recurring_frequency</element>
+            <position>12</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-09-17 12:50:47</sys_created_on>
+            <sys_id>2ceb7c13dbe6b01022a6d2984b961999</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="Change Template" display_value="Change Template" name="x_126749_aws_sc_document" sys_domain="global" view="e2ed31002f663010cffdfe1df699b6e4">598efd002f663010cffdfe1df699b61d</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2021-09-17 12:50:47</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>omit_price</element>
+            <position>13</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-09-17 12:50:47</sys_created_on>
+            <sys_id>a0eb7c13dbe6b01022a6d2984b96199a</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="Change Template" display_value="Change Template" name="x_126749_aws_sc_document" sys_domain="global" view="e2ed31002f663010cffdfe1df699b6e4">598efd002f663010cffdfe1df699b61d</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2021-09-17 12:50:47</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>picture</element>
+            <position>14</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-09-17 12:50:47</sys_created_on>
+            <sys_id>28eb7c13dbe6b01022a6d2984b96199a</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="Change Template" display_value="Change Template" name="x_126749_aws_sc_document" sys_domain="global" view="e2ed31002f663010cffdfe1df699b6e4">598efd002f663010cffdfe1df699b61d</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2021-09-17 12:50:47</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>awslastsynctime</element>
+            <position>15</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-09-17 12:50:47</sys_created_on>
+            <sys_id>aceb7c13dbe6b01022a6d2984b96199a</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="Change Template" display_value="Change Template" name="x_126749_aws_sc_document" sys_domain="global" view="e2ed31002f663010cffdfe1df699b6e4">598efd002f663010cffdfe1df699b61d</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2021-09-17 12:50:47</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>awsusercriteria</element>
+            <position>16</position>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-09-17 12:50:47</sys_created_on>
+            <sys_id>24eb7c13dbe6b01022a6d2984b96199b</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="Change Template" display_value="Change Template" name="x_126749_aws_sc_document" sys_domain="global" view="e2ed31002f663010cffdfe1df699b6e4">598efd002f663010cffdfe1df699b61d</sys_ui_section>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2021-09-17 12:50:47</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_section action="INSERT_OR_UPDATE">
+            <caption>Change Template</caption>
+            <header>false</header>
+            <name>x_126749_aws_sc_document</name>
+            <roles/>
+            <sys_class_name>sys_ui_section</sys_class_name>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2021-09-07 15:21:40</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>598efd002f663010cffdfe1df699b61d</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_name>x_126749_aws_sc_document</sys_name>
+            <sys_overrides/>
+            <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+            <sys_policy/>
+            <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+            <sys_update_name>sys_ui_section_598efd002f663010cffdfe1df699b61d</sys_update_name>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+            <sys_user/>
+            <title>false</title>
+            <view display_value="Change Template" name="change_template">e2ed31002f663010cffdfe1df699b6e4</view>
+            <view_name/>
+        </sys_ui_section>
+    </sys_ui_section>
+</record_update>

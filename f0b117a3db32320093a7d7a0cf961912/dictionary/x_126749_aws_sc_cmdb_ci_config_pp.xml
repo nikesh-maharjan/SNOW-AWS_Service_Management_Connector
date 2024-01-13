@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="700c01381be41010bdca97d7bd4bcb08" extends="cmdb_ci" label="CloudFormation Provisioned Products" max_length="40" name="x_126749_aws_sc_cmdb_ci_config_pp" type="collection">
+        <element label="ARN" max_length="1224" name="awsarn" type="string"/>
+        <element label="Name" max_length="1224" name="awsname" type="string"/>
+        <element label="Object Id" mandatory="true" max_length="512" name="object_id" type="string"/>
+        <element attributes="edge_encryption_enabled=true" label="Terminated On" max_length="40" name="terminated_on" type="glide_date_time"/>
+    </element>
+</database>

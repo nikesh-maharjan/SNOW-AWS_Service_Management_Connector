@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="a954ff272f18541047d8b6a62799b6f5" label="Portfolio Groups" max_length="40" name="x_126749_aws_sc_portfolio_groups" type="collection">
+        <element attributes="edge_encryption_enabled=true" label="Group" mandatory="true" max_length="32" name="group" reference="sys_user_group" type="reference"/>
+        <element attributes="edge_encryption_enabled=true" label="Portfolio" mandatory="true" max_length="32" name="portfolio" reference="x_126749_aws_sc_portfolio" type="reference"/>
+        <index name="index">
+            <element name="group"/>
+        </index>
+        <index name="index2">
+            <element name="portfolio"/>
+        </index>
+    </element>
+</database>

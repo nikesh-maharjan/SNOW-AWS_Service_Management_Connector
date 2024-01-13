@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_script">
+    <sys_script action="INSERT_OR_UPDATE">
+        <abort_action>false</abort_action>
+        <access>package_private</access>
+        <action_delete>false</action_delete>
+        <action_insert>false</action_insert>
+        <action_query>false</action_query>
+        <action_update>false</action_update>
+        <active>true</active>
+        <add_message>false</add_message>
+        <advanced>true</advanced>
+        <change_fields>false</change_fields>
+        <client_callable>false</client_callable>
+        <collection>change_request</collection>
+        <condition>gs.getProperty(C.sysprop.changeManagerAssignmentGroup) != ''</condition>
+        <description/>
+        <execute_function>false</execute_function>
+        <filter_condition table="change_request">state=-5^type=AWSChangeRequest^assignment_groupISEMPTY^EQ<item display_value="New" endquery="false" field="state" goto="false" newquery="false" operator="=" or="false" value="-5"/>
+            <item display_value="AWS Change Request" endquery="false" field="type" goto="false" newquery="false" operator="=" or="false" value="AWSChangeRequest"/>
+            <item endquery="false" field="assignment_group" goto="false" newquery="false" operator="ISEMPTY" or="false" value=""/>
+            <item endquery="true" field="" goto="false" newquery="false" operator="=" or="false" value=""/>
+        </filter_condition>
+        <is_rest>false</is_rest>
+        <message/>
+        <name>Fetch Assignment Group</name>
+        <order>100</order>
+        <priority>100</priority>
+        <rest_method/>
+        <rest_method_text/>
+        <rest_service/>
+        <rest_service_text/>
+        <rest_variables/>
+        <role_conditions/>
+        <script><![CDATA[/**
+ @Deployable({
+    table: 'sys_script',
+    column: 'script',
+    sysId: 'bcc5a14a2fa33010cffdfe1df699b68c'
+    metadata: {
+         name: 'Fetch Assignment Group',
+          collection: 'change_request',
+          action_insert: 'false',
+          when: 'display',
+          order: 100,
+          condition: "gs.getProperty(C.sysprop.changeManagerAssignmentGroup) != ''"
+          filter_condition: 'state=-5^type=AWSChangeRequest^assignment_groupISEMPTY^EQ'
+      }
+    })
+ */
+//The filter condition for this rule ensures that it is only run for change requests with state = New (-5)
+(function executeRule(current, previous /*null when async*/) {
+    var assignmentGroupSysId = gs.getProperty(C.sysprop.changeManagerAssignmentGroup);
+    if (assignmentGroupSysId) {
+        var scratchpad = g_scratchpad;
+        scratchpad.assignmentGroupSysId = assignmentGroupSysId;
+    }
+})(current, previous);
+]]></script>
+        <sys_class_name>sys_script</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-02 11:47:31</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>bcc5a14a2fa33010cffdfe1df699b68c</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Fetch Assignment Group</sys_name>
+        <sys_overrides/>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_bcc5a14a2fa33010cffdfe1df699b68c</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <template/>
+        <when>before_display</when>
+    </sys_script>
+    <sys_translated_text action="delete_multiple" query="documentkey=bcc5a14a2fa33010cffdfe1df699b68c"/>
+</record_update>

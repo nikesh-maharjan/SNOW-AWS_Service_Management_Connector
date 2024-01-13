@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_ui_policy">
+    <sys_ui_policy action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <conditions/>
+        <description/>
+        <global>true</global>
+        <inherit>false</inherit>
+        <isolate_script>true</isolate_script>
+        <model_id/>
+        <model_table/>
+        <on_load>true</on_load>
+        <order>100</order>
+        <reverse_if_false>false</reverse_if_false>
+        <run_scripts>true</run_scripts>
+        <script_false><![CDATA[function onCondition() {
+
+}]]></script_false>
+        <script_true><![CDATA[/**
+@Deployable({
+    table: 'sys_ui_policy',
+    column: 'script_true',
+    sysId: 'ef6decc6db7d601079bd2fb748961952',
+    metadata: {
+        short_description: 'Show upselling AWS service messages',
+        table: 'x_126749_aws_sc_account',
+        on_load: 1,
+        active: 1,
+        conditions: '',
+        reverse_if_false: 0,
+        run_scripts: 1
+    }
+})
+*/
+// @ts-ignore
+function onCondition() {
+    var awsConfigField = 'x_126749_aws_sc_account.awsenableconfig';
+    var awsSystemsManagerAutomationField = 'x_126749_aws_sc_account.awsenablesystemsmanager';
+    var awsSystemsManagerOpsCenterField = 'x_126749_aws_sc_account.awsenableopscenter';
+    var awsServiceCatalogField = 'x_126749_aws_sc_account.awsenableservicecatalog';
+    var awsSupportField = 'x_126749_aws_sc_account.awsenablesupport';
+    //Show Contextual message on integration 1 on enabling an integration 2 with integration 1 disabled
+    var hideOrShowContextualMessage = function (isServiceEnabled, field, message) {
+        var isEnabled = g_form.getBooleanValue(field);
+        g_form.hideFieldMsg(field, true);
+        if (isServiceEnabled && !isEnabled) {
+            g_form.showFieldMsg(field, message, 'info');
+        }
+    };
+    var onChangeHandler = function (field, oldValue, newValue) {
+        var isSystemsManagerOpsCenterEnabled = g_form.getBooleanValue('awsenableopscenter');
+        var isServiceCatalogEnabled = g_form.getBooleanValue('awsenableservicecatalog');
+        var isSupportEnabled = g_form.getBooleanValue('awsenablesupport');
+        var awsConfigUpsellMessage = 'Note that disabling "AWS Config" integration will limit the ability to see configuration items linked to OpsItems related resources. Please consider enabling this integration';
+        var awsSystemsManagerAutomationUpsellMessage = 'Note that disabling "AWS Systems Manager - Automation" integration will limit the ability to execute Automation Documents from OpsItems. Please consider enabling this integration';
+        var awsServiceCatalogConfigIntegrationMessage = 'Integrate with AWS Config needs to be enabled as well in order to see the extra relationship between the AppRegistry Resource and AWS Config resource';
+        var awsSupportGovCloudMessage = 'If the account is configured with at least one GovCloud region, SMC will target the GovCloud endpoint for AWS support regardless of the other regions configured';
+        switch (field) {
+            // As requested by the OpsCenter team, let's hide this message from now.
+            // case awsConfigField:
+            //     hideOrShowContextualMessage(isSystemsManagerOpsCenterEnabled, field, awsConfigUpsellMessage);
+            //     break;
+            case awsSystemsManagerAutomationField:
+                hideOrShowContextualMessage(isSystemsManagerOpsCenterEnabled, field, awsSystemsManagerAutomationUpsellMessage);
+                break;
+            case awsSystemsManagerOpsCenterField:
+                // hideOrShowContextualMessage(isSystemsManagerOpsCenterEnabled, awsConfigField, awsConfigUpsellMessage);
+                hideOrShowContextualMessage(isSystemsManagerOpsCenterEnabled, awsSystemsManagerAutomationField, awsSystemsManagerAutomationUpsellMessage);
+                break;
+            case awsServiceCatalogField:
+                hideOrShowContextualMessage(isServiceCatalogEnabled, awsConfigField, awsServiceCatalogConfigIntegrationMessage);
+                break;
+            case awsSupportField:
+                hideOrShowMessageOnEnablingField(isSupportEnabled, awsSupportField, awsSupportGovCloudMessage);
+                break;
+        }
+    };
+    //Show message on integration when enabled
+    var hideOrShowMessageOnEnablingField = function (isServiceEnabled, field, message) {
+        if (isServiceEnabled) {
+            g_form.showFieldMsg(field, message, 'info');
+        }
+        else {
+            g_form.hideFieldMsg(field, true);
+        }
+    };
+    // onChangeHandler(awsConfigField);
+    onChangeHandler(awsSystemsManagerAutomationField);
+    g_form.onUserChangeValue(onChangeHandler);
+}
+]]></script_true>
+        <set_values/>
+        <short_description>Show upselling AWS service messages</short_description>
+        <sys_class_name>sys_ui_policy</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-01-20 11:40:12</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>ef6decc6db7d601079bd2fb748961952</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Show upselling AWS service messages</sys_name>
+        <sys_overrides/>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_ui_policy_ef6decc6db7d601079bd2fb748961952</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <table>x_126749_aws_sc_account</table>
+        <ui_type>0</ui_type>
+        <view/>
+    </sys_ui_policy>
+</record_update>

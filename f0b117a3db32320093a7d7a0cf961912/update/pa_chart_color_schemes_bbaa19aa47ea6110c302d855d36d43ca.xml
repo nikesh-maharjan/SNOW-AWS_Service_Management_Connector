@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="pa_chart_color_schemes">
+    <pa_chart_color_schemes action="INSERT_OR_UPDATE">
+        <color_1 display_value="Red">65b30395a9fe3dba003277a7b660b5db</color_1>
+        <color_10/>
+        <color_11/>
+        <color_12/>
+        <color_13/>
+        <color_14/>
+        <color_15/>
+        <color_16/>
+        <color_17/>
+        <color_18/>
+        <color_19/>
+        <color_2 display_value="LightPink">65b30312a9fe3dba00161f68aa2a38b8</color_2>
+        <color_20/>
+        <color_21/>
+        <color_22/>
+        <color_23/>
+        <color_24/>
+        <color_25/>
+        <color_26/>
+        <color_27/>
+        <color_28/>
+        <color_29/>
+        <color_3 display_value="Green">65b302aea9fe3dba00a530d65ecc2106</color_3>
+        <color_30/>
+        <color_31/>
+        <color_32/>
+        <color_4 display_value="Yellow">65b303c7a9fe3dba000882c19631a889</color_4>
+        <color_5 display_value="LightCoral">65b302f4a9fe3dba01f112886ba36463</color_5>
+        <color_6 display_value="LightSeaGreen">65b30330a9fe3dba0176648fea43cf7a</color_6>
+        <color_7/>
+        <color_8/>
+        <color_9/>
+        <description/>
+        <name>Light Colors</name>
+        <sys_class_name>pa_chart_color_schemes</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2023-05-04 19:44:55</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>bbaa19aa47ea6110c302d855d36d43ca</sys_id>
+        <sys_mod_count>1</sys_mod_count>
+        <sys_name>Light Colors</sys_name>
+        <sys_overrides/>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>pa_chart_color_schemes_bbaa19aa47ea6110c302d855d36d43ca</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2023-05-04 20:00:13</sys_updated_on>
+    </pa_chart_color_schemes>
+    <sys_translated_text action="delete_multiple" query="documentkey=bbaa19aa47ea6110c302d855d36d43ca"/>
+</record_update>

@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.ProvisionedProductAjax</api_name>
+        <caller_access/>
+        <client_callable>true</client_callable>
+        <description/>
+        <name>ProvisionedProductAjax</name>
+        <script><![CDATA[/**
+ @Deployable({
+    table: "sys_script_include",
+    column: "script",
+    sysId: "5ab3798fdb6b13002dc6f6fdbf96194b"
+ })
+ */
+var ProvisionedProductAjax = (function () {
+    function permitting(action) {
+        return function (provisionedProductGr) {
+            var pp = new ProvisionedProduct(provisionedProductGr);
+            if (!pp.actionNamed(action).isPermitted()) {
+                // Claim no such record so to not reveal the existence of a provisioned
+                // product when the user isn't permitted to perform the action.
+                return new Error(this._argName + ": no such record " + pp.getSysId());
+            }
+            return pp;
+        };
+    }
+    function ppNotNil(prop, msg) {
+        return function (pp) {
+            if (pp.gr()[prop].nil()) {
+                return new Error(msg);
+            }
+            return pp;
+        };
+    }
+    function planExists(pp) {
+        if (!pp.hasPlan()) {
+            return new Error(this._argName + ": no plan associated with provisioned product " + pp.getSysId());
+        }
+        return pp;
+    }
+    var ppParameter = AjaxParameterSupplier.required('sysparm_provisionedProductSysId')
+        .gr('x_126749_aws_sc_cmdb_ci_pp');
+    var productParameter = AjaxParameterSupplier.optional("sysparm_productSysId")
+        .gr('x_126749_aws_sc_product');
+    var Processor = /** @class */ (function (_super) {
+        Polyfill.__extends(Processor, _super);
+        function Processor() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        Processor.prototype.executeServiceAction = function () {
+            return this._applyWith([
+                ppParameter.then(permitting('executeServiceAction')),
+                AjaxParameterSupplier.required('sysparm_executeServiceActionParams').fromJSON()
+            ], function (pp, params) {
+                try {
+                    pp.actions.executeServiceAction().request(params);
+                    return this._response('"ok"');
+                }
+                catch (e) {
+                    return this._errorResponse(e.message);
+                }
+            });
+        };
+        Processor.prototype.getProductActions = function () {
+            return this._applyWith([
+                ppParameter
+                    .then(permitting('executeServiceAction'))
+                    .then(ppNotNil('awsregion', 'Unknown AWS region for provisioned product'))
+                    .then(ppNotNil('awsproductid', 'Unknown Product ID region for provisioned product'))
+                    .then(function (pp) {
+                    if (pp.getProvisioningArtifactId() === null) {
+                        return new Error('Unknown Provisioning Artifact ID for provisioned product');
+                    }
+                    return pp;
+                })
+            ], function (pp) {
+                var cred;
+                try {
+                    cred = AwsCredentials.from(pp).as(AwsCredentials.User.End);
+                }
+                catch (ex) {
+                    return this._errorResponse("Could not obtain credential for provisioned product: " + ex.message);
+                }
+                var sc = this._getServiceCatalog(pp.gr().awsregion.toString(), cred);
+                var actions = sc.listServiceActionsForProvisioningArtifact(pp.gr().awsproductid.toString(), pp.getProvisioningArtifactId());
+                if (actions.haveError()) {
+                    var error = "Could not obtain actions for provisioned product " + pp.getSysId();
+                    return this._errorResponse(error);
+                }
+                return this._response(actions.getBody());
+            });
+        };
+        Processor.prototype.getProductAspectValues = function () {
+            return this._applyWith([
+                ppParameter.then(function (provisionedProductGr) {
+                    var pp = new ProvisionedProduct(provisionedProductGr);
+                    if (!pp.isOwnedBy(gs.getUserID()) && !Util.isCurrentUserPortfolioManager()) {
+                        return new Error(this._argName + ": no such record " + pp.getSysId());
+                    }
+                    return pp;
+                })
+            ], function (pp) {
+                var latestValues = pp.getLatestProductAspectValues();
+                if (!latestValues) {
+                    return this._errorResponse("Could not obtain current details for " + pp.getSysId());
+                }
+                return this._response(latestValues);
+            });
+        };
+        Processor.prototype.updateProvisionedProduct = function () {
+            return this._applyWith([
+                ppParameter.then(permitting('update')),
+                AjaxParameterSupplier.required('sysparm_updateParams').fromJSON()
+            ], function (pp, params) {
+                try {
+                    pp.actions.update().request(params);
+                    return this._response('"ok"');
+                }
+                catch (e) {
+                    return this._errorResponse(e.message);
+                }
+            });
+        };
+        Processor.prototype.createPlan = function () {
+            // Provisioned product sys_id required for plans for an update to a provisioned product.
+            var ppParam = AjaxParameterSupplier.optional("sysparm_provisionedProductSysId")
+                .gr("x_126749_aws_sc_cmdb_ci_pp")
+                .then(permitting("executePlan"));
+            // Otherwise it's a plan for a brand new product and the request must set the sys_id of a product.
+            var productParam = AjaxParameterSupplier.optional("sysparm_productId")
+                .gr('x_126749_aws_sc_product');
+            var planParameters = AjaxParameterSupplier.required("sysparm_planParameters")
+                .fromJSON()
+                .then(function (obj) {
+                var missing = [];
+                if (!obj.PathId)
+                    missing.push("PathId");
+                if (!obj.ProvisioningArtifactId)
+                    missing.push("ProvisioningArtifactId");
+                if (!Array.isArray(obj.ProvisioningParameters))
+                    missing.push("ProvisioningParameters");
+                // Tags optional but must be an array if set.
+                if (obj.Tags && !Array.isArray(obj.Tags))
+                    missing.push("Tags");
+                if (!obj.IdempotencyToken)
+                    missing.push("IdempotencyToken");
+                if (missing.length > 0) {
+                    return new Error(this._argName + ": missing properties " + missing.join(", "));
+                }
+                return obj;
+            });
+            // Indicates that an existing plan for a provisioned product should be deleted.
+            var forceCreateParameter = AjaxParameterSupplier.optional("sysparm_forceCreate").then(function (val) {
+                return val === "true";
+            });
+            return this._applyWith([
+                planParameters,
+                ppParam,
+                productParam,
+                forceCreateParameter,
+            ], function (params, pp, product, forceCreate) {
+                if ((!pp && !product) || (pp && product)) {
+                    return this._errorResponse("Request must include exactly one of " +
+                        ppParam.getArgument() + " or " + productParam.getArgument());
+                }
+                else if (pp && pp.hasPlan() && !forceCreate) {
+                    return this._errorResponse(ppParam.getArgument() + ": there is already a plan associated with provisioned product pp-sys-id");
+                }
+                else if (pp && params.ProvisionedProductName) {
+                    return this._errorResponse("Provisioned product already has a name");
+                }
+                else if (!pp && !params.ProvisionedProductName) {
+                    return this._errorResponse(planParameters.getArgument() + ": missing properties ProvisionedProductName");
+                }
+                var productId;
+                if (pp) {
+                    productId = pp.getProductId();
+                }
+                else {
+                    productId = product.awsproductid.toString();
+                }
+                var portfolio = product.awsportfolio.getRefRecord();
+                var customTags = Util.getCustomTags(portfolio, null);
+                var createParameters = {
+                    IdempotencyToken: params.IdempotencyToken,
+                    PathId: params.PathId,
+                    ProductId: productId,
+                    ProvisionedProductName: params.ProvisionedProductName || pp.getName(),
+                    ProvisioningArtifactId: params.ProvisioningArtifactId,
+                    ProvisioningParameters: params.ProvisioningParameters,
+                    Tags: params.Tags.concat(customTags),
+                    PlanType: "CLOUDFORMATION",
+                    PlanName: "servicenow-connector-" + new GlideDateTime().getNumericValue(),
+                };
+                var plan;
+                if (pp) {
+                    plan = ProvisionedProductPlan.forUpdate(pp, createParameters, forceCreate);
+                }
+                else {
+                    plan = ProvisionedProductPlan.forProvision(product, createParameters);
+                }
+                if (plan.success === true) {
+                    return this._response({
+                        planSysId: plan.result.getSysId(),
+                        provisionedProductSysId: plan.result.getProvisionedProduct().getSysId()
+                    });
+                }
+                else {
+                    return this._errorResponse(plan.reason);
+                }
+            });
+        };
+        Processor.prototype.deletePlan = function () {
+            return this._applyWith([
+                ppParameter.then(permitting("executePlan")),
+                productParameter,
+            ], function (pp, product) {
+                var plan = pp.getPlan();
+                if (plan) {
+                    var credentials = null;
+                    if (pp.getProduct() === null) {
+                        // It means that we are preprovisioning, therefore there is no RequestedItem on ServiceNow
+                        // We cannot infer the credentials so instead, we are using the given product to get credentials
+                        credentials = AwsCredentials.from(product).as(AwsCredentials.User.End);
+                    }
+                    var result = plan.deletePlan(credentials);
+                    if (result.success === false) {
+                        return this._errorResponse(result.reason);
+                    }
+                }
+                return this._response('"ok"');
+            });
+        };
+        Processor.prototype.describePlan = function () {
+            return this._applyWith([
+                ppParameter.then(permitting("executePlan")).then(planExists),
+                productParameter
+            ], function (pp, product) {
+                var credentials = null;
+                if (pp.getProduct() === null) {
+                    // It means that we are preprovisioning, therefore there is no RequestedItem on ServiceNow
+                    // We cannot infer the credentials so instead, we are using the given product to get credentials
+                    credentials = AwsCredentials.from(product).as(AwsCredentials.User.Sync);
+                }
+                var plan = pp.getPlan();
+                return this._response(plan.describe(true, credentials));
+            });
+        };
+        Processor.prototype.executePlan = function () {
+            return this._applyWith([
+                ppParameter.then(permitting("executePlan")).then(planExists)
+            ], function (pp) {
+                var plan = pp.getPlan();
+                switch (plan.getStatus()) {
+                    case 'CREATE_IN_PROGRESS':
+                        return this._errorResponse("Cannot execute a plan that is still being created");
+                    case 'CREATE_FAILED':
+                        return this._errorResponse("Cannot execute a plan that failed to create");
+                    case 'EXECUTE_IN_PROGRESS':
+                    case 'EXECUTE_SUCCESS':
+                    case 'EXECUTE_FAILED':
+                        return this._errorResponse("Cannot execute a plan that has already been executed");
+                }
+                if (pp.getProductStatus() === 1 /* PREPROVISIONING */.toString()) {
+                    var cred = void 0;
+                    try {
+                        cred = AwsCredentials.from(pp).as(AwsCredentials.User.End);
+                    }
+                    catch (ex) {
+                        return this._errorResponse("Authentication failure: " + ex.message);
+                    }
+                    // If there is a plan with the status create success for a pre-provisioned product, then we go through the order workflow
+                    var product = pp.getProduct();
+                    var request_1 = {
+                        'sysparm_id': product.sys_id.toString(),
+                        'sysparm_quantity': '1',
+                        'sysparm_requested_for': gs.getUserID(),
+                        'variables': {
+                            'ProvisionedProductSysId': pp.getSysId()
+                        }
+                    };
+                    // In versions before Madrid, submitting an order with CartJS creates the request
+                    // but not the requested item. Fall back to using the default cart.
+                    var cart = void 0, cartDetails = void 0;
+                    switch (Util.instanceVersion()) {
+                        case "jakarta" /* JAKARTA */:
+                        case "kingston" /* KINGSTON */:
+                        case "london" /* LONDON */:
+                            cart = new sn_sc.CartJS();
+                            try {
+                                // addToCart and checkoutCart doesn't work before Madrid.
+                                cartDetails = cart.orderNow(request_1);
+                            }
+                            catch (e) {
+                                // Something down the chain of ServiceNow business rules causes a
+                                // NullPointerException. The product is provisioned despite this.
+                            }
+                            break;
+                        case "madrid" /* MADRID */:
+                        default:
+                            cart = new sn_sc.CartJS("execute-plan-" + plan.getSysId());
+                            // orderNow doesn't work in Madrid.
+                            cart.addToCart(request_1);
+                            cartDetails = cart.checkoutCart();
+                            break;
+                    }
+                    gs.info("Executed plan " + pp.getPlan().getPlanId() + " via CartJS: created " + JSON.stringify(cartDetails) + ".");
+                }
+                else {
+                    // Otherwise, we use the classic execute plan workflow
+                    try {
+                        pp.actions.executePlan().request();
+                    }
+                    catch (e) {
+                        return this._errorResponse(e.message);
+                    }
+                }
+                return this._response('"ok"');
+            });
+        };
+        return Processor;
+    }(AbstractAwsAjaxProcessor));
+    Processor.prototype.type = 'ProvisionedProductAjax';
+    return Processor;
+}());
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-07-31 14:14:11</sys_created_on>
+        <sys_id>5ab3798fdb6b13002dc6f6fdbf96194b</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>ProvisionedProductAjax</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_5ab3798fdb6b13002dc6f6fdbf96194b</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

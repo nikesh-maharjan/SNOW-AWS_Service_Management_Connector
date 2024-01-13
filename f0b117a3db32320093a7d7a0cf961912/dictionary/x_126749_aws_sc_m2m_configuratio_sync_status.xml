@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="054c99811ba81110bec096c6b04bcb2f" label="Aws Sc M2m Configuratio Sync Status" max_length="40" name="x_126749_aws_sc_m2m_configuratio_sync_status" type="collection">
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false" label="Configuration Item" max_length="32" name="child" reference="cmdb_ci" type="reference"/>
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false" label="Sync Status" max_length="32" name="parent" reference="x_126749_aws_sc_cmdb_ci_sync_status" type="reference"/>
+        <index name="index">
+            <element name="child"/>
+        </index>
+        <index name="index2">
+            <element name="parent"/>
+        </index>
+    </element>
+</database>

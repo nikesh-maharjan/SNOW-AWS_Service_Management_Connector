@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="gsw_content_information">
+    <gsw_content_information action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <article><![CDATA[<p>AWS Systems Manager Change Manager integration in ServiceNow supports <a href="https://docs.servicenow.com/bundle/quebec-it-service-management/page/product/change-management/concept/change-models.html" rel="nofollow">Change Model</a> feaature in ServiceNow</p>
+<ol style="list-style-position: inside;"><li>Review the available settings and recommendations in the table below.</li></ol>
+<table style="border-collapse: collapse; width: 66.3342%; height: 50px;" border="1"><tbody><tr><td style="width: 50%;"><strong>Available Settings</strong></td><td style="width: 50%;"><strong>Desired Value</strong></td></tr><tr><td style="width: 50%;">com.snc.change_management.change_model.hide</td><td style="width: 50%;"><strong>false</strong></td></tr><tr><td style="width: 50%;">com.snc.change_management.change_model.type_compatibility</td><td style="width: 50%;"><strong>true</strong></td></tr></tbody></table>
+<p>For more information on Change model system properties, see <a href="https://docs.servicenow.com/bundle/quebec-it-service-management/page/product/change-management/reference/change-models-properties.html" rel="nofollow">Change models properties</a></p>]]></article>
+        <best_practice_acceptable>false</best_practice_acceptable>
+        <dependent_on_contents/>
+        <dependent_on_plugins/>
+        <dependent_on_plugins_ids/>
+        <description/>
+        <embedded_help_qualifier/>
+        <end_point>/sys_properties_list.do?sysparm_query=nameLIKEchange_model&amp;sysparm_first_row=1&amp;sysparm_view=&amp;sysparm_choice_query_raw=&amp;sysparm_list_header_search=true</end_point>
+        <end_point_open_mode>1</end_point_open_mode>
+        <end_point_type>1</end_point_type>
+        <field/>
+        <filter/>
+        <filter_result/>
+        <implicit_dependent_on/>
+        <implicit_plugin_dependencies/>
+        <is_dynamic>false</is_dynamic>
+        <more_info_available>false</more_info_available>
+        <more_info_html/>
+        <order>1100</order>
+        <parent display_value="ServiceNow Administrator configuration">075284e61b123010a148a9f6624bcbd4</parent>
+        <parents>075284e61b123010a148a9f6624bcbd4,c09fcac2dbd130100f00b298f496196f</parents>
+        <plugin_id/>
+        <property_name/>
+        <property_value/>
+        <quick_startable>false</quick_startable>
+        <root_parent display_value="AWS Service Management Connector">c09fcac2dbd130100f00b298f496196f</root_parent>
+        <skippable>true</skippable>
+        <supports_child_content>false</supports_child_content>
+        <sys_class_name>gsw_content_information</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-11-02 14:36:30</sys_created_on>
+        <sys_id>753d0a0a1b633010bec096c6b04bcbb8</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Enable AWS Systems Manager Change Manager integration Change models</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>gsw_content_information_753d0a0a1b633010bec096c6b04bcbb8</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <table/>
+        <title>Enable AWS Systems Manager Change Manager integration Change models</title>
+        <weight>1</weight>
+    </gsw_content_information>
+    <sys_translated_text action="delete_multiple" query="documentkey=753d0a0a1b633010bec096c6b04bcbb8"/>
+</record_update>

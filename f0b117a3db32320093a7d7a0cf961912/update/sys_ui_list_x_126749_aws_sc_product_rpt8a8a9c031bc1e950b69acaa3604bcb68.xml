@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update>
+    <sys_ui_list parent="" relationship="" sys_domain="global" table="x_126749_aws_sc_product" version="2" view="RPT8a8a9c031bc1e950b69acaa3604bcb68">
+        <sys_ui_list_element action="INSERT_OR_UPDATE">
+            <average_value>false</average_value>
+            <element>name</element>
+            <list_id display_value="x_126749_aws_sc_product" element="NULL" name="x_126749_aws_sc_product" parent="NULL" relationship="NULL" sys_domain="global" view="ec7c0cb72f19311061e12aa62799b6fb">327b68c31b45e950b69acaa3604bcbc3</list_id>
+            <max_value>false</max_value>
+            <min_value>false</min_value>
+            <position>0</position>
+            <sum>false</sum>
+            <sys_created_by>SMC.Specialists2</sys_created_by>
+            <sys_created_on>2023-02-20 15:59:55</sys_created_on>
+            <sys_id>3e7b68c31b45e950b69acaa3604bcbc3</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>SMC.Specialists2</sys_updated_by>
+            <sys_updated_on>2023-02-20 15:59:55</sys_updated_on>
+        </sys_ui_list_element>
+        <sys_ui_list_element action="INSERT_OR_UPDATE">
+            <average_value>false</average_value>
+            <element>short_description</element>
+            <list_id display_value="x_126749_aws_sc_product" element="NULL" name="x_126749_aws_sc_product" parent="NULL" relationship="NULL" sys_domain="global" view="ec7c0cb72f19311061e12aa62799b6fb">327b68c31b45e950b69acaa3604bcbc3</list_id>
+            <max_value>false</max_value>
+            <min_value>false</min_value>
+            <position>1</position>
+            <sum>false</sum>
+            <sys_created_by>SMC.Specialists2</sys_created_by>
+            <sys_created_on>2023-02-20 15:59:55</sys_created_on>
+            <sys_id>be7b68c31b45e950b69acaa3604bcbc3</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>SMC.Specialists2</sys_updated_by>
+            <sys_updated_on>2023-02-20 15:59:55</sys_updated_on>
+        </sys_ui_list_element>
+        <sys_ui_list_element action="INSERT_OR_UPDATE">
+            <average_value>false</average_value>
+            <element>awsportfolio.awsaccount</element>
+            <list_id display_value="x_126749_aws_sc_product" element="NULL" name="x_126749_aws_sc_product" parent="NULL" relationship="NULL" sys_domain="global" view="ec7c0cb72f19311061e12aa62799b6fb">327b68c31b45e950b69acaa3604bcbc3</list_id>
+            <max_value>false</max_value>
+            <min_value>false</min_value>
+            <position>2</position>
+            <sum>false</sum>
+            <sys_created_by>SMC.Specialists2</sys_created_by>
+            <sys_created_on>2023-02-20 15:59:55</sys_created_on>
+            <sys_id>327b68c31b45e950b69acaa3604bcbc4</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>SMC.Specialists2</sys_updated_by>
+            <sys_updated_on>2023-02-20 15:59:55</sys_updated_on>
+        </sys_ui_list_element>
+        <sys_ui_list_element action="INSERT_OR_UPDATE">
+            <average_value>false</average_value>
+            <element>awsportfolio</element>
+            <list_id display_value="x_126749_aws_sc_product" element="NULL" name="x_126749_aws_sc_product" parent="NULL" relationship="NULL" sys_domain="global" view="ec7c0cb72f19311061e12aa62799b6fb">327b68c31b45e950b69acaa3604bcbc3</list_id>
+            <max_value>false</max_value>
+            <min_value>false</min_value>
+            <position>3</position>
+            <sum>false</sum>
+            <sys_created_by>SMC.Specialists2</sys_created_by>
+            <sys_created_on>2023-02-20 15:59:55</sys_created_on>
+            <sys_id>b27b68c31b45e950b69acaa3604bcbc4</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>SMC.Specialists2</sys_updated_by>
+            <sys_updated_on>2023-02-20 15:59:55</sys_updated_on>
+        </sys_ui_list_element>
+        <sys_ui_list_element action="INSERT_OR_UPDATE">
+            <average_value>false</average_value>
+            <element>awsregion</element>
+            <list_id display_value="x_126749_aws_sc_product" element="NULL" name="x_126749_aws_sc_product" parent="NULL" relationship="NULL" sys_domain="global" view="ec7c0cb72f19311061e12aa62799b6fb">327b68c31b45e950b69acaa3604bcbc3</list_id>
+            <max_value>false</max_value>
+            <min_value>false</min_value>
+            <position>4</position>
+            <sum>false</sum>
+            <sys_created_by>SMC.Specialists2</sys_created_by>
+            <sys_created_on>2023-02-20 15:59:55</sys_created_on>
+            <sys_id>367b68c31b45e950b69acaa3604bcbc4</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>SMC.Specialists2</sys_updated_by>
+            <sys_updated_on>2023-02-20 15:59:55</sys_updated_on>
+        </sys_ui_list_element>
+        <sys_ui_list action="INSERT_OR_UPDATE">
+            <average_value>false</average_value>
+            <element/>
+            <max_value>false</max_value>
+            <min_value>false</min_value>
+            <name>x_126749_aws_sc_product</name>
+            <parent/>
+            <position/>
+            <relationship/>
+            <sum>false</sum>
+            <sys_class_name>sys_ui_list</sys_class_name>
+            <sys_created_by>SMC.Specialists2</sys_created_by>
+            <sys_created_on>2023-02-20 15:59:55</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>327b68c31b45e950b69acaa3604bcbc3</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_name>x_126749_aws_sc_product</sys_name>
+            <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+            <sys_policy/>
+            <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+            <sys_update_name>sys_ui_list_x_126749_aws_sc_product_RPT8a8a9c031bc1e950b69acaa3604bcb68</sys_update_name>
+            <sys_updated_by>SMC.Specialists2</sys_updated_by>
+            <sys_updated_on>2023-02-20 15:59:55</sys_updated_on>
+            <sys_user/>
+            <view display_value="Rpt8a8a9c031bc1e950b69acaa3604bcb68" name="RPT8a8a9c031bc1e950b69acaa3604bcb68">ec7c0cb72f19311061e12aa62799b6fb</view>
+            <view_name/>
+        </sys_ui_list>
+    </sys_ui_list>
+</record_update>

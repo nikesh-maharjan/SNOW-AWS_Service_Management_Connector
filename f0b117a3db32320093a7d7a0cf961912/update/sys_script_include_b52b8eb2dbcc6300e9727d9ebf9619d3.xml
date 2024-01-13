@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>false</active>
+        <api_name>x_126749_aws_sc.TemporaryCredentialSupplier</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>TemporaryCredentialSupplier</name>
+        <script><![CDATA[/**
+ * Create an instance.
+ * @classdesc Functions to work with credentials that expire.
+ * @class TemporaryCredentialSupplier
+ * @param identity {GlideRecord} A GlideRecord for an identity.
+ * @param sessionName {string=}
+ *      The name for the STS session. Required when identity represents a role.
+ *      Per the STS AssumeRole API, session names must match "[\w+=,.@-]*".
+ * @param lazy {boolean=} Defer the initial `get` of the credential.
+ */
+var TemporaryCredentialSupplier = (function () {
+    function expired(datetime) {
+        if (!(datetime instanceof GlideDateTime)) {
+            datetime = new GlideDateTime(datetime);
+        }
+        return datetime !== undefined && new GlideDateTime().onOrAfter(datetime);
+    }
+    /**
+     * @param datetime
+     * @returns {boolean} True if datetime is in the next five minutes.
+     */
+    function expiresSoon(datetime) {
+        if (!(datetime instanceof GlideDateTime)) {
+            datetime = new GlideDateTime(datetime);
+        }
+        var soon = new GlideDateTime();
+        soon.addSeconds(300);
+        return datetime !== undefined && soon.onOrAfter(datetime);
+    }
+    function grToCred(gr) {
+        return {
+            identity: gr.awsaccesskey.toString(),
+            secret: gr.awssecretaccesskey.getDecryptedValue(),
+            session: gr.awssessiontoken.getDecryptedValue(),
+            expiration: gr.getValue("awsexpiration"),
+            role: gr.awsuserarn.toString()
+        };
+    }
+    function isRoleArn(arn) {
+        return arn && arn.toString().match(/arn:aws(-us-gov)?:iam::\d+:role/);
+    }
+    var Supplier = /** @class */ (function () {
+        function Supplier(region, identity, sessionName, lazy) {
+            this.type = "TemporaryCredentialSupplier";
+            this._region = region;
+            this._identity = identity;
+            this._sessionName = sessionName;
+            if (!lazy) {
+                // Eagerly get the credential so callers have immediate verification that the object is valid.
+                try {
+                    this.get();
+                }
+                catch (e) {
+                    gs.debug("Suppressed error obtaining temporary credential: " + (e.message || e));
+                    this._errorMessage = e.message;
+                }
+            }
+        }
+        /**
+         * Get a credential for the role and session.
+         * @param renew {boolean=}
+         *   Optional boolean indicating that the credential held by the
+         *   supplier should be renewed.
+         * @returns {*}
+         */
+        Supplier.prototype.get = function (renew) {
+            if (!this._identity) {
+                throw new Error("Identity unset");
+            }
+            else if (!this._identity.awsarn.nil() && isRoleArn(this._identity.awsarn.toString()) && !this._sessionName) {
+                throw new Error("sessionName required for role ARNs");
+            }
+            var account = this._identity.awsaccount;
+            if (account.nil()) {
+                throw new Error("No account associated with identity " + this._identity.sys_id.toString());
+            }
+            else if (account.awsaccesskey.nil()) {
+                throw new Error("No access key associated with account " + account.sys_id.toString());
+            }
+            else if (account.awssecretaccesskey.nil()) {
+                throw new Error("No secret access key associated with account " + account.sys_id.toString());
+            }
+            else if (this._identity.awsarn.nil()) {
+                throw new Error("No ARN set on identity " + this._identity.sys_id.toString());
+            }
+            if (!renew && !this._credential) {
+                this._credential = this._loadCachedValue();
+            }
+            var almostDone = this._credential && expiresSoon(this._credential.expiration);
+            if (renew || !this._credential || almostDone) {
+                this._credential = this._renew();
+            }
+            return this._credential;
+        };
+        Supplier.prototype.isValid = function () {
+            return this._credential && !expired(this._credential.expiration);
+        };
+        Supplier.prototype.getErrorMessage = function () {
+            return this._errorMessage;
+        };
+        Supplier.prototype.getIdentity = function () {
+            return this._identity;
+        };
+        Supplier.prototype.getSessionName = function () {
+            return this._sessionName;
+        };
+        Supplier.prototype._loadCachedValue = function () {
+            // Find a credential.
+            var arn = this._identity.awsarn.toString();
+            var gr = new GlideRecord('x_126749_aws_sc_tc');
+            gr.addQuery('awsidentity', this._identity.sys_id.toString());
+            gr.addQuery('awssessionname', this._sessionName);
+            gr.addQuery('awsregion', this._region);
+            // That hasn't expired (according to the clock on ServiceNow!)
+            var cutOff = new GlideDateTime();
+            gr.addQuery('awsexpiration', '>', cutOff);
+            // There may be multiple matching records (since several scripts may load a
+            // credential at the same time). Choose the one that will expire last.
+            gr.orderByDesc('awsexpiration');
+            gr.setLimit(1);
+            gr.query();
+            if (gr.next()) {
+                return grToCred(gr);
+            }
+            return null;
+        };
+        Supplier.prototype._renew = function () {
+            // Make and save an AssumeRole request
+            var account = this._identity.awsaccount, arn = this._identity.awsarn.toString();
+            var region = this._region;
+            var cred = {
+                identity: account.awsaccesskey.toString(),
+                secret: account.awssecretaccesskey.getDecryptedValue()
+            };
+            if (isRoleArn(arn)) {
+                try {
+                    var sessionLength = Util.getSystemPropertyInt(C.sysprop.stsRoleSessionDuration);
+                    var options = {};
+                    if (sessionLength !== undefined) {
+                        sessionLength = Math.max(sessionLength, 900);
+                        sessionLength = Math.min(sessionLength, 43200);
+                        options.DurationSeconds = sessionLength;
+                    }
+                    var sts = new AwsSecurityTokenService(region, cred);
+                    var role = sts.assumeRole(arn, this._sessionName, options);
+                    cred = this._insertTemporaryCredential(role);
+                }
+                catch (e) {
+                    throw new Error("Unable to assume identity: " + e.message);
+                }
+            }
+            return cred;
+        };
+        Supplier.prototype._insertTemporaryCredential = function (response) {
+            var gr = new GlideRecord('x_126749_aws_sc_tc');
+            gr.initialize();
+            gr.awsidentity = this._identity.sys_id.toString();
+            gr.awssessionname = this._sessionName;
+            gr.awsregion = this._region;
+            var c = response.Credentials;
+            gr.awsaccesskey = c.AccessKeyId;
+            gr.awssecretaccesskey.setDisplayValue(c.SecretAccessKey);
+            gr.awssessiontoken.setDisplayValue(c.SessionToken);
+            gr.awsexpiration = Util.toGlideDateTime(c.Expiration);
+            var u = response.AssumedRoleUser;
+            gr.awsuserarn = u.Arn;
+            gr.awsroleid = u.AssumedRoleId;
+            gr.awspackedpolicysize = response.PackedPolicySize;
+            gr.insert();
+            return grToCred(gr);
+        };
+        /**
+         * Delete expired credentials.
+         */
+        Supplier.cleanCache = function () {
+            var cutOff = new GlideDateTime();
+            var gr = new GlideRecord('x_126749_aws_sc_tc');
+            var qc = gr.addNullQuery('awsexpiration');
+            qc.addOrCondition('awsexpiration', '<=', cutOff);
+            gr.deleteMultiple();
+        };
+        return Supplier;
+    }());
+    return Supplier;
+}());
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-08-24 17:47:38</sys_created_on>
+        <sys_id>b52b8eb2dbcc6300e9727d9ebf9619d3</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>TemporaryCredentialSupplier</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_b52b8eb2dbcc6300e9727d9ebf9619d3</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

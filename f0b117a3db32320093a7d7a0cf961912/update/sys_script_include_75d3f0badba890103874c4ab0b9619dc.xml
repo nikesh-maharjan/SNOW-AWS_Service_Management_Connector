@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.CfnStackResourceType</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>CfnStackResourceType</name>
+        <script><![CDATA[var CfnStackResourceType = /** @class */ (function (_super) {
+    Polyfill.__extends(CfnStackResourceType, _super);
+    function CfnStackResourceType() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    CfnStackResourceType.prototype.rules = function () {
+        return [{
+                order: 1,
+                syncType: ConfigSyncProvider.SYNC_DIR.FROM_AWS_CONFIG,
+                externalResourceType: 'AWS::CloudFormation::Stack',
+                externalResourceId: 'resourceId',
+                snTable: 'x_126749_aws_sc_cmdb_ci_cloudformation_stack',
+                syncFromAws: this.syncFromAws,
+            }];
+    };
+    CfnStackResourceType.prototype.fields = function () {
+        return [{
+                mode: ConfigSyncProvider.FieldMode.FromAws,
+                snField: 'operational_status',
+                transformFromAws: function (object) { return object.data.stackStatus
+                    ? object.data.stackStatus === "CREATE_COMPLETE" || object.data.stackStatus === "UPDATE_COMPLETE"
+                        ? 1
+                        : 2
+                    : 6; }
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromAws,
+                snField: 'name',
+                transformFromAws: function (object, context) { return (context && context.resourceIdAsName) || !object.item.resourceName
+                    ? object.item.resourceId : object.item.resourceName; }
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromAws,
+                snField: 'short_description',
+                awsField: 'data.description'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromAws,
+                snField: 'terminated_on',
+                awsField: 'item.resourceDeletionTime'
+            }];
+    };
+    CfnStackResourceType.prototype.relationships = function () {
+        return [
+            {
+                relationship: ConfigSyncProvider.RelationshipType.HostedOn,
+                externalResourceType: 'AWS::Region',
+                snTable: 'cmdb_ci_aws_datacenter',
+                documentationOnly: true
+            }
+        ];
+    };
+    CfnStackResourceType.prototype.syncFromAwsAddRelationships = function (context, config, resourceSysId) {
+        // Process relationships to AWS regions
+        this.addHostedOnRegionRelationship(context, config, resourceSysId);
+    };
+    return CfnStackResourceType;
+}(AbstractResourceType));
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-05-06 20:31:13</sys_created_on>
+        <sys_id>75d3f0badba890103874c4ab0b9619dc</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>CfnStackResourceType</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_75d3f0badba890103874c4ab0b9619dc</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

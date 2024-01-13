@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element audit="true" db_object_id="b11a398cdb310300a5d3ddd0cf9619c5" extends="cmdb_ci" label="AWS Service Catalog Product" max_length="40" name="x_126749_aws_sc_cmdb_ci_pp" type="collection">
+        <element label="ARN" max_length="1224" name="awsarn" read_only="true" type="string"/>
+        <element label="CreatedTime" max_length="40" name="awscreatedtime" read_only="true" type="glide_date_time"/>
+        <element label="Id" max_length="40" name="awsid" read_only="true" type="string"/>
+        <element label="Idempotency Token" max_length="128" name="awsidempotencytoken" read_only="true" type="string"/>
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false" label="AWS Identity" max_length="32" name="awsidentity" read_only="true" reference="x_126749_aws_sc_aws_identity" reference_cascade_rule="restrict" type="reference"/>
+        <element label="Last Record Id" max_length="40" name="awslastrecordid" read_only="true" type="string"/>
+        <element label="Name" max_length="1224" name="awsname" read_only="true" type="string_full_utf8"/>
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false" label="Plan" max_length="32" name="awsplan" read_only="true" reference="x_126749_aws_sc_pp_plan" type="reference"/>
+        <element label="Product ID" mandatory="true" max_length="100" name="awsproductid" read_only="true" type="string"/>
+        <element attributes="edge_encryption_enabled=true" choice="3" default="1" label="Product Status" max_length="40" name="awsproductstatus" type="choice">
+            <choice>
+                <element inactive_on_update="false" label="Error" sequence="0" value="0"/>
+                <element inactive_on_update="false" label="Preprovisioning" sequence="1" value="1"/>
+                <element inactive_on_update="false" label="Provisioning" sequence="2" value="2"/>
+                <element inactive_on_update="false" label="Provisioned" sequence="3" value="3"/>
+                <element inactive_on_update="false" label="Terminating" sequence="4" value="4"/>
+                <element inactive_on_update="false" label="Terminated" sequence="5" value="5"/>
+                <element inactive_on_update="false" label="Termination Requested" sequence="6" value="6"/>
+            </choice>
+        </element>
+        <element label="Provisioning Artifact ID" max_length="100" name="awsprovisioningartifactid" read_only="true" type="string"/>
+        <element label="Region" max_length="40" name="awsregion" read_only="true" type="string"/>
+        <element attributes="edge_encryption_enabled=true" choice="1" default="UNKNOWN" label="Status" max_length="40" name="awsstatus" read_only="true" type="choice">
+            <choice>
+                <element inactive_on_update="false" label="Available" value="AVAILABLE"/>
+                <element inactive_on_update="false" label="Error" value="ERROR"/>
+                <element inactive_on_update="false" label="Plan in Progress" value="PLAN_IN_PROGRESS"/>
+                <element inactive_on_update="false" label="Tainted" value="TAINTED"/>
+                <element inactive_on_update="false" label="Under Change" value="UNDER_CHANGE"/>
+                <element inactive_on_update="false" label="Unknown" value="UNKNOWN"/>
+            </choice>
+        </element>
+        <element label="Status Message" max_length="1024" name="awsstatusmessage" read_only="true" type="string"/>
+        <element label="STS Session Name" max_length="40" name="awsstssessionname" read_only="true" type="string"/>
+        <element attributes="edge_encryption_enabled=true" choice="1" label="Sync Status" max_length="40" name="awssyncstatus" read_only="true" type="choice">
+            <choice>
+                <element inactive_on_update="false" label="Authentication Failure" value="3"/>
+                <element inactive_on_update="false" label="Error" value="2"/>
+                <element inactive_on_update="false" label="Ok" value="1"/>
+            </choice>
+        </element>
+        <element label="Type" max_length="40" name="awstype" read_only="true" type="string"/>
+    </element>
+</database>

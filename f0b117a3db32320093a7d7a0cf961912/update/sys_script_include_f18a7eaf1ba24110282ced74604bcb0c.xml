@@ -1,0 +1,433 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.IncidentManagerSyncProvider</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>IncidentManagerSyncProvider</name>
+        <script><![CDATA[var IncidentManagerSyncProvider = /** @class */ (function (_super) {
+    Polyfill.__extends(IncidentManagerSyncProvider, _super);
+    function IncidentManagerSyncProvider() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.providerName = 'AWS Systems Manager Incident Manager';
+        _this.incidentRepo = new IncidentRepo();
+        _this.openStatus = "OPEN";
+        _this.resolvedStatus = 'RESOLVED';
+        _this.serviceNowResolvedStatuses = ["Resolved", "Canceled"];
+        _this.bidirectional = "Bidirectional";
+        _this.awsToServiceNow = "Unidirectional: AWS to ServiceNow";
+        _this.serviceNowToAWS = "Unidirectional: ServiceNow to AWS";
+        _this.syncTimelineEvent = function (incidentManager, eventSummary, incident, incidentRecordArn) {
+            var timelineEvent = _this.getTimelineEvent(incidentManager, eventSummary, incidentRecordArn);
+            if (timelineEvent) {
+                var eventDescription = _this.recordEventMessage(timelineEvent);
+                var eventMessage = "[".concat(Util.toGlideDateTime(eventSummary.eventTime), "] -  ").concat(eventDescription);
+                //Update time is not working well on their API, commenting out those lines
+                //Example of a non updated event: "eventTime": "2022-04-18T14:18:24+01:00" ; "eventUpdatedTime": "2022-04-18T14:18:24.827000+01:00"
+                // if (eventSummary.eventUpdatedTime != eventSummary.eventTime) {
+                //     eventMessage += ` (Updated: ${Util.toGlideDateTime(eventSummary.eventUpdatedTime)})`;
+                // }
+                _this.incidentRepo.addWorkNote(incident, eventMessage);
+            }
+            else {
+                gs.warn("[SYNC][IncidentManager] Failed to get timeline event ".concat(eventSummary.eventId, " for Incident of arn: ") +
+                    "".concat(incident.x_126749_aws_sc_awsincidentarn));
+            }
+        };
+        return _this;
+    }
+    IncidentManagerSyncProvider.prototype.filterAccountSync = function (accountSync) {
+        _super.prototype.filterAccountSync.call(this, accountSync);
+        accountSync.addQuery('awsaccount.awsenableincidentmanager', 'true');
+    };
+    IncidentManagerSyncProvider.prototype.fromAwsWith = function (account, region) {
+        var syncResults = {
+            success: true,
+            seconds: 0,
+            requests: 0,
+        };
+        var timer = Util.startTimer();
+        var credentials = AwsCredentials.from(account).as(AwsCredentials.User.Sync);
+        var incidentManager = this.getIncidentManager(region, credentials);
+        try {
+            var priorityMapping = new PriorityMapping();
+            //1 - Synchronise any new Incident record from AWS
+            var syncIncidentsSuccess = this.syncIncidents(account, region, incidentManager, priorityMapping);
+            syncResults.success = syncResults.success && syncIncidentsSuccess;
+            //2- Update any existing Incident on ServiceNow that is OPEN
+            var updateOpenIncidentsSuccess = this.updateOpenIncidents(account, region, incidentManager, priorityMapping);
+            syncResults.success = syncResults.success && updateOpenIncidentsSuccess;
+            //3 - Update any existing Incident on ServiceNow that was RESOLVED within the past 7 days
+            var updateResolvedIncidentsSuccess = this.updateResolvedIncidents(account, region, incidentManager);
+            syncResults.success = syncResults.success && updateResolvedIncidentsSuccess;
+        }
+        catch (e) {
+            syncResults.success = false;
+            syncResults.error = e.message;
+        }
+        finally {
+            syncResults.seconds = timer.elapsed();
+            syncResults.requests = incidentManager.getRequestCount();
+        }
+        return syncResults;
+    };
+    IncidentManagerSyncProvider.prototype.getIncidentManager = function (region, credentials) {
+        var incidentManager = new AwsSystemsManagerIncidentManager(region, credentials);
+        incidentManager.setExponentialBackoff(this.timeout);
+        return incidentManager;
+    };
+    IncidentManagerSyncProvider.prototype.fromSn = function (context) {
+        return {
+            success: true,
+            seconds: 0,
+            requests: 0,
+        };
+    };
+    IncidentManagerSyncProvider.prototype.fromSnWith = function (incident) {
+        if (!incident) {
+            return;
+        }
+        var allowedSyncValues = [this.bidirectional, this.serviceNowToAWS];
+        if (!allowedSyncValues.some(function (asv) { return asv === gs.getProperty(C.sysprop.incidentManagerSyncResolved); })) {
+            return;
+        }
+        gs.info("[SYNC] [".concat(this.providerName, "] Synchronization of incident \"").concat(incident.description.toString(), "\" (").concat(incident.sys_id.toString(), ") resolved status, from ServiceNow to AWS"));
+        if (incident.x_126749_aws_sc_awsregion.nil()) {
+            gs.error("[SYNC] [".concat(this.providerName, "] Error synchronizing incident \"").concat(incident.sys_id.toString(), "\" to AWS Systems Manager Incident Manager because the region is unknown"));
+            return;
+        }
+        if (incident.x_126749_aws_sc_awsaccount.nil()) {
+            gs.error("[SYNC] [".concat(this.providerName, "] Error synchronizing incident \"").concat(incident.sys_id.toString(), "\" to AWS Systems Manager Incident Manager because the AWS account is unknown"));
+            return;
+        }
+        if (incident.x_126749_aws_sc_awsincidentarn.nil()) {
+            gs.error("[SYNC] [".concat(this.providerName, "] Error synchronizing incident \"").concat(incident.sys_id.toString(), "\" to AWS Systems Manager Incident Manager because the AWS incident ARN is unknown"));
+            return;
+        }
+        var credentials = AwsCredentials.from(incident.x_126749_aws_sc_awsaccount.getRefRecord()).as(AwsCredentials.User.Sync);
+        var incidentManager = this.getIncidentManager(incident.x_126749_aws_sc_awsregion, credentials);
+        var response = incidentManager.updateIncidentRecord({
+            clientToken: new Date().toString(),
+            arn: incident.x_126749_aws_sc_awsincidentarn.toString(),
+            status: 'RESOLVED'
+        });
+        if (response.haveError()) {
+            gs.error("[SYNC] [".concat(this.providerName, "] Error pushing the resolved status of incident \"").concat(incident.sys_id.toString(), "\" to AWS Systems Manager Incident Manager, for account \"").concat(incident.x_126749_aws_sc_awsaccount.awsname.toString(), "\" in region \"").concat(incident.x_126749_aws_sc_awsregion.toString(), "\": ").concat(response.deserialize().message));
+        }
+        else {
+            gs.info("[SYNC] [".concat(this.providerName, "] Successfully pushed the resolved status of incident \"").concat(incident.sys_id.toString(), "\" to AWS Systems Manager Incident Manager, for account \"").concat(incident.x_126749_aws_sc_awsaccount.awsname.toString(), "\" in region \"").concat(incident.x_126749_aws_sc_awsregion.toString(), "\""));
+        }
+    };
+    IncidentManagerSyncProvider.prototype.validate = function () {
+        return true;
+    };
+    IncidentManagerSyncProvider.prototype.syncIncidents = function (account, region, incidentManager, priorityMapping) {
+        var _this = this;
+        var getIncidentsResult = this.getIncidents(incidentManager, [
+            this.openStatus,
+            this.resolvedStatus
+        ], this.findLastSyncTime(account, region)).forEach(function (incidentRecordSummary) {
+            _this.syncNewIncident(account, region, incidentManager, incidentRecordSummary, priorityMapping);
+        });
+        if (getIncidentsResult.message) {
+            this.logErrorMessage(getIncidentsResult.message);
+        }
+        return getIncidentsResult.success;
+    };
+    IncidentManagerSyncProvider.prototype.findLastSyncTime = function (account, region) {
+        var lastSyncTime = this.incidentRepo.findLastSyncTime(function (incident) {
+            incident.addNotNullQuery('x_126749_aws_sc_awsincidentarn');
+            incident.addQuery('x_126749_aws_sc_awsaccount', account.sys_id.toString());
+            incident.addQuery('x_126749_aws_sc_awsregion', region);
+        });
+        return lastSyncTime || Util.toEpochSeconds(account, 'awsincidentmanagerenabledtime');
+    };
+    IncidentManagerSyncProvider.prototype.syncNewIncident = function (account, region, incidentManager, incidentRecordSummary, priorityMapping) {
+        var repo = new IncidentRepo();
+        var incident = repo.findByAwsIncidentArn(incidentRecordSummary.arn);
+        if (!incident) {
+            //Create GR Incident
+            incident = this.createIncident(incidentRecordSummary, account, region);
+            //Edge case when an Incident is created then Resolved within the sync interval
+            if (incidentRecordSummary.status === this.resolvedStatus) {
+                this.syncTimelineEvents(incident, account, incidentManager, incidentRecordSummary.arn);
+                this.updateIncidentWithDetails(incidentManager, incident, account, region, priorityMapping);
+            }
+            //Send GR Incident link to AWS
+            this.notifyAwsOfIncident(incident, incidentManager, incidentRecordSummary.arn);
+        }
+    };
+    IncidentManagerSyncProvider.prototype.updateOpenIncidents = function (account, region, incidentManager, priorityMapping) {
+        var success = true;
+        var incident = new GlideRecord('incident');
+        incident.addNotNullQuery('x_126749_aws_sc_awsincidentarn');
+        incident.addQuery('x_126749_aws_sc_awsstatus', this.openStatus);
+        incident.addQuery('x_126749_aws_sc_awsaccount', account.sys_id);
+        incident.addQuery('x_126749_aws_sc_awsregion', region);
+        incident.query();
+        while (incident.next()) {
+            //Sync Timeline Events for any Incident
+            var syncTimelineEventsResult = this.syncTimelineEvents(incident, account, incidentManager, incident.x_126749_aws_sc_awsincidentarn.toString());
+            if (syncTimelineEventsResult.message) {
+                this.logErrorMessage(syncTimelineEventsResult.message);
+            }
+            if (incident.x_126749_aws_sc_awsstatus.toString() === this.openStatus) {
+                this.updateIncidentWithDetails(incidentManager, incident, account, region, priorityMapping);
+            }
+            //this.updateIncidentLastSyncTime(incident);
+            success = success && syncTimelineEventsResult.success;
+        }
+        return success;
+    };
+    IncidentManagerSyncProvider.prototype.updateResolvedIncidents = function (account, region, incidentManager) {
+        var success = true;
+        var incident = new GlideRecord('incident');
+        //Get Date from 7 days ago
+        var glideDateTime = new GlideDateTime();
+        glideDateTime.addDaysLocalTime(-7);
+        incident.addNotNullQuery('x_126749_aws_sc_awsincidentarn');
+        incident.addQuery('x_126749_aws_sc_awsaccount', account.sys_id);
+        incident.addQuery('x_126749_aws_sc_awsregion', region);
+        incident.addQuery('x_126749_aws_sc_awsstatus', 'IN', this.serviceNowResolvedStatuses);
+        incident.addQuery('x_126749_aws_sc_awsresolvetime', '>', glideDateTime);
+        incident.query();
+        while (incident.next()) {
+            //Sync Timeline Events for any Incident
+            var syncTimelineEventsResult = this.syncTimelineEvents(incident, account, incidentManager, incident.x_126749_aws_sc_awsincidentarn.toString());
+            if (syncTimelineEventsResult.message) {
+                this.logErrorMessage(syncTimelineEventsResult.message);
+            }
+            success = success && syncTimelineEventsResult.success;
+            this.updateIncidentLastSyncTime(incident);
+        }
+        return success;
+    };
+    IncidentManagerSyncProvider.prototype.updateIncidentWithDetails = function (incidentManager, incident, account, region, priorityMapping) {
+        var incidentRecord = this.getIncidentRecord(incidentManager, incident.x_126749_aws_sc_awsincidentarn);
+        if (incidentRecord) {
+            this.updateIncident(incident, incidentRecord, account, region, priorityMapping);
+        }
+        else {
+            gs.warn("[SYNC][IncidentManager] Failed to get details for Incident of arn: " +
+                "".concat(incident.x_126749_aws_sc_awsincidentarn));
+        }
+    };
+    IncidentManagerSyncProvider.prototype.getIncidents = function (incidentManager, statuses, after) {
+        return incidentManager.listIncidentRecords({
+            filters: [
+                {
+                    key: "status",
+                    condition: {
+                        equals: {
+                            stringValues: statuses
+                        }
+                    }
+                },
+                {
+                    key: "creationTime",
+                    condition: {
+                        after: after
+                    }
+                }
+            ]
+        });
+    };
+    IncidentManagerSyncProvider.prototype.notifyAwsOfIncident = function (incident, incidentManager, incidentRecordArn) {
+        incidentManager.updateRelatedItems({
+            incidentRecordArn: incidentRecordArn,
+            clientToken: incidentRecordArn,
+            relatedItemsUpdate: {
+                itemToAdd: {
+                    title: 'ServiceNow Incident',
+                    identifier: {
+                        type: 'OTHER',
+                        value: {
+                            url: Util.recordUrl('incident', incident, 'AWS_Systems_Manager_Incident_Manager')
+                        }
+                    }
+                }
+            }
+        });
+    };
+    IncidentManagerSyncProvider.prototype.getIncidentRecord = function (incidentManager, arn) {
+        return incidentManager.getIncidentRecord({
+            arn: arn.toString()
+        }).getValue().incidentRecord;
+    };
+    IncidentManagerSyncProvider.prototype.awsConsoleUrlForIncident = function (account, region, incident) {
+        var arn = incident.arn; // 'arn:aws:ssm-incidents::785884216041:incident-record/Test-Response-Plan/3cbffcb5-a863-37d9-7554-71a087857c7d';
+        var incidentId = encodeURIComponent(encodeURIComponent(arn.substr(arn.indexOf('/') + 1))); // '/Test-Response-Plan%2F3cbffcb5-a863-37d9-7554-71a087857c7d'
+        var anchor = "#/".concat(account.awsaccountnumber.toString(), "/").concat(incidentId);
+        return "https://".concat(region, ".console.aws.amazon.com/systems-manager/incidents/home?region=").concat(region).concat(anchor);
+    };
+    IncidentManagerSyncProvider.prototype.createIncident = function (incidentRecordSummary, account, region) {
+        return this.incidentRepo.insert({ x_126749_aws_sc_awsincidentarn: incidentRecordSummary.arn }, { x_126749_aws_sc_awsstatus: incidentRecordSummary.status, x_126749_aws_sc_awsaccount: account.sys_id.toString(), x_126749_aws_sc_awsregion: region });
+    };
+    IncidentManagerSyncProvider.prototype.updateIncidentLastSyncTime = function (incident) {
+        var fields = {
+            x_126749_aws_sc_awslastsynctime: new GlideDateTime(),
+        };
+        this.incidentRepo.update(incident, fields);
+    };
+    IncidentManagerSyncProvider.prototype.updateIncident = function (incident, incidentRecord, account, region, priorityMapping) {
+        var fields = {
+            short_description: incidentRecord.title,
+            description: incidentRecord.summary,
+            x_126749_aws_sc_awsaccount: account.sys_id.toString(),
+            x_126749_aws_sc_awsregion: region,
+            x_126749_aws_sc_awsincidentarn: incidentRecord.arn,
+            x_126749_aws_sc_awsstatus: incidentRecord.status,
+            x_126749_aws_sc_awscreationtime: Util.toGlideDateTime(incidentRecord.creationTime),
+            x_126749_aws_sc_awsresolvetime: Util.toGlideDateTime(incidentRecord.resolvedTime),
+            x_126749_aws_sc_awslastupdatedtime: Util.toGlideDateTime(incidentRecord.lastModifiedTime),
+            x_126749_aws_sc_awslastsynctime: new GlideDateTime(),
+            x_126749_aws_sc_awsincidenturl: this.awsConsoleUrlForIncident(account, region, incidentRecord),
+            impact: incidentRecord.impact ?
+                priorityMapping.getMappedImpactFromSMIMImpact(incidentRecord.impact).toString() : 1,
+            urgency: 1 //hard-coded to HIGH per AWS demand
+        };
+        var assignmentGroup = gs.getProperty(C.sysprop.incidentManagerAssignmentGroup);
+        if (assignmentGroup) {
+            fields['assignment_group'] = assignmentGroup;
+        }
+        this.resolveIncident(incident, incidentRecord, fields);
+        this.incidentRepo.update(incident, fields);
+    };
+    //Resolve the Snow Incident if
+    //not resolved already and if the "Synchronization of the resolved status" system property says so
+    IncidentManagerSyncProvider.prototype.resolveIncident = function (incident, incidentRecord, fields) {
+        var resolvedState = Util.getChoiceValueFromLabel('incident', 'state', 'Resolved');
+        var canceledState = Util.getChoiceValueFromLabel('incident', 'state', 'Canceled');
+        if (incident.state.toString() !== resolvedState
+            && incident.state.toString() !== canceledState
+            && incidentRecord.status === this.resolvedStatus) {
+            var syncResolved = gs.getProperty(C.sysprop.incidentManagerSyncResolved);
+            if (syncResolved === this.bidirectional || syncResolved === this.awsToServiceNow) {
+                fields['state'] = resolvedState;
+                fields['close_notes'] = 'Marked as Resolved in AWS Incident Manager';
+                fields['close_code'] = Util.getIncidentResolvedCode();
+            }
+        }
+    };
+    IncidentManagerSyncProvider.prototype.syncTimelineEvents = function (incident, account, incidentManager, incidentRecordArn) {
+        var _this = this;
+        var lastSyncTime = this.getLastSyncTime(incident, account);
+        return incidentManager.listTimelineEvents({
+            incidentRecordArn: incidentRecordArn,
+            filters: [
+                {
+                    key: 'eventTime',
+                    condition: {
+                        after: lastSyncTime
+                    }
+                }
+            ],
+            sortOrder: 'ASCENDING'
+        }).forEach(function (eventSummary) {
+            _this.syncTimelineEvent(incidentManager, eventSummary, incident, incidentRecordArn);
+        });
+    };
+    IncidentManagerSyncProvider.prototype.getLastSyncTime = function (incident, account) {
+        if (incident.x_126749_aws_sc_awslastsynctime && !incident.x_126749_aws_sc_awslastsynctime.nil()) {
+            return new GlideDateTime(incident.x_126749_aws_sc_awslastsynctime).getNumericValue() / 1000;
+        }
+        return Util.toEpochSeconds(account, 'awsincidentmanagerenabledtime');
+    };
+    //An event should contain a "modifiedAttributes: property with an attributeName and a newValue. There are 3 cases.
+    //1- The event is as expected: display a customised string
+    //2- The event contains something unexpected but is parsable: display the stringified JSON
+    //3- The event contains something unexpected and cannot be parsable: display string directly
+    IncidentManagerSyncProvider.prototype.recordEventMessage = function (timelineEvent) {
+        var _a, _b, _c, _d, _e, _f, _g, _h;
+        var maybeEventData = Util.tryParseJson(timelineEvent.eventData, "eventData");
+        //Case 3
+        if (maybeEventData.success === false) {
+            gs.debug("[SYNC][IncidentManager] Could not parse event ".concat(timelineEvent.eventId, ": Displaying eventData string."));
+            return timelineEvent.eventData;
+        }
+        try {
+            var attributeName = (_a = maybeEventData.result['modifiedAttributes'][0]) === null || _a === void 0 ? void 0 : _a.attributeName;
+            var newValue = (_b = maybeEventData.result['modifiedAttributes'][0]) === null || _b === void 0 ? void 0 : _b.newValue;
+            if (attributeName) {
+                if (newValue) {
+                    //Related Items are a bit trickier to parse. There are 2 cases itemsToAdd and itemToRemove with a
+                    //slight difference in the structure
+                    if (attributeName === 'relatedItems') {
+                        var maybeNewValue = Util.tryParseJson(newValue, "newValue");
+                        if (maybeNewValue.success === true) {
+                            newValue = maybeNewValue.result;
+                            if (newValue.itemToAdd) {
+                                if ((_d = (_c = newValue.itemToAdd.identifier) === null || _c === void 0 ? void 0 : _c.value) === null || _d === void 0 ? void 0 : _d.url) {
+                                    return "".concat(newValue.itemToAdd.identifier.value.url, " added to related items.");
+                                }
+                                else if ((_f = (_e = newValue.itemToAdd.identifier) === null || _e === void 0 ? void 0 : _e.value) === null || _f === void 0 ? void 0 : _f.arn) {
+                                    return "".concat(newValue.itemToAdd.identifier.value.arn, " added to related items.");
+                                }
+                            }
+                            else if (newValue.itemToRemove) {
+                                if ((_g = newValue.itemToRemove.value) === null || _g === void 0 ? void 0 : _g.url) {
+                                    return "".concat(newValue.itemToRemove.value.url, " removed from related items.");
+                                }
+                                else if ((_h = newValue.itemToRemove.value) === null || _h === void 0 ? void 0 : _h.arn) {
+                                    return "".concat(newValue.itemToRemove.value.arn, " removed from related items.");
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        //Case 1
+                        return "Incident ".concat(attributeName, " updated to ").concat(newValue, ".");
+                    }
+                }
+                else {
+                    //Case 1
+                    return "Incident ".concat(attributeName, " updated.");
+                }
+            }
+        }
+        catch (ex) {
+            //DoNothing if parsing fails
+        }
+        //Case 2
+        gs.debug("[SYNC][IncidentManager] Could not identify event structure of event ".concat(timelineEvent.eventId, ": Try displaying prettified JSON."));
+        //Since the JSON is parseable, below block updates the work note with pretty eventData (prints keys and values)
+        var timelineObject = maybeEventData.result;
+        var eventString = '\n';
+        for (var _i = 0, _j = Object.keys(timelineObject); _i < _j.length; _i++) {
+            var property = _j[_i];
+            var value = timelineObject[property];
+            if (typeof value == 'object') {
+                value = JSON.stringify(value);
+            }
+            eventString = eventString + property + ': ' + value + '\n';
+        }
+        return eventString;
+    };
+    IncidentManagerSyncProvider.prototype.getTimelineEvent = function (incidentManager, eventSummary, incidentRecordArn) {
+        return incidentManager.getTimelineEvent({
+            eventId: eventSummary.eventId,
+            incidentRecordArn: incidentRecordArn
+        }).getValue().event;
+    };
+    IncidentManagerSyncProvider.prototype.logErrorMessage = function (message) {
+        gs.error("[SYNC][IncidentManager] Error: ".concat(message));
+    };
+    return IncidentManagerSyncProvider;
+}(AbstractSyncProvider));
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2022-04-05 12:55:18</sys_created_on>
+        <sys_id>f18a7eaf1ba24110282ced74604bcb0c</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>IncidentManagerSyncProvider</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_f18a7eaf1ba24110282ced74604bcb0c</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ui_action_role">
+    <sys_ui_action_role action="INSERT_OR_UPDATE">
+        <sys_class_name>sys_ui_action_role</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-02-18 13:48:32</sys_created_on>
+        <sys_id>1a9162d32f12201047d8b6a62799b6ba</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Create Problem from OpsItem.x_126749_aws_sc.opscenter_manager</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_ui_action display_value="Create Problem from OpsItem">0d3611b7dba120101aa72bfa4b96197e</sys_ui_action>
+        <sys_update_name>sys_ui_action_role_1a9162d32f12201047d8b6a62799b6ba</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <sys_user_role display_value="x_126749_aws_sc.opscenter_manager" name="x_126749_aws_sc.opscenter_manager">7284b256db0120101aa72bfa4b961933</sys_user_role>
+    </sys_ui_action_role>
+</record_update>

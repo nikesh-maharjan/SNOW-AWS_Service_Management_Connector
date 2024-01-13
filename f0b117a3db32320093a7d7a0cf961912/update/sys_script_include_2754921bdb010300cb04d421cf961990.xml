@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.Response</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>Response</name>
+        <script><![CDATA[var WrappedResponse = /** @class */ (function () {
+    /**
+     * @class
+     * @classdesc Wraps ServiceNow's RESTResponse.
+     * @constructs WrappedResponse
+     * @name WrappedResponse
+     * @param response {sn_ws.RESTResponse} A response object.
+     * @param focus {String=} Optional property in the response body that `data` should return.
+     */
+    function WrappedResponse(response, focus) {
+        this.response = response;
+        this.focus = focus;
+    }
+    WrappedResponse.prototype.getAllHeaders = function () {
+        return this.response.getAllHeaders();
+    };
+    WrappedResponse.prototype.getBody = function () {
+        return this.response.getBody();
+    };
+    WrappedResponse.prototype.getCookies = function () {
+        return this.response.getCookies();
+    };
+    WrappedResponse.prototype.getErrorCode = function () {
+        return this.response.getErrorCode();
+    };
+    WrappedResponse.prototype.getErrorMessage = function () {
+        return this.response.getErrorMessage();
+    };
+    WrappedResponse.prototype.getHeader = function (name) {
+        return this.response.getHeader(name);
+    };
+    WrappedResponse.prototype.getHeaders = function () {
+        return this.response.getHeaders();
+    };
+    WrappedResponse.prototype.getQueryString = function () {
+        return this.response.getQueryString();
+    };
+    WrappedResponse.prototype.getResponseAttachmentSysid = function () {
+        return this.response.getResponseAttachmentSysid();
+    };
+    WrappedResponse.prototype.getStatusCode = function () {
+        return this.response.getStatusCode();
+    };
+    WrappedResponse.prototype.haveError = function () {
+        return this.response.haveError();
+    };
+    WrappedResponse.prototype.waitForResponse = function (timeoutSecs) {
+        return this.response.waitForResponse(timeoutSecs);
+    };
+    /**
+     * Attempts to deserialize the response body into a Javascript object. The
+     * following content types are supported:
+     * <ul>
+     *     <li>application/json</li>
+     *     <li>application/x-amz-json-1.1</li>
+     *     <li>text/xml</li>
+     * </ul>
+     *
+     * Recommend using getValue() instead which has a cleaner return type.
+     *
+     * @param contentType {String=} Optional override of the Content-Type header.
+     * @since 1.4
+     */
+    WrappedResponse.prototype.deserialize = function (contentType) {
+        var content = contentType;
+        if (!content)
+            content = this.getHeader("Content-Type");
+        if (!content)
+            content = this.getHeader("content-type");
+        switch (content) {
+            case "text/xml":
+                return gs.xmlToJSON(this.getBody().trim());
+            case "application/json":
+            case "application/x-amz-json-1.1":
+                return JSON.parse(this.getBody());
+            default:
+                throw new Error("Unsupported Content-Type: " + content);
+        }
+    };
+    /**
+     * Parses the content of the response and returns the value.
+     *
+     * Any errors are thrown.
+     *
+     * Any type T that is exactly an Error will also be thrown. Use 'deserialize'
+     * directly if you really need to get a value of type Error.
+     *
+     * @param contentType Optional override of the Content-Type header
+     */
+    WrappedResponse.prototype.getValue = function (contentType) {
+        var deserialized = this.deserialize(contentType);
+        // Given that deserialize() returns an intersection of T and Error we need to rule out that we got
+        // an Error response. To do that we verify that either of the required properties of Error are absent.
+        // If either is missing then we didn't get an Error, or if it has any properties that Error doesn't,
+        // it must be of type T.
+        var doesNotHaveRequiredErrorProperties = !deserialized.hasOwnProperty('name') || !deserialized.hasOwnProperty('message');
+        var errorKeys = Object.keys(Error);
+        var hasANonErrorProperty = Object.keys(deserialized).every(function (key) { return !(key in errorKeys); });
+        if (doesNotHaveRequiredErrorProperties || hasANonErrorProperty) {
+            return deserialized;
+        }
+        // it is an Error, so we throw it
+        throw deserialized;
+    };
+    /**
+     * Calls <code>JSON.parse</code> on the response body. Returns an empty object
+     * if any error occurs.
+     * @deprecated since 1.4.0 use deserialize instead.
+     */
+    WrappedResponse.prototype.getJsonBody = function () {
+        if (!this._json) {
+            try {
+                this._json = JSON.parse(this.getBody());
+            }
+            catch (e) {
+                gs.error("Could not parse JSON response body: " + e.message);
+                return {};
+            }
+        }
+        return this._json;
+    };
+    /**
+     * @returns {*|{}}
+     *      The parsed JSON response, narrowed to the <code>focus</code> if one was set.
+     */
+    WrappedResponse.prototype.data = function () {
+        return this.focus
+            ? Util.getObjectWithName(this.focus, this.deserialize())
+            : this.deserialize();
+    };
+    /**
+     * @returns {boolean} True if the request that caused this response should be retried.
+     */
+    WrappedResponse.prototype.isRequestRetryable = function () {
+        try {
+            return this.deserialize()['__type'] === 'ThrottlingException' || this.getStatusCode() >= 500;
+        }
+        catch (e) {
+            return false;
+        }
+    };
+    WrappedResponse.prototype.isRequestNotAuthorized = function () {
+        try {
+            return this.haveError() && (this.deserialize()['__type'] === 'AccessDeniedException'
+                || this.deserialize()['__type'] === 'NotAuthorized'
+                || this.getStatusCode() === 403);
+        }
+        catch (e) {
+            return false;
+        }
+    };
+    //Error thrown when calling with an invalid security token (useful for GovCloud accounts for instance)
+    WrappedResponse.prototype.isRequestUnrecognized = function () {
+        try {
+            return this.haveError() && (this.deserialize()['__type'] === 'UnrecognizedClientException');
+        }
+        catch (e) {
+            return false;
+        }
+    };
+    return WrappedResponse;
+}());
+WrappedResponse.prototype.type = 'WrappedResponse';
+var PaginationIteration;
+(function (PaginationIteration) {
+    PaginationIteration["CONTINUE"] = "Pagination-Continue";
+    PaginationIteration["STOP"] = "Pagination-Stop";
+})(PaginationIteration || (PaginationIteration = {}));
+var PaginatedResponse = /** @class */ (function (_super) {
+    Polyfill.__extends(PaginatedResponse, _super);
+    /**
+     * Create a `PaginatedResponse`.
+     * @class
+     * @classdesc A `WrappedResponse` with functions to call paginated APIs.
+     * @constructs PaginatedResponse
+     * @name PaginatedResponse
+     * @param response {sn_ws.RESTResponse} A response object.
+     * @param focus {String} The portion of each response page that should be iterated in
+     *     {@link #collectAll} and {@link #map}.
+     * @param pageFn {Function} A function that returns the next response page.
+     * @param pageToken [String] The property in the response that indicates that there
+     *     is another page of data available. Defaults to "NextPageToken".
+     */
+    function PaginatedResponse(response, focus, pageFn, pageToken) {
+        if (pageToken === void 0) { pageToken = "NextPageToken"; }
+        var _this = _super.call(this, response, focus) || this;
+        _this.pageFn = pageFn;
+        _this.pageToken = pageToken;
+        return _this;
+    }
+    /**
+     * @returns {boolean} True if the JSON response body has a property called "NextPageToken" that is non-null.
+     */
+    PaginatedResponse.prototype.hasNextPage = function () {
+        var deserialized = this.deserialize();
+        return this.pageToken in deserialized && deserialized[this.pageToken] !== null;
+    };
+    /**
+     * Retrieves the next page of data by applying <code>NextPageToken</code> to <code>pageFn</code>.
+     * @returns {PaginatedResponse}
+     */
+    PaginatedResponse.prototype.nextPage = function () {
+        if (this.hasNextPage()) {
+            var token = Util.getObjectWithName(this.pageToken, this.deserialize());
+            return this.pageFn.call(null, token);
+        }
+    };
+    /**
+     * Transform and collect results using the supplied function.
+     * If there is an error response to a <code>nextPage()</code> call the object
+     * returned will only contain data collected before the error.
+     */
+    PaginatedResponse.prototype.map = function (fn, followPages) {
+        var data = this.data();
+        if (data && data.map) {
+            var m = data.map(fn);
+            if (followPages && this.hasNextPage()) {
+                var nextlot = this.nextPage().map(fn, followPages);
+                m.push.apply(m, nextlot);
+            }
+            return m;
+        }
+        else {
+            return [];
+        }
+    };
+    /**
+     * For use with responses that contain an array of values that may spread over several
+     * pages and you need all the results.  This will iterate over the pages collecting
+     * the results in result.all. If not all results could be collected, result.success will
+     * be false, and result.message will contain an error message.
+     *
+     * **DEPRECATED** use `forEach` or `forEachPage` instead
+     */
+    PaginatedResponse.prototype.collectAll = function () {
+        var result = {
+            all: [],
+            success: false,
+            requests: 1
+        };
+        var page = this;
+        if (page.haveError()) {
+            result.message = this._getErrorDetails(page);
+            return result;
+        }
+        result.all.push.apply(result.all, page.data());
+        while (page.hasNextPage()) {
+            page = page.nextPage();
+            result.requests++;
+            if (page.haveError()) {
+                result.message = this._getErrorDetails(page);
+                return result;
+            }
+            result.all.push.apply(result.all, page.data());
+        }
+        result.success = true;
+        return result;
+    };
+    /**
+     * Iterates over each page or results in the response, calling the callback
+     * with the array of Items in each page.
+     *
+     * The callback can prevent further iteration, e.g. if it has found the information
+     * it requires, by returning the value `PaginationIteration.STOP`. This will
+     * prevent the fetching of the next page and the function will return.
+     *
+     * If the callback would simply iterate over each item on the page consider
+     * using the `forEach` method instead.
+     *
+     * @param callback a function that will be called with an array of items on each page
+     * @param params Additional parameters to be passed to the callback
+     */
+    PaginatedResponse.prototype.forEachPage = function (callback, params) {
+        var result = {
+            success: false,
+            requests: 1,
+        };
+        if (this.haveError()) {
+            return Util.assign(result, { message: this.getErrorMessage() });
+        }
+        var page = this;
+        // first iteration
+        if (page.haveError()) {
+            return Util.assign(result, { message: this._getErrorDetails(page) });
+        }
+        var paginationIteration = callback(page.data(), params) || PaginationIteration.CONTINUE;
+        // loop until results are exhausted or the callback requested a stop
+        while (paginationIteration != PaginationIteration.STOP && page.hasNextPage()) {
+            page = page.nextPage();
+            result.requests++;
+            if (page.haveError()) {
+                result.message = this._getErrorDetails(page);
+                return result;
+            }
+            paginationIteration = callback(page.data(), params) || PaginationIteration.CONTINUE;
+        }
+        result.success = true;
+        return result;
+    };
+    /**
+     * Iterates over each item on each page in the response, calling the callback
+     * with each item.
+     *
+     * Each page will be fetched automatically after the last item on each page
+     * has been passed to the callback.
+     *
+     * The callback can prevent further iteration, e.g. if it has found the information
+     * it required, by returning the value `PaginationIteration.STOP`. This will
+     * prevent further items being passed to the callback and prevents the fetching
+     * of any more pages of results.
+     *
+     * @param callback a function that will be called with each item on each page
+     * @param params Additional parameters to be passed to the callback
+     */
+    PaginatedResponse.prototype.forEach = function (callback, params) {
+        return this.forEachPage(function (items) {
+            for (var _i = 0, items_1 = items; _i < items_1.length; _i++) {
+                var item = items_1[_i];
+                if (callback(item, params) == PaginationIteration.STOP) {
+                    return PaginationIteration.STOP;
+                }
+            }
+            return PaginationIteration.CONTINUE;
+        });
+    };
+    PaginatedResponse.prototype._getErrorDetails = function (response) {
+        var message = response.getErrorMessage();
+        var responseBody = response.getJsonBody();
+        if (responseBody['__type'] && responseBody['Message']) {
+            message = message + " (" + responseBody['__type'] + ": " + responseBody['Message'] + ")";
+        }
+        return message;
+    };
+    return PaginatedResponse;
+}(WrappedResponse));
+PaginatedResponse.prototype.type = 'PaginatedResponse';
+/**
+ * Functions for richer `RESTResponses`.
+ * @namespace
+ */
+var Response = {
+    /**
+     * Create a `PaginatedResponse`.
+     * @return {PaginatedResponse}
+     */
+    paginated: function (response, focus, pageFn, pageToken) {
+        return new PaginatedResponse(response, focus, pageFn, pageToken);
+    },
+    /**
+     * Create a `WrappedResponse`.
+     * @param response {RESTResponse}
+     * @param [focus] {string} Optional "focus" for WrappedResponse.data.
+     * @return {WrappedResponse}
+     */
+    of: function (response, focus) {
+        return new WrappedResponse(response, focus);
+    }
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2017-09-12 08:25:23</sys_created_on>
+        <sys_id>2754921bdb010300cb04d421cf961990</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Response</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_2754921bdb010300cb04d421cf961990</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

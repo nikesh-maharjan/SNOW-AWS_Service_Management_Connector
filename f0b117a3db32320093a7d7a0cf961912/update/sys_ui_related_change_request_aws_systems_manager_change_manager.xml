@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update>
+    <sys_ui_related sys_domain="global" table="change_request" version="2" view="aws_systems_manager_change_manager">
+        <sys_ui_related_list_entry action="INSERT_OR_UPDATE">
+            <filter/>
+            <list_id display_value="Change Request - AWS Systems Manager Change Manager" name="change_request" related_list="NULL" sys_domain="global" view="f021fb982f267010cffdfe1df699b621">0f50ef0b1b178110e047ea85604bcb0e</list_id>
+            <order_by/>
+            <position>0</position>
+            <related_list>task_ci.task</related_list>
+            <sys_class_name>sys_ui_related_list_entry</sys_class_name>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2022-05-11 09:09:09</sys_created_on>
+            <sys_id>8750ef0b1b178110e047ea85604bcb10</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-05-11 09:09:09</sys_updated_on>
+        </sys_ui_related_list_entry>
+        <sys_ui_related_list_entry action="INSERT_OR_UPDATE">
+            <filter/>
+            <list_id display_value="Change Request - AWS Systems Manager Change Manager" name="change_request" related_list="NULL" sys_domain="global" view="f021fb982f267010cffdfe1df699b621">0f50ef0b1b178110e047ea85604bcb0e</list_id>
+            <order_by/>
+            <position>1</position>
+            <related_list>task_cmdb_ci_service.task</related_list>
+            <sys_class_name>sys_ui_related_list_entry</sys_class_name>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2022-05-11 09:09:09</sys_created_on>
+            <sys_id>8350ef0b1b178110e047ea85604bcb11</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-05-11 09:09:09</sys_updated_on>
+        </sys_ui_related_list_entry>
+        <sys_ui_related_list_entry action="INSERT_OR_UPDATE">
+            <filter/>
+            <list_id display_value="Change Request - AWS Systems Manager Change Manager" name="change_request" related_list="NULL" sys_domain="global" view="f021fb982f267010cffdfe1df699b621">0f50ef0b1b178110e047ea85604bcb0e</list_id>
+            <order_by/>
+            <position>2</position>
+            <related_list>task_service_offering.task</related_list>
+            <sys_class_name>sys_ui_related_list_entry</sys_class_name>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2022-05-11 09:09:09</sys_created_on>
+            <sys_id>0b50ef0b1b178110e047ea85604bcb11</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-05-11 09:09:09</sys_updated_on>
+        </sys_ui_related_list_entry>
+        <sys_ui_related_list_entry action="INSERT_OR_UPDATE">
+            <filter/>
+            <list_id display_value="Change Request - AWS Systems Manager Change Manager" name="change_request" related_list="NULL" sys_domain="global" view="f021fb982f267010cffdfe1df699b621">0f50ef0b1b178110e047ea85604bcb0e</list_id>
+            <order_by/>
+            <position>3</position>
+            <related_list>sysapproval_approver.sysapproval</related_list>
+            <sys_class_name>sys_ui_related_list_entry</sys_class_name>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2022-05-11 09:09:09</sys_created_on>
+            <sys_id>8f50ef0b1b178110e047ea85604bcb11</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-05-11 09:09:09</sys_updated_on>
+        </sys_ui_related_list_entry>
+        <sys_ui_related_list_entry action="INSERT_OR_UPDATE">
+            <filter/>
+            <list_id display_value="Change Request - AWS Systems Manager Change Manager" name="change_request" related_list="NULL" sys_domain="global" view="f021fb982f267010cffdfe1df699b621">0f50ef0b1b178110e047ea85604bcb0e</list_id>
+            <order_by/>
+            <position>4</position>
+            <related_list>change_task.change_request</related_list>
+            <sys_class_name>sys_ui_related_list_entry</sys_class_name>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2022-05-11 09:09:09</sys_created_on>
+            <sys_id>0750ef0b1b178110e047ea85604bcb12</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-05-11 09:09:09</sys_updated_on>
+        </sys_ui_related_list_entry>
+        <sys_ui_related_list_entry action="INSERT_OR_UPDATE">
+            <filter/>
+            <list_id display_value="Change Request - AWS Systems Manager Change Manager" name="change_request" related_list="NULL" sys_domain="global" view="f021fb982f267010cffdfe1df699b621">0f50ef0b1b178110e047ea85604bcb0e</list_id>
+            <order_by/>
+            <position>5</position>
+            <related_list>cab_agenda_item.task</related_list>
+            <sys_class_name>sys_ui_related_list_entry</sys_class_name>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2022-05-11 09:09:09</sys_created_on>
+            <sys_id>8b50ef0b1b178110e047ea85604bcb12</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-05-11 09:09:09</sys_updated_on>
+        </sys_ui_related_list_entry>
+        <sys_ui_related_list_entry action="INSERT_OR_UPDATE">
+            <filter/>
+            <list_id display_value="Change Request - AWS Systems Manager Change Manager" name="change_request" related_list="NULL" sys_domain="global" view="f021fb982f267010cffdfe1df699b621">0f50ef0b1b178110e047ea85604bcb0e</list_id>
+            <order_by/>
+            <position>6</position>
+            <related_list>problem.rfc</related_list>
+            <sys_class_name>sys_ui_related_list_entry</sys_class_name>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2022-05-11 09:09:09</sys_created_on>
+            <sys_id>4b50a34b1b178110e047ea85604bcb22</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-05-11 09:09:09</sys_updated_on>
+        </sys_ui_related_list_entry>
+        <sys_ui_related_list_entry action="INSERT_OR_UPDATE">
+            <filter/>
+            <list_id display_value="Change Request - AWS Systems Manager Change Manager" name="change_request" related_list="NULL" sys_domain="global" view="f021fb982f267010cffdfe1df699b621">0f50ef0b1b178110e047ea85604bcb0e</list_id>
+            <order_by/>
+            <position>7</position>
+            <related_list>incident.rfc</related_list>
+            <sys_class_name>sys_ui_related_list_entry</sys_class_name>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2022-05-11 09:09:09</sys_created_on>
+            <sys_id>cf50a34b1b178110e047ea85604bcb22</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-05-11 09:09:09</sys_updated_on>
+        </sys_ui_related_list_entry>
+        <sys_ui_related_list_entry action="INSERT_OR_UPDATE">
+            <filter/>
+            <list_id display_value="Change Request - AWS Systems Manager Change Manager" name="change_request" related_list="NULL" sys_domain="global" view="f021fb982f267010cffdfe1df699b621">0f50ef0b1b178110e047ea85604bcb0e</list_id>
+            <order_by/>
+            <position>8</position>
+            <related_list>incident.caused_by</related_list>
+            <sys_class_name>sys_ui_related_list_entry</sys_class_name>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2022-05-11 09:09:09</sys_created_on>
+            <sys_id>4750a34b1b178110e047ea85604bcb23</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-05-11 09:09:09</sys_updated_on>
+        </sys_ui_related_list_entry>
+        <sys_ui_related_list_entry action="INSERT_OR_UPDATE">
+            <filter/>
+            <list_id display_value="Change Request - AWS Systems Manager Change Manager" name="change_request" related_list="NULL" sys_domain="global" view="f021fb982f267010cffdfe1df699b621">0f50ef0b1b178110e047ea85604bcb0e</list_id>
+            <order_by/>
+            <position>9</position>
+            <related_list>task_sla.task</related_list>
+            <sys_class_name>sys_ui_related_list_entry</sys_class_name>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2022-05-11 09:09:09</sys_created_on>
+            <sys_id>cb50a34b1b178110e047ea85604bcb23</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-05-11 09:09:09</sys_updated_on>
+        </sys_ui_related_list_entry>
+        <sys_ui_related_list_entry action="INSERT_OR_UPDATE">
+            <filter/>
+            <list_id display_value="Change Request - AWS Systems Manager Change Manager" name="change_request" related_list="NULL" sys_domain="global" view="f021fb982f267010cffdfe1df699b621">0f50ef0b1b178110e047ea85604bcb0e</list_id>
+            <order_by/>
+            <position>10</position>
+            <related_list>task_outage.task</related_list>
+            <sys_class_name>sys_ui_related_list_entry</sys_class_name>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2022-05-11 09:09:09</sys_created_on>
+            <sys_id>4350a34b1b178110e047ea85604bcb24</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-05-11 09:09:09</sys_updated_on>
+        </sys_ui_related_list_entry>
+        <sys_ui_related_list_entry action="INSERT_OR_UPDATE">
+            <filter/>
+            <list_id display_value="Change Request - AWS Systems Manager Change Manager" name="change_request" related_list="NULL" sys_domain="global" view="f021fb982f267010cffdfe1df699b621">0f50ef0b1b178110e047ea85604bcb0e</list_id>
+            <order_by/>
+            <position>11</position>
+            <related_list>x_126749_aws_sc_change_request_cloudtrail_event.awschangerequest</related_list>
+            <sys_class_name>sys_ui_related_list_entry</sys_class_name>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2022-05-11 09:09:09</sys_created_on>
+            <sys_id>c750a34b1b178110e047ea85604bcb24</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-05-11 09:09:09</sys_updated_on>
+        </sys_ui_related_list_entry>
+        <sys_ui_related_list action="INSERT_OR_UPDATE">
+            <calculated_name>Change Request - AWS Systems Manager Change Manager</calculated_name>
+            <filter/>
+            <name>change_request</name>
+            <order_by/>
+            <position/>
+            <related_list/>
+            <sys_class_name>sys_ui_related_list</sys_class_name>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2022-05-11 09:09:09</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>0f50ef0b1b178110e047ea85604bcb0e</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_name>Change Request - AWS Systems Manager Change Manager</sys_name>
+            <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+            <sys_policy/>
+            <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+            <sys_update_name>sys_ui_related_change_request_aws_systems_manager_change_manager</sys_update_name>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+            <sys_user/>
+            <view display_value="AWS Systems Manager Change Manager" name="aws_systems_manager_change_manager">f021fb982f267010cffdfe1df699b621</view>
+            <view_name/>
+        </sys_ui_related_list>
+    </sys_ui_related>
+</record_update>

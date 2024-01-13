@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_script">
+    <sys_script action="INSERT_OR_UPDATE">
+        <abort_action>false</abort_action>
+        <access>package_private</access>
+        <action_delete>false</action_delete>
+        <action_insert>true</action_insert>
+        <action_query>false</action_query>
+        <action_update>true</action_update>
+        <active>true</active>
+        <add_message>false</add_message>
+        <advanced>true</advanced>
+        <change_fields>false</change_fields>
+        <client_callable>false</client_callable>
+        <collection>x_126749_aws_sc_account</collection>
+        <condition/>
+        <description/>
+        <execute_function>false</execute_function>
+        <filter_condition/>
+        <is_rest>false</is_rest>
+        <message/>
+        <name>Set OpsCenter Enabled Time</name>
+        <order>100</order>
+        <priority>100</priority>
+        <rest_method/>
+        <rest_method_text/>
+        <rest_service/>
+        <rest_service_text/>
+        <rest_variables/>
+        <role_conditions/>
+        <script><![CDATA[/**
+ @Deployable({
+    table: 'sys_script',
+    column: 'script',
+    sysId: '7880b4fbdb61201079bd2fb7489619f1',
+    metadata: {
+        name: 'Set OpsCenter Enabled Time',
+        collection: 'x_126749_aws_sc_account',
+        when: 'before',
+        order: '100',
+        action_update: 'true',
+        action_insert: 'true'
+    }
+})
+ */
+(function executeRule(current, previous /*null when async*/) {
+    // if awsenableopscenter is true and was previously false, set the time to now
+    if (previous.getValue('awsenableopscenter') !== current.getValue('awsenableopscenter')) {
+        var newValue = !!current.awsenableopscenter ? new GlideDateTime() : undefined;
+        Util.setValue(current, 'awsopscenterenabledtime', newValue);
+    }
+})(current, previous);
+]]></script>
+        <sys_class_name>sys_script</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-01-13 12:15:47</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>7880b4fbdb61201079bd2fb7489619f1</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Set OpsCenter Enabled Time</sys_name>
+        <sys_overrides/>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_7880b4fbdb61201079bd2fb7489619f1</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <template/>
+        <when>before</when>
+    </sys_script>
+    <sys_translated_text action="delete_multiple" query="documentkey=7880b4fbdb61201079bd2fb7489619f1"/>
+</record_update>

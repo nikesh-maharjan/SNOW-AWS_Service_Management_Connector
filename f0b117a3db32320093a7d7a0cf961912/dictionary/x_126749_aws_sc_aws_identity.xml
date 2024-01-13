@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="699f35284f610300c5883b728110c78f" label="AWS Identity" max_length="40" name="x_126749_aws_sc_aws_identity" type="collection">
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false" label="Account" max_length="32" name="awsaccount" reference="x_126749_aws_sc_account" reference_cascade_rule="restrict" type="reference"/>
+        <element attributes="no_truncate=true" display="true" label="ARN" max_length="2048" name="awsarn" read_only="true" type="string"/>
+        <index name="index">
+            <element name="awsaccount"/>
+        </index>
+    </element>
+</database>

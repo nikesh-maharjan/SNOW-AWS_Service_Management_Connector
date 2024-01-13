@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.IncidentRepo</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>IncidentRepo</name>
+        <script><![CDATA[var IncidentRepo = /** @class */ (function () {
+    function IncidentRepo() {
+        // fields on an Incident that when changed would result in an update to any related OpsItem
+        this.mappedIncidentToOpsItemFields = [
+            "description",
+            'impact',
+            "urgency",
+            "short_description",
+            "state",
+        ];
+    }
+    /**
+     * Records the message in the OpsCenter AuditTrail.
+     *
+     * @param opsItem The OpsCenter OpsItem
+     * @param message The message
+     */
+    IncidentRepo.prototype.record = function (opsItem, message) {
+        //noop - todo - awaiting AWS deployment of Audit Trail
+    };
+    IncidentRepo.prototype.shouldCreateIncidentFromFinding = function (finding) {
+        var findingAction = gs.getProperty(C.sysprop.securityHubSyncFindingAction);
+        return (findingAction === 'Create incident' || findingAction === 'Create both (incident/problem)' || !!finding.awsincident);
+    };
+    IncidentRepo.prototype.insertOrUpdateFromOpsItem = function (opsItem) {
+        var priorityMapping = new PriorityMapping();
+        var mappedFields = priorityMapping.getMappedFromFindingOrOpsItem(opsItem);
+        var additionalFields = {
+            "opened_at": opsItem.awscreatedtime,
+            "company": opsItem.awssource,
+            "description": opsItem.awsdescription,
+            'impact': parseInt(mappedFields.impact),
+            "urgency": parseInt(mappedFields.urgency),
+            "category": opsItem.awscategory,
+            "business_service": Util.getAwsServiceId("AWS Systems Manager - OpsCenter"),
+            "short_description": opsItem.awstitle,
+            "problem_id": opsItem.problem,
+            "state": this.mapOpsItemStatusToIncident(opsItem.awsstatus.toString()),
+        };
+        if (opsItem.awsstatus.toString() === 'Resolved') {
+            if (!opsItem.incident.nil()) {
+                var i = opsItem.incident.getRefRecord();
+                // Only set Caller if it isn't already set - then use 'admin'
+                if (i.caller_id.nil()) {
+                    var admin = Util.getRecord('sys_user', 'user_name', 'admin');
+                    if (admin.isValidRecord()) {
+                        additionalFields.caller_id = admin.sys_id.toString();
+                    }
+                }
+            }
+            additionalFields.close_code = Util.getIncidentResolvedCode();
+            additionalFields.close_notes = 'Marked as Resolved in AWS OpsCenter';
+        }
+        var assignmentGroupSysId = gs.getProperty(C.sysprop.opsCenterAssignmentGroup);
+        if (assignmentGroupSysId) {
+            additionalFields.assignment_group = assignmentGroupSysId;
+        }
+        var incident = this.insertOrUpdate(opsItem.getValue('incident'), additionalFields);
+        this.updateOpsItemWithIncident(opsItem, incident);
+        return incident;
+    };
+    IncidentRepo.prototype.insertOrUpdateFromFinding = function (finding) {
+        var priorityMapping = new PriorityMapping();
+        var mappedFields = priorityMapping.getMappedFromFindingOrOpsItem(finding);
+        //for multi-choice fields we need to post the numerical value of the field
+        //instead of the string value
+        //service is a reference field to cmdb_ci_service - need to add AWS to that table and get sys_id of record
+        var additionalFields = {
+            "opened_at": finding.awscreatedat,
+            "company": finding.awscompanyname,
+            "description": finding.awsdescription,
+            'impact': parseInt(mappedFields.impact),
+            "urgency": parseInt(mappedFields.urgency),
+            "category": "software",
+            "business_service": Util.getAwsServiceId("AWS Security Hub"),
+            "short_description": finding.awsdescription,
+            "problem_id": finding.awsproblem,
+            "state": this.mapFindingStatusToIncident(finding.awsworkflowstatus.toString()),
+        };
+        if (finding.awsworkflowstatus.toString() === 'RESOLVED') {
+            if (!finding.awsincident.nil()) {
+                var i = finding.awsincident.getRefRecord();
+                // Only set Caller if it isn't already set - then use 'admin'
+                if (i.caller_id.nil()) {
+                    var admin = Util.getRecord('sys_user', 'user_name', 'admin');
+                    if (admin.isValidRecord()) {
+                        additionalFields.caller_id = admin.sys_id.toString();
+                    }
+                }
+            }
+            additionalFields.close_code = Util.getIncidentResolvedCode();
+            additionalFields.close_notes = 'Marked as Resolved in AWS Security Hub';
+        }
+        var incident = this.insertOrUpdate(finding.getValue('awsincident'), additionalFields);
+        this.updateFindingWithIncident(finding, incident);
+        return incident;
+    };
+    IncidentRepo.prototype.insert = function (definitionalFields, additionalFields) {
+        return Util.insertOrUpdate("incident", definitionalFields, additionalFields);
+    };
+    IncidentRepo.prototype.update = function (incident, fields) {
+        return Util.insertOrUpdate("incident", { sys_id: incident.sys_id }, fields);
+    };
+    IncidentRepo.prototype.insertOrUpdate = function (incidentSysId, incidentFields) {
+        return Util.insertOrUpdate("incident", { sys_id: incidentSysId }, incidentFields, false);
+    };
+    IncidentRepo.prototype.updateFindingWithIncident = function (finding, incident) {
+        if (finding.getValue('awsincident') !== incident.sys_id.toString()) {
+            gs.info('Updating finding with new incident');
+            Util.setValue(finding, 'awsincident', incident.sys_id.toString());
+            finding.update();
+        }
+        return finding;
+    };
+    IncidentRepo.prototype.updateOpsItemWithIncident = function (opsItem, incident) {
+        if (opsItem.getValue('incident') !== incident.sys_id.toString()) {
+            gs.info('Updating opsItem with new incident');
+            Util.setValue(opsItem, 'incident', incident.sys_id.toString());
+            opsItem.update();
+        }
+    };
+    /**
+     * Checks if the user has selected to create Incidents when an OpsItem is
+     * created and the Incident doesn't already exist.
+     *
+     * @param opsItem the OpsItem that has been created
+     * @param action  the action to perform when an new OpsItem is created
+     */
+    IncidentRepo.prototype.shouldCreateFromOpsItem = function (opsItem) {
+        // get the priority of the opsItem and then check the action for that priority
+        var action;
+        var severity = opsItem.awsseverity.toString();
+        switch (severity) {
+            case "1":
+                action = gs.getProperty(C.sysprop.opsCenterSyncSeverity1);
+                break;
+            case "2":
+                action = gs.getProperty(C.sysprop.opsCenterSyncSeverity2);
+                break;
+            case "3":
+                action = gs.getProperty(C.sysprop.opsCenterSyncSeverity3);
+                break;
+            case "4":
+                action = gs.getProperty(C.sysprop.opsCenterSyncSeverity4);
+                break;
+            default:
+                action = 'Do nothing';
+        }
+        var incidentDoesNotAlreadyExist = opsItem.incident !== undefined;
+        return action === "Create incident" && incidentDoesNotAlreadyExist;
+    };
+    /**
+     * Search for an Incident by the sys_id, returns undefined if no record found.
+     *
+     * @param incidentId the sys_id of the Incident record
+     */
+    IncidentRepo.prototype.get = function (incidentId) {
+        var incident = new GlideRecord('incident');
+        incident.addQuery('sys_id', incidentId);
+        incident.query();
+        if (incident.next()) {
+            return incident;
+        }
+        return undefined;
+    };
+    /**
+     * Maps an AWS OpsItem Status to a SNOW Incident Status.
+     *
+     * Ref: https://docs.aws.amazon.com/systems-manager/latest/APIReference/API_OpsItemSummary.html#systemsmanager-Type-OpsItemSummary-Status
+     *
+     * @param state the AWS STATUS
+     * @private
+     */
+    IncidentRepo.prototype.mapOpsItemStatusToIncident = function (state) {
+        switch (state) {
+            case 'InProgress':
+                return this.getIncidentState('In Progress');
+            case 'Resolved':
+                return this.getIncidentState('Resolved');
+            case 'Open':
+            default:
+                return this.getIncidentState('New');
+        }
+    };
+    IncidentRepo.prototype.getIncidentState = function (label) {
+        return Util.getChoiceValueFromLabel('incident', 'incident_state', label);
+    };
+    /**
+     * Maps an AWS Finding Workflow Status to a SNOW Incident Status.
+     *
+     * Ref: https://docs.aws.amazon.com/securityhub/1.0/APIReference/API_Workflow.html#securityhub-Type-Workflow-Status
+     *
+     * @param state the AWS STATUS
+     * @private
+     */
+    IncidentRepo.prototype.mapFindingStatusToIncident = function (state) {
+        switch (state) {
+            case 'NEW':
+                return this.getIncidentState('New');
+            case 'NOTIFIED':
+                return this.getIncidentState('In Progress');
+            case 'RESOLVED':
+                return this.getIncidentState('Resolved');
+            case 'SUPPRESSED':
+                return this.getIncidentState('Canceled');
+        }
+        var message = "Unexpected Finding State: ".concat(state);
+        gs.error(message);
+        throw new Error(message);
+    };
+    /**
+     * Checks for any OpsItem related to the Incident then checks for any
+     * changes to any Incident field that would be updated to the OpsItem and
+     * generates a message which is sent to the Audit Trail.
+     *
+     * @param current  the updated Incident
+     * @param previous the original Incident
+     */
+    IncidentRepo.prototype.auditAnyOpsItemUpdatesFromIncident = function (current, previous) {
+        var opsItemRepo = new OpsItemRepo();
+        var opsItem = opsItemRepo.findForIncident(current);
+        if (opsItem !== null && opsItem.isValidRecord()) {
+            var changes_1 = [];
+            this.mappedIncidentToOpsItemFields.forEach(function (field) {
+                var previousValue = previous.getValue(field);
+                var currentValue = current.getValue(field);
+                if (currentValue != previousValue) {
+                    changes_1.push("".concat(field, ": \"").concat(previousValue, "\" to \"").concat(currentValue, "\""));
+                }
+            });
+            if (changes_1.length > 0) {
+                var change = changes_1.join(', ');
+                this.record(opsItem, "ServiceNow Incident updated: ".concat(change));
+            }
+        }
+    };
+    IncidentRepo.prototype.isUpdatedForOpsItem = function (current, previous) {
+        return this.mappedIncidentToOpsItemFields.reduce(function (acc, field) {
+            var currentValue = current.getValue(field);
+            var previousValue = previous.getValue(field);
+            return currentValue !== previousValue || acc;
+        }, false);
+    };
+    IncidentRepo.prototype.findByAwsIncidentArn = function (arn) {
+        var incident = new GlideRecord('incident');
+        incident.addQuery('x_126749_aws_sc_awsincidentarn', arn.toString());
+        incident.query();
+        if (incident.next()) {
+            return incident;
+        }
+        return null;
+    };
+    IncidentRepo.prototype.addWorkNote = function (incident, message) {
+        this.update(incident, { work_notes: message });
+    };
+    IncidentRepo.prototype.findLastSyncTime = function (filters) {
+        var incident = new GlideRecord('incident');
+        incident.orderByDesc('x_126749_aws_sc_awslastsynctime');
+        incident.setLimit(1);
+        filters(incident);
+        incident.query();
+        if (incident.next()) {
+            return Util.toEpochSeconds(incident, 'x_126749_aws_sc_awslastsynctime');
+        }
+        return null;
+    };
+    return IncidentRepo;
+}());
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-10-05 14:29:02</sys_created_on>
+        <sys_id>4192de6fdb27101079bd2fb748961946</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>IncidentRepo</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_4192de6fdb27101079bd2fb748961946</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.SecurityHubSyncProvider</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>SecurityHubSyncProvider</name>
+        <script><![CDATA[var SecurityHubSyncProvider = /** @class */ (function (_super) {
+    Polyfill.__extends(SecurityHubSyncProvider, _super);
+    function SecurityHubSyncProvider() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.providerName = 'AWS Security Hub';
+        _this.timeout = 60;
+        return _this;
+    }
+    SecurityHubSyncProvider.prototype.filterAccountSync = function (accountSync) {
+        _super.prototype.filterAccountSync.call(this, accountSync);
+        accountSync.addQuery('awsaccount.awsenablesecurityhub', 'true');
+    };
+    SecurityHubSyncProvider.prototype.fromAwsWith = function (account, region) {
+        var syncResults = {
+            success: true,
+            seconds: 0,
+            requests: 0
+        };
+        var timer = Util.startTimer();
+        var credentials = AwsCredentials.from(account).as(AwsCredentials.User.Sync);
+        var sqsService = new AwsSqs(region, credentials, this.timeout);
+        try {
+            this.doSyncFindings(account, region, sqsService);
+        }
+        catch (ex) {
+            syncResults.success = false;
+            syncResults.error = ex.message;
+        }
+        finally {
+            syncResults.seconds = timer.elapsed();
+            syncResults.requests = sqsService.getRequestCount();
+        }
+        return syncResults;
+    };
+    SecurityHubSyncProvider.prototype.fromSn = function () {
+        var syncResults = {
+            success: true,
+            seconds: 0,
+            requests: 0,
+        };
+        return syncResults;
+    };
+    /**
+     * Sync update from ServiceNow to AWS
+     */
+    SecurityHubSyncProvider.prototype.updateAws = function (finding) {
+        if (!finding.account.awsenablesecurityhub) {
+            gs.warn("[SYNC] [" + this.providerName + "] Skipping synchronization of Finding " + finding.sys_id + "): the feature is disabled for account " + finding.account.awsname + " in region " + finding.awsregion);
+        }
+        else if (this.isUpdatedSinceSyncFromAws(finding)) {
+            try {
+                var workflow_1 = WorkflowTasks.pushFindingsToAws.startWorkflow(finding);
+                gs.info("[SYNC] [" + this.providerName + "] Successfully pushed updated finding \"" + finding.sys_id + "\" to AWS SecurityHub, for account \"" + finding.account.awsname + "\" in region \"" + finding.awsregion + "\". See workflow context " + workflow_1.sys_id + " for the execution details");
+            }
+            catch (ex) {
+                gs.warn("[SYNC] [" + this.providerName + "] Error requesting push of Finding \"" + finding.sys_id + "\" to AWS SecurityHub, for account \"" + finding.account.awsname + "\" in region \"" + finding.awsregion + "\": " + ex.message);
+            }
+        }
+    };
+    SecurityHubSyncProvider.prototype.validate = function () {
+        return true;
+    };
+    SecurityHubSyncProvider.prototype.isUpdatedSinceSyncFromAws = function (finding) {
+        return finding.sys_updated_on > finding.awslastupdatedfromaws;
+    };
+    SecurityHubSyncProvider.prototype.doSyncFindings = function (account, region, sqsService) {
+        var repo = new FindingRepo(sqsService);
+        var maxMessages = parseInt(gs.getProperty(C.sysprop.securityHubSyncFindingMessagesMax));
+        repo.syncFromAWS(account, region, maxMessages);
+    };
+    return SecurityHubSyncProvider;
+}(AbstractSyncProvider));
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-10-08 13:11:04</sys_created_on>
+        <sys_id>e58d51acdb3710101aa72bfa4b961968</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>SecurityHubSyncProvider</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_e58d51acdb3710101aa72bfa4b961968</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

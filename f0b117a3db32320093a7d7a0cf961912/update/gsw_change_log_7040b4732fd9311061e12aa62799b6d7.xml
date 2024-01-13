@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="gsw_change_log">
+    <gsw_change_log action="INSERT_OR_UPDATE">
+        <change_date>2023-09-22 06:43:05</change_date>
+        <changed_by display_value="Nikesh Maharjan">f5e6c1b52fd5b11061e12aa62799b6f3</changed_by>
+        <content display_value="Validate configurations">3ca44ca71b0b3010bec096c6b04bcbb3</content>
+        <related_change_log_entry/>
+        <related_task_entry/>
+        <sys_class_name>gsw_change_log</sys_class_name>
+        <sys_created_by>nmaharjan</sys_created_by>
+        <sys_created_on>2023-09-22 06:43:05</sys_created_on>
+        <sys_id>7040b4732fd9311061e12aa62799b6d7</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>2023-09-22 06:43:05</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>gsw_change_log_7040b4732fd9311061e12aa62799b6d7</sys_update_name>
+        <sys_updated_by>nmaharjan</sys_updated_by>
+        <sys_updated_on>2023-09-22 06:43:05</sys_updated_on>
+        <type>1</type>
+    </gsw_change_log>
+</record_update>

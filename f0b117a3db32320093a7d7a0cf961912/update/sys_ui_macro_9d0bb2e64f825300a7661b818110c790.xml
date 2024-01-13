@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ui_macro">
+    <sys_ui_macro action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <category>general</category>
+        <description>Displays current.duration in a readable format.</description>
+        <media_type/>
+        <name>format_duration</name>
+        <scoped_name>x_126749_aws_sc_format_duration</scoped_name>
+        <sys_class_name>sys_ui_macro</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-05-16 16:37:19</sys_created_on>
+        <sys_id>9d0bb2e64f825300a7661b818110c790</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>format_duration</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_ui_macro_9d0bb2e64f825300a7661b818110c790</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <xml><![CDATA[<?xml version="1.0" encoding="utf-8" ?>
+<j:jelly trim="false" xmlns:j="jelly:core" xmlns:g2="null">
+    <!--
+    Displays the current record's `duration` property in a human-readable format.
+    The HTML is structured to render a label and disabled input as on a two-column form layout.
+    -->
+    <g2:evaluate var="jvar_duration" >
+        var d = current.getValue("duration");
+        if (d) {
+            d = Util.renderDuration(d);
+        } else {
+            d = "";
+        }
+        d;
+    </g2:evaluate>
+    <div nowrap="true" data-type="label" id="label.x_126749_aws_sc_req_log.duration" choice="0" type="integer"
+         class="">
+        <label for="sys_readonly.x_126749_aws_sc_req_log.duration" dir="ltr"
+               class="col-xs-12 col-md-3 col-lg-4 control-label">
+            <span class="label-text">Duration</span>
+        </label>
+    </div>
+    <div class="col-xs-10 col-sm-9 col-md-6 col-lg-5 form-field input_controls">
+        <input id="sys_readonly.x_126749_aws_sc_req_log.duration" readonly="readonly"
+               class="form-control disabled" value="$[jvar_duration]"/>
+    </div>
+</j:jelly>
+]]></xml>
+    </sys_ui_macro>
+</record_update>

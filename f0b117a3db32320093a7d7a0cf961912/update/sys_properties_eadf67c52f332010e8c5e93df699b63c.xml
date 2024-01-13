@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_properties">
+    <sys_properties action="INSERT_OR_UPDATE">
+        <choices/>
+        <description>Always use resource ID as name (provided to duplicate ITOM Discovery behavior, recommended for ITOM compatibility)&#13;
+If unchecked the resource name will be used where available otherwise the resource ID will be used.</description>
+        <ignore_cache>true</ignore_cache>
+        <is_private>false</is_private>
+        <name>x_126749_aws_sc.config.name.resourceId</name>
+        <read_roles/>
+        <suffix>config.name.resourceId</suffix>
+        <sys_class_name>sys_properties</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-04-27 09:21:59</sys_created_on>
+        <sys_id>eadf67c52f332010e8c5e93df699b63c</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>x_126749_aws_sc.config.name.resourceId</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_properties_eadf67c52f332010e8c5e93df699b63c</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <type>boolean</type>
+        <value>false</value>
+        <write_roles/>
+    </sys_properties>
+    <sys_translated_text action="delete_multiple" query="documentkey=eadf67c52f332010e8c5e93df699b63c"/>
+</record_update>

@@ -1,0 +1,416 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.AwsCredentials</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>AwsCredentials</name>
+        <script><![CDATA[/**
+ * AwsCredentials uses AWS STS to obtain credentials in the context of ServiceNow users and roles.
+ * @namespace
+ */
+var AwsCredentials = /** @class */ (function () {
+    function AwsCredentials(account) {
+        Util.assertExists(account, 'Account is missing');
+        this.account = account;
+    }
+    AwsCredentials.from = function (object) {
+        Util.assertExists(object, 'Cannot get credentials from unset object');
+        if (object.awsaccesskeysyncuser !== undefined && object.awsaccesskeyenduser !== undefined) {
+            return new AwsCredentials(object);
+        }
+        if (object.awsprovidername !== undefined) {
+            return AwsCredentials.from(object.awsaccount.getRefRecord());
+        }
+        if (object.awsportfolio !== undefined) {
+            return AwsCredentials.from(object.awsportfolio.getRefRecord());
+        }
+        if (object.awstargettype !== undefined) {
+            return AwsCredentials.from(object.awsaccount.getRefRecord());
+        }
+        if (object.awsaccount !== undefined) {
+            return AwsCredentials.from(object.awsaccount.getRefRecord());
+        }
+        if (object.awsidempotencytoken !== undefined) {
+            return AwsCredentials.from(ProvisionedProduct.from(object.sys_id.toString()));
+        }
+        if (object.meta !== undefined) {
+            var meta = void 0;
+            try {
+                meta = JSON.parse(object.meta);
+            }
+            catch (e) {
+                throw new Error("Cannot get credentials from the record producer \"meta\" JSON object");
+            }
+            var accountGr = new GlideRecord('x_126749_aws_sc_account');
+            if (!accountGr.get(meta.account) || !accountGr.isValidRecord()) {
+                throw new Error("Cannot get credentials from the record producer because the AWS account is invalid");
+            }
+            return AwsCredentials.from(accountGr);
+        }
+        if (object instanceof ProvisionedProduct) {
+            return AwsCredentials.from(object.getProduct());
+        }
+        if (object.awsautomationexecutionid !== undefined) {
+            return AwsCredentials.from(AutomationExecution.from(object.sys_id.toString()));
+        }
+        if (object instanceof AutomationExecution) {
+            return AwsCredentials.from(object.getAccount());
+        }
+        throw new Error("Cannot get credentials from object \"".concat(object.sys_id, "\""));
+    };
+    AwsCredentials.prototype.as = function (user) {
+        switch (user) {
+            case AwsCredentials.User.Sync:
+                return {
+                    identity: this.account.awsaccesskeysyncuser.toString(),
+                    secret: Util.getDecryptedValue(this.account.awssecretaccesskeysyncuser)
+                };
+            case AwsCredentials.User.End:
+                return {
+                    identity: this.account.awsaccesskeyenduser.toString(),
+                    secret: Util.getDecryptedValue(this.account.awssecretaccesskeyenduser)
+                };
+            default:
+                throw new Error("Cannot get credentials. User ".concat(user, " is not defined"));
+        }
+    };
+    AwsCredentials.prototype.validate = function () {
+        var regions = new GlideRecord('x_126749_aws_sc_account_sync');
+        regions.addQuery('awsaccount', this.account.sys_id.toString());
+        regions.query();
+        var errors = [];
+        while (regions.next()) {
+            var region = regions.awsregion.toString();
+            try {
+                var accountNumberSync = new AwsSecurityTokenService(region, this.as(AwsCredentials.User.Sync)).getCallerIdentity().Account;
+                var accountNumberEnd = new AwsSecurityTokenService(region, this.as(AwsCredentials.User.End)).getCallerIdentity().Account;
+                if (accountNumberSync !== accountNumberEnd) {
+                    throw new Error('The Sync User and End User are within different AWS accounts.');
+                }
+                if (!this.account.awsaccountnumber.nil() && accountNumberSync !== this.account.awsaccountnumber.toString()) {
+                    throw new Error("The given credentials don't match the current account ID (".concat(this.account.awsaccountnumber.toString(), ")"));
+                }
+            }
+            catch (ex) {
+                errors.push({
+                    region: region,
+                    error: ex.message,
+                    service: 'AWS Services Management Connector'
+                });
+                continue;
+            }
+            var awsSystemsManager = new AwsSystemsManager(region, this.as(AwsCredentials.User.Sync));
+            if (this.account.awsenableservicecatalog) {
+                var serviceNameSC = 'AWS Service Catalog';
+                gs.debug("Validating ".concat(serviceNameSC, " for ").concat(this.account.awsaccountnumber, " in ").concat(region, "..."));
+                var serviceCatalogSync = new AwsServiceCatalog(region, this.as(AwsCredentials.User.Sync));
+                var serviceCatalogResponseSyncUser = serviceCatalogSync.searchProductsAsAdmin({ PageSize: 1 });
+                // Returns a 400 error instead of 403  code when the user is not authorized
+                if (serviceCatalogResponseSyncUser.haveError()) {
+                    var msg = Util.explainError(serviceCatalogResponseSyncUser.deserialize());
+                    this.pushError(region, msg, serviceNameSC, errors);
+                }
+                var serviceCatalogEnd = new AwsServiceCatalog(region, this.as(AwsCredentials.User.End));
+                var serviceCatalogResponseEndUser = serviceCatalogEnd.searchProducts({ PageSize: 1 });
+                // Returns a 400 error instead of 403  code when the user is not authorized
+                if (serviceCatalogResponseEndUser.haveError()) {
+                    var msg = Util.explainError(serviceCatalogResponseEndUser.deserialize());
+                    this.pushError(region, msg, serviceNameSC, errors);
+                }
+            }
+            if (this.account.awsenableconfig) {
+                var serviceNameConfig = 'AWS Config';
+                gs.debug("Validating ".concat(serviceNameConfig, " for ").concat(this.account.awsaccountnumber, " in ").concat(region, "..."));
+                var configService = new AwsConfig(region, this.as(AwsCredentials.User.Sync));
+                var configResponse = configService.selectResourceConfig("SELECT resourceId  WHERE resourceType = 'validation:externalResourceType'");
+                if (configResponse.isRequestNotAuthorized()) {
+                    var msg = Util.explainError(configResponse.deserialize());
+                    this.pushError(region, msg, serviceNameConfig, errors);
+                }
+            }
+            if (this.account.awsenablesystemsmanager) {
+                gs.debug("Validating AWS Systems Manager for ".concat(this.account.awsaccountnumber, " in ").concat(region, "..."));
+                var systemsManagerResponse = awsSystemsManager.listDocuments({
+                    Filters: [
+                        {
+                            Key: 'Owner',
+                            Values: ['Self']
+                        }, {
+                            Key: 'tag:tagName',
+                            Values: ['DoesNotExist']
+                        }
+                    ]
+                });
+                if (systemsManagerResponse.haveError()) {
+                    var msg = Util.explainError(systemsManagerResponse.deserialize());
+                    this.pushError(region, msg, 'AWS Systems Manager - Automation', errors);
+                }
+            }
+            if (this.account.awsenablesecurityhub) {
+                var serviceNameSecurityHub = 'AWS Security Hub';
+                gs.debug("Validating ".concat(serviceNameSecurityHub, " in for ").concat(this.account.awsaccountnumber, " ").concat(region, "..."));
+                this.validateSQSQueue(region, serviceNameSecurityHub, gs.getProperty(C.sysprop.securityHubSyncSQSName), errors);
+                var serviceSecHub = new AwsSecurityHub(region, this.as(AwsCredentials.User.Sync));
+                // Returns 403 when the securityLabel or severityLabel contain invalid values
+                var secHubResponse = serviceSecHub.batchUpdateFindings('findingArn', 'productArn', 'LOW', 'NEW');
+                if (secHubResponse.isRequestNotAuthorized()) {
+                    var msg = Util.explainError(secHubResponse.deserialize());
+                    this.pushError(region, msg, serviceNameSecurityHub, errors);
+                }
+            }
+            if (this.account.awsenableopscenter) {
+                var serviceNameOpsCenter = 'AWS Systems Manager - OpsCenter';
+                gs.debug("Validating ".concat(serviceNameOpsCenter, " in for ").concat(this.account.awsaccountnumber, " ").concat(region, "..."));
+                var describeOpsItemsResponse = awsSystemsManager.describeOpsItems({
+                    OpsItemFilters: [
+                        {
+                            Key: 'OpsItemId',
+                            Operator: 'Equal',
+                            Values: ['DoesNotExist']
+                        }
+                    ]
+                });
+                if (describeOpsItemsResponse.isRequestNotAuthorized()) {
+                    var msg = Util.explainError(describeOpsItemsResponse.deserialize());
+                    this.pushError(region, msg, serviceNameOpsCenter, errors);
+                }
+                var updateOpsItemResponse = awsSystemsManager.updateOpsItem({
+                    OpsItemId: 'DoesNotExist'
+                });
+                if (updateOpsItemResponse.isRequestNotAuthorized()) {
+                    var msg = Util.explainError(updateOpsItemResponse.deserialize());
+                    this.pushError(region, msg, serviceNameOpsCenter, errors);
+                }
+            }
+            if (this.account.awsenablechangemanager) {
+                this.validateChangeManager(region, awsSystemsManager, errors);
+            }
+            if (this.account.awsenablehealthdashboard) {
+                this.validateHealth(region, errors);
+            }
+            if (this.account.awsenableincidentmanager) {
+                this.validateIncidentManagerApi(region, errors, awsSystemsManager);
+            }
+        } // END looping over regions
+        if (this.account.awsenablesupport) {
+            this.validateSupportApi(errors);
+        }
+        return errors;
+    };
+    //TODO use api more specific to change manager once it has been written
+    AwsCredentials.prototype.validateChangeManager = function (region, awsSystemsManager, errors) {
+        gs.debug("Validating AWS Change Manager for ".concat(this.account.awsaccountnumber, " in ").concat(region, "..."));
+        var changeManagerResponse = awsSystemsManager.listDocuments({
+            Filters: [
+                {
+                    Key: 'Owner',
+                    Values: ['Self']
+                }, {
+                    Key: 'tag:tagName',
+                    Values: ['DoesNotExist']
+                }
+            ]
+        });
+        if (changeManagerResponse.haveError()) {
+            var msg = Util.explainError(changeManagerResponse.deserialize());
+            this.pushError(region, msg, 'AWS Systems Manager - Change Manager', errors);
+        }
+        // optional CloudTrail Event Data Lake integration
+        this.validateChangeManagerCloudTrail(region, errors);
+    };
+    // Support API only operates in two regions: us-east-1 for non-govcloud accounts and us-gov-west-1 for govcloud accounts
+    AwsCredentials.prototype.validateSupportApi = function (errors) {
+        gs.info("Validating AWS Support in ".concat(this.account.awsaccountnumber, " ..."));
+        var awsSupport = new AwsSupport(this.account.sys_id.toString(), this.as(AwsCredentials.User.Sync));
+        var supportErrors = [];
+        var region; // only region
+		if(awsSupport.useGovCloudEndpoint){
+			region = "us-gov-west-1";
+		} else if(awsSupport.useBeijingRegionEndpoint){
+			region = "cn-north-1";
+		} else if(awsSupport.useNingxiaRegionEndpoint){
+			region = "cn-northwest-1";
+		} else {
+			region = "us-east-1";
+		}
+        this.validateSQSQueue(region, 'AWS Support', gs.getProperty(C.sysprop.supportSQSName), errors);
+        this.verifyApiResponseIsAuthorised('AWS Support', awsSupport.describeCases({
+            "includeCommunications": false,
+            "includeResolvedCases": false,
+            "language": "en",
+            "maxResults": 10,
+        }), "DescribeCases", supportErrors);
+        this.verifyApiResponseIsAuthorised('AWS Support', awsSupport.describeServices({
+            "language": "en",
+        }), "DescribeServices", supportErrors);
+        this.verifyApiResponseIsAuthorised('AWS Support', awsSupport.createCase({
+            subject: "TEST - Please Ignore",
+            communicationBody: "Testing permissions",
+            attachmentSetId: "Does Not Exist - should prevent creation of case",
+        }), "CreateCase", supportErrors);
+        this.verifyApiResponseIsAuthorised('AWS Support', awsSupport.addCommunicationToCase({
+            communicationBody: "Testing permissions",
+            caseId: "Does Not Exist - should prevent creation of case",
+            attachmentSetId: "Does Not Exist - should prevent creation of case",
+        }), "AddCommunicationToCase", supportErrors);
+        this.verifyApiResponseIsAuthorised('AWS Support', awsSupport.addAttachmentsToSet({
+            attachmentSetId: "Does Not Exist - should prevent creation of case",
+            attachments: [],
+        }), "AddAttachmentsToSet", supportErrors);
+        this.verifyApiResponseIsAuthorised('AWS Support', awsSupport.resolveCase({
+            caseId: "Does Not Exist - should prevent resolution of case"
+        }), "ResolveCase", supportErrors);
+        //dedupe supportErrors
+        // - no point reporting identical 'subscription required' message n times.
+        var service = 'AWS Support';
+        var unique = {};
+        supportErrors.forEach(function (error) { return unique[error] = true; });
+        Object.keys(unique).forEach(function (error) {
+            return errors.push({ error: error, service: service, region: region });
+        });
+    };
+    AwsCredentials.prototype.validateHealth = function (region, errors) {
+        gs.info("Validating AWS Health in ".concat(this.account.awsaccountnumber, " in ").concat(region, "..."));
+        this.validateSQSQueue(region, 'AWS Health', gs.getProperty(C.sysprop.healthSQSName), errors);
+    };
+    AwsCredentials.prototype.validateChangeManagerCloudTrail = function (region, validateResults) {
+        var service = 'AWS Systems Manager Change Manager - CloudTrail Event Lake';
+        gs.debug("Validating ".concat(service, " for ").concat(this.account.awsaccountnumber, " in ").concat(region, "..."));
+        var errors = [];
+        var aws = new AwsCloudTrail(region, this.as(AwsCredentials.User.Sync));
+        var QueryId = '1234-does-not-exist';
+        var dataStoreName = gs.getProperty(C.sysprop.changeManagerEventDataStoreName);
+        var EventDataStore = dataStoreName || '1234-does-not-exist';
+        var QueryStatement = 'do-nothing';
+        this.verifyApiResponseIsAuthorised(service, aws.listEventDataStores(), 'ListEventDataStores', errors);
+        if (dataStoreName !== '' && errors.length === 0) {
+            // only do this test if the authorised test didn't fail
+            var found_1 = false;
+            aws.listEventDataStores().forEach(function (dataStore) { return found_1 || (found_1 = dataStore.Name === dataStoreName); });
+            if (!found_1) {
+                errors.push("CloudTrail Event Data Store named '".concat(EventDataStore, "' not found in ").concat(region));
+            }
+        }
+        this.verifyApiResponseIsAuthorised(service, aws.startQuery({ QueryStatement: QueryStatement }), 'StartQuery', errors);
+        this.verifyApiResponseIsAuthorised(service, aws.describeQuery({ QueryId: QueryId, EventDataStore: EventDataStore }), 'DescribeQuery', errors);
+        this.verifyApiResponseIsAuthorised(service, aws.getQueryResults({ QueryId: QueryId, EventDataStore: EventDataStore }), 'GetQueryResults', errors);
+        var level = dataStoreName === ''
+            ? AwsCredentials.ValidateResultLevel.INFO
+            : AwsCredentials.ValidateResultLevel.ERROR;
+        errors.forEach(function (error) {
+            return validateResults.push({ region: region, error: error, service: service, level: level });
+        });
+    };
+    AwsCredentials.prototype.validateIncidentManagerApi = function (region, errors, awsSystemsManager) {
+        var serviceName = 'AWS Systems Manager - Incident Manager';
+        gs.debug("Validating ".concat(serviceName, " for ").concat(this.account.awsaccountnumber, " in ").concat(region, "..."));
+        var incidentManagerErrors = [];
+        var incidentManagerSync = new AwsSystemsManagerIncidentManager(region, this.as(AwsCredentials.User.Sync));
+        //Sync User API list: listIncidentRecords, getIncidentRecord, listTimelineEvents, updateRelatedItems
+        this.verifyApiResponseIsAuthorised(serviceName, incidentManagerSync.listIncidentRecords({}), "ListsIncidentRecords", incidentManagerErrors);
+        this.verifyApiResponseIsAuthorised(serviceName, incidentManagerSync.getIncidentRecord({ arn: "arn:aws:ssm-incidents::".concat(this.account.awsaccountnumber, ":incident-record/Test-Response-Plan/DoNotExist") }), "GetIncidentRecord", incidentManagerErrors);
+        this.verifyApiResponseIsAuthorised(serviceName, incidentManagerSync.listTimelineEvents({ incidentRecordArn: "arn:aws:ssm-incidents::".concat(this.account.awsaccountnumber, ":incident-record/Test-Response-Plan/DoNotExist") }), "ListTimelineEvents", incidentManagerErrors);
+        this.verifyApiResponseIsAuthorised(serviceName, incidentManagerSync.getTimelineEvent({
+            eventId: "DoNotExist",
+            incidentRecordArn: "arn:aws:ssm-incidents::".concat(this.account.awsaccountnumber, ":incident-record/Test-Response-Plan/DoNotExist"),
+        }), "GetTimelineEvent", incidentManagerErrors);
+        this.verifyApiResponseIsAuthorised(serviceName, incidentManagerSync.updateRelatedItems({
+            incidentRecordArn: "arn:aws:ssm-incidents::".concat(this.account.awsaccountnumber, ":incident-record/Test-Response-Plan/DoNotExist"),
+            relatedItemsUpdate: {
+                itemToRemove: {
+                    type: "OTHER",
+                    value: {
+                        url: "https://do-not-exist.com"
+                    }
+                }
+            }
+        }), "UpdateRelatedItems", incidentManagerErrors);
+        this.verifyApiResponseIsAuthorised(serviceName, incidentManagerSync.updateIncidentRecord({
+            arn: "arn:aws:ssm-incidents::".concat(this.account.awsaccountnumber, ":incident-record/Test-Response-Plan/DoNotExist"),
+            title: "New Title"
+        }), "UpdateIncidentRecord", incidentManagerErrors);
+        this.verifyApiResponseIsAuthorised(serviceName, awsSystemsManager.listOpsItemRelatedItems('1234-DoNotExists'), "ListOpsItemRelatedItems", incidentManagerErrors);
+        var unique = {};
+        incidentManagerErrors.forEach(function (error) { return unique[error] = true; });
+        Object.keys(unique).forEach(function (error) {
+            return errors.push({ region: region, error: error, service: serviceName });
+        });
+    };
+    AwsCredentials.prototype.verifyApiResponseIsAuthorised = function (service, response, action, errors) {
+        try {
+            var responseData = response.deserialize();
+            if (responseData['__type'] === 'SubscriptionRequiredException'
+                || response.isRequestUnrecognized()) {
+                var error = responseData['message'];
+                errors.push(error);
+            }
+            else if (response.isRequestNotAuthorized()) {
+                var error = Util.explainError(responseData) ||
+                    "An unknown problem occurred validating ".concat(service, ".").concat(action, " ") +
+                        "for ".concat(this.account.awsaccountnumber, ".");
+                errors.push(error);
+                gs.error(error);
+            }
+            else {
+                // Expected forced errors are not reported to the user
+                gs.info("Validated ".concat(service, ".").concat(action, " okay ") +
+                    "for ".concat(this.account.awsaccountnumber, "."));
+            }
+        }
+        catch (e) {
+            var error = "Unexpected error processing response for " +
+                "".concat(service, ".").concat(action, ": ").concat(JSON.stringify(e));
+            errors.push(error);
+            gs.error(error);
+        }
+    };
+    AwsCredentials.prototype.validateSQSQueue = function (region, serviceName, queueName, errors) {
+        var serviceSqs = new AwsSqs(region, this.as(AwsCredentials.User.Sync), 60);
+        var sqsResponse = serviceSqs.getSqsMessages(this.account.awsaccountnumber.toString(), queueName, 1);
+        if (sqsResponse.haveError()) {
+            var msg = Util.explainError(sqsResponse.deserialize());
+            this.pushError(region, msg, serviceName, errors);
+        }
+    };
+    AwsCredentials.prototype.pushError = function (region, msg, service, errors, level) {
+        if (level === void 0) { level = AwsCredentials.ValidateResultLevel.ERROR; }
+        errors.push({
+            level: level,
+            region: region,
+            service: service,
+            error: msg || "An unknown problem occurred validating account for ".concat(service, "."),
+        });
+    };
+    return AwsCredentials;
+}());
+(function (AwsCredentials) {
+    var User;
+    (function (User) {
+        User[User["Sync"] = 0] = "Sync";
+        User[User["End"] = 1] = "End";
+    })(User = AwsCredentials.User || (AwsCredentials.User = {}));
+    var ValidateResultLevel;
+    (function (ValidateResultLevel) {
+        ValidateResultLevel[ValidateResultLevel["INFO"] = 0] = "INFO";
+        ValidateResultLevel[ValidateResultLevel["WARN"] = 1] = "WARN";
+        ValidateResultLevel[ValidateResultLevel["ERROR"] = 2] = "ERROR";
+    })(ValidateResultLevel = AwsCredentials.ValidateResultLevel || (AwsCredentials.ValidateResultLevel = {}));
+})(AwsCredentials || (AwsCredentials = {}));
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2017-10-10 13:38:14</sys_created_on>
+        <sys_id>ff68631c4f750300c5883b728110c7fa</sys_id>
+        <sys_mod_count>2</sys_mod_count>
+        <sys_name>AwsCredentials</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_ff68631c4f750300c5883b728110c7fa</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2023-03-14 18:59:51</sys_updated_on>
+    </sys_script_include>
+</record_update>

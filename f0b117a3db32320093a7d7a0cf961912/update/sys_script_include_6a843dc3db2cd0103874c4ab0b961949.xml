@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.EbsVolumeResourceType</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>EbsVolumeResourceType</name>
+        <script><![CDATA[var EbsVolumeResourceType = /** @class */ (function (_super) {
+    Polyfill.__extends(EbsVolumeResourceType, _super);
+    function EbsVolumeResourceType() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    EbsVolumeResourceType.prototype.rules = function () {
+        return [{
+                order: 9,
+                syncType: ConfigSyncProvider.SYNC_DIR.FROM_AWS_CONFIG,
+                externalResourceType: 'AWS::EC2::Volume',
+                externalResourceId: 'resourceId',
+                snTable: 'cmdb_ci_storage_volume',
+                syncFromAws: this.syncFromAws,
+            }];
+    };
+    EbsVolumeResourceType.prototype.fields = function () {
+        var _this = this;
+        return [{
+                mode: ConfigSyncProvider.FieldMode.FromAws,
+                snField: 'state',
+                transformFromAws: function (object) { return _this.getState(object); }
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromAws,
+                snField: 'storage_type',
+                transformFromAws: function (object) { return 'block'; }
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromAws,
+                snField: 'volume_id',
+                awsField: 'item.resourceId'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromAws,
+                snField: 'name',
+                transformFromAws: function (object, context) {
+                    var name = ((object.data.tags || []).filter(function (tag) { return tag.key === 'Name'; })[0] || {}).value;
+                    return (context && context.resourceIdAsName) || !name
+                        ? object.item.resourceId : name;
+                }
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromAws,
+                snField: 'size_bytes',
+                transformFromAws: function (object) { return object.data.size * 1073741824; } //1024 * 1024 * 1024
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromAws,
+                snField: 'terminated_on',
+                awsField: 'item.resourceDeletionTime'
+            }];
+    };
+    EbsVolumeResourceType.prototype.relationships = function () {
+        return [
+            {
+                relationship: ConfigSyncProvider.RelationshipType.HostedOn,
+                externalResourceType: 'AWS::Region',
+                snTable: 'cmdb_ci_aws_datacenter',
+                documentationOnly: true
+            }
+        ];
+    };
+    EbsVolumeResourceType.prototype.syncFromAwsAddRelationships = function (context, config, resourceSysId) {
+        // Process relationships to AWS regions
+        this.addHostedOnRegionRelationship(context, config, resourceSysId);
+    };
+    EbsVolumeResourceType.prototype.getState = function (config) {
+        if (!config.data.hasOwnProperty('state')) {
+            return 'terminated';
+        }
+        switch (config.data.state.value) {
+            case 'in-use':
+                return 'in_use';
+            default:
+                return 'offline';
+        }
+    };
+    return EbsVolumeResourceType;
+}(AbstractResourceType));
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-05-07 19:52:31</sys_created_on>
+        <sys_id>6a843dc3db2cd0103874c4ab0b961949</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>EbsVolumeResourceType</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_6a843dc3db2cd0103874c4ab0b961949</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

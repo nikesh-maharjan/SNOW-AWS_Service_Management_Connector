@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.ProvisionedProductPlan</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>ProvisionedProductPlan</name>
+        <script><![CDATA[var ProvisionedProductPlan = /** @class */ (function () {
+    function ProvisionedProductPlan(plan, pp) {
+        this.ppPlanGr = plan;
+        if (pp) {
+            this.pp = pp;
+        }
+        else {
+            this.pp = ProvisionedProduct.from(plan.awsproduct);
+        }
+    }
+    /**
+     * Create a plan for the first deployment of a product.
+     */
+    ProvisionedProductPlan.forProvision = function (product, planParameters) {
+        var pp = ProvisionedProductRepo.createProvisionedProductFromRecordDetail(product, gs.getUserID(), Util.sessionNameForUser(), planParameters, 1 /* PREPROVISIONING */);
+        var provisionedProduct = new ProvisionedProduct(pp);
+        var account = product.awsportfolio.getRefRecord().awsaccount.getRefRecord();
+        var plan = this.forUpdate(provisionedProduct, planParameters, false, account);
+        // Set the ID of the newly-created product and try to create a PROVISION_PRODUCT event
+        // for the plan creation.
+        if (plan.success === true) {
+            var ppId = plan.result.ppPlanGr.awsprovisionproductid.toString();
+            pp.awsid = ppId;
+            pp.awsstatus = "PLAN_IN_PROGRESS";
+            pp.update();
+        }
+        else {
+            pp.deleteRecord();
+        }
+        return plan;
+    };
+    /**
+     * Create a plan for an update to a provisioned product.
+     * @param provisionedProduct The provisioned product the plan is destined for
+     * @param planParameters Inputs for the plan.
+     * @param forceCreate Delete the current plan, if any, before creating the plan.
+     * @param account The account to use to create a plan.
+     */
+    ProvisionedProductPlan.forUpdate = function (provisionedProduct, planParameters, forceCreate, account) {
+        if (provisionedProduct.hasPlan() && !forceCreate) {
+            return Util.failure("Provisioned product already has a plan");
+        }
+        var cred;
+        try {
+            cred = AwsCredentials.from(account || provisionedProduct).as(AwsCredentials.User.End);
+        }
+        catch (ex) {
+            return Util.failure("Authentication failure: " + ex.message);
+        }
+        var sc = new AwsServiceCatalog(provisionedProduct.getRegion(), cred);
+        if (provisionedProduct.hasPlan()) {
+            var maybeDelete = provisionedProduct.getPlan().deletePlan();
+            if (maybeDelete.success === false) {
+                return Util.failure("Unable to create new plan for " + provisionedProduct.getName() + " as deletion of existing plan failed: " + maybeDelete.reason);
+            }
+        }
+        //Numerical parameters cause a cast exception when included in a create plan call
+        planParameters.ProvisioningParameters.forEach(function (param) {
+            param.Value = param.Value === null || !param.Value ? '' : param.Value.toString();
+        });
+        var response = sc.createProvisionedProductPlan(planParameters.PlanName, planParameters.PlanType, planParameters.ProvisionedProductName, planParameters.ProductId, planParameters.PathId, planParameters.ProvisioningArtifactId, planParameters.ProvisioningParameters, planParameters.Tags, planParameters.IdempotencyToken);
+        if (response.haveError()) {
+            return Util.failure(Util.explainError(response.deserialize()), response.isRequestRetryable());
+        }
+        var planGr = ProvisionedProductRepo.createProvisionedProductPlan(provisionedProduct.gr(), response.deserialize());
+        return Util.success(new ProvisionedProductPlan(planGr, provisionedProduct));
+    };
+    ProvisionedProductPlan.from = function (planId, provisionedProduct) {
+        var pp = typeof provisionedProduct === "string"
+            ? ProvisionedProduct.from(provisionedProduct)
+            : provisionedProduct;
+        if (pp !== null) {
+            var planGr = new GlideRecord('x_126749_aws_sc_pp_plan');
+            if (planGr.get(planId)) {
+                return new ProvisionedProductPlan(planGr, pp);
+            }
+        }
+        return null;
+    };
+    ProvisionedProductPlan.prototype.deletePlan = function (credentials) {
+        var cred = credentials;
+        if (!cred) {
+            try {
+                cred = AwsCredentials.from(this.pp).as(AwsCredentials.User.End);
+            }
+            catch (ex) {
+                return Util.failure("Authentication failure: " + ex.message);
+            }
+        }
+        var sc = new AwsServiceCatalog(this.pp.getRegion(), cred);
+        var response = sc.deleteProvisionedProductPlan(this.getPlanId());
+        if (response.haveError()) {
+            return Util.failure(Util.explainError(response.deserialize()));
+        }
+        this.ppPlanGr.deleteRecord();
+        return Util.success(null);
+    };
+    ProvisionedProductPlan.prototype.describe = function (sync, credentials) {
+        if ((typeof sync !== "undefined" && sync) && this.isInProgress()) {
+            this.sync(credentials);
+        }
+        var description = {};
+        description.ProvisionedProductPlanDetails = {
+            CreatedTime: (!this.ppPlanGr.awscreatedtime.nil() ? new GlideDateTime(this.ppPlanGr.awscreatedtime).getNumericValue() : ''),
+            PathId: this.ppPlanGr.awspathid.toString(),
+            ProductId: this.ppPlanGr.awsproductid.toString(),
+            PlanName: this.ppPlanGr.awsplanname.toString(),
+            PlanId: this.ppPlanGr.awsplanid.toString(),
+            ProvisionProductId: this.ppPlanGr.awsprovisionproductid.toString(),
+            ProvisionProductName: this.ppPlanGr.awsprovisionproductname.toString(),
+            PlanType: this.ppPlanGr.awsplantype.toString(),
+            ProvisioningArtifactId: this.ppPlanGr.awsprovisioningartifactid.toString(),
+            Status: this.ppPlanGr.awsstatus.toString(),
+            UpdatedTime: (!this.ppPlanGr.awsupdatedtime.nil() ? new GlideDateTime(this.ppPlanGr.awsupdatedtime).getNumericValue() : ''),
+            StatusMessage: this.ppPlanGr.awsstatusmessage.toString(),
+        };
+        description.SyncStatus = this.ppPlanGr.awssyncstatus.toString();
+        description.LastSyncTime = (!this.ppPlanGr.awslastsynctime.nil() ? new GlideDateTime(this.ppPlanGr.awslastsynctime).getNumericValue() : '');
+        if (this.getStatus() !== "CREATE_IN_PROGRESS") {
+            var changes = [];
+            var rc = new GlideRecord('x_126749_aws_sc_pp_plan_rc');
+            rc.addQuery('awsplan', this.ppPlanGr.sys_id);
+            rc.query();
+            while (rc.next()) {
+                var scope = void 0;
+                try {
+                    scope = JSON.parse(rc.awsscope.toString());
+                }
+                catch (e) {
+                    scope = [];
+                }
+                changes.push({
+                    Action: rc.awsaction.toString(),
+                    LogicalResourceId: rc.awslogicalresourceid.toString(),
+                    PhysicalResourceId: rc.awsphysicalresourceid.toString(),
+                    ResourceType: rc.awsresourcetype.toString(),
+                    Replacement: rc.awsreplacement.toString(),
+                    Scope: scope,
+                });
+            }
+            description.ResourceChanges = changes;
+        }
+        return description;
+    };
+    /**
+     * Perform the DescribeProvisionedProductPlan API action and use its result to
+     * update the values of this plan.
+     */
+    ProvisionedProductPlan.prototype.sync = function (credentials) {
+        if (!credentials) {
+            try {
+                credentials = AwsCredentials.from(this.pp).as(AwsCredentials.User.Sync);
+            }
+            catch (ex) {
+                return this.updateSyncStatus(3 /* AUTH_FAILURE */);
+            }
+        }
+        // Use the first page to update the core plan details
+        var sc = new AwsServiceCatalog(this.pp.getRegion(), credentials);
+        var response = sc.describeProvisionedProductPlan(this.getPlanId(), {
+            PageSize: 20
+        });
+        if (response.haveError()) {
+            return this.updateSyncStatus(2 /* ERROR */);
+        }
+        var body = response.deserialize(), details = body.ProvisionedProductPlanDetails, changes = body.ResourceChanges;
+        // Save the resource changes if:
+        // * the response body contains them
+        // * they have not already been saved: no records in plan_rc for this plan.
+        // * every page of resource changes is loadable now.
+        if (Array.isArray(changes) && changes.length > 0) {
+            var rcExists = new GlideRecord('x_126749_aws_sc_pp_plan_rc');
+            rcExists.addQuery('awsplan', this.ppPlanGr.sys_id);
+            rcExists.setLimit(1);
+            rcExists.query();
+            if (!rcExists.hasNext()) {
+                // Changes are paginated. Only continue if they all load successfully.
+                var allChanges = response.collectAll();
+                if (!allChanges.success) {
+                    return this.updateSyncStatus(2 /* ERROR */);
+                }
+                for (var i = 0; i < allChanges.all.length; i++) {
+                    ProvisionedProductRepo.createPlanResourceChange(this.ppPlanGr, allChanges.all[i]);
+                }
+            }
+        }
+        ProvisionedProductRepo.updateProvisionedProductPlan(this.ppPlanGr, details);
+    };
+    ProvisionedProductPlan.prototype.execute = function (token) {
+        var cred;
+        try {
+            cred = AwsCredentials.from(this.pp).as(AwsCredentials.User.End);
+        }
+        catch (ex) {
+            return Util.failure("Authentication failure: " + ex.message);
+        }
+        gs.debug("Executing provisioned product plan " + this.getPlanId() + " on " + this.pp.getName());
+        var sc = this.pp._getServiceCatalog(this.pp.getRegion(), cred);
+        var response = sc.executeProvisionedProductPlan(this.getPlanId(), token), body = response.deserialize();
+        if (!response.haveError()) {
+            this.pp.gr().awsstatus = "UNDER_CHANGE" /* UNDER_CHANGE */;
+            this.pp.gr().awsproductstatus = 2 /* PROVISIONING */;
+            this.ppPlanGr.awsstatus = "EXECUTE_IN_PROGRESS";
+            this.ppPlanGr.update();
+            return Util.success(body);
+        }
+        else {
+            return Util.failure(Util.explainError(body), response.isRequestRetryable());
+        }
+    };
+    /**
+     * @return the ID of this plan in AWS.
+     */
+    ProvisionedProductPlan.prototype.getPlanId = function () {
+        return this.ppPlanGr.awsplanid.toString();
+    };
+    ProvisionedProductPlan.prototype.getProvisionedProduct = function () {
+        return this.pp;
+    };
+    /**
+     * @param sync {boolean}
+     *      Synchronize the plan with AWS Service Catalog if it is currently
+     *      CREATE_IN_PROGRESS or EXECUTE_IN_PROGRESS.
+     * @return the status of this plan in AWS.
+     */
+    ProvisionedProductPlan.prototype.getStatus = function (sync) {
+        if ((typeof sync !== "undefined" && sync) && this.isInProgress()) {
+            this.sync();
+        }
+        return this.ppPlanGr.awsstatus.toString();
+    };
+    ProvisionedProductPlan.prototype.getSysId = function () {
+        return this.ppPlanGr.sys_id.toString();
+    };
+    /**
+     * True if this plan is CREATE_IN_PROGRESS or EXECUTE_IN_PROGRESS.
+     */
+    ProvisionedProductPlan.prototype.isInProgress = function () {
+        var status = this.ppPlanGr.awsstatus.toString();
+        return status === "CREATE_IN_PROGRESS" || status === "EXECUTE_IN_PROGRESS";
+    };
+    ProvisionedProductPlan.prototype.updateSyncStatus = function (status) {
+        this.ppPlanGr.awssyncstatus = status;
+        this.ppPlanGr.update();
+    };
+    return ProvisionedProductPlan;
+}());
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-03-12 11:48:59</sys_created_on>
+        <sys_id>1107b2cfdb0033006c85ab7dca961976</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>ProvisionedProductPlan</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_1107b2cfdb0033006c85ab7dca961976</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

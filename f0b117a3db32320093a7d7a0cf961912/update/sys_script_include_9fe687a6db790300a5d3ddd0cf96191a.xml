@@ -1,0 +1,550 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.ProvisionedProduct</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>ProvisionedProduct</name>
+        <script><![CDATA[/**
+ * Create an instance.
+ * @classdesc Functions to act on provisioned products.
+ * @class ProvisionedProduct
+ * @param product {GlideRecord} A GlideRecord for a provisioned product.
+ * @param [authenticator] {Object} Optional authenticator. Defaults to AwsCredentials. Deprecated since 2.0.
+ */
+var ProvisionedProduct = /** @class */ (function () {
+    function ProvisionedProduct(product) {
+        var _this = this;
+        this.actions = {
+            terminate: function () {
+                return ProvisionedProductAction.terminate(_this);
+            },
+            update: function () {
+                return ProvisionedProductAction.update(_this);
+            },
+            executeServiceAction: function () {
+                return ProvisionedProductAction.executeServiceAction(_this);
+            },
+            executePlan: function () {
+                return ProvisionedProductAction.executePlan(_this);
+            }
+        };
+        this.product = product;
+    }
+    /**
+     * Create a ProvisionedProduct instance from a sys ID.
+     * @param sysId {String}
+     * @returns {ProvisionedProduct} A ProvisionedProduct instance or null if no provisioned product exists with the given ID.
+     * @memberof! ProvisionedProduct
+     * @alias from
+     */
+    ProvisionedProduct.from = function (sysId) {
+        var provisionedProductGr = new GlideRecord('x_126749_aws_sc_cmdb_ci_pp');
+        if (provisionedProductGr.get(sysId)) {
+            return new ProvisionedProduct(provisionedProductGr);
+        }
+        return null;
+    };
+    /**
+     * Tests whether userId is the owner of any provisioned product.
+     * @param userId {string} The sys_id of a user.
+     * @returns {boolean}
+     * @memberof! ProvisionedProduct
+     * @alias isOwner
+     */
+    ProvisionedProduct.isOwner = function (userId) {
+        Util.assertExists(userId, "userId");
+        var provisionedProductGr = new GlideRecord('x_126749_aws_sc_cmdb_ci_pp');
+        provisionedProductGr.addQuery('owned_by', userId);
+        provisionedProductGr.setLimit(1);
+        provisionedProductGr.query();
+        return provisionedProductGr.hasNext();
+    };
+    ProvisionedProduct.prototype.actionNamed = function (name) {
+        if (name in this.actions) {
+            return this.actions[name]();
+        }
+        throw new Error('Unrecognised action: ' + name);
+    };
+    ProvisionedProduct.prototype.transitionStatusOnResponseError = function (product, errorType) {
+        var productStatus = parseInt(product.awsproductstatus.toString());
+        // A product disappears once it has been terminated.
+        if (productStatus === ProvisionedProduct.Status.terminating &&
+            (errorType === "AccessDeniedException" || errorType === "ResourceNotFoundException")) {
+            product.awsproductstatus = ProvisionedProduct.Status.terminated;
+            product.awssyncstatus = 'NULL';
+            product.awsstatus = 'NULL';
+            product.awsstatusmessage = 'NULL';
+        }
+        else {
+            product.awssyncstatus = 2 /* ERROR */;
+        }
+    };
+    ProvisionedProduct.prototype.transitionStatusOnResponseOk = function (product, responseDetail) {
+        var currentProdStatus = parseInt(product.awsproductstatus.toString()), newAwsStatus = responseDetail.Status;
+        product.awssyncstatus = 1 /* OK */;
+        if (currentProdStatus === ProvisionedProduct.Status.provisioning &&
+            (newAwsStatus === "AVAILABLE" || (newAwsStatus === "TAINTED" && product.awstype !='TERRAFORM_OPEN_SOURCE'))) {
+            product.awsproductstatus = ProvisionedProduct.Status.provisioned;
+        }
+        else if (newAwsStatus === "ERROR" || (newAwsStatus === "TAINTED" && product.awstype =='TERRAFORM_OPEN_SOURCE') ) {
+            product.awsproductstatus = ProvisionedProduct.Status.error;
+        }
+    };
+    /**
+     * Get the most recent values for the different aspects of the provisioned product.
+     *
+     * @return {Object} An object with the aspect values from the latest event for the product, or null if none found.
+     */
+    ProvisionedProduct.prototype.getLatestProductAspectValues = function () {
+        var result = {
+            "ProductId": this.getProductId(),
+            "ProductStatus": this.product.awsproductstatus.getChoiceValue(),
+            "ProvisionedProductName": this.getName(),
+            "ProvisionedProductId": this.getId(),
+            "ProvisionedProductType": this.getType(),
+            "ProvisioningArtifactId": this.getProvisioningArtifactId(),
+            "UpdatedOn": new GlideDateTime(this.product.sys_updated_on).getNumericValue()
+        };
+        if (!this.product.awsplan.nil()) {
+            result['PlanSysId'] = this.product.getValue('awsplan');
+        }
+        var ppeGR = new GlideRecord('x_126749_aws_sc_pp_event');
+        ppeGR.addQuery('awsproduct', this.product.sys_id);
+        ppeGR.orderByDesc('sys_updated_on');
+        ppeGR.setLimit(1);
+        ppeGR.query();
+        if (ppeGR.next()) {
+            result.PathId = ppeGR.awspathid.toString();
+        }
+        return result;
+    };
+    /**
+     * Sets the product's <code>awssyncstatus</code> and <code>awsproductstatus</code>.
+     * @param describeResponse {WrappedResponse} The result of a DescribeProvisionedProduct request.
+     * @private
+     * @memberOf! ProvisionedProduct#
+     * @alias _transitionStatuses
+     */
+    ProvisionedProduct.prototype._transitionStatuses = function (describeResponse) {
+        if (describeResponse.haveError()) {
+            var errorType = describeResponse.deserialize()["__type"];
+            this.transitionStatusOnResponseError(this.product, errorType);
+        }
+        else {
+            this.transitionStatusOnResponseOk(this.product, describeResponse.deserialize().ProvisionedProductDetail);
+        }
+    };
+    /**
+     * Updates this product with the latest data from AWS Service Catalog.
+     *
+     * Sets the product's <code>syncStatus</code> to <code>authFailure</code> and returns
+     * immediately when a credential cannot be obtained. Otherwise, performs the AWS Service Catalog
+     * <code>DescribeProvisionedProduct</code> action and updates the product's properties.
+     *
+     * @memberof! ProvisionedProduct#
+     * @alias sync
+     */
+    ProvisionedProduct.prototype.sync = function () {
+        var cred;
+        try {
+            cred = AwsCredentials.from(this.product).as(AwsCredentials.User.Sync);
+            var sc = this._getServiceCatalog(this.product.awsregion.toString(), cred);
+            var response_1 = sc.describeProvisionedProduct(this.product.awsid.toString());
+            this._transitionStatuses(response_1);
+            if (!response_1.haveError()) {
+                var data = response_1.getJsonBody().ProvisionedProductDetail;
+                this.product.awsarn = data.Arn;
+                this.product.awscreatedtime = Util.toGlideDateTime(data.CreatedTime);
+                this.product.awsid = data.Id;
+                this.product.awsidempotencytoken = data.IdempotencyToken;
+                this.product.awslastrecordid = data.LastRecordId;
+                this.product.awsname = data.Name;
+                this.product.awsstatus = data.Status;
+                this.product.awsprovisioningartifactid = data.ProvisioningArtifactId;
+                // StatusMessage may be unset.
+                Util.setValue(this.product, 'awsstatusmessage', data.StatusMessage);
+                this.product.awstype = data.Type;
+            }
+        }
+        catch (ex) {
+            this.product.awssyncstatus = 3 /* AUTH_FAILURE */;
+        }
+        this.product.update();
+        if (this.hasPlan()) {
+            var plan = this.getPlan();
+            if (plan.isInProgress()) {
+                plan.sync();
+            }
+        }
+    };
+    /**
+     * @returns {string} The name given to this provisioned product.
+     * @memberof! ProvisionedProduct#
+     * @alias getName
+     */
+    ProvisionedProduct.prototype.getName = function () {
+        return this.product.awsname.toString();
+    };
+    /**
+     * @returns {string} The AWS Service Catalog ID of this provisioned product.
+     * @memberof! ProvisionedProduct#
+     * @alias getId
+     */
+    ProvisionedProduct.prototype.getId = function () {
+        return this.product.awsid.toString();
+    };
+    ProvisionedProduct.prototype.getPlan = function () {
+        if (!this.hasPlan()) {
+            return null;
+        }
+        return new ProvisionedProductPlan(this.product.awsplan.getRefRecord(), this);
+    };
+    /**
+     * @returns {servicenow.Product} The GlideRecord object backing the product from which this provisioned product is from, or null if it cannot be determine.
+     * @memberof! ProvisionedProduct#
+     * @alias getProduct
+     */
+    ProvisionedProduct.prototype.getProduct = function () {
+        var reqItemGr = new GlideRecord('sc_req_item');
+        reqItemGr.addQuery('configuration_item', '=', this.getSysId());
+        reqItemGr.query();
+        if (reqItemGr.next() && !reqItemGr.cat_item.nil()) {
+            return reqItemGr.cat_item.getRefRecord();
+        }
+        // In the case of a pre-provisioned product (i.e. has a plan but is not yet provisioned) we don't have yet a
+        // requested item therefore we need to do a manual lookup on the product table
+        var productGr = new GlideRecord('x_126749_aws_sc_product');
+        productGr.addQuery('awsproductid', this.getProductId());
+        productGr.query();
+        return productGr.next() ? productGr : null;
+    };
+    /**
+     * @returns {string} The AWS Service Catalog Product ID of this provisioned product.
+     * @memberof! ProvisionedProduct#
+     * @alias getProductId
+     */
+    ProvisionedProduct.prototype.getProductId = function () {
+        // Try to find it from an event in the case that it's not set on the pp
+        // (for any products that were provisioned before the column was added).
+        if (this.product.awsproductid.nil()) {
+            var e = new GlideRecord('x_126749_aws_sc_pp_event');
+            e.addQuery('awsproduct', this.product.sys_id);
+            e.addNotNullQuery('awsproductid');
+            e.setLimit(1);
+            e.query();
+            if (!e.next()) {
+                gs.warn("No known ProductId for " + this.getName());
+                return null;
+            }
+            this.product.awsproductid = e.awsproductid.toString();
+            this.product.update();
+        }
+        return this.product.awsproductid.toString();
+    };
+    /**
+     * @returns {string} The provisioning artifact ID of this product.
+     * @memberof! ProvisionedProduct#
+     * @alias getProvisioningArtifactId
+     */
+    ProvisionedProduct.prototype.getProvisioningArtifactId = function () {
+        // The value might be null if the product was provisioned before the column was added.
+        if (this.product.awsprovisioningartifactid.nil()) {
+            var e = new GlideRecord('x_126749_aws_sc_pp_event');
+            e.addQuery('awsproduct', this.product.sys_id);
+            e.addNotNullQuery('awsprovisioningartifactid');
+            e.orderByDesc('awscreatedtime');
+            e.setLimit(1);
+            e.query();
+            if (!e.next()) {
+                gs.warn("No known ProvisioningArtifactId for " + this.getName());
+                return null;
+            }
+            this.product.awsprovisioningartifactid = e.awsprovisioningartifactid.toString();
+            this.product.update();
+        }
+        return this.product.awsprovisioningartifactid.toString();
+    };
+    /**
+     * @returns {string} The AWS region that this product exists in.
+     * @memberof! ProvisionedProduct#
+     * @alias getRegion
+     */
+    ProvisionedProduct.prototype.getRegion = function () {
+        return this.product.awsregion.toString();
+    };
+    /**
+     * @returns {string} The ServiceNow id for this provisioned product.
+     * @memberof! ProvisionedProduct#
+     * @alias getSysId
+     */
+    ProvisionedProduct.prototype.getSysId = function () {
+        return this.product.sys_id.toString();
+    };
+    /**
+     * @returns {string}
+     *   The CloudFormation stack (or stack set) name of the provisioned product, or null if it could not be determined.
+     * @memberof! ProvisionedProduct#
+     * @alias getStackName
+     * @deprecated since 2.0 use getCloudFormationARN instead
+     */
+    ProvisionedProduct.prototype.getStackName = function () {
+        return this.getCloudFormationName();
+    };
+    /**
+     * @returns {string}
+     *    The status of this product in AWS
+     * @memberof! ProvisionedProduct#
+     * @alias getStatus
+     */
+    ProvisionedProduct.prototype.getStatus = function () {
+        return this.product.awsstatus.toString();
+    };
+    /**
+     * @returns {string}
+     *    The status of this provisioned product in the connector
+     * @memberof! ProvisionedProduct#
+     * @alias getProductStatus
+     */
+    ProvisionedProduct.prototype.getProductStatus = function () {
+        return this.product.awsproductstatus.toString();
+    };
+    /**
+     * @returns {string} The type of this product; the value of the <code>awstype</code> column.
+     * @memberof! ProvisionedProduct#
+     * @alias getType
+     */
+    ProvisionedProduct.prototype.getType = function () {
+        return this.product.awstype.toString();
+    };
+    /**
+     * @returns {string}
+     *   The CloudFormation name of the stack, or stack set, of the provisioned product, or null if it could not be determined.
+     * @memberof! ProvisionedProduct#
+     * @alias getCloudFormationName
+     */
+    ProvisionedProduct.prototype.getCloudFormationName = function () {
+        // The CloudFormation ARN is included in the outputs of every provisioned product event.
+        // The format of the ARN for stacks is:
+        // arn:aws:cloudformation:region:account-id:stack/stackname/additionalidentifier
+        // The format of the ARN for stack sets is:
+        // arn:aws:cloudformation:region:account-id:stackset/stacksetname:additionalidentifier
+        // https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#arn-syntax-cloudformation
+        var provisionedProductOutputGr = new GlideRecord('x_126749_aws_sc_ppo');
+        provisionedProductOutputGr.addQuery('awsppevent.awsproduct', this.product.sys_id.toString());
+        var arnQuery = provisionedProductOutputGr.addQuery('awskey', 'CloudformationStackARN');
+        arnQuery.addOrCondition('awskey', 'CloudformationStackSetARN');
+        provisionedProductOutputGr.setLimit(1);
+        provisionedProductOutputGr.query();
+        if (provisionedProductOutputGr.next() && !provisionedProductOutputGr.awsvalue.nil()) {
+            var arn = provisionedProductOutputGr.awsvalue.toString(), arnRgx = /^arn:aws:cloudformation:[^:]*:[^:]*:stack(set)?\/([^\/:]*)/, match = arnRgx.exec(arn);
+            if (match) {
+                return match[2];
+            }
+        }
+        return null;
+    };
+    /**
+     * @return True if there is a plan associated with this provisioned product.
+     */
+    ProvisionedProduct.prototype.hasPlan = function () {
+        return !this.product.awsplan.nil();
+    };
+    /**
+     * @returns {array}
+     *   The CloudFormation stack (or stack set) parameters of the provisioned product. Returns an empty array if there is none.
+     * @memberof! ProvisionedProduct#
+     * @alias loadProvisioningParameters
+     */
+    ProvisionedProduct.prototype.loadProvisioningParameters = function () {
+        var cred;
+        try {
+            cred = AwsCredentials.from(this.product).as(AwsCredentials.User.End);
+        }
+        catch (ex) {
+            var noCreds = "could not establish credentials (" + ex.message + ")";
+            var message = "Unable to get stack parameters for " + this.product.awsname.toString() + " because " + noCreds;
+            gs.warn(message);
+            return [];
+        }
+        var cf = this._getCloudFormation(this.product.awsregion.toString(), cred);
+        var stackName = this.getCloudFormationName();
+        var context, xpath;
+        switch (this.product.awstype.toString()) {
+            case 'CFN_STACK':
+                context = cf.describeStacks(stackName);
+                xpath = 'DescribeStacksResponse.DescribeStacksResult.Stacks.member.Parameters.member';
+                break;
+            case 'CFN_STACKSET':
+                context = cf.describeStackSet(stackName);
+                xpath = 'DescribeStackSetResponse.DescribeStackSetResult.StackSet.Parameters.member';
+                break;
+        }
+        var stackParameters = [];
+        if (context && xpath && !context.haveError()) {
+            stackParameters = Util.getObjectWithName(xpath, context.deserialize()) || [];
+            // gs.xmlToJSON behaves differently when there is a single parameter.
+            if (stackParameters && !Array.isArray(stackParameters)) {
+                stackParameters = [stackParameters];
+            }
+        }
+        return stackParameters;
+    };
+    ProvisionedProduct.prototype._getServiceCatalog = function (region, credential) {
+        return new AwsServiceCatalog(region, credential);
+    };
+    ProvisionedProduct.prototype._getCloudFormation = function (region, credential) {
+        return new AwsCloudFormation(region, credential);
+    };
+    /**
+     * @param userId {String} Sys ID of a user.
+     * @returns {boolean} True if the given user is the owner of this product.
+     * @memberof! ProvisionedProduct#
+     * @alias isOwnedBy
+     */
+    ProvisionedProduct.prototype.isOwnedBy = function (userId) {
+        return !this.product.owned_by.nil() && this.product.owned_by.toString() === userId;
+    };
+    /** @deprecated since 1.4.0 without replacement. */
+    ProvisionedProduct.prototype._terminateRequestResponse = function (resultStatus, message) {
+        var reason = "";
+        if (resultStatus !== ProvisionedProduct.Status.terminating) {
+            var status = this.product.awsstatusmessage.nil() ? "" : this.product.awsstatusmessage.toString();
+            reason = status.indexOf("Cannot terminate:") >= 0
+                ? status
+                : "Cannot terminate: " + message + ". Original status: " + status;
+            return { status: resultStatus, message: reason };
+        }
+        return { status: resultStatus, message: "" };
+    };
+    /**
+     * Check if this product can be terminated.
+     * @deprecated since 1.4.0 Use terminate action isEnabled instead.
+     */
+    ProvisionedProduct.prototype.canTerminate = function () {
+        var provisionedOrError = (this.product.awsstatus.toString() === "ERROR" ||
+            this.product.awsproductstatus == ProvisionedProduct.Status.provisioned ||
+            this.product.awsproductstatus == ProvisionedProduct.Status.error);
+        return provisionedOrError && this.getProduct() !== null && !this.product.awsid.nil();
+    };
+    /**
+     * Terminate this product.
+     *
+     * @param idempotencyToken {string} The idempotency token for the termination request.
+     * @memberof! ProvisionedProduct#
+     * @alias terminate
+     * @deprecated since 1.4.0 Use terminate action instead.
+     */
+    ProvisionedProduct.prototype.terminate = function (idempotencyToken) {
+        var cred;
+        try {
+            cred = AwsCredentials.from(this.product).as(AwsCredentials.User.End);
+            var sc = this._getServiceCatalog(this.product.awsregion.toString(), cred);
+            if (this.product.awsid.nil() || this.product.awsid.toString().trim() === "") {
+                var noId = "product.awsid is unset";
+                gs.warn("Unable to terminate " + this.product.awsname.toString() + ": " + noId);
+                return this._terminateRequestResponse(ProvisionedProduct.Status.error, noId);
+            }
+            var ppID = this.product.awsid.toString();
+            var response_2 = sc.terminateProvisionedProduct(ppID, idempotencyToken);
+            if (response_2.haveError()) {
+                gs.warn("Unable to terminate " + this.product.awsname.toString()
+                    + "(" + ppID + "): " + response_2.getErrorMessage());
+                return this._terminateRequestResponse(ProvisionedProduct.Status.error, response_2.getErrorMessage());
+            }
+            var responseBody = response_2.getJsonBody();
+            var recordDetail = Util.assertExists(responseBody.RecordDetail, "RecordDetail");
+            ProvisionedProductRepo.saveProvisionedProductEvent(this.product, recordDetail);
+            return this._terminateRequestResponse(ProvisionedProduct.Status.terminating);
+        }
+        catch (ex) {
+            var noCreds = "could not establish credentials (" + ex.message + ")";
+            var message = "Unable to terminate " + this.product.awsname.toString() + " because " + noCreds;
+            gs.warn(message);
+            return this._terminateRequestResponse(ProvisionedProduct.Status.error, noCreds);
+        }
+    };
+    /**
+     * Request the termination of this provisioned product and returns the change request record.
+     * @deprecated since 1.4.0 Use terminate action instead.
+     */
+    ProvisionedProduct.prototype.createTerminationChangeRequest = function () {
+        gs.info("Requesting termination of " + this.product.awsname.toString());
+        ProvisionedProductRepo.updateWithStatus(this.product, ProvisionedProduct.Status.terminationRequested);
+        var AWS_PRODUCT_TERMINATION = 'AwsProductTermination';
+        var crType = gs.getProperty('x_126749_aws_sc.termination_change_request_type');
+        if (['standard', 'normal', 'emergency'].indexOf(crType) === -1) {
+            crType = AWS_PRODUCT_TERMINATION;
+        }
+        var cr = new GlideRecord('change_request');
+        cr.initialize();
+        cr.category = "AWS Service Catalog Product";
+        cr.short_description = "Terminate product " + this.product.awsname.toString();
+        cr.cmdb_ci = this.product.sys_id;
+        cr.type = crType;
+        cr.insert();
+        return cr;
+    };
+    /** @return {GlideRecord} The GlideRecord object backing this provisioned product. */
+    ProvisionedProduct.prototype.gr = function () {
+        return this.product;
+    };
+    /**
+     * Values correspond to the choices for the awsproductstatus column.
+     * @type {{error: number, preProvisioning: number, provisioning: number, provisioned: number, terminating: number, terminated: number, terminationRequested: number}}
+     * @memberof! ProvisionedProduct
+     * @alias Status
+     */
+    ProvisionedProduct.Status = {
+        /**
+         * There was a non-200 response from AWS Service Catalog when updating the product.
+         */
+        error: 0,
+        /**
+         * The product has been requested but the ProvisionProduct request has not been made.
+         */
+        preProvisioning: 1,
+        /**
+         * A ProvisionProduct request has been made for the product and the last Status from
+         * AWS Service Catalog was UNDER_CHANGE.
+         */
+        provisioning: 2,
+        /**
+         * The last status from AWS Service Catalog was AVAILABLE.
+         */
+        provisioned: 3,
+        /**
+         * A TerminateProvisionedProduct request has been submitted for the product.
+         */
+        terminating: 4,
+        /**
+         * The product has been terminated. Requests to DescribeProvisionedProduct respond
+         * with a 400 Error.
+         */
+        terminated: 5,
+        /**
+         * Termination of the product has been requested but the TerminateProvisionedProduct
+         * request has not been made.
+         */
+        terminationRequested: 6,
+    };
+    return ProvisionedProduct;
+}());
+ProvisionedProduct.prototype.type = 'ProvisionedProduct';
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2017-10-17 10:58:17</sys_created_on>
+        <sys_id>9fe687a6db790300a5d3ddd0cf96191a</sys_id>
+        <sys_mod_count>1</sys_mod_count>
+        <sys_name>ProvisionedProduct</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_9fe687a6db790300a5d3ddd0cf96191a</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2023-04-24 17:31:41</sys_updated_on>
+    </sys_script_include>
+</record_update>

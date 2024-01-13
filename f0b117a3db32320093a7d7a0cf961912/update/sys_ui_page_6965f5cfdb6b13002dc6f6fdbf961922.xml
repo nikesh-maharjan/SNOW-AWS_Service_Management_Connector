@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ui_page">
+    <sys_ui_page action="INSERT_OR_UPDATE">
+        <category>general</category>
+        <client_script/>
+        <description>A page to update an AWS Service Catalog Provisioned Product</description>
+        <direct>false</direct>
+        <endpoint>x_126749_aws_sc_update_product.do</endpoint>
+        <html><![CDATA[<?xml version="1.0" encoding="utf-8" ?>
+<j:jelly trim="false" xmlns:j="jelly:core" xmlns:g="glide" xmlns:j2="null" xmlns:g2="null">
+    <g:requires name="angular_includes_1.5.11.jsx"/>
+    <g:requires name="x_126749_aws_sc.angularBootstrap.jsdbx"/>
+    <g:requires name="x_126749_aws_sc.ngTagsInput.jsdbx"/>
+    <g:requires name="x_126749_aws_sc.awsComponents.jsdbx"/>
+    <g:requires name="x_126749_aws_sc.productCatalog.jsdbx"/>
+    <g:include_scripts src="x_126749_aws_sc.C"/>
+    <head>
+        <title>Update Provisioned Product</title>
+    </head>
+    <body ng-app="productCatalog">
+
+    <g:evaluate object="true">
+        // Get session token. Required so we can use $http in Service Portal. See
+        // https://community.servicenow.com/community?id=community_blog&amp;sys_id=bebc6e25dbd0dbc01dcaf3231f961928
+        // Note ServiceNow documentation says that GlideSystem's getSessionToken()
+        // method "is no longer available. Instead, use gs.getSession().getSessionToken()."
+        // Experimentally on Istanbul this is not true on this page, only in server scripts.
+        var session = gs.getSession();
+        var token;
+        gs.info('session found ' + session);
+        var token = session.getSessionToken();
+        if (!token) {
+            try {
+                token = gs.getSessionToken();
+            } catch (err) {
+                gs.debug('Fallback to GlideSession.getSessionToken failed');
+            }
+        }
+    </g:evaluate>
+
+    <g:evaluate object="true">
+        var featuresObject = {};
+        var featureNames = [
+            x_126749_aws_sc.C.sysprop.launchOptionSelectable,
+            x_126749_aws_sc.C.sysprop.productVersionSelectable,
+            x_126749_aws_sc.C.sysprop.plansVisible
+        ];
+
+        featureNames.forEach(function(featureName){
+            var modifiedName = featureName.substring(16).replace(/\.([a-z])/g, function (g) { return g[1].toUpperCase(); });
+            var systemPropertyGr = new GlideRecord('sys_properties');
+            systemPropertyGr.addQuery('name', featureName);
+            systemPropertyGr.query();
+            while (systemPropertyGr.next()) {
+                featuresObject[modifiedName] = systemPropertyGr.value.toString() === "true";
+            }
+        });
+        var globalFeatures = JSON.stringify(featuresObject);
+    </g:evaluate>
+
+    <header></header>
+    <main>
+        <update-product-ui user-token="$[token]" global-features="$[globalFeatures]"></update-product-ui>
+    </main>
+    <footer></footer>
+    </body>
+</j:jelly>
+]]></html>
+        <name>update_product</name>
+        <processing_script/>
+        <sys_class_name>sys_ui_page</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-07-31 14:22:02</sys_created_on>
+        <sys_id>6965f5cfdb6b13002dc6f6fdbf961922</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>update_product</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_ui_page_6965f5cfdb6b13002dc6f6fdbf961922</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_ui_page>
+</record_update>

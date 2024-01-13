@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.Ec2SecurityGroupResourceType</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>Ec2SecurityGroupResourceType</name>
+        <script><![CDATA[var Ec2SecurityGroupResourceType = /** @class */ (function (_super) {
+    Polyfill.__extends(Ec2SecurityGroupResourceType, _super);
+    function Ec2SecurityGroupResourceType() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Ec2SecurityGroupResourceType.prototype.rules = function () {
+        return [{
+                order: 90,
+                syncType: ConfigSyncProvider.SYNC_DIR.FROM_AWS_CONFIG,
+                externalResourceType: 'AWS::EC2::SecurityGroup',
+                externalResourceId: 'resourceId',
+                snTable: 'cmdb_ci_compute_security_group',
+                syncFromAws: this.syncFromAws,
+            }];
+    };
+    Ec2SecurityGroupResourceType.prototype.fields = function () {
+        return [{
+                mode: ConfigSyncProvider.FieldMode.FromAws,
+                snField: 'name',
+                transformFromAws: function (object, context) { return (context && context.resourceIdAsName) || !object.item.resourceName
+                    ? object.item.resourceId : object.item.resourceName; }
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromAws,
+                snField: 'state',
+                transformFromAws: function (object) {
+                    switch (object.item.configurationItemStatus) {
+                        case 'OK':
+                        case 'ResourceDiscovered':
+                        case 'ResourceNotRecorded':
+                            return 'available';
+                        default:
+                            return 'terminated';
+                    }
+                }
+            }];
+    };
+    Ec2SecurityGroupResourceType.prototype.relationships = function () {
+        return [
+            {
+                resourceType: new Ec2ResourceType(),
+                relationship: ConfigSyncProvider.RelationshipType.UsedBy,
+                reverse: false,
+            },
+            {
+                relationship: ConfigSyncProvider.RelationshipType.HostedOn,
+                externalResourceType: 'AWS::Region',
+                snTable: 'cmdb_ci_aws_datacenter',
+                documentationOnly: true,
+            }
+        ];
+    };
+    Ec2SecurityGroupResourceType.prototype.syncFromAwsAddRelationships = function (context, config, resourceSysId) {
+        // Process relationships to AWS regions
+        this.addHostedOnRegionRelationship(context, config, resourceSysId);
+    };
+    return Ec2SecurityGroupResourceType;
+}(AbstractResourceType));
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-05-11 07:08:27</sys_created_on>
+        <sys_id>cd1ce7c8db7410103874c4ab0b9619fd</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Ec2SecurityGroupResourceType</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_cd1ce7c8db7410103874c4ab0b9619fd</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

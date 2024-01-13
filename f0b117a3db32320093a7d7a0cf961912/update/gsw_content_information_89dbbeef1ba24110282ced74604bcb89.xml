@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="gsw_content_information">
+    <gsw_content_information action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <article><![CDATA[<p>To use AWS Systems Manager Incident Manager you must configure it in your AWS Account.</p>
+<p>Full details on how to do this are available on the <a title="AWS website" href="https://docs.aws.amazon.com/incident-manager/latest/userguide/getting-started.html" target="_blank" rel="noopener noreferrer nofollow">AWS website</a>.</p>
+<p>You will need to:</p>
+<ol style="list-style-position: inside;"><li>Setup a replication set for the enabled regions</li><li>Setup at least 1 Response Plan, 1 Contact, and 1 Emergency Plan</li></ol>]]></article>
+        <best_practice_acceptable>false</best_practice_acceptable>
+        <dependent_on_contents/>
+        <dependent_on_plugins/>
+        <dependent_on_plugins_ids/>
+        <description/>
+        <embedded_help_qualifier/>
+        <end_point/>
+        <end_point_open_mode/>
+        <end_point_type/>
+        <field/>
+        <filter/>
+        <filter_result/>
+        <implicit_dependent_on/>
+        <implicit_plugin_dependencies/>
+        <is_dynamic>false</is_dynamic>
+        <more_info_available>false</more_info_available>
+        <more_info_html/>
+        <order>10</order>
+        <parent display_value="Configure AWS Systems Manager Incident Manager">9c374d531b620110282ced74604bcbc4</parent>
+        <parents>9c374d531b620110282ced74604bcbc4,c09fcac2dbd130100f00b298f496196f</parents>
+        <plugin_id/>
+        <property_name/>
+        <property_value/>
+        <quick_startable>false</quick_startable>
+        <root_parent display_value="AWS Service Management Connector">c09fcac2dbd130100f00b298f496196f</root_parent>
+        <skippable>true</skippable>
+        <supports_child_content>false</supports_child_content>
+        <sys_class_name>gsw_content_information</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2022-04-05 13:19:21</sys_created_on>
+        <sys_id>89dbbeef1ba24110282ced74604bcb89</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Configure AWS Account</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>gsw_content_information_89dbbeef1ba24110282ced74604bcb89</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <table/>
+        <title>Configure AWS Account</title>
+        <weight>1</weight>
+    </gsw_content_information>
+    <sys_translated_text action="delete_multiple" query="documentkey=89dbbeef1ba24110282ced74604bcb89"/>
+</record_update>

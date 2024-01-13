@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update>
+    <sys_ui_related sys_domain="global" table="problem" version="2" view="problem_from_aws">
+        <sys_ui_related_list_entry action="INSERT_OR_UPDATE">
+            <filter/>
+            <list_id display_value="Problem - Problem from AWS" name="problem" related_list="NULL" sys_domain="global" view="9b6b1803db9160101aa72bfa4b9619d2">20ad1483db9160101aa72bfa4b9619fb</list_id>
+            <order_by/>
+            <position>0</position>
+            <related_list>x_126749_aws_sc_opsitem.problem</related_list>
+            <sys_class_name>sys_ui_related_list_entry</sys_class_name>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2020-12-29 16:30:29</sys_created_on>
+            <sys_id>e8ad1483db9160101aa72bfa4b9619fb</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2020-12-29 16:30:29</sys_updated_on>
+        </sys_ui_related_list_entry>
+        <sys_ui_related_list action="INSERT_OR_UPDATE">
+            <calculated_name>Problem - Problem from AWS</calculated_name>
+            <filter/>
+            <name>problem</name>
+            <order_by/>
+            <position/>
+            <related_list/>
+            <sys_class_name>sys_ui_related_list</sys_class_name>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2020-12-29 16:30:29</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>20ad1483db9160101aa72bfa4b9619fb</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_name>Problem - Problem from AWS</sys_name>
+            <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+            <sys_policy/>
+            <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+            <sys_update_name>sys_ui_related_problem_problem_from_aws</sys_update_name>
+            <sys_updated_by>admin</sys_updated_by>
+            <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+            <sys_user/>
+            <view display_value="Problem from AWS" name="problem_from_aws">9b6b1803db9160101aa72bfa4b9619d2</view>
+            <view_name/>
+        </sys_ui_related_list>
+    </sys_ui_related>
+</record_update>

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category/>
+        <client_script><![CDATA[function awsScPortalFormController($scope, $document, connectorAjax) {
+    /* widget controller */
+    var c = this;
+    // On Kingston, and only on Kingston, on the order page on Service Portal,
+    // the page displays a field (a text box) for the UI Page variable.
+    // This should not be shown, so we remove it manually. This can be removed
+    // once Kingston is no longer supported.
+    function removeAnyUiPageField() {
+        if (c.data.uiPageId) {
+            var uiPageDiv = document.getElementById(c.data.uiPageId);
+            if (uiPageDiv) {
+                var uiPageParent = uiPageDiv.parentElement;
+                uiPageParent.removeChild(uiPageDiv);
+            }
+        }
+    }
+    c.setUserToken = function () {
+        connectorAjax.setUserToken(c.data.sessionToken);
+        c.tokenIsSet = true;
+    };
+    var scope = $scope.$parent;
+    var productSysId = null;
+    while (scope) {
+        if (scope.formModel) {
+            productSysId = scope.formModel.sys_id;
+            break;
+        }
+        else {
+            scope = scope.$parent;
+        }
+    }
+    $document.get(0).scSubmissionError = function () {
+        // signal validation error to all components contained in this scope
+        $scope.$broadcast('aws-sc:validationFailure', {});
+    };
+    if (!productSysId) {
+        throw new Error('Could not determine product ID');
+    }
+    c.data.productSysId = productSysId;
+    removeAnyUiPageField();
+    c.onError = function (errs) {
+        // no action needed on this page
+    };
+    c.updateHiddenFields = function (model) {
+        $scope.page.g_form.setValue('ProvisionedProductSysId', model.provisionedProductSysId);
+        $scope.page.g_form.setValue('ProvisionedProductName', model.name);
+        $scope.page.g_form.setValue('ProvisioningArtifactId', model.productVersion);
+        $scope.page.g_form.setValue('PathId', model.launchOption);
+        $scope.page.g_form.setValue('ProvisioningParameters', model.params);
+        $scope.page.g_form.setValue('ProvisioningPreferences', model.preferences);
+        $scope.page.g_form.setValue('Tags', model.tags);
+        $scope.page.g_form.setValue('IsValid', model.valid);
+    };
+    $scope.$watch('c.data.sessionToken', c.setUserToken);
+}
+]]></client_script>
+        <controller_as>c</controller_as>
+        <css/>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>true</has_preview>
+        <id>aws-sc-order-form</id>
+        <internal>false</internal>
+        <link/>
+        <name>AWS SC Service Portal Form</name>
+        <option_schema/>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[// TODO: Make this typescript + deploy annotation
+(function() {
+    var UI_PAGE_VARIABLE = 'uiPage';
+    var VARIABLE_SET = 'AWS Service Catalog Variables';
+
+    data.sessionToken = gs.getSession().getSessionToken();
+
+    // The result of this query is used to remove the "UI Page" text box in Kingston.
+    var variable = new GlideRecord('item_option_new');
+    variable.addQuery('name', UI_PAGE_VARIABLE);
+    variable.addQuery('variable_set.name', VARIABLE_SET);
+    variable.query();
+    if (variable.next()) {
+        data.uiPageId = variable.sys_id.toString();
+    }
+
+    var featuresObject = {};
+    var featureNames = [
+        x_126749_aws_sc.C.sysprop.productNameEditable,
+        x_126749_aws_sc.C.sysprop.launchOptionSelectable,
+        x_126749_aws_sc.C.sysprop.productVersionSelectable,
+        x_126749_aws_sc.C.sysprop.tagsConfigurable,
+        x_126749_aws_sc.C.sysprop.plansVisible
+    ];
+
+    featureNames.forEach(function(featureName){
+        var modifiedName = featureName.substring(16).replace(/\.([a-z])/g, function (g) { return g[1].toUpperCase(); });
+        var systemPropertyGr = new GlideRecord('sys_properties');
+        systemPropertyGr.addQuery('name', featureName);
+        systemPropertyGr.query();
+        while (systemPropertyGr.next()) {
+            featuresObject[modifiedName] = systemPropertyGr.value.toString() === "true";
+        }
+    });
+    data.globalFeatures = featuresObject;
+
+})();
+]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-05-01 08:43:18</sys_created_on>
+        <sys_id>237f37290f3113003ab248dce1050e2f</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AWS SC Service Portal Form</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sp_widget_237f37290f3113003ab248dce1050e2f</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <template><![CDATA[<div ng-if="c.tokenIsSet">
+    <customize-product-form
+        product-sys-id="c.data.productSysId"
+        on-model-update="c.updateHiddenFields(model)"
+        on-error="c.onError(errs)"
+        global-features="c.data.globalFeatures">
+    </customize-product-form>
+</div>
+]]></template>
+    </sp_widget>
+</record_update>

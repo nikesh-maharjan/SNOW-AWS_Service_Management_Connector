@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.FindingRepo</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>FindingRepo</name>
+        <script><![CDATA[var FindingRepo = /** @class */ (function () {
+    function FindingRepo(awsSqs) {
+        this.FINDINGS_TABLE_NAME = "x_126749_aws_sc_finding";
+        this.RESOURCES_TABLE_NAME = "x_126749_aws_sc_finding_resource";
+        this.TYPES_TABLE_NAME = "x_126749_aws_sc_finding_type";
+        this.sqs = awsSqs;
+        this.FINDING_SEVERITY_TO_BE_SYNC = this.loadFindingSeverityToSync();
+        this.QUEUE_NAME = gs.getProperty(C.sysprop.securityHubSyncSQSName);
+    }
+    FindingRepo.prototype.syncFromAWS = function (account, region, maxMessages) {
+        var _this = this;
+        if (!this.sqs) {
+            return;
+        }
+        var messageCounter = 0;
+        var batchCounter = AwsSqs.getBatchCount(maxMessages);
+        var sqsMessages;
+        gs.debug("[SYNC] [AWS SecurityHub] Synchronizing from AWS finding with severities " + this.FINDING_SEVERITY_TO_BE_SYNC);
+        do {
+            sqsMessages = this.getSQSMessages(account.awsaccountnumber, maxMessages - messageCounter);
+            sqsMessages
+                .forEach(function (sqsMessage) {
+                messageCounter++;
+                _this.getAwsFindings(sqsMessage)
+                    .forEach(function (awsFinding) {
+                    if (_this.mustBeSync(awsFinding)) {
+                        _this.syncFindingFromAWS(awsFinding, account.sys_id, region);
+                    }
+                });
+                _this.deleteSQSMessage(sqsMessage, account.awsaccountnumber);
+            });
+            batchCounter--;
+        } while (sqsMessages.length > 0 && batchCounter > 0);
+        return true;
+    };
+    FindingRepo.prototype.updateFindingFromProblemOrIncident = function (finding, source, updateStatus) {
+        //don't update if the finding is updated within a second of the source
+        var findingUpdateTime = new GlideDateTime(finding.sys_updated_on);
+        findingUpdateTime.addSeconds(1);
+        var sourceUpdateTime = new GlideDateTime(source.sys_updated_on);
+        if (findingUpdateTime.onOrAfter(sourceUpdateTime)) {
+            return;
+        }
+        var priorityMapping = new PriorityMapping();
+        var mappedFields = priorityMapping.getMappedFromTask(source, finding);
+        var currentFindingSeverity = finding.getValue('awsseverity');
+        var currentFindingSeverityLabel = finding.getValue('awsseveritylabel');
+        //Urgency on Problem and incident do not have values CRITICAL and INFORMATIONAL
+        //so if urgency from Problem or Incident is 'HIGH' and current value of severity on Finding is CRITICAL,
+        //or if the urgency from Problem or Incident is 'LOW' and current value of severity on Finding is INFORMATIONAL do not change it
+        if (currentFindingSeverity && ((parseInt(currentFindingSeverity) > 89 && parseInt(mappedFields.findingSeverity) === 70) || (parseInt(currentFindingSeverity) === 0 && parseInt(mappedFields.findingSeverity) === 1))) {
+            mappedFields.findingSeverity = currentFindingSeverity;
+        }
+        if ((currentFindingSeverityLabel === "CRITICAL" && mappedFields.findingSeverityLabel === "HIGH") || (currentFindingSeverityLabel === "INFORMATIONAL" && mappedFields.findingSeverityLabel === "LOW")) {
+            mappedFields.findingSeverityLabel = currentFindingSeverityLabel;
+        }
+        //only update if the fields have changed or the state (workflow) of the source is Resolved and that of the Finding is not RESOLVED
+        //strict not_equals (!==) does not work here
+        if ((finding.awscriticality != parseInt(mappedFields.findingCriticality)) || (finding.awsseverity != parseInt(mappedFields.findingSeverity))
+            || (finding.awsseveritylabel != mappedFields.findingSeverityLabel)
+            || ((finding.awsworkflowstatus !== 'RESOLVED') && updateStatus)) {
+            var additionalFields = {
+                "awscriticality": mappedFields.findingCriticality,
+                "awsseverity": mappedFields.findingSeverity,
+                "awsseveritylabel": mappedFields.findingSeverityLabel
+            };
+            // Updating the Finding if the Problem or the Incident is resolved
+            if (source.getDisplayValue('state') === "Resolved") {
+                additionalFields['awsworkflowstatus'] = "RESOLVED";
+            }
+            var definitional = {
+                "sys_id": finding.sys_id
+            };
+            var updatedFinding = Util.insertOrUpdate("x_126749_aws_sc_finding", definitional, additionalFields);
+        }
+    };
+    FindingRepo.prototype.syncFindingFromAWS = function (awsFinding, accountSysId, region) {
+        var snowFinding = Util.insertOrUpdate(this.FINDINGS_TABLE_NAME, { "awsfindingarn": awsFinding.Id }, this.createFindingFromAWS(awsFinding, accountSysId, region));
+        this.syncResources(snowFinding.sys_id, awsFinding);
+        this.syncTypes(snowFinding.sys_id, awsFinding);
+        this.insertOrUpdateProblemAndIncidentIfRequired(snowFinding);
+    };
+    FindingRepo.prototype.insertOrUpdateProblemAndIncidentIfRequired = function (snowFinding) {
+        this.insertOrUpdateProblemIfRequired(snowFinding);
+        this.insertOrUpdateIncidentIfRequired(snowFinding);
+    };
+    FindingRepo.prototype.insertOrUpdateIncidentIfRequired = function (snowFinding) {
+        var incidentRepo = new IncidentRepo();
+        if (incidentRepo.shouldCreateIncidentFromFinding(snowFinding)) {
+            incidentRepo.insertOrUpdateFromFinding(snowFinding);
+        }
+    };
+    FindingRepo.prototype.insertOrUpdateProblemIfRequired = function (snowFinding) {
+        var problemRepo = new ProblemRepo();
+        if (problemRepo.shouldCreateOrUpdateFromFinding(snowFinding)) {
+            problemRepo.insertOrUpdateFromFinding(snowFinding);
+        }
+    };
+    FindingRepo.prototype.syncResources = function (snowFindingSysId, awsFinding) {
+        var _this = this;
+        this.createResources(awsFinding, snowFindingSysId)
+            .forEach(function (resource) {
+            Util.insertOrUpdate(_this.RESOURCES_TABLE_NAME, {
+                "awsid": resource.awsid,
+                "awspartition": resource.awspartition,
+                "awsregion": resource.awsregion,
+                "awstype": resource.awstype,
+                "finding": resource.finding,
+            }, resource);
+        });
+    };
+    FindingRepo.prototype.syncTypes = function (snowFindingSysId, awsFinding) {
+        var _this = this;
+        this.createTypes(awsFinding, snowFindingSysId)
+            .forEach(function (type) {
+            Util.insertOrUpdate(_this.TYPES_TABLE_NAME, {
+                "awsdescription": type.awsdescription,
+                "finding": type.finding,
+            }, type);
+        });
+    };
+    FindingRepo.prototype.getSQSMessages = function (accountNumber, maxMessages) {
+        var response = this.sqs.getSqsMessages(accountNumber, this.QUEUE_NAME, Math.min(10, maxMessages));
+        if (response.haveError()) {
+            var readingErrorString = "Error getting findings";
+            gs.error(readingErrorString + ": " + response.getErrorMessage());
+            throw new Error(readingErrorString);
+        }
+        var data = response.data();
+        var messages = AwsSqs.asArray(data);
+        gs.debug("[SYNC] [AWS SecurityHub] getSQSMessages: " + messages.length + " messages retrieved");
+        return messages;
+    };
+    FindingRepo.prototype.getAwsFindings = function (message) {
+        try {
+            var event_1 = JSON.parse(message.Body);
+            var findings = event_1.detail.findings;
+            gs.debug("[SYNC] [AWS SecurityHub] getAwsFindings: " + findings.length + " findings in message");
+            return findings;
+        }
+        catch (e) {
+            gs.error("[SYNC] [AWS SecurityHub] Error parsing Finding from SQS: " + e.message);
+            return [];
+        }
+    };
+    FindingRepo.prototype.deleteSQSMessage = function (message, accountNumber) {
+        try {
+            this.doDeleteSQSMessage(message, accountNumber);
+        }
+        catch (e) {
+            gs.error("[SYNC] [AWS SecurityHub] Error deleting message from SQS: " + e.message);
+        }
+    };
+    FindingRepo.prototype.createFindingFromAWS = function (finding, accountSysId, region) {
+        return {
+            "account": accountSysId,
+            "awsregion": region,
+            "awsaccountid": finding.AwsAccountId,
+            "awscompanyname": finding.ProductFields['aws/securityhub/CompanyName'],
+            "awscompliance": this.compliance(finding.Compliance),
+            "awscreatedat": finding.CreatedAt,
+            "awsdescription": finding.Description,
+            "awscriticality": finding.Criticality,
+            "awsfirstobservedat": finding.FirstObservedAt,
+            "awslastobservedat": finding.LastObservedAt,
+            "awsproductname": finding.ProductFields['aws/securityhub/ProductName'],
+            "awsproductarn": finding.ProductArn,
+            "awsrecordstate": finding.RecordState,
+            "awsseverity": finding.Severity.Normalized,
+            "awsseveritylabel": finding.Severity.Label,
+            "awsstatus": this.status(finding.Compliance),
+            "awstitle": finding.Title,
+            "awsupdatedat": finding.UpdatedAt,
+            "awsworkflowstatus": this.workflowStatus(finding.Workflow),
+            "awsremediationtext": finding.Remediation && finding.Remediation.Recommendation ? finding.Remediation.Recommendation.Text : undefined,
+            "awsremediationurl": finding.Remediation && finding.Remediation.Recommendation ? finding.Remediation.Recommendation.Url : undefined,
+            "awslastupdatedfromaws": new GlideDateTime(),
+            "awsuserdefinedfields": JSON.stringify(finding.UserDefinedFields, null, 2)
+        };
+    };
+    FindingRepo.prototype.compliance = function (compliance) {
+        if (compliance === undefined
+            || compliance.StatusReasons === undefined
+            || !Array.isArray(compliance.StatusReasons)) {
+            return "";
+        }
+        return compliance.StatusReasons.map(function (reason) { return reason.Description; }).join("\n");
+    };
+    FindingRepo.prototype.status = function (compliance) {
+        if (compliance === undefined
+            || compliance.Status === undefined) {
+            return "";
+        }
+        return compliance.Status;
+    };
+    FindingRepo.prototype.workflowStatus = function (workflow) {
+        if (workflow === undefined
+            || workflow.Status === undefined) {
+            return "";
+        }
+        return workflow.Status;
+    };
+    FindingRepo.prototype.createResources = function (awsFinding, snowFindingSysId) {
+        return awsFinding.Resources.map(function (resource) {
+            return {
+                "awsid": resource.Id,
+                "awspartition": resource.Partition,
+                "awsregion": resource.Region,
+                "awstype": resource.Type,
+                "finding": snowFindingSysId,
+            };
+        });
+    };
+    FindingRepo.prototype.createTypes = function (awsFinding, snowFindingSysId) {
+        return awsFinding.Types.map(function (type) {
+            return {
+                "awsdescription": type,
+                "finding": snowFindingSysId,
+            };
+        });
+    };
+    FindingRepo.prototype.doDeleteSQSMessage = function (message, accountNumber) {
+        if (!this.sqs) {
+            return;
+        }
+        var response = this.sqs.deleteMessage(accountNumber, this.QUEUE_NAME, message.ReceiptHandle);
+        if (response.haveError()) {
+            var deletingErrorString = "Error deleting finding message";
+            gs.error("[SYNC] [AWS SecurityHub] " + deletingErrorString + " :  " + response.getErrorMessage());
+            throw new Error(deletingErrorString);
+        }
+    };
+    FindingRepo.prototype.loadFindingSeverityToSync = function () {
+        var toBeSync = [];
+        if (gs.getProperty(C.sysprop.securityHubSyncCritical) === "true") {
+            toBeSync.push("CRITICAL");
+        }
+        if (gs.getProperty(C.sysprop.securityHubSyncHigh) === "true") {
+            toBeSync.push("HIGH");
+        }
+        if (gs.getProperty(C.sysprop.securityHubSyncMedium) === "true") {
+            toBeSync.push("MEDIUM");
+        }
+        if (gs.getProperty(C.sysprop.securityHubSyncLow) === "true") {
+            toBeSync.push("LOW");
+        }
+        if (gs.getProperty(C.sysprop.securityHubSyncInformational) === "true") {
+            toBeSync.push("INFORMATIONAL");
+        }
+        return toBeSync;
+    };
+    FindingRepo.prototype.mustBeSync = function (finding) {
+        var findingSeverityLabel = finding.Severity.Label;
+        return this.FINDING_SEVERITY_TO_BE_SYNC.indexOf(findingSeverityLabel.toUpperCase()) >= 0;
+    };
+    return FindingRepo;
+}());
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-10-08 13:11:52</sys_created_on>
+        <sys_id>ecbd1d6cdb3710101aa72bfa4b96194e</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>FindingRepo</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_ecbd1d6cdb3710101aa72bfa4b96194e</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

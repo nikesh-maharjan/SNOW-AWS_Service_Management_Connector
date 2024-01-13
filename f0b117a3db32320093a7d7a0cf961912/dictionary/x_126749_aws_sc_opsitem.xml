@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="1e263696db0120101aa72bfa4b961927" label="OpsItem" max_length="40" name="x_126749_aws_sc_opsitem" type="collection">
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false,readonly_clickthrough=true" label="Account" max_length="32" name="awsaccount" read_only="true" reference="x_126749_aws_sc_account" type="reference"/>
+        <element label="Category" max_length="64" name="awscategory" read_only="true" type="string"/>
+        <element label="Created By" max_length="2048" name="awscreatedby" read_only="true" type="string"/>
+        <element label="Created Time" max_length="40" name="awscreatedtime" read_only="true" type="glide_date_time"/>
+        <element label="Deduplication string" max_length="512" name="awsdeduplicationstring" read_only="true" type="string"/>
+        <element label="Description" max_length="1024" name="awsdescription" read_only="true" type="string"/>
+        <element label="Last Modified By" max_length="2048" name="awslastmodifiedby" read_only="true" type="string"/>
+        <element label="Last Modified Time" max_length="40" name="awslastmodifiedtime" read_only="true" type="glide_date_time"/>
+        <element label="Last Sync Time" max_length="40" name="awslastsyncfromaws" read_only="true" type="glide_date_time"/>
+        <element label="Operational Data" max_length="20480" name="awsoperationaldata" read_only="true" type="string_full_utf8"/>
+        <element display="true" label="OpsItem Id" max_length="15" name="awsopsitemid" read_only="true" type="string"/>
+        <element attributes="edge_encryption_enabled=true" label="Priority" max_length="40" name="awspriority" read_only="true" type="integer"/>
+        <element choice="3" choice_field="awsregion" choice_table="x_126749_aws_sc_account_sync" label="Region" max_length="40" name="awsregion" read_only="true" type="string">
+            <choice>
+                <element inactive_on_update="false" label="US East (N. Virginia)" sequence="0" value="us-east-1"/>
+                <element inactive_on_update="false" label="US East (Ohio)" sequence="1" value="us-east-2"/>
+                <element inactive_on_update="false" label="US West (Oregon)" sequence="2" value="us-west-2"/>
+                <element inactive_on_update="false" label="US West (N. California)" sequence="3" value="us-west-1"/>
+                <element inactive_on_update="false" label="EU (Frankfurt)" sequence="4" value="eu-central-1"/>
+                <element inactive_on_update="false" label="EU (Ireland)" sequence="5" value="eu-west-1"/>
+                <element inactive_on_update="false" label="EU (London)" sequence="6" value="eu-west-2"/>
+                <element inactive_on_update="false" label="EU (Paris)" sequence="7" value="eu-west-3"/>
+                <element inactive_on_update="false" label="EU (Stockholm)" sequence="8" value="eu-north-1"/>
+                <element inactive_on_update="false" label="EU (Milan)" sequence="9" value="eu-south-1"/>
+                <element inactive_on_update="false" label="Asia Pacific (Seoul)" sequence="10" value="ap-northeast-2"/>
+                <element inactive_on_update="false" label="Asia Pacific (Tokyo)" sequence="11" value="ap-northeast-1"/>
+                <element inactive_on_update="false" label="Asia Pacific (Hong Kong" sequence="12" value="ap-east-1"/>
+                <element inactive_on_update="false" label="Asia Pacific (Sydney)" sequence="13" value="ap-southeast-2"/>
+                <element inactive_on_update="false" label="Asia Pacific (Mumbai)" sequence="14" value="ap-south-1"/>
+                <element inactive_on_update="false" label="Asia Pacific (Singapore)" sequence="15" value="ap-southeast-1"/>
+                <element inactive_on_update="false" label="Africa (Cape Town)" sequence="16" value="af-south-1"/>
+                <element inactive_on_update="false" label="Canada (Central)" sequence="17" value="ca-central-1"/>
+                <element inactive_on_update="false" label="South America (São Paulo)" sequence="18" value="sa-east-1"/>
+                <element inactive_on_update="false" label="Middle East (Bahrain)" sequence="19" value="me-south-1"/>
+                <element inactive_on_update="false" label="US GovCloud (US West)" sequence="20" value="us-gov-west-1"/>
+                <element inactive_on_update="false" label="US GovCloud (US West) - FIPS" sequence="21" value="us-gov-west-1:fips"/>
+                <element inactive_on_update="false" label="US GovCloud (US East)" sequence="22" value="us-gov-east-1"/>
+                <element inactive_on_update="false" label="US GovCloud (US East) - FIPS" sequence="23" value="us-gov-east-1:fips"/>
+            </choice>
+        </element>
+        <element attributes="edge_encryption_enabled=true" choice="1" label="Severity" max_length="64" name="awsseverity" type="choice">
+            <choice>
+                <element inactive_on_update="false" label="1" sequence="10" value="1"/>
+                <element inactive_on_update="false" label="2" sequence="20" value="2"/>
+                <element inactive_on_update="false" label="3" sequence="30" value="3"/>
+                <element inactive_on_update="false" label="4" sequence="40" value="4"/>
+            </choice>
+        </element>
+        <element label="Source" max_length="128" name="awssource" read_only="true" type="string"/>
+        <element attributes="edge_encryption_enabled=true" choice="3" label="Status" max_length="40" name="awsstatus" type="choice">
+            <choice>
+                <element inactive_on_update="false" label="Cancelled" value="Cancelled"/>
+                <element inactive_on_update="false" label="Closed" value="Closed"/>
+                <element inactive_on_update="false" label="Completed With Failure" value="CompletedWithFailure"/>
+                <element inactive_on_update="false" label="Completed With Success" value="CompletedWithSuccess"/>
+                <element inactive_on_update="false" label="Failed" value="Failed"/>
+                <element inactive_on_update="false" label="Rejected" value="Rejected"/>
+                <element inactive_on_update="false" label="Timed Out" value="TimedOut"/>
+                <element inactive_on_update="false" label="Open" sequence="10" value="Open"/>
+                <element inactive_on_update="false" label="In Progress" sequence="20" value="InProgress"/>
+                <element inactive_on_update="false" label="Resolved" sequence="30" value="Resolved"/>
+            </choice>
+        </element>
+        <element label="Title" max_length="1024" name="awstitle" read_only="true" type="string"/>
+        <element label="AWS Type" max_length="64" name="awstype" read_only="true" type="string"/>
+        <element label="Version" max_length="10" name="awsversion" read_only="true" type="string"/>
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false,readonly_clickthrough=true" label="Incident" max_length="32" name="incident" read_only="true" reference="incident" type="reference"/>
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false,readonly_clickthrough=true" label="Problem" max_length="32" name="problem" read_only="true" reference="problem" type="reference"/>
+        <index name="index">
+            <element name="awsaccount"/>
+        </index>
+        <index name="index2">
+            <element name="incident"/>
+        </index>
+        <index name="index3">
+            <element name="problem"/>
+        </index>
+    </element>
+</database>

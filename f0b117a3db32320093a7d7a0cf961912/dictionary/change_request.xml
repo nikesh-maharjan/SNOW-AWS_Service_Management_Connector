@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element attributes="email_client=true,hasWorkflow=true,live_feed=true" audit="true" db_object_id="24b1a076d4a3211095d7c105f1bf4371" extends="task" label="Change Request" max_length="40" name="change_request" text_index="true" type="collection">
+        <element label="AWS Automation Execution ID" max_length="64" name="x_126749_aws_sc_automationexecutionid" read_only="true" type="string"/>
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false" label="AWS Account" max_length="32" name="x_126749_aws_sc_awsaccount" read_only="true" reference="x_126749_aws_sc_account" reference_qual="awsenablechangemanager=true^EQ" reference_qual_condition="awsenablechangemanager=true^EQ" type="reference"/>
+        <element label="AWS Region" max_length="64" name="x_126749_aws_sc_awsregion" read_only="true" type="string"/>
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false, readonly_clickthrough=true" label="AWS Request ID" max_length="64" name="x_126749_aws_sc_awsrequestid" read_only="true" reference="x_126749_aws_sc_opsitem" type="reference"/>
+        <element label="AWS Status" max_length="64" name="x_126749_aws_sc_awsstatus" read_only="true" type="string"/>
+        <element label="Last Sync Time" max_length="40" name="x_126749_aws_sc_lastsynctime" read_only="true" type="glide_date_time"/>
+    </element>
+</database>

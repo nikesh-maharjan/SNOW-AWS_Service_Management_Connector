@@ -1,0 +1,698 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.SupportService</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>SupportService</name>
+        <script><![CDATA[var SupportService = /** @class */ (function () {
+    function SupportService() {
+        this.providerName = "AWS Support (Services)";
+        // if true then only journals that are comments (i.e. not work_notes) will be sent to AWS
+        this.onlyPushComments = true;
+        // prefix used in Workflow-task to identify a communication created on ServiceNow
+        this.serviceNowPrefix = "[ServiceNow]";
+        this.awsPrefix = "[AWS]";
+        // how long (in seconds) to keep trying to push comments to AWS when no case identifier
+        this.retryPeriod = 900; // 900 = 15 minutes. If you change this value, make sure the logs using it are updated as well
+    }
+    SupportService.getAwsSupport = function (account) {
+        var credentials = AwsCredentials.from(account).as(AwsCredentials.User.Sync);
+        return new AwsSupport(account.sys_id.toString(), credentials);
+    };
+    //Before pushing to AWS we check that the associated incident is an AWS support case
+    //and compare the sys_updated_on and 'x_126749_aws_sc_awslastsynctime' fields of
+    //the associated incident. If these times are within 1s of each other then we assume the comment has
+    //just been synced from AWS.
+    SupportService.prototype.attachmentOnUpload = function (attachment) {
+        if (!this.isAttachmentFromAWS(attachment)) {
+            this.handleAttachmentUploadedEvent(attachment);
+        }
+    };
+    SupportService.prototype.isAttachmentFromAWS = function (attachment) {
+        return attachment.file_name.startsWith(this.awsPrefix);
+    };
+    SupportService.prototype.getExpiryTime = function () {
+        return this.getNow() + (this.retryPeriod * 1000);
+    };
+    SupportService.prototype.getNow = function () {
+        return new GlideDateTime().getNumericValue();
+    };
+    //Before pushing to AWS we check that the associated incident is an AWS support case
+    //and compare the sys_updated_on and 'x_126749_aws_sc_awslastsynctime' fields of
+    //the associated incident. If these times are within 1s of each other then the comment has
+    //just been synced from AWS.
+    SupportService.prototype.journalFieldOnInsert = function (journal) {
+        var isIntermediateTableModeEnabled = gs.getProperty(C.sysprop.intermediateTableMode) === "true";
+        if (!isIntermediateTableModeEnabled) {
+            var _a = this.shouldJournalBePushedToAwsSupportCase(journal), shouldBePushed = _a.shouldBePushed, supportCase_1 = _a.supportCase;
+            if (shouldBePushed && supportCase_1) {
+                this.pushCommentToAwsSupportCase(supportCase_1, journal);
+            }
+        }
+        else {
+            var journalTableName = journal.name.toString();
+            var isSmcSupportCaseTable = journalTableName == 'x_126749_aws_sc_smc_support_case';
+            var supportCase_2 = isSmcSupportCaseTable
+                ? this.findSupportCaseLinkedToAwsAccount(journal.element_id.toString(), true)
+                : undefined;
+            var isAwsSupportCase = supportCase_2 && supportCase_2.next();
+            var isMoreRecentlyUpdatedThanAWS = isAwsSupportCase && this.isUpdatedMoreRecentlyThanAWS(supportCase_2);
+            if (isSmcSupportCaseTable && isAwsSupportCase && isMoreRecentlyUpdatedThanAWS) {
+                this.addCommunicationToCaseFromSmcSupportCase(supportCase_2, journal);
+            }
+        }
+    };
+    /**
+     * Returns a boolean if the journal entry should be pushed to AWS, and the
+     * SupportCase (incident record) the entry is related to.
+     *
+     * The SupportCase, if defined, is a GlideRecord that has already had its `next` method called.
+     *
+     * @param journal the Journal Entry
+     * @private
+     */
+    SupportService.prototype.shouldJournalBePushedToAwsSupportCase = function (journal) {
+        var journalTableName = journal.name.toString();
+        var journalType = journal.element.toString();
+        var isIncidentTable = journalTableName == 'incident';
+        var isValidJournalType = !this.onlyPushComments || journalType == 'comments';
+        var supportCase = isIncidentTable
+            ? this.findSupportCaseLinkedToAwsAccount(journal.element_id.toString())
+            : undefined;
+        var isAwsSupportCase = supportCase && supportCase.next();
+        var isMoreRecentlyUpdatedThanAWS = isAwsSupportCase && this.isUpdatedMoreRecentlyThanAWS(supportCase);
+        return {
+            shouldBePushed: isIncidentTable
+                && isValidJournalType
+                && isAwsSupportCase
+                && isMoreRecentlyUpdatedThanAWS,
+            supportCase: supportCase
+        };
+    };
+    SupportService.prototype.findSupportCaseLinkedToAwsAccount = function (sysId, isIntermediateTableModeEnabled) {
+        if (isIntermediateTableModeEnabled === void 0) { isIntermediateTableModeEnabled = false; }
+        var table = isIntermediateTableModeEnabled ? 'x_126749_aws_sc_smc_support_case' : 'incident';
+        var incident = new GlideRecord(table);
+        incident.addQuery('sys_id', sysId);
+        incident.addNotNullQuery('x_126749_aws_sc_awsaccount');
+        incident.query();
+        return incident;
+    };
+    /**
+     * Has the SupportCase in ServiceNow been updated more recently than in AWS?
+     *
+     * returns true if the sys_updated_time of the incident is more than 1s after the
+     * 'x_126749_aws_sc_awslastsynctime' of the incident
+     * @param supportCase the supportCase that we want to compare times for.
+     */
+    SupportService.prototype.isUpdatedMoreRecentlyThanAWS = function (supportCase) {
+        if (!supportCase.x_126749_aws_sc_awscaseidentifier.nil() &&
+            !supportCase.x_126749_aws_sc_awslastsynctime.nil()) {
+            var awsUpdateTime = new GlideDateTime(supportCase.x_126749_aws_sc_awslastsynctime);
+            awsUpdateTime.addSeconds(1);
+            var sysUpdatedTime = new GlideDateTime(supportCase.getValue('sys_updated_on')).getNumericValue();
+            return sysUpdatedTime > awsUpdateTime.getNumericValue();
+        }
+        return true;
+    };
+    SupportService.prototype.pushCommentToAwsSupportCase = function (incident, journal) {
+        gs.debug("[".concat(this.providerName, "] Pushing comment on Incident '").concat(incident.number));
+        var account = incident.x_126749_aws_sc_awsaccount.getRefRecord();
+        if (!account.awsenablesupport) {
+            gs.warn("[SYNC] [".concat(this.providerName, "] Skipping push of comment of ServiceNow Incident ").concat(incident.sys_id, " to AWS Support: the feature is disabled for account ").concat(account.awsname));
+            return;
+        }
+        try {
+            var workflow_1 = WorkflowTasks.pushCommentToAws.startWorkflow(incident.sys_id.toString(), incident.x_126749_aws_sc_awscaseidentifier.toString() || '', incident.x_126749_aws_sc_awsaccount.toString(), "".concat(this.serviceNowPrefix, " ").concat(journal.value.toString()));
+            gs.debug("[".concat(this.providerName, "] Successfully requested ") +
+                "push of comment \"".concat(journal.value.toString(), "\" on Incident '").concat(incident.number, " ") +
+                "to AWS Support. " +
+                "See workflow context ".concat(workflow_1.sys_id, " for the execution details"));
+        }
+        catch (ex) {
+            gs.warn("[".concat(this.providerName, "] Error requesting push ") +
+                "of attachment \"".concat(journal.value.toString(), "\" on Incident '").concat(incident.number, " ") +
+                "to AWS Support: ".concat(ex.message));
+        }
+    };
+    //Function to handler any Attachment uploaded on Incident Support Cases already synched with AWS Support
+    // (excluding the ones uploaded on creation, if any)
+    SupportService.prototype.handleAttachmentUploadedEvent = function (current, attachment) {
+        if (attachment === void 0) { attachment = current; }
+        var isIntermediateTableModeEnabled = gs.getProperty(C.sysprop.intermediateTableMode) === "true";
+        var target_table = isIntermediateTableModeEnabled ? 'x_126749_aws_sc_smc_support_case' : 'incident';
+        if (attachment.table_name.toString() === target_table) {
+            var supportCase_3 = this.getSupportCaseBySysId(attachment.table_sys_id.toString(), target_table);
+            //Filter out attachments created from AWS
+            if (supportCase_3) {
+                var isSupportCase = supportCase_3.x_126749_aws_sc_awsaccount && !supportCase_3.x_126749_aws_sc_awsaccount.nil();
+                var isSyncedWithAws = !supportCase_3.x_126749_aws_sc_awscaseidentifier.nil();
+                //Filter out submitted Incident that are not Support Cases
+                if (isSupportCase && isSyncedWithAws) {
+                    if (!isIntermediateTableModeEnabled) {
+                        this.pushAttachmentToAwsSupportCase(supportCase_3, attachment);
+                    }
+                    else {
+                        this.addAttachmentToCaseFromSmcSupportCase(supportCase_3, attachment);
+                    }
+                }
+            }
+        }
+    };
+    SupportService.prototype.getSupportCaseBySysId = function (sysId, target_table) {
+        var supportCase = new GlideRecord(target_table);
+        return supportCase.get(sysId) ? supportCase : null;
+    };
+    SupportService.prototype.pushAttachmentToAwsSupportCase = function (incident, attachment) {
+        var account = incident.x_126749_aws_sc_awsaccount.getRefRecord();
+        var incidentCase = "Incident '".concat(incident.number, "' to ") + "AWS Support";
+        gs.info("[".concat(this.providerName, "] Pushing attachment \"").concat(attachment.file_name, "\"") + "on ".concat(incidentCase));
+        if (!account.awsenablesupport) {
+            gs.warn("[SYNC] [".concat(this.providerName, "] Skipping push of attachment of ServiceNow Incident ").concat(incident.sys_id, " to AWS Support: the feature is disabled for account ").concat(account.awsname));
+            return;
+        }
+        try {
+            var workflow_2 = WorkflowTasks.pushAttachmentsToAws.startWorkflow(incident.sys_id.toString(), incident.x_126749_aws_sc_awscaseidentifier.nil() ? '' : incident.x_126749_aws_sc_awscaseidentifier.toString(), incident.x_126749_aws_sc_awsaccount.toString(), attachment.sys_id);
+            gs.info("[".concat(this.providerName, "] Successfully requested ") +
+                "push of attachment \"".concat(attachment.file_name, "\" on \"").concat(incidentCase, "\" ") +
+                "to AWS Support, for account \"".concat(account.awsname, "\". ") +
+                "See workflow context ".concat(workflow_2.sys_id, " for the execution details"));
+        }
+        catch (ex) {
+            gs.warn("[".concat(this.providerName, "] Error requesting push ") +
+                "of attachment \"".concat(attachment.file_name, "\" on \"").concat(incidentCase, "\" ") +
+                "to AWS Support, for account \"".concat(account.awsname, "\": ").concat(ex.message));
+        }
+    };
+    SupportService.prototype.addAttachmentToIncident = function (caseId, attachment) {
+        var attachmentRecord = new GlideSysAttachment();
+        var supportCase = new GlideRecord('incident');
+        supportCase.addQuery('x_126749_aws_sc_awscaseidentifier', caseId);
+        supportCase.query();
+        if (supportCase.next()) {
+            var fileName = this.awsPrefix + attachment.fileName;
+            var contentType = this.getContentType(attachment.fileName);
+            var base64Encodedcontent = attachment.data;
+            if (typeof base64Encodedcontent === "string") {
+                attachmentRecord.writeBase64(supportCase, fileName, contentType, base64Encodedcontent);
+            }
+        }
+    };
+    SupportService.prototype.getContentType = function (fileName) {
+        var fileNameParts = fileName.split('.');
+        var ext = fileNameParts[fileNameParts.length - 1];
+        var fileType;
+        switch (ext) {
+            case 'docx':
+                fileType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+                break;
+            case 'doc':
+                fileType = 'application/msword';
+                break;
+            case 'jpg':
+                fileType = 'image/jpeg';
+                break;
+            case 'png':
+                fileType = 'image/png';
+                break;
+            case 'xlsx':
+                fileType = 'application/xlsx OR application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+                break;
+            case 'xls':
+                fileType = 'application/vnd.ms-excel';
+                break;
+            case 'pptx':
+                fileType = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+                break;
+            case 'pdf':
+                fileType = 'application/pdf';
+                break;
+            default: fileType = 'text/csv';
+        }
+        return fileType;
+    };
+    SupportService.prototype.doSyncCommunicationsFromAwsPerPage = function (support, caseId, communications, context, isIntermediateTableModeEnabled) {
+        var _this = this;
+        communications.forEach(function (communication) {
+            if (!_this.communicationAlreadySynced(communication, caseId, isIntermediateTableModeEnabled)) {
+                if (!isIntermediateTableModeEnabled) {
+                    _this.addCommentToIncident(caseId, communication, context);
+                }
+                else {
+                    _this.addCommentToSmcSupportCase(caseId, communication);
+                }
+                if (communication.attachmentSet && communication.attachmentSet.length > 0) {
+                    communication.attachmentSet.forEach(function (attachmentDetails) {
+                        var att = support.describeAttachment({
+                            attachmentId: attachmentDetails.attachmentId
+                        }).deserialize();
+                        if (!isIntermediateTableModeEnabled) {
+                            _this.addAttachmentToIncident(caseId, att.attachment);
+                        }
+                        else {
+                            _this.addAttachmentToSmcSupportCase(caseId, att.attachment);
+                        }
+                    });
+                }
+            }
+        });
+    };
+    //When adding a comment to a case we also set the 'x_126749_aws_sc_awslastsynctime' to the current time
+    //This is required to prevent an immediate push back to AWS. See notRecentlyUpdated method to see how this is used.
+    SupportService.prototype.addCommentToIncident = function (caseId, communication, context) {
+        var supportCaseGr = new GlideRecord('incident');
+        supportCaseGr.addQuery('x_126749_aws_sc_awscaseidentifier', caseId);
+        supportCaseGr.query();
+        if (supportCaseGr.next()) {
+            var communicationBody = communication.body.trim();
+            if (supportCaseGr.description.nil()) {
+                Util.setValue(supportCaseGr, "description", communicationBody);
+            }
+            Util.setValue(supportCaseGr, "comments", communicationBody);
+            //Updating last sync time to avoid unwanted push back to AWS
+            Util.setValue(supportCaseGr, 'x_126749_aws_sc_awslastsynctime', new GlideDateTime());
+            if (!context.statusOnly) {
+                Util.setValue(supportCaseGr, 'x_126749_aws_sc_aws_last_scheduled_job_sync_time', new GlideDateTime());
+            }
+            supportCaseGr.update();
+        }
+    };
+    /**
+     * returns true if the creation time of the communication is within 1s of the creation time
+     * of the case
+     * @param communication the communication that has been received from AWS
+     * @param caseCreatedTime the time the case was created for comparison
+     */
+    SupportService.prototype.isFirstCommunication = function (communication, caseCreatedTime) {
+        //first communication typically created about 100ms after case.
+        //add 1s to ensure case creation time is always >= first communication created time
+        caseCreatedTime.addSeconds(2);
+        var commCreatedTime = Util.toGlideDateTime(communication.timeCreated);
+        return caseCreatedTime.compareTo(commCreatedTime) > -1;
+    };
+    /**
+     * returns true if the body of the communication is already associated with the case
+     * or if the ServiceNow communication prefix is found
+     * @param communication the communication that has been received from AWS
+     * @param caseIdentifier the id of the case associated with the communication
+     * @param context object containing information about last sync time and a list of caseIDs
+     * @param isIntermediateTableModeEnabled
+     */
+    SupportService.prototype.communicationAlreadySynced = function (communication, caseIdentifier, isIntermediateTableModeEnabled) {
+        var body = communication.body.trim();
+        //look for prefix in body indicating that it's a comment created in ServiceNow
+        if (body.startsWith(this.serviceNowPrefix)) {
+            return true;
+        }
+        //look in sys_journal_field for the body of the communication
+        var supportCase = isIntermediateTableModeEnabled ?
+            this.findSmcSupportCaseFromCaseIdentifier(caseIdentifier) :
+            this.findIncidentFromCaseIdentifier(caseIdentifier);
+        if (supportCase === null) {
+            //this should not happen - should we throw an error instead?
+            return true;
+        }
+        var journalEntries = new GlideRecord('sys_journal_field');
+        journalEntries.addQuery('element_id', supportCase.getValue('sys_id'));
+        journalEntries.addQuery('value', body);
+        journalEntries.query();
+        return journalEntries.hasNext();
+    };
+    /**
+     * returns the incident associated with the given caseId
+     * @param caseIdentifier the technical id of the support case
+     */
+    SupportService.prototype.findIncidentFromCaseIdentifier = function (caseIdentifier) {
+        var incident = new GlideRecord('incident');
+        incident.addQuery('x_126749_aws_sc_awscaseidentifier', caseIdentifier);
+        incident.addNotNullQuery('x_126749_aws_sc_awsaccount');
+        incident.query();
+        if (incident.hasNext()) {
+            incident.next();
+            return incident;
+        }
+        return null;
+    };
+    SupportService.prototype.doSyncCommunicationsFromAwsForSingleCase = function (support, context, supportCaseIdentifier, isIntermediateTableModeEnabled) {
+        var _this = this;
+        var request = {
+            "caseId": supportCaseIdentifier
+        };
+        //If the Support Case is already existing on ServiceNow, put a time filter to sync only the new communications
+        if (!context.isNewSupportCase) {
+            request.afterTime = Util.toISO8601String(context.syncCommsFrom);
+        }
+        support.describeCommunications(request).forEachPage(function (communications) {
+            if (communications.length > 0) {
+                //reverse list from api to show most recent at the top
+                communications.reverse();
+                _this.doSyncCommunicationsFromAwsPerPage(support, supportCaseIdentifier, communications, context, isIntermediateTableModeEnabled);
+            }
+        });
+    };
+    //Called by UI Action on support case view - calls full case sync but passing optional caseIdList parameter to restrict results to single case
+    //Called by SQS Event CreateCase
+    SupportService.prototype.syncSingleCaseFromAws = function (supportCaseIdentifier, support, account, isIntermediateTableModeEnabled) {
+        var supportCase = isIntermediateTableModeEnabled ?
+            this.findSmcSupportCaseFromCaseIdentifier(supportCaseIdentifier) :
+            this.findIncidentFromCaseIdentifier(supportCaseIdentifier);
+        //if support case does not exist it is new
+        var commsSyncFrom = supportCase ? new GlideDateTime(this.getLastUpdatedTime(supportCase).toString()) : new GlideDateTime();
+        var context = {
+            isFullSync: false,
+            syncStart: new GlideDateTime(),
+            syncCasesFrom: new GlideDateTime(account.awssupportenabledtime.toString()),
+            syncCommsFrom: commsSyncFrom,
+            isNewSupportCase: !!supportCase,
+            caseIdList: [supportCaseIdentifier],
+            statusOnly: false
+        };
+        this.doSyncAllCasesFromAws(support, account, context, isIntermediateTableModeEnabled);
+        this.doSyncCommunicationsFromAwsForSingleCase(support, context, supportCaseIdentifier, isIntermediateTableModeEnabled);
+    };
+    SupportService.prototype.doSyncAllCasesFromAws = function (support, account, context, isIntermediateTableModeEnabled) {
+        var _this = this;
+        var payload = context.caseIdList ?
+            {
+                "caseIdList": context.caseIdList,
+                "includeResolvedCases": !context.isFullSync
+            } : {
+            "afterTime": Util.toISO8601String(context.syncCasesFrom),
+            "includeResolvedCases": !context.isFullSync
+        };
+        support.describeCases(payload).forEachPage(function (caseList) {
+            if (caseList.length > 0) {
+                if (!isIntermediateTableModeEnabled) {
+                    _this.doSyncCasesFromAwsToIncidentPerPage(account, caseList, context);
+                }
+                else {
+                    _this.doSyncCasesFromAwsToSmcSupportCasePerPage(account, caseList, context);
+                }
+            }
+        });
+    };
+    SupportService.prototype.doSyncCasesFromAwsToIncidentPerPage = function (account, caseList, context) {
+        var priorityMapping = new PriorityMapping();
+        caseList.forEach(this.syncCaseFromAws(context, account, priorityMapping));
+    };
+    SupportService.prototype.syncCaseFromAws = function (context, account, priorityMapping) {
+        var _this = this;
+        var stateResolved = parseInt(Util.getChoiceValueFromLabel('incident', 'state', 'Resolved'));
+        var closeCodeClosedByCaller = Util.getIncidentResolvedCode();
+        return function (caseDetails) {
+            var _a;
+            var mapped = priorityMapping.getMappedFromAwsSupportCase(caseDetails);
+            var definitional = {
+                "x_126749_aws_sc_awscaseidentifier": caseDetails.caseId,
+                "x_126749_aws_sc_awsaccount": account.getValue('sys_id')
+            };
+            var additional = {
+                "state": mapped.incidentState,
+                "x_126749_aws_sc_awscasestatus": caseDetails.status,
+                "impact": mapped.incidentImpact,
+                "urgency": mapped.incidentUrgency,
+                "close_notes": mapped.incidentState === stateResolved ? 'Marked as Resolved in AWS Support' : '',
+                "close_code": mapped.incidentState === stateResolved ? closeCodeClosedByCaller : '',
+            };
+            if (!context.statusOnly) {
+                additional["x_126749_aws_sc_awsservice"] = caseDetails.serviceCode ?
+                    _this.getServiceSysIdFromCaseServiceCode(caseDetails.serviceCode, account.getValue('sys_id')) : '';
+                additional["x_126749_aws_sc_awscategory"] = caseDetails.categoryCode ?
+                    _this.getCategorySysIdFromCaseCategoryCode(caseDetails.categoryCode) : '';
+                additional["short_description"] = caseDetails.subject;
+                additional["severity"] = mapped.incidentSeverity;
+                additional["x_126749_aws_sc_awssupportcaseid"] = caseDetails.displayId;
+                additional["x_126749_aws_sc_awscasecommunicationemails"] = ((_a = caseDetails.ccEmailAddresses) === null || _a === void 0 ? void 0 : _a.join(', ')) || '';
+                additional["x_126749_aws_sc_awscasecreatedtime"] = Util.toGlideDateTime(caseDetails.timeCreated);
+                additional["x_126749_aws_sc_awslastsynctime"] = context.syncStart;
+            }
+            if (!context.statusOnly && !context.caseIdList) {
+                additional["x_126749_aws_sc_aws_last_scheduled_job_sync_time"] = context.syncStart;
+            }
+            Util.insertOrUpdate('incident', definitional, additional);
+        };
+    };
+    SupportService.prototype.resolveCaseFromAws = function () {
+        return function (supportCase) {
+            var definitional = { "sys_id": supportCase.sys_id };
+            var additional = {
+                "state": Util.getChoiceValueFromLabel('incident', 'state', 'Resolved'),
+                "x_126749_aws_sc_awscasestatus": 'Resolved',
+                "close_notes": 'Marked as Resolved in AWS Support',
+                "close_code": Util.getIncidentResolvedCode(),
+            };
+            Util.insertOrUpdate('incident', definitional, additional);
+        };
+    };
+    SupportService.prototype.reopenCaseFromAws = function () {
+        return function (supportCase) {
+            var definitional = { "sys_id": supportCase.sys_id };
+            var additional = {
+                "state": Util.getChoiceValueFromLabel('incident', 'state', 'In Progress'),
+                "x_126749_aws_sc_awscasestatus": 'Reopened',
+                "close_notes": 'NULL',
+                "close_code": 'NULL'
+            };
+            Util.insertOrUpdate('incident', definitional, additional);
+        };
+    };
+    //Try to get Sys Id of ServiceNow Service record. Otherwise returns directly the serviceCode
+    SupportService.prototype.getServiceSysIdFromCaseServiceCode = function (caseServiceCode, accountSysId) {
+        var supportCaseServiceGr = new GlideRecord('x_126749_aws_sc_support_case_service');
+        supportCaseServiceGr.addQuery('awscode', caseServiceCode);
+        supportCaseServiceGr.addQuery('awsaccount', accountSysId);
+        supportCaseServiceGr.query();
+        if (supportCaseServiceGr.next()) {
+            return supportCaseServiceGr.getValue('sys_id');
+        }
+        return caseServiceCode;
+    };
+    //Try to get Sys Id of the ServiceNow Case Category record. Otherwise returns directly the categoryCode
+    SupportService.prototype.getCategorySysIdFromCaseCategoryCode = function (caseCategoryCode) {
+        var supportCaseCategoryGr = new GlideRecord('x_126749_aws_sc_support_case_category');
+        supportCaseCategoryGr.addQuery('awscode', caseCategoryCode);
+        supportCaseCategoryGr.query();
+        if (supportCaseCategoryGr.next()) {
+            return supportCaseCategoryGr.getValue('sys_id');
+        }
+        return caseCategoryCode;
+    };
+    // returns the dateTime the support case was last updated
+    SupportService.prototype.getLastUpdatedTime = function (supportCase) {
+        return supportCase.x_126749_aws_sc_awslastsynctime.nil()
+            ? supportCase.x_126749_aws_sc_awscasecreatedtime.toString()
+            : supportCase.x_126749_aws_sc_awslastsynctime.toString();
+    };
+    SupportService.prototype.updateCaseStatus = function () {
+        //Neither full nor delta sync will return cases where the status has changed to resolved on AWS
+        //So for each enabled account we query the status of open cases
+        //Cases which have been reopened in AWS will be detected by the full sync.
+        var account = new GlideRecord('x_126749_aws_sc_account');
+        account.addQuery('awsenablesupport', 'true');
+        account.query();
+        while (account.next()) {
+            var support_1 = SupportService.getAwsSupport(account);
+            var isIntermediateTableModeEnabled_1 = gs.getProperty(C.sysprop.intermediateTableMode) === "true";
+            var caseIds = [];
+            if (!isIntermediateTableModeEnabled_1) {
+                var cases = new GlideRecord('incident');
+                cases.addNotNullQuery('x_126749_aws_sc_awssupportcaseid');
+                cases.addQuery('x_126749_aws_sc_awsaccount', account.getValue('sys_id'));
+                cases.addQuery('state', '<', 6);
+                cases.query();
+                while (cases.next()) {
+                    caseIds.push(cases.getValue('x_126749_aws_sc_awscaseidentifier'));
+                }
+            }
+            else {
+                var cases = new GlideRecord('x_126749_aws_sc_smc_support_case');
+                cases.addNotNullQuery('x_126749_aws_sc_awssupportcaseid');
+                cases.addQuery('x_126749_aws_sc_awsaccount', account.getValue('sys_id'));
+                cases.addQuery('x_126749_aws_sc_awscasestatus', '!=', 'resolved');
+                cases.query();
+                while (cases.next()) {
+                    caseIds.push(cases.getValue('x_126749_aws_sc_awscaseidentifier'));
+                }
+            }
+            //The parameter caseIdList has a maximum size of 100
+            while (caseIds.length > 0) {
+                var context = {
+                    isFullSync: false,
+                    syncStart: new GlideDateTime(),
+                    syncCasesFrom: new GlideDateTime(account.awssupportenabledtime.toString()),
+                    syncCommsFrom: new GlideDateTime(account.awssupportenabledtime.toString()),
+                    statusOnly: true,
+                    caseIdList: caseIds.splice(0, 100)
+                };
+                this.doSyncAllCasesFromAws(support_1, account, context, isIntermediateTableModeEnabled_1);
+            }
+        }
+    };
+    /**
+     * returns the SMC Support Case associated with the given case Identifier
+     * @param caseIdentifier the technical id of the support case
+     */
+    SupportService.prototype.findSmcSupportCaseFromCaseIdentifier = function (caseIdentifier) {
+        var supportCase = new GlideRecord('x_126749_aws_sc_smc_support_case');
+        supportCase.addQuery('x_126749_aws_sc_awscaseidentifier', caseIdentifier);
+        supportCase.addNotNullQuery('x_126749_aws_sc_awsaccount');
+        supportCase.query();
+        if (supportCase.hasNext()) {
+            supportCase.next();
+            return supportCase;
+        }
+        return null;
+    };
+    SupportService.prototype.doSyncCasesFromAwsToSmcSupportCasePerPage = function (account, caseList, context) {
+        caseList.forEach(this.syncCaseFromAwsToSmcSupportCase(context, account));
+    };
+    SupportService.prototype.syncCaseFromAwsToSmcSupportCase = function (context, account) {
+        var _this = this;
+        return function (caseDetails) {
+            var _a;
+            var definitional = {
+                "x_126749_aws_sc_awscaseidentifier": caseDetails.caseId,
+                "x_126749_aws_sc_awsaccount": account.getValue('sys_id')
+            };
+            var additional = {
+                "x_126749_aws_sc_awscategory": caseDetails.categoryCode ?
+                    _this.getCategorySysIdFromCaseCategoryCode(caseDetails.categoryCode) : '',
+                "x_126749_aws_sc_awscasecommunicationemails": ((_a = caseDetails.ccEmailAddresses) === null || _a === void 0 ? void 0 : _a.join(', ')) || '',
+                "x_126749_aws_sc_awscasestatus": caseDetails.status,
+                "x_126749_aws_sc_awscasecreatedtime": Util.toGlideDateTime(caseDetails.timeCreated),
+                "x_126749_aws_sc_awssupportcaseid": caseDetails.displayId,
+                "x_126749_aws_sc_awsopenedby": caseDetails.submittedBy,
+                "x_126749_aws_sc_awsservice": caseDetails.serviceCode ?
+                    _this.getServiceSysIdFromCaseServiceCode(caseDetails.serviceCode, account.getValue('sys_id')) : '',
+                "x_126749_aws_sc_awsseverity": caseDetails.severityCode,
+                "x_126749_aws_sc_awssubject": caseDetails.subject,
+                "x_126749_aws_sc_awslastsynctime": context.syncStart,
+                "x_126749_aws_sc_awslanguage": caseDetails.language || ''
+            };
+            Util.insertOrUpdate('x_126749_aws_sc_smc_support_case', definitional, additional);
+        };
+    };
+    SupportService.prototype.resolveCaseFromAwsToSmcSupportCase = function () {
+        return function (supportCase) {
+            var definitional = { "sys_id": supportCase.sys_id };
+            var additional = {
+                "x_126749_aws_sc_awscasestatus": 'resolved',
+            };
+            Util.insertOrUpdate('x_126749_aws_sc_smc_support_case', definitional, additional);
+        };
+    };
+    SupportService.prototype.reopenCaseFromAwsToSmcSupportCase = function () {
+        return function (supportCase) {
+            var definitional = { "sys_id": supportCase.sys_id };
+            var additional = {
+                "x_126749_aws_sc_awscasestatus": 'reopened',
+            };
+            Util.insertOrUpdate('x_126749_aws_sc_smc_support_case', definitional, additional);
+        };
+    };
+    SupportService.prototype.addCommentToSmcSupportCase = function (caseId, communication) {
+        var supportCaseGr = new GlideRecord('x_126749_aws_sc_smc_support_case');
+        supportCaseGr.addQuery('x_126749_aws_sc_awscaseidentifier', caseId);
+        supportCaseGr.query();
+        if (supportCaseGr.next()) {
+            var communicationBody = communication.body.trim();
+            if (supportCaseGr.x_126749_aws_sc_description.nil()) {
+                Util.setValue(supportCaseGr, "x_126749_aws_sc_description", communicationBody);
+            }
+            Util.setValue(supportCaseGr, "x_126749_aws_sc_comments", communicationBody);
+            //Updating last sync time to avoid unwanted push back to AWS
+            Util.setValue(supportCaseGr, 'x_126749_aws_sc_awslastsynctime', new GlideDateTime());
+            supportCaseGr.update();
+        }
+    };
+    SupportService.prototype.addAttachmentToSmcSupportCase = function (caseId, attachment) {
+        var attachmentRecord = new GlideSysAttachment();
+        var supportCase = new GlideRecord('x_126749_aws_sc_smc_support_case');
+        supportCase.addQuery('x_126749_aws_sc_awscaseidentifier', caseId);
+        supportCase.query();
+        if (supportCase.next()) {
+            var fileName = this.awsPrefix + attachment.fileName;
+            var contentType = this.getContentType(attachment.fileName);
+            var base64Encodedcontent = attachment.data;
+            if (typeof base64Encodedcontent === "string") {
+                attachmentRecord.writeBase64(supportCase, fileName, contentType, base64Encodedcontent);
+            }
+        }
+    };
+    SupportService.prototype.addAttachmentToCaseFromSmcSupportCase = function (smcSupportCase, attachment) {
+        var account = smcSupportCase.x_126749_aws_sc_awsaccount.getRefRecord();
+        var incidentCase = "SMC Support Case '".concat(smcSupportCase.x_126749_aws_sc_awssupportcaseid, "' to ") + "AWS Support'";
+        gs.info("[".concat(this.providerName, "] Pushing attachment \"").concat(attachment.file_name, "\"") + "on ".concat(incidentCase));
+        if (!account.awsenablesupport) {
+            gs.warn("[SYNC] [".concat(this.providerName, "] Skipping push of attachment of ServiceNow SMC Support Case ").concat(smcSupportCase.sys_id, " to AWS Support: the feature is disabled for account ").concat(account.awsname));
+            return;
+        }
+        try {
+            var workflow_3 = WorkflowTasks.pushAttachmentsToAws.startWorkflow(smcSupportCase.sys_id.toString(), smcSupportCase.x_126749_aws_sc_awscaseidentifier.nil() ? '' : smcSupportCase.x_126749_aws_sc_awscaseidentifier.toString(), smcSupportCase.x_126749_aws_sc_awsaccount.toString(), attachment.sys_id);
+            gs.info("[".concat(this.providerName, "] Successfully requested ") +
+                "push of attachment \"".concat(attachment.file_name, "\" on \"").concat(incidentCase, "\" ") +
+                "to AWS Support, for account \"".concat(account.awsname, "\". ") +
+                "See workflow context ".concat(workflow_3.sys_id, " for the execution details"));
+        }
+        catch (ex) {
+            gs.warn("[".concat(this.providerName, "] Error requesting push ") +
+                "of attachment \"".concat(attachment.file_name, "\" on \"").concat(incidentCase, "\" ") +
+                "to AWS Support, for account \"".concat(account.awsname, "\": ").concat(ex.message));
+        }
+    };
+    SupportService.prototype.addCommunicationToCaseFromSmcSupportCase = function (smcSupportCase, journal) {
+        gs.debug("[".concat(this.providerName, "] Pushing comment from SMC Support Case '").concat(smcSupportCase.sys_id, " to AWS Support"));
+        var account = smcSupportCase.x_126749_aws_sc_awsaccount.getRefRecord();
+        if (!account.awsenablesupport) {
+            gs.warn("[SYNC] [".concat(this.providerName, "] Skipping push of comment of ServiceNow SMC Support Case ").concat(smcSupportCase.sys_id, " to AWS Support: the feature is disabled for account ").concat(account.awsname));
+            return;
+        }
+        try {
+            var workflow_4 = WorkflowTasks.pushCommentToAws.startWorkflow(smcSupportCase.sys_id.toString(), smcSupportCase.x_126749_aws_sc_awscaseidentifier.toString() || '', smcSupportCase.x_126749_aws_sc_awsaccount.toString(), "".concat(this.serviceNowPrefix, " ").concat(journal.value.toString()));
+            gs.debug("[".concat(this.providerName, "] Successfully requested ") +
+                "push of comment \"".concat(journal.value.toString(), "\" from SMC Support Case '").concat(smcSupportCase.sys_id, " ") +
+                "to AWS Support. " +
+                "See workflow context ".concat(workflow_4.sys_id, " for the execution details"));
+        }
+        catch (ex) {
+            gs.warn("[".concat(this.providerName, "] Error requesting push ") +
+                "of attachment \"".concat(journal.value.toString(), "\" from SMC Support Case '").concat(smcSupportCase.sys_id, " ") +
+                "to AWS Support: ".concat(ex.message));
+        }
+    };
+    //This method is called by the business rule resolve-support-case-to-aws-support
+    // to resolve a support case to AWS using a workflow
+    SupportService.prototype.resolveCaseFromSmcSupportCase = function (smcSupportCase) {
+        var account = smcSupportCase.x_126749_aws_sc_awsaccount.getRefRecord();
+        if (!account.awsenablesupport) {
+            gs.warn("[SYNC] [".concat(this.providerName, "] Skipping synchronization of ServiceNow SMC Support Case ").concat(smcSupportCase.sys_id, " to AWS Support: the feature is disabled for account ").concat(account.awsname));
+            return;
+        }
+        try {
+            var workflow_5 = WorkflowTasks.resolveSupportCaseToAws.startWorkflow(smcSupportCase.sys_id.toString(), smcSupportCase.x_126749_aws_sc_awsaccount.toString(), smcSupportCase.x_126749_aws_sc_awscaseidentifier.toString());
+            gs.info("[SYNC] [".concat(this.providerName, "] Successfully requested resolution of ServiceNow SMC Support Case \"").concat(smcSupportCase.sys_id, "\" to AWS Support, for account \"").concat(account.awsname, "\". See workflow context ").concat(workflow_5.sys_id, " for the execution details"));
+        }
+        catch (ex) {
+            gs.warn("[SYNC] [".concat(this.providerName, "] Error requesting resolution of ServiceNow SMC Support Case \"").concat(smcSupportCase.sys_id, "\" to AWS Support, for account \"").concat(account.awsname, "\": ").concat(Util.errorMessageFormat(ex.message)));
+        }
+    };
+    return SupportService;
+}());
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2022-02-03 11:11:23</sys_created_on>
+        <sys_id>991a58c41b210110282ced74604bcba0</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>SupportService</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_991a58c41b210110282ced74604bcba0</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

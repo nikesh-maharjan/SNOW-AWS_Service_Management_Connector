@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_fix">
+    <sys_script_fix action="INSERT_OR_UPDATE">
+        <before>false</before>
+        <description>Set the AWS account type, for each AWS account registered in ServiceNow.&#13;
+This script is required when upgrading from the AWS Service Catalog connector v2.0.2</description>
+        <name>Update AWS account type</name>
+        <record_for_rollback>false</record_for_rollback>
+        <script><![CDATA[gs.info('*** Start upgrading AWS accounts');
+var accountGr = new GlideRecord('x_126749_aws_sc_account');
+accountGr.query();
+// For each account, check if there are regions associated to it. If not, the account is of type "sync-user", otherwise "end-user".
+// Save the results as the account "type"
+while (accountGr.next()) {
+    var regionsGr = new GlideRecord('x_126749_aws_sc_account_sync');
+    regionsGr.addQuery('awsaccount', '=', accountGr.sys_id);
+    regionsGr.query();
+    accountGr.type = !regionsGr.hasNext() ? 'end-user' : 'sync-user';
+    var sysId = accountGr.update();
+    if (sysId === null) {
+        gs.error("Failed to update AWS account \"" + accountGr.awsname + "\" (" + accountGr.sys_id + "). Please re-run the script or set the type manually");
+    }
+    else {
+        gs.info("Successfully updated AWS account \"" + accountGr.awsname + "\" (" + accountGr.sys_id + ") as \"" + accountGr.type + "\"");
+    }
+}
+gs.info('*** End upgrading AWS accounts');
+]]></script>
+        <sys_class_name>sys_script_fix</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-10-10 09:42:57</sys_created_on>
+        <sys_id>3bd7c6171b500010541332a3cc4bcb75</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Update AWS account type</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_fix_3bd7c6171b500010541332a3cc4bcb75</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+        <unloadable>false</unloadable>
+    </sys_script_fix>
+</record_update>

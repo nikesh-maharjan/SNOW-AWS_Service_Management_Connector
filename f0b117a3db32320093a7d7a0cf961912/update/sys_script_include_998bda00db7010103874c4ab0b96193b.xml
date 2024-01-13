@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.Ec2NetworkInterfaceResourceType</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>Ec2NetworkInterfaceResourceType</name>
+        <script><![CDATA[var Ec2NetworkInterfaceResourceType = /** @class */ (function (_super) {
+    Polyfill.__extends(Ec2NetworkInterfaceResourceType, _super);
+    function Ec2NetworkInterfaceResourceType() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Ec2NetworkInterfaceResourceType.prototype.rules = function () {
+        return [{
+                order: 70,
+                syncType: ConfigSyncProvider.SYNC_DIR.FROM_AWS_CONFIG,
+                externalResourceType: 'AWS::EC2::NetworkInterface',
+                externalResourceId: 'resourceId',
+                snTable: 'cmdb_ci_nic',
+                syncFromAws: this.syncFromAws,
+            }];
+    };
+    Ec2NetworkInterfaceResourceType.prototype.fields = function () {
+        var _this = this;
+        return [{
+                mode: ConfigSyncProvider.FieldMode.FromAws,
+                snField: 'name',
+                awsField: 'item.resourceId'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromAws,
+                snField: 'private_ip',
+                awsField: 'data.privateIpAddress'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromAws,
+                snField: 'public_ip',
+                transformFromAws: function (object) { return (object.data.association || {}).publicIp; }
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromAws,
+                snField: 'private_dns',
+                awsField: 'data.privateDnsName'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromAws,
+                snField: 'state',
+                transformFromAws: function (object) { return _this.getState(object); }
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromAws,
+                snField: 'netmask',
+                transformFromAws: function (object) { return '255.255.255.0'; }
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromAws,
+                snField: 'is_source_dest_check',
+                awsField: 'data.sourceDestCheck'
+            }, {
+                mode: ConfigSyncProvider.FieldMode.FromAws,
+                snField: 'public_dns',
+                transformFromAws: function (object) { return (object.data.association || {}).publicDnsName; }
+            }];
+    };
+    Ec2NetworkInterfaceResourceType.prototype.relationships = function () {
+        return [
+            {
+                resourceType: new SubnetResourceType(),
+                relationship: ConfigSyncProvider.RelationshipType.Contains,
+                reverse: false,
+            },
+            {
+                resourceType: new Ec2ResourceType(),
+                relationship: ConfigSyncProvider.RelationshipType.ImplementEndPointTo,
+                reverse: false,
+            },
+            {
+                relationship: ConfigSyncProvider.RelationshipType.HostedOn,
+                externalResourceType: 'AWS::Region',
+                snTable: 'cmdb_ci_aws_datacenter',
+                documentationOnly: true,
+            }
+        ];
+    };
+    Ec2NetworkInterfaceResourceType.prototype.syncFromAwsAddRelationships = function (context, config, resourceSysId) {
+        // Process relationships to AWS regions
+        this.addHostedOnRegionRelationship(context, config, resourceSysId);
+    };
+    Ec2NetworkInterfaceResourceType.prototype.getState = function (config) {
+        if (!config.data.hasOwnProperty('status')) {
+            return 'terminated';
+        }
+        switch (config.data.status) {
+            case 'in-use':
+                return 'in_use';
+            default:
+                return 'available';
+        }
+    };
+    return Ec2NetworkInterfaceResourceType;
+}(AbstractResourceType));
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-05-11 01:17:07</sys_created_on>
+        <sys_id>998bda00db7010103874c4ab0b96193b</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Ec2NetworkInterfaceResourceType</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_998bda00db7010103874c4ab0b96193b</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>

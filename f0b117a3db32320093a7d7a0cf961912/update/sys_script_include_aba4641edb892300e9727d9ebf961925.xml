@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_126749_aws_sc.AjaxParameterSupplier</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>AjaxParameterSupplier</name>
+        <script><![CDATA[/**
+ * @class AjaxParameterSupplier
+ * @classdesc
+ * AjaxParameterSupplier handles the transformation of AJAX Processors
+ * request parameters into interesting objects.
+ * @param name {string} The name of a request parameter.
+ * @param required {boolean=} Whether the parameter is strictly required, default true.
+ * @param fns {Array<Function>} Optional array of functions to call in order.
+ */
+var AjaxParameterSupplier = /** @class */ (function () {
+    function AjaxParameterSupplier(name, required, fns) {
+        this.type = 'AjaxParameterSupplier';
+        this._argName = name;
+        this._required = required !== false;
+        this._fns = fns || [];
+    }
+    AjaxParameterSupplier.prototype.getArgument = function () {
+        return this._argName;
+    };
+    AjaxParameterSupplier.prototype.get = function (ajaxProcessor) {
+        var current = ajaxProcessor.getParameter(this._argName);
+        if (this._required && ajaxProcessor._isMissingOrEmpty(current)) {
+            return new Error(this._argName + ": missing");
+        }
+        if (current) {
+            for (var i = 0, l = this._fns.length; i < l; i++) {
+                current = this._fns[i].call(this, current);
+                if (current instanceof Error) {
+                    break;
+                }
+            }
+        }
+        return current;
+    };
+    AjaxParameterSupplier.prototype._instanceCalling = function (fn) {
+        var fns = this._fns.slice();
+        fns.push(fn);
+        return new AjaxParameterSupplier(this._argName, this._required, fns);
+    };
+    AjaxParameterSupplier.prototype.gr = function (table) {
+        var an = this._argName;
+        return this._instanceCalling(function (sysId) {
+            var g = new GlideRecord(table);
+            if (!g.get(sysId)) {
+                return new Error(an + ": no such record " + sysId);
+            }
+            return g;
+        });
+    };
+    AjaxParameterSupplier.prototype.notNil = function (col) {
+        var an = this._argName;
+        return this._instanceCalling(function (recordGr) {
+            if (recordGr[col].nil()) {
+                return new Error(an + ": nil value for " + col);
+            }
+            return recordGr;
+        });
+    };
+    AjaxParameterSupplier.prototype.fromJSON = function () {
+        var an = this._argName;
+        return this._instanceCalling(function (s) {
+            try {
+                return JSON.parse(s);
+            }
+            catch (e) {
+                var m = an + ": error parsing JSON: " + (e.message ? e.message : e.toString());
+                return new Error(m);
+            }
+        });
+    };
+    AjaxParameterSupplier.prototype.fromBoolean = function () {
+        var an = this._argName;
+        return this._instanceCalling(function (s) {
+            try {
+                var value = JSON.parse(s);
+                if (typeof value !== 'boolean') {
+                    throw new Error("Value \"" + s + "\" is not a boolean");
+                }
+                return value;
+            }
+            catch (e) {
+                var m = an + ": error parsing boolean: " + (e.message ? e.message : e.toString());
+                return new Error(m);
+            }
+        });
+    };
+    AjaxParameterSupplier.prototype.then = function (fn) {
+        return this._instanceCalling(fn);
+    };
+    AjaxParameterSupplier.required = function (name) {
+        return new AjaxParameterSupplier(name, true);
+    };
+    AjaxParameterSupplier.optional = function (name) {
+        return new AjaxParameterSupplier(name, false);
+    };
+    AjaxParameterSupplier.prototype.catItemSearch = function () {
+        var an = this._argName;
+        return this._instanceCalling(function (sysId) {
+            var g = new sn_sc.CatalogSearch().search('', '', '', false, true);
+            g.addQuery("sys_id", sysId);
+            g.query();
+            if (!g.next()) {
+                return new Error(an + ": no such record " + sysId);
+            }
+            return g;
+        });
+    };
+    return AjaxParameterSupplier;
+}());
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-10-11 14:05:47</sys_created_on>
+        <sys_id>aba4641edb892300e9727d9ebf961925</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AjaxParameterSupplier</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_include_aba4641edb892300e9727d9ebf961925</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2022-12-15 10:10:29</sys_updated_on>
+    </sys_script_include>
+</record_update>
