@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_fix">
+    <sys_script_fix action="INSERT_OR_UPDATE">
+        <before>false</before>
+        <description/>
+        <name>Fix_Script_AWS</name>
+        <record_for_rollback>true</record_for_rollback>
+        <script><![CDATA[var workflow = {
+    "scratchpad": {}
+};
+var context = null,
+    activity = null,
+	params = null,
+    grRITM = new GlideRecord("sc_req_item");
+// grRITM.get(""); // https://.servicenowservices.com/nav_to.do?uri=sc_req_item.do?sys_id=
+	
+
+// listProvisioningArtifacts_01_works();
+// listProvisioningArtifacts_02_testing();
+// terminateProduct_01();
+// terminateProduct_02()
+// requestProduct_01();
+// listLaunchPaths();
+// describeProductView();
+searchProvisionedProducts();
+
+function searchProvisionedProducts() {
+	var credentials = AwsCredentials.from(this.getAccount()).as(AwsCredentials.User.Sync);
+	// var region = grProduct.getValue("awsregion");
+	var region = "us-east-1";
+	var serviceCatalog = new AwsServiceCatalog(region, credentials);
+	var response = serviceCatalog.searchProvisionedProducts({
+        PageSize: 10
+    });
+    gs.info("NM Response describeProductView: " + JSON.stringify(response.deserialize()));
+}
+
+function describeProductView() {
+    var grProduct = new GlideRecord("x_126749_aws_sc_product");
+	grProduct.get("");
+	var credentials = AwsCredentials.from(grProduct).as(AwsCredentials.User.End);
+	var region = grProduct.getValue("awsregion");
+	var serviceCatalog = new AwsServiceCatalog(region, credentials);
+	
+	var response = serviceCatalog.describeProductView(grProduct.getValue("awsid"), {
+        PageSize: 10,
+		Filters: { // ProvisionedProductFilters
+			"name": ["LINUX"]
+		},
+    });
+    gs.info("NM Response describeProductView: " + JSON.stringify(response.deserialize()));
+}
+
+
+
+function getAccount() {
+    var gr = new GlideRecord("x_126749_aws_sc_account");
+    if (gr.get("b70458332f59311061e12aa62799b69b")) {
+        return gr;
+    }
+}
+
+
+function listLaunchPaths() {
+    var grProduct = new GlideRecord("x_126749_aws_sc_product");
+    grProduct.get("");
+    var credentials = AwsCredentials.from(grProduct).as(AwsCredentials.User.End);
+    var region = grProduct.getValue("awsregion");
+    var serviceCatalog = new AwsServiceCatalog(region, credentials);
+    
+    var response = serviceCatalog.listLaunchPaths(grProduct.getValue("awsproductid"), {
+        PageSize: 10
+    });
+    gs.info("NM Response LauchPaths: " + JSON.stringify(response.deserialize()));
+}
+/* 200 
+{
+    "success": true,
+    "result": {
+        "LaunchPathSummaries": [
+            {
+                "ConstraintSummaries": [
+                    {
+                        "Description": "Launch with arn:aws:iam::2222222:role/service-catalog-linux-desktop-launch-role",
+                        "Type": "LAUNCH"
+                    }
+                ],
+                "Id": "lpv3-jjjjjjjjj",
+                "Name": "service-catalog-linuxdesktop",
+                "Tags": [
+                    {
+                        "Key": "RepositoryName",
+                        "Value": "AWS DataHub - Service Catalog LinuxDesktop"
+                    }
+                ]
+            }
+        ]
+    }
+}*/
+
+
+function listProvisioningArtifacts_02_testing() {
+    var provisioner = new x_126749_aws_sc.Provisioner(workflow, context, activity, grRITM);
+    var catalogProduct = provisioner.getCatalogProduct();
+    var productId = catalogProduct.awsproductid.toString();
+
+    // gs.info("NM catalog product: " + catalogProduct.getDisplayValue());
+    var region = catalogProduct.awsregion.toString();
+    var credentials = AwsCredentials.from(catalogProduct).as(AwsCredentials.User.Sync);
+    var serviceCatalog = new AwsServiceCatalog(region, credentials);
+//     var response = serviceCatalog.listProvisioningArtifacts(productId, {
+//         PageSize: 2
+//     });
+    
+    var request = new sn_ws.RESTMessageV2;
+    var region = "us-east-1";
+    var service = "servicecatalog"; // service
+    var host = "";
+    host = host ? host : service;
+    host += "." + region;
+	
+	if (region == "cn-north-1" || region == "cn-northwest-1") {
+		host += ".amazonaws.com.cn";
+	} else {
+		host += ".amazonaws.com";
+	}
+
+    var path = "";
+    var endpoint = "https://" + host + (path ? path : '');
+    var method = "POST";
+    var action = "ListProvisioningArtifacts";
+    // var credentials = x_126749_aws_sc.AwsCredentials.from(catalogProduct).as(x_126749_aws_sc.AwsCredentials.User.End);
+    var grAccount = getAccount();
+    var secret = grAccount.awssecretaccesskeyenduser.getDecryptedValue();
+    var credentials = {
+    	identity: grAccount.awsaccesskeyenduser.toString(),
+    	secret: secret
+    }
+    // gs.info("NM Account: " + grAccount.getDisplayValue());
+    
+    var payload = {
+    	"PageSize": 2
+    };
+    var headers = {
+    	"Host": host,
+    	// "X-Amz-Date": "isoDate()",
+		"X-Amz-Date": "20231114T180000Z",
+    	"User-Agent": serviceCatalog.agent(),
+    	"Content-Type": "application/x-amz-json-1.1",
+    	"X-Amz-Target": "AWS242ServiceCatalogService." + action
+    };
+    
+	// https://servicecatalog.us-east-1.amazonaws.com
+	// https://servicecatalog.us-east-1
+	// gs.info("NM Endpoint: " + endpoint);
+    request.setEndpoint(endpoint);
+    request.setHttpMethod(method);
+    request.setRequestBody(payload);
+	var queryParameters = null;
+    
+    var signer = new AwsSignature(service, region, credentials, serviceCatalog.iso8601());
+	headers["Authorization"] = signer.signV4(method, headers, path || "/", queryParameters, payload);
+    // gs.info("NM Signer: " + headers["Authorization"]);
+    
+	Object.keys(headers)
+    	.forEach(function(key) {
+    	request.setRequestHeader(key, headers[key]);
+    });
+ 
+    var response = Response.of(request.execute());
+    gs.info("NM Response: " + JSON.stringify(response.deserialize()));
+	
+	
+//     gs.info("NM not serialized response: " + JSON.stringify({
+//     	response: {
+//     		body: response.getBody()
+//     	}
+//     }, null, 2));
+    
+
+}
+
+]]></script>
+        <sys_class_name>sys_script_fix</sys_class_name>
+        <sys_created_by>nmaharjan</sys_created_by>
+        <sys_created_on>2024-01-26 17:42:59</sys_created_on>
+        <sys_id>649f7bd82f88ca1061e12aa62799b6a9</sys_id>
+        <sys_mod_count>8</sys_mod_count>
+        <sys_name>Fix_Script_AWS</sys_name>
+        <sys_package display_value="AWS Service Management Connector - 4.7.7" source="x_126749_aws_sc">f0b117a3db32320093a7d7a0cf961912</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="AWS Service Management Connector - 4.7.7">f0b117a3db32320093a7d7a0cf961912</sys_scope>
+        <sys_update_name>sys_script_fix_649f7bd82f88ca1061e12aa62799b6a9</sys_update_name>
+        <sys_updated_by>nmaharjan</sys_updated_by>
+        <sys_updated_on>2024-01-26 18:06:51</sys_updated_on>
+        <unloadable>false</unloadable>
+    </sys_script_fix>
+</record_update>
